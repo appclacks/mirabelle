@@ -1,0 +1,133 @@
+(ns mirabelle.action)
+
+(defn call-rescue
+  [event children]
+  (doseq [child children]
+    (child event)))
+
+(def condition->fn
+  "Map containing the functions associated to the where options"
+  {:pos? pos?
+   :neg? neg?
+   :zero? zero?
+   :> >
+   :>= >=
+   :< <
+   :<= <=
+   := =
+   :nil? nil?
+   :not= not=})
+
+(defn compute-condition
+  "Verifies if a condition is valid for an event"
+  [[condition field & args] event]
+  (let [condition-fn (get condition->fn condition)
+        event-field (get event field)]
+    (apply condition-fn event-field args)))
+
+(defn compute-conditions
+  "Verifies if a list of conditions is valid for an event"
+  [conditions event]
+  (reduce
+   (fn [state condition]
+     (conj state (compute-condition condition event)))
+   []
+   conditions))
+
+(defn where*
+  [_ conditions & children]
+  (fn [event]
+    (let [valid? (cond
+                   (= :or (first conditions))
+                   (apply some (compute-conditions (rest conditions) event))
+
+                   (= :and (first conditions))
+                   (every? identity (compute-conditions (rest conditions) event))
+
+                   :else
+                   (compute-condition conditions event))]
+      (when valid?
+        (call-rescue event children)))))
+
+(defn where
+  "Filter events based on conditions.
+  Each condition is a vector composed of the function to apply on the field,
+  the field to extract from the event, and the event itself.
+  Multiple conditions can be added by using `:or` or `:and`.
+
+  ```clojure
+  (where [:= :metric 4])
+  ```
+
+  Here, we keep only events where the :metric field is equal to 4.
+
+  ```clojure
+  (where [:and [:= :host \"foo\"]
+               [:> :metric 10])
+  ```
+
+  Here, we keep only events with :host = foo and with :metric > 10"
+  [conditions & children]
+  {:action :where
+   :params [conditions]
+   :children children})
+
+(defn increment*
+  [_ & children]
+  (fn [event]
+    (call-rescue (update event :metric inc)
+                 children)))
+
+(defn increment
+  "Decrement the event :metric field."
+  [& children]
+  {:action :increment
+   :children children})
+
+(defn decrement*
+  [_ & children]
+  (fn [event]
+    (call-rescue (update event :metric dec)
+                 children)))
+
+(defn decrement
+  "Decrement the event :metric field."
+  [& children]
+  {:action :decrement
+   :children children})
+
+(defn debug*
+  [_ & children]
+  (fn [event]
+    (println (pr-str event))
+    (call-rescue event children)))
+
+(defn debug
+  "Print the event in the logs
+
+  ```clojure
+  (increment
+    (debug))
+  ```"
+  [& children]
+  {:action :debug
+   :children children})
+
+(def action->fn
+  {:decrement decrement*
+   :debug debug*
+   :increment increment*
+   :where where*}
+  )
+
+
+(def stream
+  [(where [:> :metric 10]
+          (increment
+           (debug))
+          (increment
+           (decrement
+            (debug))
+           )
+          )]
+  )
