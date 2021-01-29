@@ -2,7 +2,6 @@
   (:require [mirabelle.action :as action]))
 
 (defn compile!
-  "Build a list of executable functions from a stream definition"
   [context stream]
   (when (seq stream)
     (for [s stream]
@@ -12,3 +11,11 @@
         (if (seq params)
           (apply func context (concat params children))
           (apply func context children))))))
+
+(defn compile-stream!
+  "Compile a stream to functions and associate to it its entrypoint."
+  [context stream]
+  (assoc stream :entrypoint
+         (->> [(:actions stream)]
+              (compile! context)
+              first)))

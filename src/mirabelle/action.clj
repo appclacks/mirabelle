@@ -40,7 +40,7 @@
   (fn [event]
     (let [valid? (cond
                    (= :or (first conditions))
-                   (apply some (compute-conditions (rest conditions) event))
+                   (some identity (compute-conditions (rest conditions) event))
 
                    (= :and (first conditions))
                    (every? identity (compute-conditions (rest conditions) event))
@@ -150,12 +150,37 @@
   {:action :mean
    :children children})
 
+(defn test-action*
+  [_ state]
+  (fn [event]
+    (swap! state conj event)))
+
+(defn test-action
+  "Bufferize all received events in the state (an atom)
+  passed as parameter"
+  [state & children]
+  {:action :test-action
+   :params [state]
+   :children children})
+
+(defn sdo*
+  [_ & children]
+  (fn [event]
+    (call-rescue event children)))
+
+(defn sdo
+  [& children]
+  {:action :sdo
+   :children children})
+
 (def action->fn
   {:decrement decrement*
    :debug debug*
    :fixed-event-window fixed-event-window*
    :increment increment*
    :mean mean*
+   :sdo sdo*
+   :test-action test-action*
    :where where*})
 
 (def stream

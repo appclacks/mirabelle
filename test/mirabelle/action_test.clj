@@ -33,7 +33,23 @@
     (test-action (a/where* nil [:> :metric 20] rec)
                  state
                  [{:metric -1} {:metric 30} {:metric 40}]
-                 [{:metric 30} {:metric 40}])))
+                 [{:metric 30} {:metric 40}])
+    (test-action (a/where* nil
+                           [:and
+                            [:> :metric 20]
+                            [:< :metric 40]]
+                           rec)
+                 state
+                 [{:metric -1} {:metric 30} {:metric 31} {:metric 50}]
+                 [{:metric 30} {:metric 31}])
+    (test-action (a/where* nil
+                           [:or
+                            [:< :metric 20]
+                            [:> :metric 40]]
+                           rec)
+                 state
+                 [{:metric -1} {:metric 30} {:metric 31} {:metric 50}]
+                 [{:metric -1} {:metric 50}])))
 
 (deftest increment*-test
   (let [[rec state] (recorder)]
@@ -79,3 +95,10 @@
                    {:metric 20 :time 1 :host "bar"}
                    {:metric 30 :time 2 :host "baz"}]]
                  [{:metric 20 :time 3 :host "foo"}])))
+
+(deftest sdo-test
+  (let [[rec state] (recorder)]
+    (test-action (a/sdo* nil rec)
+                 state
+                 [{:metric 10}]
+                 [{:metric 10}])))
