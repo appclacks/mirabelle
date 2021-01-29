@@ -1,4 +1,5 @@
-(ns mirabelle.action)
+(ns mirabelle.action
+  (:require [mirabelle.math :as math]))
 
 (defn call-rescue
   [event children]
@@ -113,13 +114,49 @@
   {:action :debug
    :children children})
 
+(defn fixed-event-window*
+  [_ size & children]
+  (let [window (atom [])]
+    (fn [event]
+      (let [events (swap! window (fn [events]
+                                   (let [events (conj events event)]
+                                     (if (< size (count events))
+                                       [event]
+                                       events))))]
+        (when (= size (count events))
+          (call-rescue events children))))))
+
+(defn fixed-event-window
+  "Returns a fixed-sized window of events
+
+  ```clojure
+  (fixed-event-window 5
+    (debug))
+  ```
+
+  This example will return a vector events partitioned 5 by 5."
+  [size & children]
+  {:action :fixed-event-window
+   :params [size]
+   :children children})
+
+(defn mean*
+  [_ & children]
+  (fn [events]
+    (call-rescue (math/mean events) children)))
+
+(defn mean
+  [& children]
+  {:action :mean
+   :children children})
+
 (def action->fn
   {:decrement decrement*
    :debug debug*
+   :fixed-event-window fixed-event-window*
    :increment increment*
-   :where where*}
-  )
-
+   :mean mean*
+   :where where*})
 
 (def stream
   [(where [:> :metric 10]

@@ -48,3 +48,34 @@
                  state
                  [{:metric 10} {:metric 11}]
                  [{:metric 11} {:metric 12}])))
+
+(deftest fixed-event-window*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/fixed-event-window* nil 3 rec)
+                 state
+                 [{:metric 10} {:metric 11}]
+                 [])
+    (test-action (a/fixed-event-window* nil 3 rec)
+                 state
+                 [{:metric 10} {:metric 11} {:metric 12}
+                  {:metric 13} {:metric 14} {:metric 15}
+                  {:metric 16}]
+                 [[{:metric 10} {:metric 11} {:metric 12}]
+                  [{:metric 13} {:metric 14} {:metric 15}]])))
+
+(deftest mean*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/mean* nil rec)
+                 state
+                 [[{:metric 10} {:metric 12}]]
+                 [{:metric 11}])
+    (test-action (a/mean* nil rec)
+                 state
+                 [[{:metric 10}]]
+                 [{:metric 10}])
+    (test-action (a/mean* nil rec)
+                 state
+                 [[{:metric 10 :time 3 :host "foo"}
+                   {:metric 20 :time 1 :host "bar"}
+                   {:metric 30 :time 2 :host "baz"}]]
+                 [{:metric 20 :time 3 :host "foo"}])))
