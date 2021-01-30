@@ -348,7 +348,7 @@
    :children children})
 
 (defn critical-dt
-    "Takes a time period in seconds `dt`.
+  "Takes a time period in seconds `dt`.
   If all events received during at least the period `dt` have `:state` critical,
   new critical events received after the `dt` period will be passed on until
   an invalid event arrives."
@@ -365,9 +365,23 @@
       (call-rescue event children))))
 
 (defn critical
-    "Keep all events in state critical"
+  "Keep all events in state critical"
   [& children]
   {:action :critical
+   :children children})
+
+(defn default*
+  [_ field value & children]
+  (fn [event]
+    (if-not (get event field)
+      (call-rescue (assoc event field value) children)
+      (call-rescue event children))))
+
+(defn default
+  "Set a default value for an event"
+  [field value & children]
+  {:action :default
+   :params [field value]
    :children children})
 
 (def action->fn

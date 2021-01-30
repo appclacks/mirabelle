@@ -154,3 +154,20 @@
                  [{:state "critical" :metric 2}
                   {:state "critical" :metric 3}
                   {:state "critical" :metric 5}])))
+
+(deftest default*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/default* nil :state "ok" rec)
+                 state
+                 [{:metric 1}
+                  {:state "critical" :metric 2}
+                  {:state "critical" :metric 3}
+                  {:state "ok" :metric 4}
+                  {:metric 5}
+                  {:state "critical" :metric 6}]
+                 [{:state "ok" :metric 1}
+                  {:state "critical" :metric 2}
+                  {:state "critical" :metric 3}
+                  {:state "ok" :metric 4}
+                  {:state "ok" :metric 5}
+                  {:state "critical" :metric 6}])))
