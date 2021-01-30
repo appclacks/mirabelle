@@ -105,3 +105,28 @@
             {:state "critical" :time 14}
             {:state "critical" :time 31}]
            @recorder))))
+
+(deftest full-test
+  (let [stream {:name "my-stream"
+                :description "foo"
+                :actions (a/sdo
+                          (a/above-dt 10 20)
+                          (a/between-dt 10 20 30)
+                          (a/decrement)
+                          (a/critical)
+                          (a/critical-dt 10)
+                          (a/debug)
+                          (a/info)
+                          (a/error)
+                          (a/expired)
+                          (a/fixed-event-window 10)
+                          (a/increment)
+                          (a/mean)
+                          (a/not-expired)
+                          (a/outside-dt 10 10 20)
+                          (a/where [:> :metric 10])
+                          (a/where [:and
+                                    [:< :metric 10]
+                                    [:> :metric 1]]))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (is (fn? entrypoint))))

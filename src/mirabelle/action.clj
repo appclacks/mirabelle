@@ -1,7 +1,9 @@
 (ns mirabelle.action
-  (:require [mirabelle.event :as e]
+  (:require [clojure.spec.alpha :as s]
+            [mirabelle.event :as e]
             [mirabelle.log :as log]
-            [mirabelle.math :as math]))
+            [mirabelle.math :as math]
+            [mirabelle.spec :as spec]))
 
 (defn call-rescue
   [event children]
@@ -19,7 +21,22 @@
    :<= <=
    := =
    :nil? nil?
+   :not-nil? (comp not nil?)
    :not= not=})
+
+(defn valid-condition?
+  [condition]
+  (and
+   (sequential? condition)
+   (cond
+     (or (= :or (first condition))
+         (= :and (first condition)))
+     (every? identity (map #(valid-condition? %) (rest condition)))
+
+     :else
+     (and ((-> condition->fn keys set)
+           (first condition))
+          (keyword? (second condition))))))
 
 (defn compile-condition
   [[condition field & args]]
@@ -58,6 +75,9 @@
       (when (condition-fn event)
         (call-rescue event children)))))
 
+(s/def ::condition valid-condition?)
+(s/def ::where (s/cat :conditions ::condition))
+
 (defn where
   "Filter events based on conditions.
   Each condition is a vector composed of the function to apply on the field,
@@ -77,6 +97,7 @@
 
   Here, we keep only events with :host = foo and with :metric > 10"
   [conditions & children]
+  (spec/valid? ::where [conditions])
   {:action :where
    :params [conditions]
    :children children})
@@ -168,6 +189,8 @@
         (when (= size (count events))
           (call-rescue events children))))))
 
+(s/def ::fixed-event-window (s/cat :size pos-int?))
+
 (defn fixed-event-window
   "Returns a fixed-sized window of events
 
@@ -178,6 +201,7 @@
 
   This example will return a vector events partitioned 5 by 5."
   [size & children]
+  (spec/valid? ::fixed-event-window [size])
   {:action :fixed-event-window
    :params [size]
    :children children})
@@ -297,6 +321,8 @@
                      (> event-time (+ changed-state-time dt)))
             (call-rescue event children)))))))
 
+(s/def ::above-dt (s/cat :threshold pos-int? :dt pos-int?))
+
 (defn above-dt
    "Takes a number `threshold` and a time period in seconds `dt`.
   If the condition `the event metric is > to the threshold` is valid for all events
@@ -304,9 +330,12 @@
   period will be passed on until an invalid event arrives.
   `:metric` should not be nil (it will produce exceptions)."
   [threshold dt & children]
+  (spec/valid? ::above-dt [threshold dt])
   {:action :above-dt
    :params [[:> :metric threshold] dt]
    :children children})
+
+(s/def ::below-dt (s/cat :threshold pos-int? :dt pos-int?))
 
 (defn below-dt
     "Takes a number `threshold` and a time period in seconds `dt`.
@@ -315,9 +344,12 @@
   the `dt` period will be passed on until an invalid event arrives.
   `:metric` should not be nil (it will produce exceptions)."
   [threshold dt & children]
+  (spec/valid? ::below-dt [threshold dt])
   {:action :below-dt
    :params [[:< :metric threshold] dt]
    :children children})
+
+(s/def ::between-dt (s/cat :low pos-int? :high pos-int? :dt pos-int?))
 
 (defn between-dt
     "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
@@ -326,12 +358,15 @@
   period will be passed on until an invalid event arrives.
   `:metric` should not be nil (it will produce exceptions)."
   [low high dt & children]
+  (spec/valid? ::between-dt [low high dt])
   {:action :between-dt
    :params [[:and
              [:> :metric low]
              [:< :metric high]]
             dt]
    :children children})
+
+(s/def ::outside-dt (s/cat :low pos-int? :high pos-int? :dt pos-int?))
 
 (defn outside-dt
     "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
@@ -340,6 +375,7 @@
   period will be passed on until an invalid event arrives.
   `:metric` should not be nil (it will produce exceptions)."
   [low high dt & children]
+  (spec/valid? ::outside-dt [low high dt])
   {:action :outside-dt
    :params [[:or
              [:< :metric low]
@@ -347,12 +383,15 @@
             dt]
    :children children})
 
+(s/def ::critical-dt (s/cat :dt pos-int?))
+
 (defn critical-dt
   "Takes a time period in seconds `dt`.
   If all events received during at least the period `dt` have `:state` critical,
   new critical events received after the `dt` period will be passed on until
   an invalid event arrives."
   [dt & children]
+  (spec/valid? ::critical-dt [dt])
   {:action :critical-dt
    :params [[:= :state "critical"]
             dt]
@@ -377,9 +416,12 @@
       (call-rescue (assoc event field value) children)
       (call-rescue event children))))
 
+(s/def ::default (s/cat :field spec/not-null :value any?))
+
 (defn default
   "Set a default value for an event"
   [field value & children]
+  (spec/valid? ::default [field value])
   {:action :default
    :params [field value]
    :children children})
