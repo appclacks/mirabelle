@@ -209,12 +209,18 @@
                    {:host "2" :service "foo" :metric 1 :time 6 :ttl 11}
                    {:host "2" :service "bar" :metric 2 :time 6 :ttl 11}
                    {:host "2" :service "foo" :metric 3 :time 10 :ttl 11}
-                   {:host "3" :service "foo" :metric 3 :time 19 :ttl 11}]]
+                   {:host "3" :service "foo" :metric 3 :time 19 :ttl 11}
+                   {:host "3" :service "foo" :metric 3 :time 100 :ttl 11}
+                   {:host "3" :service "bar" :metric 3 :time 101 :ttl 11}
+                   {:host "3" :service "bar" :metric 3 :time 105 :ttl 11}]]
       (action event))
-    (is (= (map set @state)
-           [#{{:host "1" :service "foo" :metric 1 :time 5 :ttl 11}}
+    (is (= [#{{:host "1" :service "foo" :metric 1 :time 5 :ttl 11}}
             #{{:host "1" :service "foo" :metric 1 :time 5 :ttl 11}
               {:host "2" :service "bar" :metric 2 :time 6 :ttl 11}
               {:host "2" :service "foo" :metric 3 :time 10 :ttl 11}}
             #{{:host "2" :service "foo" :metric 3 :time 10 :ttl 11}
-              {:host "3" :service "foo" :metric 3 :time 19 :ttl 11}}]))))
+              {:host "3" :service "foo" :metric 3 :time 19 :ttl 11}}
+            #{{:host "3" :service "foo" :metric 3 :time 100 :ttl 11}}
+            #{{:host "3" :service "foo" :metric 3 :time 100 :ttl 11}
+              {:host "3" :service "bar" :metric 3 :time 105 :ttl 11}}]
+           (map set @state)))))
