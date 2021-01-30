@@ -109,8 +109,7 @@
             {:state "critical" :time 31}]
            @recorder))))
 
-
-(deftest critical-dt-test
+(deftest io-file-test
   (let [stream {:name "my-stream"
                 :description "foo"
                 :actions (a/critical
