@@ -4,11 +4,11 @@
             [mirabelle.time :as t]))
 
 (deftest expired?-test
-  (are [event] (e/expired? event)
+  (are [event] (e/expired? 300 event)
     {:time 1}
     {:state "expired"}
-    {:time (- (t/now) 20) :ttl 10})
-  (are [event] (not (e/expired? event))
-    {:time (t/now)}
+    {:time 280 :ttl 10})
+  (are [event] (not (e/expired? 300 event))
+    {:time 250}
     {:state "ok"}
-    {:time (- (t/now) 20) :ttl 40}))
+    {:time 200 :ttl 110}))

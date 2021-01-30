@@ -15,7 +15,7 @@
   (reset! state [])
   (doseq [event input]
     (action event))
-  (is (= @state expected)))
+  (is (= expected @state)))
 
 (deftest valid-condition?-test
   (are [condition] (a/valid-condition? condition)
@@ -133,22 +133,27 @@
                  state
                  [{:state "expired"}
                   {:state "ok"}
-                  {:time 1}
-                  {:time (t/now)}]
+                  {:time 60}
+                  {:time 10}
+                  {:time 10 :ttl 10}
+                  {:time 10 :ttl 50}]
                  [{:state "expired"}
-                  {:time 1}])))
+                  {:time 10 :ttl 10}])))
 
 (deftest not-expired-test
-  (let [[rec state] (recorder)
-        current-time (t/now)]
+  (let [[rec state] (recorder)]
     (test-action (a/not-expired* nil rec)
                  state
                  [{:state "expired"}
                   {:state "ok"}
                   {:time 1}
-                  {:time current-time}]
+                  {:time 60}
+                  {:time 1 :ttl 10}
+                  {:time 1 :ttl 120}]
                  [{:state "ok"}
-                  {:time current-time}])))
+                  {:time 1}
+                  {:time 60}
+                  {:time 1 :ttl 120}])))
 
 (deftest cond-dt*-test
   (let [[rec state] (recorder)]
@@ -194,3 +199,22 @@
                   {:state "ok" :metric 4}
                   {:state "ok" :metric 5}
                   {:state "critical" :metric 6}])))
+
+(deftest coalesce*-test
+  (let [state (atom [])
+        rec (fn [event] (swap! state conj event))
+        action (a/coalesce* nil [:host :service] 5 rec)]
+    (doseq [event [{:host "1" :service "foo" :metric 1 :time 0 :ttl 11}
+                   {:host "1" :service "foo" :metric 1 :time 5 :ttl 11}
+                   {:host "2" :service "foo" :metric 1 :time 6 :ttl 11}
+                   {:host "2" :service "bar" :metric 2 :time 6 :ttl 11}
+                   {:host "2" :service "foo" :metric 3 :time 10 :ttl 11}
+                   {:host "3" :service "foo" :metric 3 :time 19 :ttl 11}]]
+      (action event))
+    (is (= (map set @state)
+           [#{{:host "1" :service "foo" :metric 1 :time 5 :ttl 11}}
+            #{{:host "1" :service "foo" :metric 1 :time 5 :ttl 11}
+              {:host "2" :service "bar" :metric 2 :time 6 :ttl 11}
+              {:host "2" :service "foo" :metric 3 :time 10 :ttl 11}}
+            #{{:host "2" :service "foo" :metric 3 :time 10 :ttl 11}
+              {:host "3" :service "foo" :metric 3 :time 19 :ttl 11}}]))))

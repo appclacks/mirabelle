@@ -9,11 +9,11 @@
 
 (defn expired?
   "Verifies if an event is expired"
-  [event]
+  [current-time event]
   (or (= (:state event) "expired")
       (when-let [time (:time event)]
         (let [ttl (:ttl event t/default-ttl)
-              age (- (t/now) time)]
+              age (- current-time time)]
           (> age ttl)))))
 
 (defn critical?

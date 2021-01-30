@@ -250,9 +250,12 @@
 (defn expired*
   "Keep expired events."
   [_ & children]
-  (fn [event]
-    (when (e/expired? event)
-      (call-rescue event children))))
+  (let [time-state (atom 0)]
+    (fn [event]
+      (let [current-time (swap! time-state (fn [old-time]
+                                             (max old-time (:time event 0))))]
+        (when (e/expired? current-time event)
+          (call-rescue event children))))))
 
 (defn expired
   "Keep expired events
@@ -268,9 +271,12 @@
 (defn not-expired*
   "Keep non-expired events."
   [_ & children]
-  (fn stream [event]
-    (when (not (e/expired? event))
-      (call-rescue event children))))
+  (let [time-state (atom 0)]
+    (fn [event]
+      (let [current-time (swap! time-state (fn [old-time]
+                                             (max old-time (:time event 0))))]
+        (when (not (e/expired? current-time event))
+          (call-rescue event children))))))
 
 (defn not-expired
   "Keep non-expired events
@@ -441,6 +447,32 @@
   (s/def ::push-io! (s/cat :io-name keyword?))
   {:action :push-io!
    :params [io-name]})
+
+(defn coalesce*
+  [_ fields dt & children]
+  (let [state (atom {:previous-tick 0
+                     :send? false
+                     :events {}})]
+    (fn [event]
+      (let [current-state
+            ;; quickly done, can probably be optimized
+            (swap! state (fn [{:keys [previous-tick events]}]
+                           (let [current-time (max previous-tick
+                                                   (:time event))
+                                 send? (>= current-time
+                                           (+ previous-tick dt))]
+                             {:previous-tick (if send?
+                                               current-time
+                                               previous-tick)
+                              :send? send?
+                              :events (->> (assoc events
+                                                  (map event fields)
+                                                  event)
+                                           (remove (fn [[_ v]]
+                                                     (e/expired? current-time v)))
+                                           (into {}))})))]
+        (when (:send? current-state)
+          (call-rescue (vals (:events current-state)) children))))))
 
 (def action->fn
   {:above-dt cond-dt*
