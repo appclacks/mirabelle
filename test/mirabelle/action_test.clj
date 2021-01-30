@@ -141,3 +141,16 @@
                  [{:time 12 :metric 12}
                   {:time 22 :metric 13}
                   {:time 36 :metric 12}])))
+
+(deftest critical*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/critical* nil  rec)
+                 state
+                 [{:state "ok" :metric 1}
+                  {:state "critical" :metric 2}
+                  {:state "critical" :metric 3}
+                  {:state "ok" :metric 1}
+                  {:state "critical" :metric 5}]
+                 [{:state "critical" :metric 2}
+                  {:state "critical" :metric 3}
+                  {:state "critical" :metric 5}])))

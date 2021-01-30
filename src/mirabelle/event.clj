@@ -15,3 +15,8 @@
         (let [ttl (:ttl event t/default-ttl)
               age (- (t/now) time)]
           (> age ttl)))))
+
+(defn critical?
+  "Verifies if an event is critical"
+  [event]
+  (= (:state event) "critical"))

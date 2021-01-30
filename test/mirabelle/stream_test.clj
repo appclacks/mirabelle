@@ -20,7 +20,7 @@
     (entrypoint {:metric 30})
     (is (= [{:metric 11} {:metric 13} {:metric 29} {:metric 31}] @recorder))))
 
-(deftest above-test
+(deftest above-dt-test
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
@@ -41,7 +41,7 @@
     (is (= [{:metric 12 :time 12} {:metric 13 :time 14} {:metric 15 :time 31}]
            @recorder))))
 
-(deftest between-test
+(deftest between-dt-test
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
@@ -62,7 +62,7 @@
     (is (= [{:metric 24 :time 12} {:metric 25 :time 14} {:metric 28 :time 31}]
            @recorder))))
 
-(deftest outside-test
+(deftest outside-dt-test
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
@@ -83,7 +83,7 @@
     (is (= [{:metric 4 :time 12} {:metric 5 :time 14} {:metric 40 :time 31}]
            @recorder))))
 
-(deftest critical-test
+(deftest critical-dt-test
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"

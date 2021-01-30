@@ -358,10 +358,23 @@
             dt]
    :children children})
 
+(defn critical*
+  [_ & children]
+  (fn [event]
+    (when (e/critical? event)
+      (call-rescue event children))))
+
+(defn critical
+    "Keep all events in state critical"
+  [& children]
+  {:action :critical
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
    :decrement decrement*
+   :critical critical*
    :critical-dt cond-dt*
    :debug debug*
    :info info*
