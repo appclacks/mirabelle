@@ -449,30 +449,73 @@
    :params [io-name]})
 
 (defn coalesce*
-  [_ fields dt & children]
-  (let [state (atom {:previous-tick 0
-                     :send? false
-                     :events {}})]
+  [_ dt fields & children]
+  (let [state (atom {:buffer {}
+                     :current-time 0
+                     :last-tick nil
+                     :window nil})
+        key-fn #(vals (select-keys % fields))]
+    ;; the implementation can rprobably be optimized ?
     (fn [event]
-      (let [current-state
-            ;; quickly done, can probably be optimized
-            (swap! state (fn [{:keys [previous-tick events]}]
-                           (let [current-time (max previous-tick
-                                                   (:time event))
-                                 send? (>= current-time
-                                           (+ previous-tick dt))]
-                             {:previous-tick (if send?
-                                               current-time
-                                               previous-tick)
-                              :send? send?
-                              :events (->> (assoc events
-                                                  (map event fields)
-                                                  event)
-                                           (remove (fn [[_ v]]
-                                                     (e/expired? current-time v)))
-                                           (into {}))})))]
-        (when (:send? current-state)
-          (call-rescue (vals (:events current-state)) children))))))
+      (let [buffer-update-fn (fn [current-event]
+                               (cond
+                                 ;; current-event is nil
+                                 (not current-event)
+                                 event
+
+                                 ;; current event most recent
+                                 (e/most-recent? current-event
+                                                 event)
+                                 current-event
+                                 :else
+                                 event))
+
+            current-state
+            (swap! state
+                   (fn [{:keys [current-time last-tick buffer] :as state}]
+                     ;; remove events with no time
+                     (if (nil? (:time event))
+                       (assoc state :window nil)
+                       (let [current-time (max current-time
+                                               (:time event))]
+                         (cond
+
+                           ;; event expired, don't keep it
+                           (e/expired? current-time event)
+                           (assoc state :window nil)
+
+                           ;; to last tick, set it to the current time
+                           ;; and keep the event
+                           (nil? last-tick)
+                           (-> (update-in state
+                                          [:buffer (key-fn event)]
+                                          buffer-update-fn)
+                               (assoc :last-tick (:time event)
+                                      :windiw nil))
+
+                           ;; we are still in the same window, add the event
+                           ;; to the buffer
+                           (< current-time (+ last-tick dt))
+                           (-> (update-in state
+                                          [:buffer (key-fn event)]
+                                          buffer-update-fn)
+                               (assoc :window nil
+                                      :current-time current-time))
+
+                           ;; we should emit
+                           :else
+                           (let [tmp-buffer (->> (update buffer
+                                                         (key-fn event)
+                                                         buffer-update-fn)
+                                                 (remove (fn [[_ v]]
+                                                           (e/expired? current-time v))))]
+                             (-> (assoc state
+                                        :last-tick current-time
+                                        :current-time current-time
+                                        :buffer (into {} tmp-buffer)
+                                        :window (map second tmp-buffer)))))))))]
+        (when-let [window (:window current-state)]
+          (call-rescue window children))))))
 
 (def action->fn
   {:above-dt cond-dt*

@@ -16,6 +16,13 @@
               age (- current-time time)]
           (> age ttl)))))
 
+(defn most-recent?
+  "Returns true if event 1 is most recent than event 2.
+  Does not work with events with no time."
+  [event1 event2]
+  (> (:time event1)
+     (:time event2)))
+
 (defn critical?
   "Verifies if an event is critical"
   [event]

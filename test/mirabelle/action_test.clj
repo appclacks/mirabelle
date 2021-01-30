@@ -203,24 +203,30 @@
 (deftest coalesce*-test
   (let [state (atom [])
         rec (fn [event] (swap! state conj event))
-        action (a/coalesce* nil [:host :service] 5 rec)]
-    (doseq [event [{:host "1" :service "foo" :metric 1 :time 0 :ttl 11}
-                   {:host "1" :service "foo" :metric 1 :time 5 :ttl 11}
-                   {:host "2" :service "foo" :metric 1 :time 6 :ttl 11}
-                   {:host "2" :service "bar" :metric 2 :time 6 :ttl 11}
-                   {:host "2" :service "foo" :metric 3 :time 10 :ttl 11}
-                   {:host "3" :service "foo" :metric 3 :time 19 :ttl 11}
-                   {:host "3" :service "foo" :metric 3 :time 100 :ttl 11}
-                   {:host "3" :service "bar" :metric 3 :time 101 :ttl 11}
-                   {:host "3" :service "bar" :metric 3 :time 105 :ttl 11}]]
+        action (a/coalesce* nil 5 [:host :service] rec)]
+    (doseq [event [{:host "1" :service "foo" :metric 1 :time 0 :ttl 10}
+                   {:host "1" :service "bar" :metric 1 :time 5 :ttl 10}
+                   {:host "2" :service "foo" :metric 1 :time 5 :ttl 10}
+                   {:host "2" :service "foo" :metric 1 :time 11 :ttl 10}
+                   {:host "2" :service "foo" :metric 1 :time 14 :ttl 10}
+                   {:host "2" :service "foo" :metric 1 :time 12 :ttl 10}
+                   {:host "3" :service "foo" :metric 1 :time 16 :ttl 10}]]
       (action event))
-    (is (= [#{{:host "1" :service "foo" :metric 1 :time 5 :ttl 11}}
-            #{{:host "1" :service "foo" :metric 1 :time 5 :ttl 11}
-              {:host "2" :service "bar" :metric 2 :time 6 :ttl 11}
-              {:host "2" :service "foo" :metric 3 :time 10 :ttl 11}}
-            #{{:host "2" :service "foo" :metric 3 :time 10 :ttl 11}
-              {:host "3" :service "foo" :metric 3 :time 19 :ttl 11}}
-            #{{:host "3" :service "foo" :metric 3 :time 100 :ttl 11}}
-            #{{:host "3" :service "foo" :metric 3 :time 100 :ttl 11}
-              {:host "3" :service "bar" :metric 3 :time 105 :ttl 11}}]
+    (is (= [#{{:host "1", :service "foo", :metric 1, :time 0, :ttl 10}
+              {:host "1", :service "bar", :metric 1, :time 5, :ttl 10}}
+            #{{:host "2", :service "foo", :metric 1, :time 11, :ttl 10}
+              {:host "1", :service "bar", :metric 1, :time 5, :ttl 10}}
+            #{{:host "2", :service "foo", :metric 1, :time 14, :ttl 10}
+              {:host "3", :service "foo", :metric 1, :time 16, :ttl 10}}]
+           (map set @state))))
+  (let [state (atom [])
+        rec (fn [event] (swap! state conj event))
+        action (a/coalesce* nil 5 [:host :service] rec)]
+    (doseq [event [{:host "1" :service "foo" :metric 1 :time 0 :ttl 20}
+                   {:host "1" :service "baz" :metric 1 :time 1 :ttl 20}
+                   {:host "1" :service "bar" :metric 1 :time 12 :ttl 20}]]
+      (action event))
+    (is (= [#{{:host "1" :service "foo" :metric 1 :time 0 :ttl 20}
+              {:host "1" :service "baz" :metric 1 :time 1 :ttl 20}
+              {:host "1" :service "bar" :metric 1 :time 12 :ttl 20}}]
            (map set @state)))))
