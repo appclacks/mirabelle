@@ -126,3 +126,18 @@
                   {:time current-time}]
                  [{:state "ok"}
                   {:time current-time}])))
+
+(deftest cond-dt*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/cond-dt* nil [:> :metric 10] 10 rec)
+                 state
+                 [{:time 1 :metric 12}
+                  {:time 4 :metric 12}
+                  {:time 12 :metric 12}
+                  {:time 22 :metric 13}
+                  {:time 23 :metric 1}
+                  {:time 25 :metric 11}
+                  {:time 36 :metric 12}]
+                 [{:time 12 :metric 12}
+                  {:time 22 :metric 13}
+                  {:time 36 :metric 12}])))

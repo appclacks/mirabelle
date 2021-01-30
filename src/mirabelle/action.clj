@@ -1,5 +1,6 @@
 (ns mirabelle.action
   (:require [mirabelle.event :as e]
+            [mirabelle.log :as log]
             [mirabelle.math :as math]))
 
 (defn call-rescue
@@ -28,6 +29,8 @@
                        args))))
 
 (defn compile-conditions
+  "Takes a condition and returns a function which can be applied to an
+  event to check if the condition is valid for this event"
   [conditions]
   (let [compile-conditions-fn
         (fn [cd] (reduce
@@ -105,7 +108,7 @@
 (defn debug*
   [_ & children]
   (fn [event]
-    (println (pr-str event))
+    (log/info {} (pr-str event))
     (call-rescue event children)))
 
 (defn debug
@@ -221,8 +224,54 @@
   {:action :not-expired
    :children children})
 
+(defn cond-dt*
+  "A stream which detects if a condition `(f event)` is true during `dt` seconds.
+  Takes `conditions` (like in the where action) and a time period `dt` in seconds.
+  If the condition is valid for all events received during at least the period `dt`, valid events received after the `dt` period will be passed on until an invalid event arrives.
+  Skips events that are too old or that do not have a timestamp."
+  [_ conditions dt & children]
+  (let [condition-fn (compile-conditions conditions)
+        last-changed-state (atom {:ok false
+                                  :time nil})]
+    (fn [event]
+      (let [{ok :ok changed-state-time :time} @last-changed-state
+            event-time (:time event)
+            valid-event (condition-fn event)]
+        (when event-time ;; filter events with no time
+          (swap! last-changed-state (fn [state]
+                        (cond
+                          (and valid-event (and (not ok)
+                                                (or (not changed-state-time)
+                                                    (> event-time changed-state-time))))
+                          ;; event is validating the condition
+                          ;; last event is not ok, has no time or is too old
+                          ;; => last-changed-state is now ok with a new time
+                          {:ok true :time event-time}
+                          (and (not valid-event) (and ok
+                                                      (or (not changed-state-time)
+                                                          (> event-time changed-state-time))))
+                          ;; event is not validating the condition
+                          ;; last event is ok, has no time or is too old
+                          ;; => last-changed-state is now ko with a new time
+                          {:ok false :time event-time}
+                          ;; default value, return the state
+                          :default state)))
+          (when (and valid-event
+                      ;; we already had an ok event
+                     ok
+                     ;; check is current time > first ok event + dt
+                     (> event-time (+ changed-state-time dt)))
+            (call-rescue event children)))))))
+
+(defn above
+  [_ threshold dt & children]
+  {:action :above
+   :params [[:> :metric threshold] dt]
+   :children children})
+
 (def action->fn
-  {:decrement decrement*
+  {:above cond-dt*
+   :decrement decrement*
    :debug debug*
    :expired expired*
    :fixed-event-window fixed-event-window*

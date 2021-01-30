@@ -19,3 +19,7 @@
          (->> [(:actions stream)]
               (compile! context)
               first)))
+
+(defn stream!
+  [stream event]
+  ((:entrypoint stream) event))
