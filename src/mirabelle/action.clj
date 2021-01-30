@@ -1,5 +1,6 @@
 (ns mirabelle.action
-  (:require [mirabelle.math :as math]))
+  (:require [mirabelle.event :as e]
+            [mirabelle.math :as math]))
 
 (defn call-rescue
   [event children]
@@ -169,16 +170,61 @@
     (call-rescue event children)))
 
 (defn sdo
+  "Send events to children
+
+  ```clojure
+  (sdo
+    (increment)
+    (decrement))
+  ```"
   [& children]
   {:action :sdo
+   :children children})
+
+(defn expired*
+  "Keep expired events."
+  [_ & children]
+  (fn [event]
+    (when (e/expired? event)
+      (call-rescue event children))))
+
+(defn expired
+  "Keep expired events
+
+  ```clojure
+  (expired
+    (increment))
+  ```"
+  [& children]
+  {:action :expired
+   :children children})
+
+(defn not-expired*
+  "Keep non-expired events."
+  [_ & children]
+  (fn stream [event]
+    (when (not (e/expired? event))
+      (call-rescue event children))))
+
+(defn not-expired
+  "Keep non-expired events
+
+  ```clojure
+  (not-expired
+    (increment))
+  ```"
+  [& children]
+  {:action :not-expired
    :children children})
 
 (def action->fn
   {:decrement decrement*
    :debug debug*
+   :expired expired*
    :fixed-event-window fixed-event-window*
    :increment increment*
    :mean mean*
+   :not-expired not-expired*
    :sdo sdo*
    :test-action test-action*
    :where where*})

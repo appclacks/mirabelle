@@ -1,6 +1,7 @@
 (ns mirabelle.action-test
   (:require [clojure.test :refer :all]
-            [mirabelle.action :as a]))
+            [mirabelle.action :as a]
+            [mirabelle.time :as t]))
 
 (defn recorder
   []
@@ -102,3 +103,26 @@
                  state
                  [{:metric 10}]
                  [{:metric 10}])))
+
+(deftest expired-test
+  (let [[rec state] (recorder)]
+    (test-action (a/expired* nil rec)
+                 state
+                 [{:state "expired"}
+                  {:state "ok"}
+                  {:time 1}
+                  {:time (t/now)}]
+                 [{:state "expired"}
+                  {:time 1}])))
+
+(deftest not-expired-test
+  (let [[rec state] (recorder)]
+    (let [current-time (t/now)]
+      (test-action (a/not-expired* nil rec)
+                   state
+                   [{:state "expired"}
+                    {:state "ok"}
+                    {:time 1}
+                    {:time current-time}]
+                   [{:state "ok"}
+                    {:time current-time}]))))
