@@ -108,11 +108,11 @@
 (defn debug*
   [_ & children]
   (fn [event]
-    (log/info {} (pr-str event))
+    (log/debug {} (pr-str event))
     (call-rescue event children)))
 
 (defn debug
-  "Print the event in the logs
+  "Print the event in the logs using the debug level
 
   ```clojure
   (increment
@@ -120,6 +120,40 @@
   ```"
   [& children]
   {:action :debug
+   :children children})
+
+(defn info*
+  [_ & children]
+  (fn [event]
+    (log/info {} (pr-str event))
+    (call-rescue event children)))
+
+(defn info
+  "Print the event in the logs using the info level
+
+  ```clojure
+  (increment
+    (debug))
+  ```"
+  [& children]
+  {:action :info
+   :children children})
+
+(defn error*
+  [_ & children]
+  (fn [event]
+    (log/error {} (pr-str event))
+    (call-rescue event children)))
+
+(defn error
+  "Print the event in the logs using the error level
+
+  ```clojure
+  (increment
+    (debug))
+  ```"
+  [& children]
+  {:action :error
    :children children})
 
 (defn fixed-event-window*
@@ -263,32 +297,81 @@
                      (> event-time (+ changed-state-time dt)))
             (call-rescue event children)))))))
 
-(defn above
-  [_ threshold dt & children]
-  {:action :above
+(defn above-dt
+   "Takes a number `threshold` and a time period in seconds `dt`.
+  If the condition `the event metric is > to the threshold` is valid for all events
+  received during at least the period `dt`, valid events received after the `dt`
+  period will be passed on until an invalid event arrives.
+  `:metric` should not be nil (it will produce exceptions)."
+  [threshold dt & children]
+  {:action :above-dt
    :params [[:> :metric threshold] dt]
    :children children})
 
+(defn below-dt
+    "Takes a number `threshold` and a time period in seconds `dt`.
+  If the condition `the event metric is < to the threshold` is valid for all
+  events received during at least the period `dt`, valid events received after
+  the `dt` period will be passed on until an invalid event arrives.
+  `:metric` should not be nil (it will produce exceptions)."
+  [threshold dt & children]
+  {:action :below-dt
+   :params [[:< :metric threshold] dt]
+   :children children})
+
+(defn between-dt
+    "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
+  If the condition `the event metric is > low and < high` is valid for all events
+  received during at least the period `dt`, valid events received after the `dt`
+  period will be passed on until an invalid event arrives.
+  `:metric` should not be nil (it will produce exceptions)."
+  [low high dt & children]
+  {:action :between-dt
+   :params [[:and
+             [:> :metric low]
+             [:< :metric high]]
+            dt]
+   :children children})
+
+(defn outside-dt
+    "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
+  If the condition `the event metric is < low or > high` is valid for all events
+  received during at least the period `dt`, valid events received after the `dt`
+  period will be passed on until an invalid event arrives.
+  `:metric` should not be nil (it will produce exceptions)."
+  [low high dt & children]
+  {:action :outside-dt
+   :params [[:or
+             [:< :metric low]
+             [:> :metric high]]
+            dt]
+   :children children})
+
+(defn critical-dt
+    "Takes a time period in seconds `dt`.
+  If all events received during at least the period `dt` have `:state` critical,
+  new critical events received after the `dt` period will be passed on until
+  an invalid event arrives."
+  [dt & children]
+  {:action :critical-dt
+   :params [[:= :state "critical"]
+            dt]
+   :children children})
+
 (def action->fn
-  {:above cond-dt*
+  {:above-dt cond-dt*
+   :between-dt cond-dt*
    :decrement decrement*
+   :critical-dt cond-dt*
    :debug debug*
+   :info info*
+   :error error*
    :expired expired*
    :fixed-event-window fixed-event-window*
    :increment increment*
    :mean mean*
    :not-expired not-expired*
+   :outside-dt cond-dt*
    :sdo sdo*
    :test-action test-action*
    :where where*})
-
-(def stream
-  [(where [:> :metric 10]
-          (increment
-           (debug))
-          (increment
-           (decrement
-            (debug))
-           )
-          )]
-  )
