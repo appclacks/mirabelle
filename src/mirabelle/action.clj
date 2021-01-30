@@ -455,7 +455,7 @@
                      :last-tick nil
                      :window nil})
         key-fn #(vals (select-keys % fields))]
-    ;; the implementation can rprobably be optimized ?
+    ;; the implementation can probably be optimized ?
     (fn [event]
       (let [buffer-update-fn (fn [current-event]
                                (cond
@@ -491,7 +491,7 @@
                                           [:buffer (key-fn event)]
                                           buffer-update-fn)
                                (assoc :last-tick (:time event)
-                                      :windiw nil))
+                                      :window nil))
 
                            ;; we are still in the same window, add the event
                            ;; to the buffer
