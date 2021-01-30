@@ -1,6 +1,9 @@
 (ns mirabelle.stream-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.java.io :as io]
+            [clojure.string :as string]
+            [clojure.test :refer :all]
             [mirabelle.action :as a]
+            [mirabelle.io.file :as io-file]
             [mirabelle.stream :as stream]))
 
 (deftest compile!-test
@@ -105,6 +108,25 @@
             {:state "critical" :time 14}
             {:state "critical" :time 31}]
            @recorder))))
+
+
+(deftest critical-dt-test
+  (let [stream {:name "my-stream"
+                :description "foo"
+                :actions (a/critical
+                          (a/push-io! :file-example-io))}
+        file (io/file "file-example-io")
+        io-component (io-file/map->FileIO {:path (.getPath file)})
+        {:keys [entrypoint]} (stream/compile-stream!
+                              {:io {:file-example-io io-component}}
+                              stream)]
+    (entrypoint {:state "critical" :time 1})
+    (entrypoint {:state "critical" :time 2})
+    (entrypoint {:state "ok" :time 2})
+    (let [result (slurp file)]
+      (is ["{:state \"critical\" :time 1}"
+           "{:state \"critical\" :time 2}"]
+       (string/split result #"\n")))))
 
 (deftest full-test
   (let [stream {:name "my-stream"

@@ -1,7 +1,8 @@
 (ns mirabelle.action
   (:require [clojure.spec.alpha :as s]
+            [corbihttp.log :as log]
             [mirabelle.event :as e]
-            [mirabelle.log :as log]
+            [mirabelle.io :as io]
             [mirabelle.math :as math]
             [mirabelle.spec :as spec]))
 
@@ -426,6 +427,21 @@
    :params [field value]
    :children children})
 
+(defn push-io!*
+  [context io-name]
+  (let [io-component (get-in context [:io io-name])]
+    (fn [event]
+      (io/inject! io-component event))))
+
+(s/def ::push-io! (s/cat :io-name keyword?))
+
+(defn push-io!
+  "Push events to an external system"
+  [io-name]
+  (s/def ::push-io! (s/cat :io-name keyword?))
+  {:action :push-io!
+   :params [io-name]})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -441,6 +457,7 @@
    :mean mean*
    :not-expired not-expired*
    :outside-dt cond-dt*
+   :push-io! push-io!*
    :sdo sdo*
    :test-action test-action*
    :where where*})
