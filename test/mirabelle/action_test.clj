@@ -116,13 +116,13 @@
                   {:time 1}])))
 
 (deftest not-expired-test
-  (let [[rec state] (recorder)]
-    (let [current-time (t/now)]
-      (test-action (a/not-expired* nil rec)
-                   state
-                   [{:state "expired"}
-                    {:state "ok"}
-                    {:time 1}
-                    {:time current-time}]
-                   [{:state "ok"}
-                    {:time current-time}]))))
+  (let [[rec state] (recorder)
+        current-time (t/now)]
+    (test-action (a/not-expired* nil rec)
+                 state
+                 [{:state "expired"}
+                  {:state "ok"}
+                  {:time 1}
+                  {:time current-time}]
+                 [{:state "ok"}
+                  {:time current-time}])))

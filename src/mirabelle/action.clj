@@ -20,35 +20,39 @@
    :nil? nil?
    :not= not=})
 
-(defn compute-condition
-  "Verifies if a condition is valid for an event"
-  [[condition field & args] event]
-  (let [condition-fn (get condition->fn condition)
-        event-field (get event field)]
-    (apply condition-fn event-field args)))
+(defn compile-condition
+  [[condition field & args]]
+  (let [condition-fn (get condition->fn condition)]
+    (fn [event] (apply condition-fn
+                       (get event field)
+                       args))))
 
-(defn compute-conditions
-  "Verifies if a list of conditions is valid for an event"
-  [conditions event]
-  (reduce
-   (fn [state condition]
-     (conj state (compute-condition condition event)))
-   []
-   conditions))
+(defn compile-conditions
+  [conditions]
+  (let [compile-conditions-fn
+        (fn [cd] (reduce
+                  (fn [state condition]
+                    (conj state (compile-condition condition)))
+                  []
+                  cd))]
+    (cond
+      (= :or (first conditions))
+      (let [cond-fns (compile-conditions-fn (rest conditions))]
+        (fn [event] (some identity (map #(% event) cond-fns))))
+
+      (= :and (first conditions))
+      (let [cond-fns (compile-conditions-fn (rest conditions))]
+        (fn [event] (every? identity (map #(% event) cond-fns))))
+
+      :else
+      (let [cond-fn (compile-condition conditions)]
+        (fn [event] (cond-fn event))))))
 
 (defn where*
   [_ conditions & children]
-  (fn [event]
-    (let [valid? (cond
-                   (= :or (first conditions))
-                   (some identity (compute-conditions (rest conditions) event))
-
-                   (= :and (first conditions))
-                   (every? identity (compute-conditions (rest conditions) event))
-
-                   :else
-                   (compute-condition conditions event))]
-      (when valid?
+  (let [condition-fn (compile-conditions conditions)]
+    (fn [event]
+      (when (condition-fn event)
         (call-rescue event children)))))
 
 (defn where
