@@ -140,12 +140,12 @@
                           (a/info)
                           (a/error)
                           (a/expired)
-                          (a/fixed-event-window 10)
+                          (a/fixed-event-window 10
+                                                (a/list-mean)
+                                                (a/list-max)
+                                                (a/list-min)
+                                                (a/list-rate))
                           (a/increment)
-                          (a/list-mean)
-                          (a/list-max)
-                          (a/list-min)
-                          (a/list-rate)
                           (a/not-expired)
                           (a/outside-dt 10 10 20)
                           (a/coalesce 10 [:host])
@@ -155,4 +155,5 @@
                                     [:< :metric 10]
                                     [:> :metric 1]]))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
-    (is (fn? entrypoint))))
+    (is (fn? entrypoint))
+    (entrypoint {:state "ok" :time 2 :metric 1 :host "foo"})))
