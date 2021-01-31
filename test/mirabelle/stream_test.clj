@@ -148,6 +148,8 @@
                                                 (a/list-rate))
                           (a/increment)
                           (a/not-expired)
+                          (a/tag "foo")
+                          (a/tag ["foo" "bar"])
                           (a/outside-dt 10 10 20)
                           (a/coalesce 10 [:host])
                           (a/set-field :foo 1)

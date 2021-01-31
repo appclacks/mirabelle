@@ -661,6 +661,29 @@
   {:action :sflatten
    :children children})
 
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn tag*
+  [_ tags & children]
+  (let [tags (flatten [tags])]
+    (fn [event]
+      (call-rescue
+       (assoc event :tags (distinct (concat tags (:tags event))))
+       children))))
+
+(s/def ::tag (s/cat :tags (s/or :single string?
+                                :multiple (s/coll-of string?))))
+
+(defn tag
+  "Adds a new tag, or set of tags, to events which flow through.
+
+  (tag \"foo\" index)
+  (tag [\"foo\" \"bar\"] index)"
+  [tags & children]
+  (spec/valid? ::tag [tags])
+  {:action :tag
+   :params [tags]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -684,5 +707,6 @@
    :push-io! push-io!*
    :sdo sdo*
    :set-field set-field*
+   :tag tag*
    :test-action test-action*
    :where where*})
