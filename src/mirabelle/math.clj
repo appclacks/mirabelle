@@ -12,6 +12,7 @@
            (-> (reduce #(+ (:metric %2) %1) 0 events)
                (/ (count events))))))
 
+;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn extremum
   [operation events]
   (when (seq events)

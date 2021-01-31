@@ -183,6 +183,7 @@
   {:action :error
    :children children})
 
+;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn fixed-event-window*
   [_ size & children]
   (let [window (atom [])]

@@ -7,6 +7,7 @@
   (-> (sort-by :time events)
       last))
 
+;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn expired?
   "Verifies if an event is expired"
   [current-time event]
