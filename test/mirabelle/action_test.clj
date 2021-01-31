@@ -20,6 +20,7 @@
 (deftest valid-condition?-test
   (are [condition] (a/valid-condition? condition)
     [:> :metric 10]
+    [:regex :host "foo"]
     [:< :metric 10]
     [:= :host "foo"]
     [:nil? :metric]
@@ -73,7 +74,17 @@
                            rec)
                  state
                  [{:metric -1} {:metric 30} {:metric 31} {:metric 50}]
-                 [{:metric -1} {:metric 50}])))
+                 [{:metric -1} {:metric 50}])
+    (test-action (a/where* nil
+                           [:regex :host "foo.*"]
+                           rec)
+                 state
+                 [{:host "bar" :metric 1}
+                  {:host "foo" :metric 2}
+                  {:host "foobar" :metric 2}
+                  {:host "baz" :metric 3}]
+                 [{:host "foo" :metric 2}
+                  {:host "foobar" :metric 2}])))
 
 (deftest increment*-test
   (let [[rec state] (recorder)]

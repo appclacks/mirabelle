@@ -21,6 +21,7 @@
    :< <
    :<= <=
    := =
+   :regex #(re-matches %2 %1)
    :nil? nil?
    :not-nil? (comp not nil?)
    :not= not=})
@@ -41,7 +42,11 @@
 
 (defn compile-condition
   [[condition field & args]]
-  (let [condition-fn (get condition->fn condition)]
+  (let [condition-fn (get condition->fn condition)
+        regex? (= :regex condition)
+        args (if regex?
+               [(-> (first args) re-pattern)]
+               args)]
     (fn [event] (apply condition-fn
                        (get event field)
                        args))))
