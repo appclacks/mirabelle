@@ -517,10 +517,31 @@
         (when-let [window (:window current-state)]
           (call-rescue window children))))))
 
+(s/def ::coalesce (s/cat :dt pos-int? :fields (s/coll-of keyword?)))
+
+(defn coalesce
+  "Returns a list of the latest non-expired events (by `fields`) every dt seconds
+  (at best).
+
+  ```clojure
+  (coalesce 10 [:host \"service\"]
+    (debug)
+  ```
+
+  In this example, the latest event for each host/service combination will be
+  kept and forwarded downstream. Expired events will be removed from the list.
+  "
+  [dt fields & children]
+  (s/def ::coalesce (s/cat :io-name keyword?))
+  {:action :coalesce
+   :children children
+   :params [dt fields]})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
    :decrement decrement*
+   :coalesce coalesce*
    :critical critical*
    :critical-dt cond-dt*
    :debug debug*
