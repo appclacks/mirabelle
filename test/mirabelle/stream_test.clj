@@ -142,10 +142,14 @@
                           (a/expired)
                           (a/fixed-event-window 10)
                           (a/increment)
-                          (a/mean)
+                          (a/list-mean)
+                          (a/list-max)
+                          (a/list-min)
+                          (a/list-rate)
                           (a/not-expired)
                           (a/outside-dt 10 10 20)
                           (a/coalesce 10 [:host])
+                          (a/set-field :foo 1)
                           (a/where [:> :metric 10])
                           (a/where [:and
                                     [:< :metric 10]

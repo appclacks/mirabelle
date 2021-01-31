@@ -212,14 +212,65 @@
    :params [size]
    :children children})
 
-(defn mean*
+(defn list-mean*
   [_ & children]
   (fn [events]
     (call-rescue (math/mean events) children)))
 
-(defn mean
+(defn list-mean
+  "Computes the events mean (on metric).
+  Should receive a list of events from the previous stream.
+  The most recent event is used as a base to create the new event
+
+  ```clojure
+  (fixed-event-window 10
+    (list-mean
+      (debug)))
+  ```
+
+  Computes the mean on windows of 10 events"
   [& children]
-  {:action :mean
+  {:action :list-mean
+   :children children})
+
+(defn list-max*
+  [_ & children]
+  (fn [events]
+    (call-rescue (math/max-event events) children)))
+
+(defn list-max
+  "Returns the event with the biggest metric.
+  Should receive a list of events from the previous stream.
+
+  ```clojure
+  (fixed-event-window 10
+    (list-max
+      (debug)))
+  ```
+
+  Get the event the biggest metric on windows of 10 events"
+  [& children]
+  {:action :list-max
+   :children children})
+
+(defn list-min*
+  [_ & children]
+  (fn [events]
+    (call-rescue (math/min-event events) children)))
+
+(defn list-min
+  "Returns the event with the smallest metric.
+  Should receive a list of events from the previous stream.
+
+  ```clojure
+  (fixed-event-window 10
+    (list-min
+      (debug)))
+  ```
+
+  Get the event the smallest metric on windows of 10 events"
+  [& children]
+  {:action :list-min
    :children children})
 
 (defn test-action*
@@ -449,7 +500,7 @@
 (defn push-io!
   "Push events to an external system"
   [io-name]
-  (s/def ::push-io! (s/cat :io-name keyword?))
+  (spec/valid? ::push-io! [io-name])
   {:action :push-io!
    :params [io-name]})
 
@@ -537,10 +588,61 @@
   kept and forwarded downstream. Expired events will be removed from the list.
   "
   [dt fields & children]
-  (s/def ::coalesce (s/cat :io-name keyword?))
+  (spec/valid? ::coalesce [dt fields])
   {:action :coalesce
    :children children
    :params [dt fields]})
+
+(defn set-field*
+  [_ field value & children]
+  (fn [event]
+    (call-rescue (assoc event field value) children)))
+
+(s/def ::set-field (s/cat :field keyword? :value any?))
+
+(defn set-field
+  "Set an event field to the given value.
+
+  ```clojure
+  (set-field :state \"critical\"
+    (debug))
+  ```
+
+  This example set the field :state to critical for events."
+  [field value & children]
+  (spec/valid? ::set-field [field value])
+  {:action :set-field
+   :children children
+   :params [field value]})
+
+(defn list-rate*
+  [_  & children]
+  (fn [events]
+    (call-rescue (math/rate events) children)))
+
+(defn list-rate
+  "Computes the rate on a list of events.
+  Should receive a list of events from the previous stream.
+  The latest event is used as a base to build the new event.
+
+  ```clojure
+  (fixed-event-window 3
+    (list-rate
+      (debug)))
+  ```
+
+  If this example receives the events:
+
+  {:metric 1 :time 1} {:metric 2 :time 2} {:metric 1 :time 3}
+
+  The stream will return {:metric 2 :time 3}
+
+  Indeed, (1+2+1)/2 = 3 (we divide by 2 because we have 2 seconds between the
+  min and max events time).
+  "
+  [& children]
+  {:action :list-rate
+   :children children})
 
 (def action->fn
   {:above-dt cond-dt*
@@ -555,10 +657,14 @@
    :expired expired*
    :fixed-event-window fixed-event-window*
    :increment increment*
-   :mean mean*
+   :list-max list-max*
+   :list-mean list-mean*
+   :list-min list-min*
+   :list-rate list-rate*
    :not-expired not-expired*
    :outside-dt cond-dt*
    :push-io! push-io!*
    :sdo sdo*
+   :set-field set-field*
    :test-action test-action*
    :where where*})

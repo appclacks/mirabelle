@@ -114,17 +114,17 @@
                  [[{:metric 10} {:metric 11} {:metric 12}]
                   [{:metric 13} {:metric 14} {:metric 15}]])))
 
-(deftest mean*-test
+(deftest list-mean*-test
   (let [[rec state] (recorder)]
-    (test-action (a/mean* nil rec)
+    (test-action (a/list-mean* nil rec)
                  state
                  [[{:metric 10} {:metric 12}]]
                  [{:metric 11}])
-    (test-action (a/mean* nil rec)
+    (test-action (a/list-mean* nil rec)
                  state
                  [[{:metric 10}]]
                  [{:metric 10}])
-    (test-action (a/mean* nil rec)
+    (test-action (a/list-mean* nil rec)
                  state
                  [[{:metric 10 :time 3 :host "foo"}
                    {:metric 20 :time 1 :host "bar"}
@@ -241,3 +241,67 @@
               {:host "1" :service "baz" :metric 1 :time 1 :ttl 20}
               {:host "1" :service "bar" :metric 1 :time 12 :ttl 20}}]
            (map set @state)))))
+
+(deftest set-field*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/set-field* nil :state "ok" rec)
+                 state
+                 [{:metric 1}
+                  {:state "critical" :metric 2}
+                  {:state "critical" :metric 3}
+                  {:state "ok" :metric 4}
+                  {:metric 5}
+                  {:state "critical" :metric 6}]
+                 [{:state "ok" :metric 1}
+                  {:state "ok" :metric 2}
+                  {:state "ok" :metric 3}
+                  {:state "ok" :metric 4}
+                  {:state "ok" :metric 5}
+                  {:state "ok" :metric 6}])))
+
+(deftest list-max*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/list-max* nil rec)
+                 state
+                 [[{:metric 1}
+                   {:metric 10}
+                   {}
+                   {}
+                   {:metric 5}]]
+                 [{:metric 10}])))
+
+(deftest list-min*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/list-min* nil rec)
+                 state
+                 [[{:metric 1}
+                   {:metric 10}
+                   {}
+                   {}
+                   {:metric 5}]]
+                 [{:metric 1}])))
+
+(deftest list-rate*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/list-rate* nil rec)
+                 state
+                 [[{:metric 1 :time 1}
+                   {:metric 10 :time 2}
+                   {:metric 4 :time 3}
+                   {:metric 10 :time 1}
+                   {:metric 5 :time 4}]]
+                 [{:time 4 :metric (/ 30 3)}])
+    (test-action (a/list-rate* nil rec)
+                 state
+                 [[{:metric 1 :time 0}
+                   {:metric 1 :time 2}
+                   {:metric 1 :time 3}
+                   {:metric 1 :time 1}
+                   {:metric 1 :time 10}]]
+                 [{:time 10 :metric (/ 5 10)}])
+    (test-action (a/list-rate* nil rec)
+                 state
+                 [[{:metric 1 :time 1}
+                   {:metric 2 :time 2}
+                   {:metric 1 :time 3}]]
+                 [{:time 3 :metric 2}])))
