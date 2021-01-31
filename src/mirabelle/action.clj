@@ -684,6 +684,29 @@
    :params [tags]
    :children children})
 
+(defn untag*
+  [_ tags & children]
+  (let [tags (set (flatten [tags]))
+        blacklist #(not (tags %))]
+    (fn [event]
+      (call-rescue (update event :tags #(filter blacklist %))
+                   children))))
+
+(s/def ::untag (s/cat :tags (s/or :single string?
+                                  :multiple (s/coll-of string?))))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn untag
+  "Removes a tag, or set of tags, from events which flow through.
+
+  (untag \"foo\" index)
+  (untag [\"foo\" \"bar\"] index)"
+  [tags & children]
+  (spec/valid? ::untag [tags])
+  {:action :untag
+   :params [tags]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -709,4 +732,5 @@
    :set-field set-field*
    :tag tag*
    :test-action test-action*
+   :untag untag*
    :where where*})

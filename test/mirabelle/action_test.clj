@@ -345,3 +345,26 @@
                   {:metric 10 :time 1 :tags ["foo" "bar"]}
                   {:metric 5 :time 4 :tags ["foo" "bar"]}])))
 
+(deftest untag*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/untag* nil "foo" rec)
+                 state
+                 [{:metric 1 :time 1}
+                  {:metric 2 :tags ["foo"]}
+                  {:metric 10 :time 1 :tags ["bar"]}
+                  {:metric 5 :time 4 :tags ["foo" "bar"]}]
+                 [{:metric 1 :time 1 :tags []}
+                  {:metric 2 :tags []}
+                  {:metric 10 :time 1 :tags ["bar"]}
+                  {:metric 5 :time 4 :tags ["bar"]}])
+    (test-action (a/untag* nil ["foo" "bar"] rec)
+                 state
+                 [{:metric 1 :time 1}
+                  {:metric 2 :tags ["foo"]}
+                  {:metric 10 :time 1 :tags ["bar"]}
+                  {:metric 5 :time 4 :tags ["foo" "bar"]}]
+                 [{:metric 1 :time 1 :tags []}
+                  {:metric 2 :tags []}
+                  {:metric 10 :time 1 :tags []}
+                  {:metric 5 :time 4 :tags []}])))
+
