@@ -21,6 +21,9 @@
    :< <
    :<= <=
    := =
+   :contains (fn [field value]
+               (some #(= value %) field))
+   :absent (fn [field value] (not (some #( = value %) field)))
    :regex #(re-matches %2 %1)
    :nil? nil?
    :not-nil? (comp not nil?)
