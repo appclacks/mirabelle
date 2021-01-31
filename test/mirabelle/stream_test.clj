@@ -141,7 +141,8 @@
                           (a/error)
                           (a/expired)
                           (a/fixed-event-window 10
-                                                (a/list-mean)
+                                                (a/list-mean
+                                                 (a/sflatten))
                                                 (a/list-max)
                                                 (a/list-min)
                                                 (a/list-rate))

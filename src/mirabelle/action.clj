@@ -644,6 +644,22 @@
   {:action :list-rate
    :children children})
 
+(defn sflatten*
+  [_ & children]
+  (fn [events]
+    (doseq [e events]
+      (call-rescue e children))))
+
+(defn sflatten
+  "Streaming flatten. Calls children with each event in events.
+  Events should be a sequence.
+
+  This stream can be used to \"flat\" a sequence of events (emitted
+  by a time window stream for example)."
+  [& children]
+  {:action :sflatten
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -656,6 +672,7 @@
    :error error*
    :expired expired*
    :fixed-event-window fixed-event-window*
+   :sflatten sflatten*
    :increment increment*
    :list-max list-max*
    :list-mean list-mean*

@@ -305,3 +305,19 @@
                    {:metric 2 :time 2}
                    {:metric 1 :time 3}]]
                  [{:time 3 :metric 2}])))
+
+(deftest sflatten*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/sflatten* nil rec)
+                 state
+                 [[{:metric 1 :time 1}
+                   {:metric 10 :time 2}
+                   {:metric 4 :time 3}
+                   {:metric 10 :time 1}
+                   {:metric 5 :time 4}]]
+                 [{:metric 1 :time 1}
+                  {:metric 10 :time 2}
+                  {:metric 4 :time 3}
+                  {:metric 10 :time 1}
+                  {:metric 5 :time 4}])))
+
