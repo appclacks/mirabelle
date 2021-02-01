@@ -1,6 +1,7 @@
 (ns mirabelle.action
   (:require [clojure.spec.alpha :as s]
             [corbihttp.log :as log]
+            [exoscale.ex :as ex]
             [mirabelle.event :as e]
             [mirabelle.io :as io]
             [mirabelle.math :as math]
@@ -597,27 +598,46 @@
    :children children
    :params [dt fields]})
 
-(defn set-field*
-  [_ field value & children]
+(defn with*
+  [_ fields & children]
   (fn [event]
-    (call-rescue (assoc event field value) children)))
+    (call-rescue (merge event fields) children)))
 
-(s/def ::set-field (s/cat :field keyword? :value any?))
+(s/def ::with (s/cat :field keyword? :value any?))
 
-(defn set-field
+(defn with
   "Set an event field to the given value.
 
   ```clojure
-  (set-field :state \"critical\"
+  (with :state \"critical\"
+    (debug))
+  ```
+
+  A map can also be provided:
+
+  ```
+  ```clojure
+  (with {:host nil :state \"critical\"}
     (debug))
   ```
 
   This example set the field :state to critical for events."
-  [field value & children]
-  (spec/valid? ::set-field [field value])
-  {:action :set-field
-   :children children
-   :params [field value]})
+  [& args]
+  (cond
+;    (spec/valid? ::with [field value])
+
+    (map? (first args))
+    {:action :with
+     :children (rest args)
+     :params [(first args)]}
+
+    :else
+    (let [[k v & children] args]
+      (if (or (not k) (not v))
+        (throw (ex/ex-info "Invalid parameters for with: %s %s" k v)))
+      {:action :with
+       :children children
+       :params [{k v}]})))
 
 (defn list-rate*
   [_  & children]
@@ -769,8 +789,8 @@
    :outside-dt cond-dt*
    :push-io! push-io!*
    :sdo sdo*
-   :set-field set-field*
    :tag tag*
    :test-action test-action*
    :untag untag*
-   :where where*})
+   :where where*
+   :with with*})

@@ -250,9 +250,9 @@
               {:host "1" :service "bar" :metric 1 :time 12 :ttl 20}}]
            (map set @state)))))
 
-(deftest set-field*-test
+(deftest with*-test
   (let [[rec state] (recorder)]
-    (test-action (a/set-field* nil :state "ok" rec)
+    (test-action (a/with* nil {:state "ok"} rec)
                  state
                  [{:metric 1}
                   {:state "critical" :metric 2}

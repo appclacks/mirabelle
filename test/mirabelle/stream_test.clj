@@ -138,6 +138,24 @@
     (is (= [{:metric 3 :time 2}
             {:metric 1 :time 14}] @recorder))))
 
+(deftest with-test-stream
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/with {:foo 1 :metric 2}
+                          (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:metric 1 :time 1})
+    (is (= [{:metric 2 :time 1 :foo 1}] @recorder)))
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/with :metric 2
+                          (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:metric 1 :time 1})
+    (is (= [{:metric 2 :time 1}] @recorder))))
+
 (deftest io-file-test
   (let [stream {:name "my-stream"
                 :description "foo"
@@ -185,7 +203,8 @@
                           (a/untag ["foo" "bar"])
                           (a/outside-dt 10 10 20)
                           (a/coalesce 10 [:host])
-                          (a/set-field :foo 1)
+                          (a/with :foo 1)
+                          (a/with {:foo 1})
                           (a/where [:> :metric 10])
                           (a/where [:and
                                     [:< :metric 10]
