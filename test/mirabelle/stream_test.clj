@@ -109,6 +109,35 @@
             {:state "critical" :time 31}]
            @recorder))))
 
+(deftest ddt-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/ddt
+                          (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:metric 1 :time 1})
+    (is (= [] @recorder))
+    (entrypoint {:metric 4 :time 2})
+    (entrypoint {:metric 0 :time 12})
+    (is (= [{:metric 3 :time 2}
+            {:metric (/ -4 10) :time 12}] @recorder))))
+
+(deftest ddt-pos-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/ddt-pos
+                          (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:metric 1 :time 1})
+    (is (= [] @recorder))
+    (entrypoint {:metric 4 :time 2})
+    (entrypoint {:metric 0 :time 12})
+    (entrypoint {:metric 2 :time 14})
+    (is (= [{:metric 3 :time 2}
+            {:metric 1 :time 14}] @recorder))))
+
 (deftest io-file-test
   (let [stream {:name "my-stream"
                 :description "foo"
@@ -149,6 +178,8 @@
                           (a/increment)
                           (a/not-expired)
                           (a/tag "foo")
+                          (a/ddt)
+                          (a/ddt-pos)
                           (a/untag "foo")
                           (a/tag ["foo" "bar"])
                           (a/untag ["foo" "bar"])

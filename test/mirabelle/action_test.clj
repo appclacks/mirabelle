@@ -376,3 +376,28 @@
                   {:metric 10 :time 1 :tags []}
                   {:metric 5 :time 4 :tags []}])))
 
+(deftest dtt*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/ddt* nil false rec)
+                 state
+                 [{:metric 1 :time 1}
+                  {:metric 10 :time 4}
+                  {:metric 11 :time 7}
+                  {:metric 8 :time 10}
+                  ]
+                 [{:metric (/ 9 3) :time 4}
+                  {:metric (/ 1 3) :time 7}
+                  {:metric -1 :time 10}])
+    (test-action (a/ddt* nil true rec)
+                 state
+                 [{:metric 1 :time 1}
+                  {:metric 10 :time 4}
+                  {:metric 11 :time 7}
+                  {:metric 0 :time 10}
+                  {:time 12}
+                  {:metric 4 :time 12}]
+                 [{:metric (/ 9 3) :time 4}
+                  {:metric (/ 1 3) :time 7}
+                  {:metric 2 :time 12}])))
+
+

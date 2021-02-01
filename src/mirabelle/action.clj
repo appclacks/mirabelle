@@ -710,6 +710,41 @@
    :params [tags]
    :children children})
 
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn ddt*
+  [_ remove-neg? & children]
+  (let [prev (atom nil)]
+    (fn stream [event]
+      (when-let [m (:metric event)]
+        (let [prev-event (let [prev-event @prev]
+                           (reset! prev event)
+                           prev-event)]
+          (when prev-event
+            (let [dt (- (:time event) (:time prev-event))]
+              (when-not (zero? dt)
+                (let [diff (/ (- m (:metric prev-event)) dt)]
+                  (when-not (and remove-neg? (> 0 diff))
+                    (call-rescue (assoc event :metric diff) children)))))))))))
+
+(defn ddt
+  "Differentiate metrics with respect to time. Takes an optional number
+  followed by child streams.
+  Emits an event for each event received, but with metric equal to
+  the difference between the current event and the previous one, divided by the
+  difference in their times. Skips events without metrics."
+  [& children]
+  {:action :ddt
+   :params [false]
+   :children children})
+
+(defn ddt-pos
+  "Like ddt but do not forward events with negative metrics.
+  This can be used for counters which may be reseted to zero for example."
+  [& children]
+  {:action :ddt-pos
+   :params [true]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -718,6 +753,8 @@
    :critical critical*
    :critical-dt cond-dt*
    :debug debug*
+   :ddt ddt*
+   :ddt-pos ddt*
    :info info*
    :error error*
    :expired expired*
