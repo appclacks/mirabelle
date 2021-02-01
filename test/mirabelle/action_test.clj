@@ -400,4 +400,14 @@
                   {:metric (/ 1 3) :time 7}
                   {:metric 2 :time 12}])))
 
+(deftest scale*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/scale* nil 10 rec)
+                 state
+                 [{:metric 1 :time 1}
+                  {:metric 10 :time 4}
+                  ]
+                 [{:metric 10 :time 1}
+                  {:metric 100 :time 4}])))
+
 

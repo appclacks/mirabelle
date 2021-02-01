@@ -187,7 +187,7 @@
                           (a/info)
                           (a/error)
                           (a/expired)
-                          (a/fixed-event-window 10
+                          (a/fixed-event-window 3
                                                 (a/list-mean
                                                  (a/sflatten))
                                                 (a/list-max)
@@ -201,8 +201,9 @@
                           (a/untag "foo")
                           (a/tag ["foo" "bar"])
                           (a/untag ["foo" "bar"])
-                          (a/outside-dt 10 10 20)
-                          (a/coalesce 10 [:host])
+                          (a/outside-dt 2 10 20)
+                          (a/coalesce 2 [:host])
+                          (a/scale 100)
                           (a/with :foo 1)
                           (a/with {:foo 1})
                           (a/where [:> :metric 10])
@@ -211,4 +212,7 @@
                                     [:> :metric 1]]))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (is (fn? entrypoint))
-    (entrypoint {:state "ok" :time 2 :metric 1 :host "foo"})))
+    (entrypoint {:state "ok" :time 2 :metric 1 :host "foo"})
+    (entrypoint {:state "ok" :time 4 :metric 1 :host "foo"})
+    (entrypoint {:state "ok" :time 100 :metric 1 :host "foo"})
+    (entrypoint {:state "ok" :time 200 :metric 1 :host "foo"})))

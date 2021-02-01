@@ -765,6 +765,21 @@
    :params [true]
    :children children})
 
+(defn scale*
+  [_ factor & children]
+  (fn [event]
+    (call-rescue (update event :metric * factor) children)))
+
+(s/def ::scale (s/cat :factor number?))
+
+(defn scale
+  "Multiplies the event :metric field by :factor"
+  [factor & children]
+  (spec/valid? ::scale [factor])
+  {:action :scale
+   :params [factor]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -788,6 +803,7 @@
    :not-expired not-expired*
    :outside-dt cond-dt*
    :push-io! push-io!*
+   :scale scale*
    :sdo sdo*
    :tag tag*
    :test-action test-action*
