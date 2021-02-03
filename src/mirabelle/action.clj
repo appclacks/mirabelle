@@ -40,6 +40,9 @@
          (= :and (first condition)))
      (every? identity (map #(valid-condition? %) (rest condition)))
 
+     (= :always-true (first condition))
+     true
+
      :else
      (and ((-> condition->fn keys set)
            (first condition))
@@ -829,6 +832,7 @@
                                   (do
                                     (swap! children conj (first clause))
                                     [:always-true])))))]
+    (spec/valid? (s/coll-of ::condition) clauses-fn)
     {:action :split
      :params [clauses-fn]
      :children @children}))

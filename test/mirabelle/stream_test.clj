@@ -210,6 +210,8 @@
                           (a/with :foo 1)
                           (a/with {:foo 1})
                           (a/where [:> :metric 10])
+                          (a/where [:always-true]
+                                   (a/critical))
                           (a/where [:and
                                     [:< :metric 10]
                                     [:> :metric 1]]))}
