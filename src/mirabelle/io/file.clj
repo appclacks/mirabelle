@@ -7,4 +7,6 @@
     (= (:path this)
        (:path other)))
   (inject! [this event]
-    (spit path (str (pr-str event) "\n") :append true)))
+    (let [events (if (sequential? event) event (list event))]
+      (doseq [event events]
+        (spit path (str (pr-str event) "\n") :append true)))))
