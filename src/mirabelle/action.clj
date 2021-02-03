@@ -22,6 +22,7 @@
    :< <
    :<= <=
    := =
+   :always-true (constantly true)
    :contains (fn [field value]
                (some #(= value %) field))
    :absent (fn [field value] (not (some #( = value %) field)))
@@ -780,6 +781,58 @@
    :params [factor]
    :children children})
 
+(defn split*
+  [_ clauses & children]
+  (println "clauses:" clauses  " children:"children)
+  (let [clauses (for [index (range (count clauses))]
+                  [(nth clauses index) (nth children index)])
+        comp-clauses (->> clauses
+                          (map (fn [clause]
+                                 [(compile-conditions (first clause))
+                                  (second clause)])))]
+    (fn [event]
+      (when-let [stream (reduce (fn [state clause]
+                                  (if ((first clause) event)
+                                    (reduced (second clause))
+                                    state))
+                                nil
+                                comp-clauses)]
+        (call-rescue event [stream])))))
+
+(defn split
+  "Split by conditions.
+
+  ```
+  (split
+    [:> :metric 10] (debug)
+    [:> :metric 5] (info)
+    (critical)
+  ```
+
+  In this example, all events with :metric > 10 will go into the debug stream,
+  all events with :metric > 5 in the info stream, and other events will to the
+  default stream which is \"critical\".
+
+  The default stream is optional, if not set all events not matching a condition
+  will be discarded."
+  [& clauses]
+  (let [children (atom [])
+        ;; can be optimized to not use an atom
+        clauses-fn (->> (partition-all 2 clauses)
+                        (mapv (fn [clause]
+                                (if (second clause)
+                                  (do
+                                    (swap! children conj (second clause))
+                                    (first clause))
+                                  ;; add a default fn to the default close
+                                  ;; if needed
+                                  (do
+                                    (swap! children conj (first clause))
+                                    [:always-true])))))]
+    {:action :split
+     :params [clauses-fn]
+     :children @children}))
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -804,6 +857,7 @@
    :outside-dt cond-dt*
    :push-io! push-io!*
    :scale scale*
+   :split split*
    :sdo sdo*
    :tag tag*
    :test-action test-action*

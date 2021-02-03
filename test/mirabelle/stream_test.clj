@@ -216,3 +216,60 @@
     (entrypoint {:state "ok" :time 4 :metric 1 :host "foo"})
     (entrypoint {:state "ok" :time 100 :metric 1 :host "foo"})
     (entrypoint {:state "ok" :time 200 :metric 1 :host "foo"})))
+
+(deftest split-test
+  (let [recorder (atom [])
+        recorder2 (atom [])
+        recorder3 (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/split
+                          [:> :metric 10] (a/test-action recorder)
+                          [:> :metric 5] (a/test-action recorder2)
+                          (a/test-action recorder3))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:metric 11 :time 1})
+    (entrypoint {:metric 6 :time 2})
+    (entrypoint {:metric 12 :time 3})
+    (entrypoint {:metric 1 :time 4})
+    (entrypoint {:metric 2 :time 5})
+    (is (= [{:metric 11 :time 1}
+            {:metric 12 :time 3}]
+           @recorder))
+    (is (= [{:metric 6 :time 2}]
+           @recorder2))
+    (is (= [{:metric 1 :time 4}
+            {:metric 2 :time 5}]
+           @recorder3)))
+  (let [recorder (atom [])
+        recorder2 (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/split
+                          [:> :metric 10] (a/test-action recorder)
+                          [:> :metric 5] (a/test-action recorder2))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:metric 11 :time 1})
+    (entrypoint {:metric 6 :time 2})
+    (entrypoint {:metric 12 :time 3})
+    (entrypoint {:metric 1 :time 4})
+    (entrypoint {:metric 2 :time 5})
+    (is (= [{:metric 11 :time 1}
+            {:metric 12 :time 3}]
+           @recorder))
+    (is (= [{:metric 6 :time 2}]
+           @recorder2)))
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/split
+                          [:> :metric 10] (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:metric 11 :time 1})
+    (entrypoint {:metric 6 :time 2})
+    (entrypoint {:metric 12 :time 3})
+    (entrypoint {:metric 1 :time 4})
+    (entrypoint {:metric 2 :time 5})
+    (is (= [{:metric 11 :time 1}
+            {:metric 12 :time 3}]
+           @recorder))))

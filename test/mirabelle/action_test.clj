@@ -410,4 +410,31 @@
                  [{:metric 10 :time 1}
                   {:metric 100 :time 4}])))
 
-
+(deftest split*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/split* nil
+                           [[:= :state "critical"]]
+                           rec)
+                 state
+                 [{:metric 1 :time 1 :state "ok"}
+                  {:metric 1 :time 1 :state "warning"}
+                  {:metric 1 :time 1 :state "critical"}]
+                 [{:metric 1 :time 1 :state "critical"}]))
+  (let [[rec state] (recorder)
+        [rec2 state2] (recorder)]
+    (test-action (a/split* nil
+                           [[:= :state "critical"]
+                            [:= :state "ok"]]
+                           rec
+                           rec2)
+                 state
+                 [{:metric 1 :time 1 :state "ok"}
+                  {:metric 1 :time 1 :state "warning"}
+                  {:metric 1 :time 1}
+                  {:metric 10 :time 4 :state "critical"}
+                  {:metric 1 :time 1 :state "foo"}
+                  {:metric 100 :time 1 :state "ok"}]
+                 [{:metric 10 :time 4 :state "critical"}])
+    (is (= [{:metric 1 :time 1 :state "ok"}
+            {:metric 100 :time 1 :state "ok"}]
+           @state2))))
