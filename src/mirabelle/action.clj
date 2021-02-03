@@ -833,6 +833,42 @@
      :params [clauses-fn]
      :children @children}))
 
+(defn throttle*
+  [_ dt & children]
+  (let [last-sent (atom [nil nil])]
+    (fn [event]
+      (when (:time event)
+        (let [[_ event-to-send] (swap! last-sent
+                                       (fn [[last-time-sent _]]
+                                         (if (or (nil? last-time-sent)
+                                                 (>= (:time event)
+                                                     (+ last-time-sent dt)))
+                                           [(:time event) event]
+
+                                           [last-time-sent nil])))]
+          (when event-to-send
+            (call-rescue event-to-send children)))))))
+
+(s/def ::throttle (s/cat :dt number?))
+
+(defn throttle
+  "Let one event pass at most every dt seconds.
+  Can be used for example to avoid sending to limit the number of alerts
+  sent to an external system.
+
+  ```clojure
+  (throttle 10
+    (alert))
+  ```
+
+  In this example, throttle will let one event pass at most every 10 seconds.
+  Other events, or events with no time, are filtered."
+  [dt & children]
+  (spec/valid? ::scale [dt])
+  {:action :throttle
+   :params [dt]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -861,6 +897,7 @@
    :sdo sdo*
    :tag tag*
    :test-action test-action*
+   :throttle throttle*
    :untag untag*
    :where where*
    :with with*})

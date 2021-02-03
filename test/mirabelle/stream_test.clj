@@ -181,6 +181,9 @@
                           (a/above-dt 10 20)
                           (a/between-dt 10 20 30)
                           (a/decrement)
+                          (a/throttle 10)
+                          (a/split
+                           [:> :metric 10] (a/critical))
                           (a/critical)
                           (a/critical-dt 10)
                           (a/debug)
