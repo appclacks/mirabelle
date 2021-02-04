@@ -201,6 +201,7 @@
                           (a/not-expired)
                           (a/tag "foo")
                           (a/ddt)
+                          (a/moving-event-window 3)
                           (a/ddt-pos)
                           (a/untag "foo")
                           (a/tag ["foo" "bar"])

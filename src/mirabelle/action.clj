@@ -936,6 +936,32 @@
    :params [n]
    :children children})
 
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn moving-event-window*
+  [_ n & children]
+  (let [window (atom (vec []))]
+    (fn stream [event]
+      (let [w (swap! window (fn swap [w]
+                              (vec (take-last n (conj w event)))))]
+        (call-rescue w children)))))
+
+(s/def ::moving-event-window (s/cat :n pos-int?))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn moving-event-window
+  "A sliding window of the last few events. Every time an event arrives, calls
+  children with a vector of the last n events, from oldest to newest. Ignores
+  event times. Example:
+
+  ```clojure
+  (moving-event-window 5 (smap folds/mean index))
+  ```"
+  [n & children]
+  (spec/valid? ::moving-event-window [n])
+  {:action :moving-event-window
+   :params [n]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -951,16 +977,17 @@
    :expired expired*
    :fixed-event-window fixed-event-window*
    :fixed-time-window fixed-time-window*
-   :sflatten sflatten*
    :increment increment*
    :list-max list-max*
    :list-mean list-mean*
    :list-min list-min*
    :list-rate list-rate*
+   :moving-event-window moving-event-window*
    :not-expired not-expired*
    :outside-dt cond-dt*
    :push-io! push-io!*
    :scale scale*
+   :sflatten sflatten*
    :split split*
    :sdo sdo*
    :tag tag*

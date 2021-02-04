@@ -483,9 +483,7 @@
                   {:metric 1 :time 9 :state "ok"}
                   {:metric 1 :time 10 :state "ok"}
                   {:metric 1 :time 29 :state "ok"}
-                  {:metric 1 :time 31 :state "ok"}
-
-                  ]
+                  {:metric 1 :time 31 :state "ok"}]
                  [[{:metric 1 :time 0 :state "ok"}
                    {:metric 1 :time 1 :state "ok"}
                    {:metric 1 :time 3 :state "ok"}]
@@ -496,3 +494,36 @@
                   []
                   []
                   [{:metric 1 :time 29 :state "ok"}]])))
+
+(deftest moving-event-window*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/moving-event-window* nil
+                                         5
+                                         rec)
+                 state
+                 [{:metric 1 :time 0 :state "ok"}
+                  {:metric 1 :time 1 :state "ok"}
+                  {:metric 1 :time 3 :state "ok"}
+                  {:metric 1 :time 9 :state "ok"}
+                  {:metric 1 :time 10 :state "ok"}
+                  {:metric 1 :time 29 :state "ok"}]
+                 [[{:metric 1 :time 0 :state "ok"}]
+                  [{:metric 1 :time 0 :state "ok"}
+                   {:metric 1 :time 1 :state "ok"}]
+                  [{:metric 1 :time 0 :state "ok"}
+                   {:metric 1 :time 1 :state "ok"}
+                   {:metric 1 :time 3 :state "ok"}]
+                  [{:metric 1 :time 0 :state "ok"}
+                   {:metric 1 :time 1 :state "ok"}
+                   {:metric 1 :time 3 :state "ok"}
+                   {:metric 1 :time 9 :state "ok"}]
+                  [{:metric 1 :time 0 :state "ok"}
+                   {:metric 1 :time 1 :state "ok"}
+                   {:metric 1 :time 3 :state "ok"}
+                   {:metric 1 :time 9 :state "ok"}
+                   {:metric 1 :time 10 :state "ok"}]
+                  [{:metric 1 :time 1 :state "ok"}
+                   {:metric 1 :time 3 :state "ok"}
+                   {:metric 1 :time 9 :state "ok"}
+                   {:metric 1 :time 10 :state "ok"}
+                   {:metric 1 :time 29 :state "ok"}]])))
