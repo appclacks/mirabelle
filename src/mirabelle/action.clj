@@ -873,6 +873,69 @@
    :params [dt]
    :children children})
 
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn fixed-time-window*
+  [_ n & children]
+  (let [state (atom {:start-time nil
+                     :buffer []
+                     :windows nil})]
+    (fn stream [event]
+      (let [s (swap! state
+                     (fn [{:keys [start-time buffer] :as state}]
+                       (cond
+                         ; No time
+                         (nil? (:time event))
+                         (-> (update state :buffer conj event)
+                             (assoc :windows nil))
+
+                         ; No start time
+                         (nil? start-time)
+                         (assoc state :start-time (:time event)
+                                      :buffer [event]
+                                      :windows nil)
+
+                         ; Too old
+                         (< (:time event) start-time)
+                         (assoc state :windows nil)
+
+                         ; Within window
+                         (< (:time event) (+ start-time n))
+                         (-> (update state :buffer conj event)
+                             (assoc :windows nil))
+
+                         ; Above window
+                         :else
+                         (let [delta (- (:time event) start-time)
+                               dstart (- delta (mod delta n))
+                               empties (dec (/ dstart n))
+                               ;; do we really need empty windows in
+                               ;; mirabelle ? Should we keep this Riemann
+                               ;; behavior ?
+                               windows (conj (repeat empties []) buffer)]
+                           (-> (update state :start-time + dstart)
+                               (assoc :buffer [event]
+                                      :windows windows))))))]
+        (when-let [windows (:windows s)]
+          (doseq [w windows]
+            (call-rescue w children)))))))
+
+(s/def ::fixed-time-window (s/cat :n pos-int?))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn fixed-time-window
+  "A fixed window over the event stream in time. Emits vectors of events, such
+  that each vector has events from a distinct n-second interval. Windows do
+  *not* overlap; each event appears at most once in the output stream. Once an
+  event is emitted, all events *older or equal* to that emitted event are
+  silently dropped.
+
+  Events without times accrue in the current window."
+  [n & children]
+  (spec/valid? ::scale [n])
+  {:action :fixed-time-window
+   :params [n]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -887,6 +950,7 @@
    :error error*
    :expired expired*
    :fixed-event-window fixed-event-window*
+   :fixed-time-window fixed-time-window*
    :sflatten sflatten*
    :increment increment*
    :list-max list-max*

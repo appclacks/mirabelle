@@ -182,6 +182,7 @@
                           (a/between-dt 10 20 30)
                           (a/decrement)
                           (a/throttle 10)
+                          (a/fixed-time-window 3)
                           (a/split
                            [:> :metric 10] (a/critical))
                           (a/critical)

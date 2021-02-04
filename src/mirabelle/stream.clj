@@ -23,3 +23,4 @@
 (defn stream!
   [stream event]
   ((:entrypoint stream) event))
+

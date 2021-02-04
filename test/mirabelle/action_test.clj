@@ -241,6 +241,15 @@
   (let [state (atom [])
         rec (fn [event] (swap! state conj event))
         action (a/coalesce* nil 5 [:host :service] rec)]
+    (doseq [event [{:host "1" :service "foo" :metric 1 :time 0 :ttl 10}
+                   {:host "1" :service "bar" :metric 1 :time 5 :ttl 10}]]
+      (action event))
+    (is (= [#{{:host "1", :service "foo", :metric 1, :time 0, :ttl 10}
+              {:host "1", :service "bar", :metric 1, :time 5, :ttl 10}}]
+           (map set @state))))
+  (let [state (atom [])
+        rec (fn [event] (swap! state conj event))
+        action (a/coalesce* nil 5 [:host :service] rec)]
     (doseq [event [{:host "1" :service "foo" :metric 1 :time 0 :ttl 20}
                    {:host "1" :service "baz" :metric 1 :time 1 :ttl 20}
                    {:host "1" :service "bar" :metric 1 :time 12 :ttl 20}]]
@@ -459,3 +468,31 @@
                   {:metric 1 :time 5 :state "ok"}
                   {:metric 1 :time 12 :state "ok"}
                   {:metric 1 :time 18 :state "ok"}])))
+
+(deftest fixed-time-window*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/fixed-time-window* nil
+                                       5
+                                       rec)
+                 state
+                 [{:metric 1 :time 0 :state "ok"}
+                  {:metric 1 :time 1 :state "ok"}
+                  {:metric 1 :time 3 :state "ok"}
+                  {:metric 1 :time 5 :state "ok"}
+                  {:metric 1 :time 7 :state "ok"}
+                  {:metric 1 :time 9 :state "ok"}
+                  {:metric 1 :time 10 :state "ok"}
+                  {:metric 1 :time 29 :state "ok"}
+                  {:metric 1 :time 31 :state "ok"}
+
+                  ]
+                 [[{:metric 1 :time 0 :state "ok"}
+                   {:metric 1 :time 1 :state "ok"}
+                   {:metric 1 :time 3 :state "ok"}]
+                  [{:metric 1 :time 5 :state "ok"}
+                   {:metric 1 :time 7 :state "ok"}
+                   {:metric 1 :time 9 :state "ok"}]
+                  [{:metric 1 :time 10 :state "ok"}]
+                  []
+                  []
+                  [{:metric 1 :time 29 :state "ok"}]])))
