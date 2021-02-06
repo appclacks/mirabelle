@@ -962,6 +962,35 @@
    :params [n]
    :children children})
 
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn ewma-timeless*
+  [_ r & children]
+  (let [m (atom 0)
+        c-existing (- 1 r)
+        c-new r]
+    (fn stream [event]
+      ; Compute new ewma
+      (let [m (when-let [metric-new (:metric event)]
+                (swap! m (comp (partial + (* c-new metric-new))
+                               (partial * c-existing))))]
+        (call-rescue (assoc event :metric m) children)))))
+
+(s/def ::ewma-timeless (s/cat :r number?))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn ewma-timeless
+  "Exponential weighted moving average. Constant space and time overhead.
+  Passes on each event received, but with metric adjusted to the moving
+  average. Does not take the time between events into account. R is the ratio
+  between successive events: r=1 means always return the most recent metric;
+  r=1/2 means the current event counts for half, the previous event for 1/4,
+  the previous event for 1/8, and so on."
+  [r & children]
+  (spec/valid? ::ewma-timeless [r])
+  {:action :ewma-timeless
+   :params [r]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -974,6 +1003,7 @@
    :ddt-pos ddt*
    :info info*
    :error error*
+   :ewma-timeless ewma-timeless*
    :expired expired*
    :fixed-event-window fixed-event-window*
    :fixed-time-window fixed-time-window*

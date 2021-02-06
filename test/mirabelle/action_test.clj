@@ -527,3 +527,38 @@
                    {:metric 1 :time 9 :state "ok"}
                    {:metric 1 :time 10 :state "ok"}
                    {:metric 1 :time 29 :state "ok"}]])))
+
+(deftest ewma-timeless*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/ewma-timeless* nil
+                                   0
+                                   rec)
+                 state
+                 [{:metric 1 :time 0 :state "ok"}
+                  {:metric 3 :time 1 :state "ok"}
+                  {:metric 5 :time 2 :state "ok"}]
+                 [{:metric 0 :time 0 :state "ok"}
+                  {:metric 0 :time 1 :state "ok"}
+                  {:metric 0 :time 2 :state "ok"}]))
+  (let [[rec state] (recorder)]
+    (test-action (a/ewma-timeless* nil
+                                   1
+                                   rec)
+                 state
+                 [{:metric 1 :time 0 :state "ok"}
+                  {:metric 3 :time 1 :state "ok"}
+                  {:metric 5 :time 2 :state "ok"}]
+                 [{:metric 1 :time 0 :state "ok"}
+                  {:metric 3 :time 1 :state "ok"}
+                  {:metric 5 :time 2 :state "ok"}]))
+  (let [[rec state] (recorder)]
+    (test-action (a/ewma-timeless* nil
+                                   0.5
+                                   rec)
+                 state
+                 [{:metric 1 :time 0 :state "ok"}
+                  {:metric 1 :time 1 :state "ok"}
+                  {:metric 1 :time 2 :state "ok"}]
+                 [{:metric 0.5 :time 0 :state "ok"}
+                  {:metric 0.75 :time 1 :state "ok"}
+                  {:metric 0.875 :time 2 :state "ok"}])))
