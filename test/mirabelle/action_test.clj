@@ -609,4 +609,17 @@
                   {:metric 1}
                   {:metric 9}])))
 
-<
+(deftest changed*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/changed* nil :state "ok" rec)
+                 state
+                 [{:metric 1 :state "ok"}
+                  {:metric 2 :state "ok"}
+                  {:metric 3 :state "critical"}
+                  {:metric 4 :state "critical"}
+                  {:metric 4 :state "critical"}
+                  {:metric 5 :state "ok"}
+                  {:metric 6 :state "critical"}]
+                 [{:metric 3 :state "critical"}
+                  {:metric 5 :state "ok"}
+                  {:metric 6 :state "critical"}])))

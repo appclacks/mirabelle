@@ -1038,14 +1038,50 @@
    :params [n]
    :children children})
 
+(defn changed*
+  [_ field init & children]
+  (let [state (atom [init nil])]
+    (fn [event]
+      (let [[_ event] (swap! state
+                             (fn [s]
+                               (let [current-val (get event field)]
+                                 (if (= (first s)
+                                        current-val)
+                                   [(first s) nil]
+                                   [current-val event]))))]
+        (when event
+          (call-rescue event children))))))
+
+(s/def ::changed (s/cat :field keyword? :init any?))
+
+(defn changed
+  "Passes on events only if the `field` passed as parameter differs
+  from the previous one.
+  The `init` parameter is the default value for the stream.
+
+  ```clojure
+  (changed :state \"ok\")
+  ```
+
+  For example, this action will let event pass if the :state field vary,
+  the initial value being `ok`.
+
+  This stream is useful to get only events making a transition."
+  [field init & children]
+  (spec/valid? ::changed [field init])
+  {:action :changed
+   :params [field init]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
-   :decrement decrement*
+   :changed changed*
    :coalesce coalesce*
    :critical critical*
    :critical-dt cond-dt*
    :debug debug*
+   :decrement decrement*
    :ddt ddt*
    :ddt-pos ddt*
    :info info*

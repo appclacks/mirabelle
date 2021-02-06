@@ -202,6 +202,7 @@
                                                 (a/coll-min)
                                                 (a/coll-rate))
                           (a/increment)
+                          (a/changed :state "ok")
                           (a/not-expired)
                           (a/tag "foo")
                           (a/ddt)
