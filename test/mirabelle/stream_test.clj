@@ -182,6 +182,7 @@
                           (a/between-dt 10 20 30)
                           (a/decrement)
                           (a/throttle 10)
+                          (a/warning)
                           (a/ewma-timeless 1)
                           (a/fixed-time-window 3)
                           (a/split

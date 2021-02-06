@@ -481,6 +481,18 @@
   {:action :critical
    :children children})
 
+(defn warning*
+  [_ & children]
+  (fn [event]
+    (when (e/warning? event)
+      (call-rescue event children))))
+
+(defn warning
+  "Keep all events in state warning"
+  [& children]
+  {:action :warning
+   :children children})
+
 (defn default*
   [_ field value & children]
   (fn [event]
@@ -1024,5 +1036,6 @@
    :test-action test-action*
    :throttle throttle*
    :untag untag*
+   :warning warning*
    :where where*
    :with with*})

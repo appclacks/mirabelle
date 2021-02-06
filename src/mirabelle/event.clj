@@ -28,3 +28,8 @@
   "Verifies if an event is critical"
   [event]
   (= (:state event) "critical"))
+
+(defn warning?
+  "Verifies if an event is warning"
+  [event]
+  (= (:state event) "warning"))

@@ -562,3 +562,16 @@
                  [{:metric 0.5 :time 0 :state "ok"}
                   {:metric 0.75 :time 1 :state "ok"}
                   {:metric 0.875 :time 2 :state "ok"}])))
+
+(deftest warning*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/warning* nil  rec)
+                 state
+                 [{:state "ok" :metric 1}
+                  {:state "warning" :metric 2}
+                  {:state "warning" :metric 3}
+                  {:state "critical" :metric 1}
+                  {:state "warning" :metric 5}]
+                 [{:state "warning" :metric 2}
+                  {:state "warning" :metric 3}
+                  {:state "warning" :metric 5}])))
