@@ -196,11 +196,11 @@
                           (a/error)
                           (a/expired)
                           (a/fixed-event-window 3
-                                                (a/list-mean
+                                                (a/coll-mean
                                                  (a/sflatten))
-                                                (a/list-max)
-                                                (a/list-min)
-                                                (a/list-rate))
+                                                (a/coll-max)
+                                                (a/coll-min)
+                                                (a/coll-rate))
                           (a/increment)
                           (a/not-expired)
                           (a/tag "foo")

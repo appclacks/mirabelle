@@ -221,65 +221,65 @@
    :params [size]
    :children children})
 
-(defn list-mean*
+(defn coll-mean*
   [_ & children]
   (fn [events]
     (call-rescue (math/mean events) children)))
 
-(defn list-mean
+(defn coll-mean
   "Computes the events mean (on metric).
   Should receive a list of events from the previous stream.
   The most recent event is used as a base to create the new event
 
   ```clojure
   (fixed-event-window 10
-    (list-mean
+    (coll-mean
       (debug)))
   ```
 
   Computes the mean on windows of 10 events"
   [& children]
-  {:action :list-mean
+  {:action :coll-mean
    :children children})
 
-(defn list-max*
+(defn coll-max*
   [_ & children]
   (fn [events]
     (call-rescue (math/max-event events) children)))
 
-(defn list-max
+(defn coll-max
   "Returns the event with the biggest metric.
   Should receive a list of events from the previous stream.
 
   ```clojure
   (fixed-event-window 10
-    (list-max
+    (coll-max
       (debug)))
   ```
 
   Get the event the biggest metric on windows of 10 events"
   [& children]
-  {:action :list-max
+  {:action :coll-max
    :children children})
 
-(defn list-min*
+(defn coll-min*
   [_ & children]
   (fn [events]
     (call-rescue (math/min-event events) children)))
 
-(defn list-min
+(defn coll-min
   "Returns the event with the smallest metric.
   Should receive a list of events from the previous stream.
 
   ```clojure
   (fixed-event-window 10
-    (list-min
+    (coll-min
       (debug)))
   ```
 
   Get the event the smallest metric on windows of 10 events"
   [& children]
-  {:action :list-min
+  {:action :coll-min
    :children children})
 
 (defn test-action*
@@ -619,8 +619,6 @@
   (fn [event]
     (call-rescue (merge event fields) children)))
 
-(s/def ::with (s/cat :field keyword? :value any?))
-
 (defn with
   "Set an event field to the given value.
 
@@ -640,7 +638,6 @@
   This example set the field :state to critical for events."
   [& args]
   (cond
-;    (spec/valid? ::with [field value])
 
     (map? (first args))
     {:action :with
@@ -655,19 +652,19 @@
        :children children
        :params [{k v}]})))
 
-(defn list-rate*
+(defn coll-rate*
   [_  & children]
   (fn [events]
     (call-rescue (math/rate events) children)))
 
-(defn list-rate
+(defn coll-rate
   "Computes the rate on a list of events.
   Should receive a list of events from the previous stream.
   The latest event is used as a base to build the new event.
 
   ```clojure
   (fixed-event-window 3
-    (list-rate
+    (coll-rate
       (debug)))
   ```
 
@@ -681,7 +678,7 @@
   min and max events time).
   "
   [& children]
-  {:action :list-rate
+  {:action :coll-rate
    :children children})
 
 (defn sflatten*
@@ -1058,10 +1055,10 @@
    :fixed-event-window fixed-event-window*
    :fixed-time-window fixed-time-window*
    :increment increment*
-   :list-max list-max*
-   :list-mean list-mean*
-   :list-min list-min*
-   :list-rate list-rate*
+   :coll-max coll-max*
+   :coll-mean coll-mean*
+   :coll-min coll-min*
+   :coll-rate coll-rate*
    :moving-event-window moving-event-window*
    :not-expired not-expired*
    :outside-dt cond-dt*
