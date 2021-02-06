@@ -1003,6 +1003,44 @@
    :params [r]
    :children children})
 
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn over*
+  [_ n & children]
+  (fn stream [event]
+    (when-let [m (:metric event)]
+      (when (< n m)
+        (call-rescue event children)))))
+
+(s/def ::over (s/cat :n number?))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn over
+  "Passes on events only when their metric is greater than x"
+  [n & children]
+  (spec/valid? ::over [n])
+  {:action :over
+   :params [n]
+   :children children})
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn under*
+  [_ n & children]
+  (fn stream [event]
+    (when-let [m (:metric event)]
+      (when (> n m)
+        (call-rescue event children)))))
+
+(s/def ::under (s/cat :n number?))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn under
+  "Passes on events only when their metric is greater than x"
+  [n & children]
+  (spec/valid? ::under [n])
+  {:action :under
+   :params [n]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -1027,6 +1065,7 @@
    :moving-event-window moving-event-window*
    :not-expired not-expired*
    :outside-dt cond-dt*
+   :over over*
    :push-io! push-io!*
    :scale scale*
    :sflatten sflatten*
@@ -1035,6 +1074,7 @@
    :tag tag*
    :test-action test-action*
    :throttle throttle*
+   :under under*
    :untag untag*
    :warning warning*
    :where where*

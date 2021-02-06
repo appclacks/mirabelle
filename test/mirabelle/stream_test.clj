@@ -184,6 +184,8 @@
                           (a/throttle 10)
                           (a/warning)
                           (a/ewma-timeless 1)
+                          (a/over 1)
+                          (a/under 1)
                           (a/fixed-time-window 3)
                           (a/split
                            [:> :metric 10] (a/critical))

@@ -191,7 +191,7 @@
 
 (deftest critical*-test
   (let [[rec state] (recorder)]
-    (test-action (a/critical* nil  rec)
+    (test-action (a/critical* nil rec)
                  state
                  [{:state "ok" :metric 1}
                   {:state "critical" :metric 2}
@@ -565,7 +565,7 @@
 
 (deftest warning*-test
   (let [[rec state] (recorder)]
-    (test-action (a/warning* nil  rec)
+    (test-action (a/warning* nil rec)
                  state
                  [{:state "ok" :metric 1}
                   {:state "warning" :metric 2}
@@ -575,3 +575,37 @@
                  [{:state "warning" :metric 2}
                   {:state "warning" :metric 3}
                   {:state "warning" :metric 5}])))
+
+(deftest over*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/over* nil 10 rec)
+                 state
+                 [{:metric 10}
+                  {:metric 1}
+                  {:metric 4}
+                  {:metric 12}
+                  {:metric 11}
+                  {:metric 1}
+                  {:metric 9}
+                  {:metric 14}]
+                 [{:metric 12}
+                  {:metric 11}
+                  {:metric 14}])))
+
+(deftest under*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/under* nil 10 rec)
+                 state
+                 [{:metric 10}
+                  {:metric 1}
+                  {:metric 4}
+                  {:metric 12}
+                  {:metric 11}
+                  {:metric 1}
+                  {:metric 9}
+                  {:metric 14}]
+                 [{:metric 1}
+                  {:metric 4}
+                  {:metric 1}
+                  {:metric 9}])))
+
