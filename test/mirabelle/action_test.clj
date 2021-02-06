@@ -623,3 +623,40 @@
                  [{:metric 3 :state "critical"}
                   {:metric 5 :state "ok"}
                   {:metric 6 :state "critical"}])))
+
+(deftest project*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/project* nil
+                             [[:= :service "foo"]
+                              [:= :service "bar"]]
+                             rec)
+                 state
+                 [{:time 1 :service "foo" :ttl 10}
+                  {:time 2 :service "foo" :ttl 10}
+                  {:time 3 :service "bar" :ttl 10}
+                  {:time 2 :service "foo" :ttl 10}
+                  {:time 2 :service "bar" :ttl 10}
+                  {:time 4 :service "trololo" :ttl 10}
+                  ;; make everything expire
+                  {:time 30 :service "trololo" :ttl 10}
+                  {:time 31 :service "foo" :ttl 10}
+                  {:time 20 :service "bar" :ttl 10}
+                  {:time 29 :service "bar" :ttl 10}
+                  {:metric 10 :service "bar" :ttl 10}
+                  ]
+                 [[{:time 1 :service "foo" :ttl 10}]
+                  [{:time 2 :service "foo" :ttl 10}]
+                  [{:time 2 :service "foo" :ttl 10}
+                   {:time 3 :service "bar" :ttl 10}]
+                  [{:time 2 :service "foo" :ttl 10}
+                   {:time 3 :service "bar" :ttl 10}]
+                  [{:time 2 :service "foo" :ttl 10}
+                   {:time 3 :service "bar" :ttl 10}]
+                  [{:time 2 :service "foo" :ttl 10}
+                   {:time 3 :service "bar" :ttl 10}]
+                  [{:time 31 :service "foo" :ttl 10}]
+                  [{:time 31 :service "foo" :ttl 10}]
+                  [{:time 31 :service "foo" :ttl 10}
+                   {:time 29 :service "bar" :ttl 10}]
+                  [{:time 31 :service "foo" :ttl 10}
+                   {:time 29 :service "bar" :ttl 10}]])))

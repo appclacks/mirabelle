@@ -1073,6 +1073,69 @@
    :params [field init]
    :children children})
 
+(defn project*
+  [_ conditions & children]
+  (let [conditions-fns (map compile-conditions conditions)
+        n (count conditions)
+        state (atom {:buffer (reduce #(assoc %1 %2 nil)
+                                     {}
+                                     (range 0 (count conditions)))
+                     :current-time 0})]
+    (fn [event]
+      (let [result (swap! state
+                          (fn [{:keys [current-time buffer]}]
+                            ;; ffirst compute the current time
+                            (let [current-time (cond
+                                                 (nil? (:time event))
+                                                 current-time
+
+                                                 (> current-time
+                                                    (:time event))
+                                                 current-time
+
+                                                 :else
+                                                 (:time event))]
+                              (cond
+                                ;; event expired or no time, don't keep it
+                                ;; but filter from the current buffer expired events
+                                (or (nil? (:time event))
+                                    (e/expired? current-time event))
+                                {:buffer (->> (map #(when-not (e/expired? current-time (second %))
+                                                      %)
+                                                   buffer)
+                                              (into {}))
+                                 :current-time current-time}
+
+                                ;; event not expired, check clauses
+                                :else
+                                {:buffer (->> (reduce
+                                               ;; reduce on buffer
+                                               ;; use the key as index
+                                               ;; for the condition fn
+                                               (fn [state [k v]]
+                                                 (let [condition-fn (nth conditions-fns k)
+                                                       match? (condition-fn event)]
+                                                   (if (and match?
+                                                            (or (nil? v)
+                                                                (> (:time event) (:time v))))
+                                                     ;; if the event match and if the current
+                                                     ;; event in the buffer is nil or less recent,
+                                                     ;; keep it.
+                                                     (conj state [k event])
+                                                     ;; else, keep the old one if not expired
+                                                     (conj state [k (when (and v
+                                                                               (not (e/expired? current-time v)))
+                                                                      v)]))))
+                                               []
+                                               buffer)
+                                              (into {}))
+                                 :current-time current-time}))))
+            events (->> (:buffer result)
+                        vals
+                        (remove nil?))]
+        (when (seq events)
+          (call-rescue events children))))))
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
