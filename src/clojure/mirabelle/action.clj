@@ -2,10 +2,12 @@
   (:require [clojure.spec.alpha :as s]
             [corbihttp.log :as log]
             [exoscale.ex :as ex]
+            [mirabelle.db.memtable :as memtable]
             [mirabelle.event :as e]
             [mirabelle.io :as io]
             [mirabelle.math :as math]
-            [mirabelle.spec :as spec]))
+            [mirabelle.spec :as spec])
+  (:import java.util.concurrent.Executor))
 
 (defn call-rescue
   [event children]
@@ -512,7 +514,7 @@
 
 (defn push-io!*
   [context io-name]
-  (let [io-component (get-in context [:io io-name])]
+  (let [io-component (get-in context [:io io-name :component])]
     (fn [event]
       (io/inject! io-component event))))
 
@@ -795,7 +797,6 @@
 
 (defn split*
   [_ clauses & children]
-  (println "clauses:" clauses  " children:"children)
   (let [clauses (for [index (range (count clauses))]
                   [(nth clauses index) (nth children index)])
         comp-clauses (->> clauses
@@ -1136,11 +1137,56 @@
         (when (seq events)
           (call-rescue events children))))))
 
+(defn index!*
+  [context labels]
+  (let [memtable-engine (get-in context [:memtable-engine])
+        ^Executor memtable-executor (get-in context [:memtable-executor])
+        labels (sort (or labels []))]
+    (fn [event]
+      (when (and (:time event)
+                 (:service event))
+        (.execute memtable-executor
+                  (fn []
+                    (memtable/inject! memtable-engine
+                                      event
+                                      labels)))))))
+
+(s/def ::index! (s/cat :labels (s/coll-of keyword?)))
+
+(defn index!
+  "Push events to an external system"
+  [labels]
+  (spec/valid? ::index! [labels])
+  {:action :index
+   :params [labels]})
+
+(defn coll-count*
+  [_ & children]
+  (fn [events]
+    ;; send empty event if the list is empty
+    (call-rescue (or (math/count-events events)
+                     {:metric 0})
+                 children)))
+
+(defn coll-count
+  "Count the number of events.
+  Should receive a list of events from the previous stream.
+  The most recent event is used as a base to create the new event, and
+  its :metric field is set to the number of events received as input."
+  [& children]
+  {:action :coll-count
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
    :changed changed*
    :coalesce coalesce*
+   :coll-max coll-max*
+   :coll-mean coll-mean*
+   :coll-min coll-min*
+   :coll-rate coll-rate*
+   :coll-count coll-count*
    :critical critical*
    :critical-dt cond-dt*
    :debug debug*
@@ -1154,10 +1200,7 @@
    :fixed-event-window fixed-event-window*
    :fixed-time-window fixed-time-window*
    :increment increment*
-   :coll-max coll-max*
-   :coll-mean coll-mean*
-   :coll-min coll-min*
-   :coll-rate coll-rate*
+   :index! index!*
    :moving-event-window moving-event-window*
    :not-expired not-expired*
    :outside-dt cond-dt*

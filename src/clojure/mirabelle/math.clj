@@ -12,6 +12,16 @@
            (-> (reduce #(+ (:metric %2) %1) 0 events)
                (/ (count events))))))
 
+(defn count-events
+  "Count the number of events.
+  The latest event is used as a base to build the event returned by
+  this funcion."
+  [events]
+  (when (seq events)
+    (assoc (event/most-recent events)
+           :metric
+           (count events))))
+
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn extremum
   [operation events]

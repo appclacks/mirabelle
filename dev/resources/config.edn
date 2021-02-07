@@ -1,0 +1,4 @@
+{:tcp {:host "127.0.0.1"
+       :port 5555}
+ :stream {:streams-directories ["dev/resources/examples/streams"]
+          :io-directories ["dev/resources/examples/io"]}}
