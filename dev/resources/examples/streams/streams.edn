@@ -1,0 +1,12 @@
+{:foo {:actions {:action :sdo,
+                 :children
+                 ({:action :where,
+                   :params [[:> :metric 10]],
+                   :children
+                   ({:action :increment,
+                     :children
+                     ({:action :index!
+                       :params [[:host]]}
+                      {:action :info
+                       :params [],
+                       :children nil})})})}}}

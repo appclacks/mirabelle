@@ -1,7 +1,6 @@
 (ns mirabelle.action-test
   (:require [clojure.test :refer :all]
-            [mirabelle.action :as a]
-            [mirabelle.time :as t]))
+            [mirabelle.action :as a]))
 
 (defn recorder
   []
@@ -124,6 +123,10 @@
 
 (deftest coll-mean*-test
   (let [[rec state] (recorder)]
+    (test-action (a/coll-mean* nil rec)
+                 state
+                 [[{:metric 10}]]
+                 [{:metric 10}])
     (test-action (a/coll-mean* nil rec)
                  state
                  [[{:metric 10} {:metric 12}]]
@@ -300,6 +303,10 @@
 
 (deftest coll-rate*-test
   (let [[rec state] (recorder)]
+    (test-action (a/coll-rate* nil rec)
+                 state
+                 [[{:metric 1 :time 1}]]
+                 [{:metric 1 :time 1}])
     (test-action (a/coll-rate* nil rec)
                  state
                  [[{:metric 1 :time 1}
@@ -660,3 +667,29 @@
                    {:time 29 :service "bar" :ttl 10}]
                   [{:time 31 :service "foo" :ttl 10}
                    {:time 29 :service "bar" :ttl 10}]])))
+
+(deftest count*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/coll-count* nil
+                                rec)
+                 state
+                 [[]
+                  [{}]
+                  [{} {}]
+                  [{} {} {}]]
+                 [{:metric 0}
+                  {:metric 1}
+                  {:metric 2}
+                  {:metric 3}]))
+  (let [[rec state] (recorder)]
+    (test-action (a/coll-count* nil
+                                rec)
+                 state
+                 [[]
+                  [{}]
+                  [{} {:time 2}]
+                  [{} {:time 1} {}]]
+                 [{:metric 0}
+                  {:metric 1}
+                  {:metric 2 :time 2}
+                  {:metric 3 :time 1}])))

@@ -4,6 +4,7 @@
             [clojure.test :refer :all]
             [mirabelle.action :as a]
             [mirabelle.io.file :as io-file]
+            [mirabelle.io :refer [IO]]
             [mirabelle.stream :as stream]))
 
 (deftest compile!-test
@@ -164,7 +165,7 @@
         file (io/file "file-example-io")
         io-component (io-file/map->FileIO {:path (.getPath file)})
         {:keys [entrypoint]} (stream/compile-stream!
-                              {:io {:file-example-io io-component}}
+                              {:io {:file-example-io {:component io-component}}}
                               stream)]
     (entrypoint {:state "critical" :time 1})
     (entrypoint {:state "critical" :time 2})
@@ -200,6 +201,7 @@
                                                  (a/sflatten))
                                                 (a/coll-max)
                                                 (a/coll-min)
+                                                (a/coll-count)
                                                 (a/coll-rate))
                           (a/increment)
                           (a/changed :state "ok")
@@ -285,3 +287,14 @@
     (is (= [{:metric 11 :time 1}
             {:metric 12 :time 3}]
            @recorder))))
+
+(deftest compile-io!-test
+  (let [io-compiled (stream/compile-io! {:type :file
+                                         :confg {:path "/tmp/foo"}})]
+    (is (satisfies? IO (:component io-compiled)))))
+
+(deftest streams-names-test
+  (is (= #{:foo :bar}
+         (stream/streams-names {:foo {} :bar {}}))))
+
+
