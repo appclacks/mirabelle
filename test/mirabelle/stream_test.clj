@@ -182,6 +182,8 @@
                           (a/above-dt 10 20)
                           (a/between-dt 10 20 30)
                           (a/decrement)
+                          (a/sdissoc :foo)
+                          (a/sdissoc [:host :service])
                           (a/throttle 10)
                           (a/warning)
                           (a/ewma-timeless 1)

@@ -964,7 +964,7 @@
   event times. Example:
 
   ```clojure
-  (moving-event-window 5 (smap folds/mean index))
+  (moving-event-window 5 (coll-mean (info))
   ```"
   [n & children]
   (spec/valid? ::moving-event-window [n])
@@ -1177,6 +1177,29 @@
   {:action :coll-count
    :children children})
 
+(s/def ::sdissoc (s/cat :sdissoc (s/or :single keyword?
+                                       :multiple (s/coll-of keyword?))))
+
+(defn sdissoc*
+  [_ fields & children]
+  (fn [event]
+    (call-rescue (apply dissoc event fields)
+                 children)))
+
+(defn sdissoc
+  "Remove a key (or a list of keys) from the event
+
+  ```clojure
+  (sdissoc :host (info))
+
+  (sdissoc [:environment :host] (info))
+  "
+  [fields & children]
+  (spec/valid? ::sdissoc [fields])
+  {:action :sdissoc
+   :params [(if (keyword? fields) [fields] fields)]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -1209,6 +1232,7 @@
    :scale scale*
    :sflatten sflatten*
    :split split*
+   :sdissoc sdissoc*
    :sdo sdo*
    :tag tag*
    :test-action test-action*

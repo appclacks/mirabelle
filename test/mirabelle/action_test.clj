@@ -693,3 +693,31 @@
                   {:metric 1}
                   {:metric 2 :time 2}
                   {:metric 3 :time 1}])))
+
+(deftest sdissoc*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/sdissoc* nil
+                             [:foo]
+                             rec)
+                 state
+                 [{:foo 1
+                   :metric 1}
+                  {:host "bar"
+                   :metric 2}]
+                 [{:metric 1}
+                  {:host "bar"
+                   :metric 2}])
+    (test-action (a/sdissoc* nil
+                             [:foo :host]
+                             rec)
+                 state
+                 [{:foo 1
+                   :metric 1}
+                  {:host "bar"
+                   :metric 2}
+                  {:host "bar"
+                   :foo 1
+                   :metric 3}]
+                 [{:metric 1}
+                  {:metric 2}
+                  {:metric 3}])))
