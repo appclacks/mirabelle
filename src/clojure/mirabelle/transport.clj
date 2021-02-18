@@ -1,8 +1,7 @@
 ;; This code is from the Riemann code base
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (ns mirabelle.transport
-  (:require [clojure.string :as string]
-            [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
             [mirabelle.time :as time]
             [mirabelle.stream :as stream]
             [riemann.codec  :as codec])
@@ -152,15 +151,14 @@
 (defn handle
   "Handles a msg with the given handler."
   [stream-handler msg]
-  (let [stream-handler @stream-handler]
-    (try
-      (doseq [event (:events msg)]
-        (stream/push! stream-handler event
-                      (or (:stream event)
-                          :streaming)))
-      {:ok true}
+  (try
+    (doseq [event (:events msg)]
+      (stream/push! stream-handler event
+                    (or (:stream event)
+                        :streaming)))
+    {:ok true}
 
-      ;; Some kind of error happened
-      (catch Exception ^Exception e
-        (log/error {} e)
-        {:ok false :error (.getMessage e)}))))
+    ;; Some kind of error happened
+    (catch Exception ^Exception e
+      (log/error {} e)
+      {:ok false :error (.getMessage e)})))

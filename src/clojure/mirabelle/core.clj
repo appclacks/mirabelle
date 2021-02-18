@@ -10,6 +10,7 @@
             [mirabelle.transport.tcp :as tcp]
             [signal.handler :refer [with-handler]]
             [unilog.config :refer [start-logging!]])
+  (:import mirabelle.stream.StreamHandler)
   (:gen-class))
 
 (defonce ^:redef system
@@ -18,21 +19,26 @@
 (defn build-system
   [{:keys [tcp stream]}]
   (let [registry (metric/registry-component {})
-        memtable-engine (component/start
-                         (memtable/map->MemtableEngine {:memtable-max-ttl 3600
-                                                        :memtable-cleanup-duration 1000}))
-        memtable-executor (pool/fixed-thread-pool-executor 1)
-        stream-handler (atom (stream/map->StreamHandler
-                              (merge stream {:memtable-engine memtable-engine
-                                             :memtable-executor memtable-executor})))]
+        memtable-engine (component/start (memtable/map->MemtableEngine {:memtable-max-ttl 3600
+                                                                        :memtable-cleanup-duration 1000}))
+        memtable-executor (pool/fixed-thread-pool-executor 1)]
     (component/system-map
-     :registry registry
-     :stream-handler stream-handler
-     :shared-event-executor (transport/event-executor)
      :memtable-executor memtable-executor
-     :tcp-server (-> (tcp/map->TCPServer (assoc tcp
-                                                :stream-handler stream-handler))
+     :registry registry
+     :stream-handler (StreamHandler. (:streams-directories stream)
+                                     (:io-directories stream)
+                                     (Object.)
+                                     {}
+                                     {}
+                                     {}
+                                     {}
+                                     {}
+                                     memtable-engine
+                                     memtable-executor)
+     :shared-event-executor (transport/event-executor)
+     :tcp-server (-> (tcp/map->TCPServer tcp)
                      (component/using [:shared-event-executor
+                                       :stream-handler
                                        :registry])))))
 
 (defn init-system
@@ -49,7 +55,7 @@
 
 (defn reload!
   []
-  (reset! (:stream-handler system) (stream/reload @(:stream-handler system))))
+  (stream/reload (:stream-handler system)))
 
 (defn start!
   "Start the system."
