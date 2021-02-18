@@ -25,3 +25,55 @@
          (math/rate [{:metric 1 :time 2}
                      {:metric 1 :time 1}
                      {:metric 1 :time 10}]))))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(deftest sorted-sample-extract-test
+  (are [es e] (= (math/sorted-sample-extract es [0 0.5 1]) e)
+    []
+    []
+
+    [{:metric nil}]
+    []
+
+    [{:metric 1}]
+    [{:metric 1} {:metric 1} {:metric 1}]
+
+    [{:metric 2} {:metric 1}]
+    [{:metric 1} {:metric 2} {:metric 2}]
+
+    [{:metric 3} {:metric 1} {:metric 2}]
+    [{:metric 1} {:metric 2} {:metric 3}]
+
+    [{:metric 6} {:metric 1} {:metric 2} {:metric 1} {:metric 1}]
+    [{:metric 1} {:metric 1} {:metric 6}]))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(deftest sorted-sample-test
+  (are [es e] (= (math/sorted-sample es [0 0.5 1]) e)
+    []
+    []
+
+    [{:metric nil}]
+    []
+
+    [{:metric 1 :service "foo"}]
+    [{:metric 1 :service "foo" :quantile "0"} {:metric 1 :service "foo" :quantile "0.5"} {:metric 1 :service "foo" :quantile "1"}]
+
+    [{:metric 2} {:metric 1}]
+    [{:metric 1 :quantile "0"} {:metric 2 :quantile "0.5"} {:metric 2 :quantile "1"}]
+
+    [{:metric 3} {:metric 1} {:metric 2}]
+    [{:metric 1 :quantile "0"} {:metric 2 :quantile "0.5"} {:metric 3 :quantile "1"}]
+
+    [{:metric 6} {:metric 1} {:metric 2} {:metric 1} {:metric 1}]
+    [{:metric 1 :quantile "0"} {:metric 1 :quantile "0.5"} {:metric 6 :quantile "1"}])
+
+  (are [es e] (= (math/sorted-sample es {0 "min" 0.5 "median" 1 "max"}) e)
+    [{:metric 2} {:metric 1}]
+    [{:metric 1 :quantile "min"} {:metric 2 :quantile "median"} {:metric 2 :quantile "max"}]
+
+    [{:metric 3} {:metric 1} {:metric 2}]
+    [{:metric 1 :quantile "min"} {:metric 2 :quantile "median"} {:metric 3 :quantile "max"}]
+
+    [{:metric 6} {:metric 1} {:metric 2} {:metric 1} {:metric 1}]
+    [{:metric 1 :quantile "min"} {:metric 1 :quantile "median"} {:metric 6 :quantile "max"}]))

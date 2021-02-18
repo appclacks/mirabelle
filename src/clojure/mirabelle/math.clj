@@ -82,3 +82,39 @@
       (if (= 0 interval)
         (assoc base :metric sum)
         (assoc base :metric (/ sum (- (:time base) min-time)))))))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn sorted-sample-extract
+  "Returns the events in seqable s, sorted and taken at each point p of points,
+  where p ranges from 0 (smallest metric) to 1 (largest metric). 0.5 is the
+  median event, 0.95 is the 95th' percentile event, and so forth. Ignores
+  events without a metric."
+  [s points]
+  (let [sorted (sort-by :metric (filter :metric s))]
+    (if (empty? sorted)
+      '()
+      (let [n (count sorted)
+            extract (fn [point]
+                      (let [idx (min (dec n) (int (Math/floor (* n point))))]
+                        (nth sorted idx)))]
+        (map extract points)))))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn sorted-sample
+  "Sample a sequence of events at points. Returns events with the :quantile
+  key set to to \"pint\". For instance, (sorted-sample events [0 1])
+  returns a 2-element seq of the smallest event and the biggest event, by
+  metric. The first has a quantile set to \"0\" and the second one set to
+  in \"1\". If the points is a map, eg (sorted-sample events {0 \".min\" 1
+  \".max\"}, the the values will be appened to the quantile directly.
+  Useful for extracting histograms and percentiles.
+
+  When s is empty, returns an empty list."
+  [s points]
+  (let [[points pnames] (if (vector? points)
+                         [points (map #(str %) points)]
+                         (apply map vector points))]
+    (map (fn [pname event]
+           (assoc event :quantile pname))
+         pnames
+         (sorted-sample-extract s points))))
