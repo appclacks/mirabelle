@@ -199,6 +199,7 @@
                           (a/error)
                           (a/expired)
                           (a/fixed-event-window 3
+                                                (a/percentiles [0 0.5 1])
                                                 (a/coll-mean
                                                  (a/sflatten))
                                                 (a/coll-max)

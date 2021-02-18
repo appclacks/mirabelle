@@ -1200,6 +1200,34 @@
    :params [(if (keyword? fields) [fields] fields)]
    :children children})
 
+(defn percentiles*
+  [_ points & children]
+  (fn [events]
+    (doseq [event (math/sorted-sample events points)]
+      (call-rescue event
+                   children))))
+
+(s/def ::percentiles (s/cat :points (s/coll-of number?)))
+
+  ;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn percentiles
+  "Over each period of interval seconds, aggregates events and selects one
+  event from that period for each point. If point is 0, takes the lowest metric
+  event.  If point is 1, takes the highest metric event. 0.5 is the median
+  event, and so forth. Forwards each of these events to children. The event
+  has the point appended the `:quantile` key.
+  Useful for extracting histograms and percentiles.
+
+  ```clojure
+  (fixed-event-window 10
+    (percentiles [0.5 .0.75 0.98 0.99]))
+  ```"
+  [points & children]
+  (spec/valid? ::percentiles [points])
+  {:action :percentiles
+   :params [points]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -1228,6 +1256,7 @@
    :not-expired not-expired*
    :outside-dt cond-dt*
    :over over*
+   :percentiles percentiles*
    :push-io! push-io!*
    :scale scale*
    :sflatten sflatten*
