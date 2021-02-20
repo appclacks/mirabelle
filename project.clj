@@ -20,7 +20,7 @@
   :main ^:skip-aot mirabelle.core
   :target-path "target/%s"
   :source-paths ["src/clojure"]
-  :java-source-paths ["src/java"]
+  :java-source-paths ["src/java/src"]
   :profiles {:dev {:dependencies [[pjstadig/humane-test-output "0.10.0"]
                                   [org.clojure/tools.namespace "1.1.0"]]
                    :plugins [[lein-ancient "0.6.15"]

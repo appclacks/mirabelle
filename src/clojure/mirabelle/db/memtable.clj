@@ -1,8 +1,13 @@
 (ns mirabelle.db.memtable
   (:require [com.stuartsierra.component :as component])
-  (:import java.util.HashMap
-           fr.mcorbin.mirabelle.memtable.Engine
-           fr.mcorbin.mirabelle.memtable.Serie))
+  (:import fr.mcorbin.mirabelle.memtable.Engine
+           fr.mcorbin.mirabelle.memtable.Serie
+           java.util.Collection
+           java.util.HashMap))
+
+(defn collection->seq
+  [^Collection c]
+  (iterator-seq (.iterator c)))
 
 (def labels-hashmap
   (memoize (fn [labels-list values]
@@ -58,6 +63,8 @@
   (remove-serie [this service labels]
     (.remove engine (->serie service labels)))
   (values [this service labels]
-    (.valuesFor engine (->serie service labels)))
+    (when-let [coll (.valuesFor engine (->serie service labels))]
+      (collection->seq coll)))
   (values-in [this service labels from to]
-    (.valuesFor engine (->serie service labels) (double from) (double to))))
+    (when-let [coll (.valuesFor engine (->serie service labels) (double from) (double to))]
+      (collection->seq coll))))

@@ -4,15 +4,18 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Memtable {
     private ConcurrentSkipListMap<Double, Object> memtable;
     private Serie serie;
+    private ReentrantLock lock;
 
     public Memtable(double firstTime, Object firstEvent, Serie serie) {
         this.memtable = new ConcurrentSkipListMap<Double, Object>();
         this.serie = serie;
         this.memtable.put(firstTime, firstEvent);
+        this.lock = new ReentrantLock();
     }
 
     public void add(double time, Object event) {
@@ -41,6 +44,10 @@ public class Memtable {
 
     public double endTime() {
         return memtable.lastKey();
+    }
+
+    public ReentrantLock getLock() {
+        return this.lock;
     }
 
     public void clear() {
