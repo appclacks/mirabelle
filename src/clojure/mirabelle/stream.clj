@@ -56,49 +56,36 @@
 
 (def io-names streams-names)
 
-(defn new-stream-config
-  [old-config new-config]
-  (let [old-streams-names (streams-names old-config)
-        new-streams-names (streams-names new-config)
-        streams-to-remove (set/difference old-streams-names new-streams-names)
-        streams-to-add (set/difference  new-streams-names old-streams-names)
-        streams-to-compare (set/union old-streams-names new-streams-names)
-        streams-to-reload (remove
-                           (fn [stream-name]
-                             (= (dissoc (get old-config stream-name) :entrypoint)
-                                (dissoc (get new-config stream-name) :entrypoint)))
-                           streams-to-compare)]
+(defn config-keys
+  "Returns, from a configuration, the keys as a set"
+  [config]
+  (->> config
+       keys
+       (map keyword)
+       set))
 
-    {:to-remove streams-to-remove
-     :to-add streams-to-add
-     :to-reload streams-to-reload}))
-
-(defn new-io-config
+(defn new-config
   [old-config new-config]
-  (let [old-io-names (io-names old-config)
-        new-io-names (io-names new-config)
-        io-to-remove (set/difference old-io-names new-io-names)
-        io-to-add (set/difference  new-io-names old-io-names)
-        io-to-compare (set/union old-io-names new-io-names)
-        io-to-reload (remove
-                           (fn [stream-name]
-                             (= (dissoc (get old-config stream-name) :entrypoint)
-                                (dissoc (get new-config stream-name) :entrypoint)))
-                           io-to-compare)]
-    {:to-remove io-to-remove
-     :to-add io-to-add
-     :to-reload io-to-reload}))
+  (let [old-names (config-keys old-config)
+        new-names (config-keys new-config)
+        to-remove (set/difference old-names new-names)
+        to-add (set/difference  new-names old-names)
+        to-compare (set/union old-names new-names)
+        to-reload (remove
+                   (fn [n]
+                     (= (get old-config n)
+                        (get new-config n)))
+                   to-compare)]
+
+    {:to-remove to-remove
+     :to-add to-add
+     :to-reload to-reload}))
 
 (defprotocol IStreamHandler
   (reload [this] "Add the new configuration")
   (add-dynamic-stream [this stream-configuration] "Add a new stream")
   (remove-dynamic-stream [this stream-name] "Remove a stream by name")
   (push! [this event streams] "Inject an event into a list of streams"))
-
-(defn debug
-  [f]
-  (println f)
-  f)
 
 (defn read-edn-dirs
   [dirs-path]
@@ -120,7 +107,6 @@
                         ^:volatile-mutable compiled-dynamic-streams
                         ^:volatile-mutable compiled-io
                         memtable-engine
-                        memtable-executor
                         ]
   component/Lifecycle
   (start [this]
@@ -130,22 +116,23 @@
       (component/stop io)))
   IStreamHandler
   (reload [this]
+    ;; I should simplify this crappy code
     (locking lock
       (log/info {} "Reloading streams")
       (let [new-streams-configurations (read-edn-dirs streams-directories)
             new-io-configurations (read-edn-dirs io-directories)
-            io-config (new-io-config io-configurations new-io-configurations)
-            io-configs-to-compile (select-keys new-io-config
+            io-config (new-config io-configurations new-io-configurations)
+            io-configs-to-compile (select-keys new-io-configurations
                                                (set/union (:to-add io-config)
                                                           (:to-reload io-config)))
             new-compiled-io (->> io-configs-to-compile
                                  (map (fn [[k v]] [k (compile-io! v)]))
-                                 (into {}))
-            io-final (-> (apply dissoc compiled-io (:to-remove io-config))
-                         (merge new-compiled-io))
+                                 (into {})
+                                 (merge
+                                  (apply dissoc compiled-io (:to-remove io-config))))
             ;; streams part
             {:keys [to-remove to-add to-reload]}
-            (new-stream-config streams-configurations new-streams-configurations)
+            (new-config streams-configurations new-streams-configurations)
             ;; new or streams to reload should be added to the current config
             ;; should be compiled first
             ;; todo filter real time streams
@@ -155,28 +142,30 @@
                                       ;; new io are injected into streams
                                       (map (fn [[k v]] [k (compile-stream!
                                                            {:memtable-engine memtable-engine
-                                                            :memtable-executor memtable-executor
-                                                            :io io-final} v)]))
-                                      (into {}))
-            streams-final (-> (apply dissoc compiled-real-time-streams to-remove)
-                              (merge new-compiled-streams))]
+                                                            :io new-compiled-io} v)]))
+                                      (into {})
+                                      (merge (apply dissoc
+                                                    compiled-real-time-streams to-remove)))]
         ;; all io not used anymore should be stopped
-        (doseq [io-to-stop (set/union (:to-reload io-config)
-                                      (:to-remove io-config))]
-          (log/infof {} "Stopping IO %s" io-to-stop)
-          (component/stop (-> (get compiled-io io-to-stop) :component)))
+        (doseq [io-to-remove (:to-remove io-config)]
+          (log/infof {} "Stopping IO %s" io-to-remove)
+          (component/stop (-> (get compiled-io io-to-remove) :component)))
+        (when-let [io-to-reload (seq (:to-reload io-config))]
+          (log/infof {} "Reloading IO %s" (string/join #", " io-to-reload)))
+        (when-let [io-to-add (seq (:to-add io-config))]
+          (log/infof {} "Adding IO %s" (string/join #", " io-to-add)))
         (when (seq to-remove)
           (log/infof {} "Removing streams %s" (string/join #", " to-remove)))
         (when (seq to-reload)
           (log/infof {} "Reloading streams %s" (string/join #", " to-reload)))
         (when (seq to-add)
-          (log/infof {} "Loading new streams %s" (string/join #", " to-add)))
+          (log/infof {} "Adding new streams %s" (string/join #", " to-add)))
 
         ;; mutate what is needed
         (set! streams-configurations new-streams-configurations)
         (set! io-configurations new-io-configurations)
-        (set! compiled-real-time-streams streams-final)
-        (set! compiled-io io-final))))
+        (set! compiled-real-time-streams new-compiled-streams)
+        (set! compiled-io new-compiled-io))))
   (push! [this event stream]
     (if (= :streaming stream)
       (doseq [[_ s] compiled-real-time-streams]

@@ -9,4 +9,7 @@
                        :params [[:host]]}
                       {:action :info
                        :params [],
+                       :children nil}
+                      {:action :push-io!
+                       :params [:file-example],
                        :children nil})})})}}}

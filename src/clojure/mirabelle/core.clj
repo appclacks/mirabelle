@@ -20,10 +20,8 @@
   [{:keys [tcp stream]}]
   (let [registry (metric/registry-component {})
         memtable-engine (component/start (memtable/map->MemtableEngine {:memtable-max-ttl 3600
-                                                                        :memtable-cleanup-duration 1000}))
-        memtable-executor (pool/fixed-thread-pool-executor 1)]
+                                                                        :memtable-cleanup-duration 1000}))]
     (component/system-map
-     :memtable-executor memtable-executor
      :registry registry
      :stream-handler (StreamHandler. (:streams-directories stream)
                                      (:io-directories stream)
@@ -33,8 +31,7 @@
                                      {}
                                      {}
                                      {}
-                                     memtable-engine
-                                     memtable-executor)
+                                     memtable-engine)
      :shared-event-executor (transport/event-executor)
      :tcp-server (-> (tcp/map->TCPServer tcp)
                      (component/using [:shared-event-executor

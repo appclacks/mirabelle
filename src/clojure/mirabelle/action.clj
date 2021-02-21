@@ -1140,16 +1140,13 @@
 (defn index!*
   [context labels]
   (let [memtable-engine (get-in context [:memtable-engine])
-        ^Executor memtable-executor (get-in context [:memtable-executor])
         labels (sort (or labels []))]
     (fn [event]
       (when (and (:time event)
                  (:service event))
-        (.execute memtable-executor
-                  (fn []
-                    (memtable/inject! memtable-engine
-                                      event
-                                      labels)))))))
+        (memtable/inject! memtable-engine
+                          event
+                          labels)))))
 
 (s/def ::index! (s/cat :labels (s/coll-of keyword?)))
 
