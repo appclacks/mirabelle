@@ -1,2 +1,2 @@
-{:file-example {:config {:path "/tmp/events2.edn"}
+{:file-example {:config {:path "/tmp/events.edn"}
                 :type :file}}

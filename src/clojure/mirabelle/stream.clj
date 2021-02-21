@@ -122,9 +122,9 @@
       (let [new-streams-configurations (read-edn-dirs streams-directories)
             new-io-configurations (read-edn-dirs io-directories)
             io-config (new-config io-configurations new-io-configurations)
+            ;; do not reload IO on purpose
             io-configs-to-compile (select-keys new-io-configurations
-                                               (set/union (:to-add io-config)
-                                                          (:to-reload io-config)))
+                                               (:to-add io-config))
             new-compiled-io (->> io-configs-to-compile
                                  (map (fn [[k v]] [k (compile-io! v)]))
                                  (into {})
@@ -150,8 +150,6 @@
         (doseq [io-to-remove (:to-remove io-config)]
           (log/infof {} "Stopping IO %s" io-to-remove)
           (component/stop (-> (get compiled-io io-to-remove) :component)))
-        (when-let [io-to-reload (seq (:to-reload io-config))]
-          (log/infof {} "Reloading IO %s" (string/join #", " io-to-reload)))
         (when-let [io-to-add (seq (:to-add io-config))]
           (log/infof {} "Adding IO %s" (string/join #", " io-to-add)))
         (when (seq to-remove)
