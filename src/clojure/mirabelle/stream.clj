@@ -110,6 +110,16 @@
                         ]
   component/Lifecycle
   (start [this]
+    (let [new-io-configurations (read-edn-dirs io-directories)
+          new-compiled-io (->> new-io-configurations
+                               (map (fn [[k v]] [k (compile-io! v)]))
+                               (into {}))]
+      (when-let [io (seq (map first new-io-configurations))]
+        (log/infof {}
+                   "Adding IO %s"
+                   (string/join #", " io)))
+      (set! io-configurations new-io-configurations)
+      (set! compiled-io new-compiled-io))
     this)
   (stop [this]
     (doseq [[_ io] compiled-io]
@@ -120,17 +130,6 @@
     (locking lock
       (log/info {} "Reloading streams")
       (let [new-streams-configurations (read-edn-dirs streams-directories)
-            new-io-configurations (read-edn-dirs io-directories)
-            io-config (new-config io-configurations new-io-configurations)
-            ;; do not reload IO on purpose
-            io-configs-to-compile (select-keys new-io-configurations
-                                               (:to-add io-config))
-            new-compiled-io (->> io-configs-to-compile
-                                 (map (fn [[k v]] [k (compile-io! v)]))
-                                 (into {})
-                                 (merge
-                                  (apply dissoc compiled-io (:to-remove io-config))))
-            ;; streams part
             {:keys [to-remove to-add to-reload]}
             (new-config streams-configurations new-streams-configurations)
             ;; new or streams to reload should be added to the current config
@@ -142,16 +141,11 @@
                                       ;; new io are injected into streams
                                       (map (fn [[k v]] [k (compile-stream!
                                                            {:memtable-engine memtable-engine
-                                                            :io new-compiled-io} v)]))
+                                                            :io compiled-io} v)]))
                                       (into {})
                                       (merge (apply dissoc
                                                     compiled-real-time-streams to-remove)))]
-        ;; all io not used anymore should be stopped
-        (doseq [io-to-remove (:to-remove io-config)]
-          (log/infof {} "Stopping IO %s" io-to-remove)
-          (component/stop (-> (get compiled-io io-to-remove) :component)))
-        (when-let [io-to-add (seq (:to-add io-config))]
-          (log/infof {} "Adding IO %s" (string/join #", " io-to-add)))
+
         (when (seq to-remove)
           (log/infof {} "Removing streams %s" (string/join #", " to-remove)))
         (when (seq to-reload)
@@ -161,9 +155,7 @@
 
         ;; mutate what is needed
         (set! streams-configurations new-streams-configurations)
-        (set! io-configurations new-io-configurations)
-        (set! compiled-real-time-streams new-compiled-streams)
-        (set! compiled-io new-compiled-io))))
+        (set! compiled-real-time-streams new-compiled-streams))))
   (push! [this event stream]
     (if (= :streaming stream)
       (doseq [[_ s] compiled-real-time-streams]

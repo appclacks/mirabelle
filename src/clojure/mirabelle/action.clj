@@ -514,9 +514,11 @@
 
 (defn push-io!*
   [context io-name]
-  (let [io-component (get-in context [:io io-name :component])]
+  (if-let [io-component (get-in context [:io io-name :component])]
     (fn [event]
-      (io/inject! io-component event))))
+      (io/inject! io-component event))
+    (throw (ex/ex-incorrect (format "IO %s not found"
+                                    io-name)))))
 
 (s/def ::push-io! (s/cat :io-name keyword?))
 
