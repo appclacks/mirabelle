@@ -1,13 +1,15 @@
 (ns mirabelle.core
   (:require [com.stuartsierra.component :as component]
+            [corbihttp.http :as corbihttp]
             [corbihttp.log :as log]
             [corbihttp.metric :as metric]
             [mirabelle.config :as config]
-            [mirabelle.stream :as stream]
             [mirabelle.db.memtable :as memtable]
-            [mirabelle.db.pool :as pool]
+            [mirabelle.handler :as handler]
+            [mirabelle.http :as http]
             [mirabelle.transport :as transport]
             [mirabelle.transport.tcp :as tcp]
+            [mirabelle.stream :as stream]
             [signal.handler :refer [with-handler]]
             [unilog.config :refer [start-logging!]])
   (:import mirabelle.stream.StreamHandler)
@@ -17,12 +19,14 @@
   nil)
 
 (defn build-system
-  [{:keys [tcp stream]}]
+  [{:keys [tcp stream http]}]
   (let [registry (metric/registry-component {})
         memtable-engine (component/start (memtable/map->MemtableEngine {:memtable-max-ttl 3600
                                                                         :memtable-cleanup-duration 1000}))]
     (component/system-map
      :registry registry
+     :http (-> (corbihttp/map->Server {:config http})
+               (component/using [:handler]))
      :stream-handler (StreamHandler. (:streams-directories stream)
                                      (:io-directories stream)
                                      (Object.)
@@ -32,6 +36,10 @@
                                      {}
                                      {}
                                      memtable-engine)
+     :handler (-> (http/map->ChainHandler {})
+                  (component/using [:api-handler :registry]))
+     :api-handler (-> (handler/map->Handler {:memtable-engine memtable-engine})
+                      (component/using [:stream-handler]))
      :shared-event-executor (transport/event-executor)
      :tcp-server (-> (tcp/map->TCPServer tcp)
                      (component/using [:shared-event-executor

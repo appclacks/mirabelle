@@ -83,8 +83,9 @@
 
 (defprotocol IStreamHandler
   (reload [this] "Add the new configuration")
-  (add-dynamic-stream [this stream-configuration] "Add a new stream")
+  (add-dynamic-stream [this stream-name stream-configuration] "Add a new stream")
   (remove-dynamic-stream [this stream-name] "Remove a stream by name")
+  (list-dynamic-streams [this] "List dynamic streams")
   (push! [this event streams] "Inject an event into a list of streams"))
 
 (defn read-edn-dirs
@@ -106,7 +107,7 @@
                         ^:volatile-mutable compiled-real-time-streams
                         ^:volatile-mutable compiled-dynamic-streams
                         ^:volatile-mutable compiled-io
-                        memtable-engine
+                        memtable-engine ;; runtime
                         ]
   component/Lifecycle
   (start [this]
@@ -119,7 +120,8 @@
                    "Adding IO %s"
                    (string/join #", " io)))
       (set! io-configurations new-io-configurations)
-      (set! compiled-io new-compiled-io))
+      (set! compiled-io new-compiled-io)
+      (set! compiled-dynamic-streams {}))
     this)
   (stop [this]
     (doseq [[_ io] compiled-io]
@@ -154,7 +156,6 @@
           (log/infof {} "Adding new streams %s" (string/join #", " to-add)))
 
         ;; mutate what is needed
-        (set! streams-configurations new-streams-configurations)
         (set! compiled-real-time-streams new-compiled-streams))))
   (push! [this event stream]
     (if (= :streaming stream)
@@ -162,4 +163,21 @@
         (stream! s event))
       (if-let [[_ s] (get compiled-dynamic-streams stream)]
         (stream! s event)
-        (throw (ex/ex-incorrect (format "Stream %s not found" stream)))))))
+        (throw (ex/ex-incorrect (format "Stream %s not found" stream))))))
+  (add-dynamic-stream [this stream-name stream-configuration]
+    (locking lock
+      (let [compiled-stream (compile-stream!
+                             {:memtable-engine memtable-engine
+                              :io compiled-io}
+                             stream-configuration)
+            new-compiled-dynamic-streams (assoc compiled-dynamic-streams
+                                                stream-name
+                                                compiled-stream)]
+        (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
+  (remove-dynamic-stream [this stream-name]
+    (locking lock
+      (let [new-compiled-dynamic-streams (assoc compiled-dynamic-streams
+                                                stream-name)]
+        (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
+  (list-dynamic-streams [this]
+    (keys compiled-dynamic-streams)))
