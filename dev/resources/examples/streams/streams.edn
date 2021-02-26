@@ -12,4 +12,6 @@
                        :children nil}
                       {:action :push-io!
                        :params [:file-example],
-                       :children nil})})})}}}
+                       :children nil}
+                      {:action :write!
+                       :params []})})})}}}

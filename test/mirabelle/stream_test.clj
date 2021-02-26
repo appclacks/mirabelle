@@ -157,25 +157,27 @@
     (entrypoint {:metric 1 :time 1})
     (is (= [{:metric 2 :time 1}] @recorder))))
 
-
 (deftest io-file-test
   (let [stream {:name "my-stream"
                 :description "foo"
-                :actions (a/critical
-                          (a/push-io! :file-example-io))}
-        file (io/file "file-example-io")
-        io-component (io-file/map->FileIO {:path (.getPath file)})
+                :actions (a/push-io! :file-example-io)}
+        file "/tmp/mirabelle-test-io"
+        io-component (io-file/map->FileIO {:path file})
         {:keys [entrypoint]} (stream/compile-stream!
                               {:io {:file-example-io {:component io-component}}}
                               stream)]
     (entrypoint {:state "critical" :time 1})
     (entrypoint {:state "critical" :time 1 :tags ["discard"]})
+    (entrypoint [{:state "critical" :time 1 :tags ["discard"]}
+                 {:state "critical" :time 1 :tags ["discard"]}
+                 {:state "critical" :time 1 :tags ["ok"]}])
     (entrypoint {:state "critical" :time 2})
-    (entrypoint {:state "ok" :time 2})
     (let [result (slurp file)]
-      (is ["{:state \"critical\" :time 1}"
-           "{:state \"critical\" :time 2}"]
-       (string/split result #"\n")))))
+      (is (= ["{:state \"critical\", :time 1}"
+              "{:state \"critical\", :time 1, :tags [\"ok\"]}"
+              "{:state \"critical\", :time 2}"]
+             (string/split result #"\n"))))
+    (io/delete-file file)))
 
 (deftest by-test
   (testing "simple example"

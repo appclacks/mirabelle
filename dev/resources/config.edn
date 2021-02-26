@@ -2,5 +2,6 @@
        :port 5555}
  :http {:host "127.0.0.1"
         :port 5666}
+ :queue {:directory "/tmp/queue"}
  :stream {:streams-directories ["dev/resources/examples/streams"]
           :io-directories ["dev/resources/examples/io"]}}

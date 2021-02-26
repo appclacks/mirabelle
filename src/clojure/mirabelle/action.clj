@@ -3,6 +3,7 @@
             [corbihttp.log :as log]
             [exoscale.ex :as ex]
             [mirabelle.db.memtable :as memtable]
+            [mirabelle.db.queue :as queue]
             [mirabelle.event :as e]
             [mirabelle.io :as io]
             [mirabelle.math :as math]
@@ -512,13 +513,19 @@
    :params [field value]
    :children children})
 
+(defn discard-fn [t] (= "discard" t))
+
+(defn keep-non-discarded-events
+  [events]
+  (remove #(some discard-fn (:tags %))
+          (if (sequential? events) events (list events))))
+
 (defn push-io!*
   [context io-name]
   (if-let [io-component (get-in context [:io io-name :component])]
-    (let [discard-fn #(= "discard" %)]
-      (fn [event]
-        (when (some discard-fn (:tags event))
-          (io/inject! io-component event))))
+    (fn [event]
+      (let [events (keep-non-discarded-events event)]
+        (io/inject! io-component events)))
     (throw (ex/ex-incorrect (format "IO %s not found"
                                     io-name)))))
 
@@ -1293,6 +1300,19 @@
    :params [fields]
    :children children})
 
+(defn write!*
+  [context]
+  (let [queue (:queue context)]
+    (fn [events]
+      (let [events (keep-non-discarded-events events)]
+        (when-not (empty? events)
+          (queue/write! queue events))))))
+
+(defn write!
+  []
+  {:action :write!
+   :params []})
+
 (def action->fn
   {:above-dt cond-dt*
    :between-dt cond-dt*
@@ -1336,4 +1356,5 @@
    :untag untag*
    :warning warning*
    :where where*
-   :with with*})
+   :with with*
+   :write! write!*})

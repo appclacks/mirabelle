@@ -114,6 +114,7 @@
                         ^:volatile-mutable compiled-dynamic-streams
                         ^:volatile-mutable compiled-io
                         memtable-engine ;; runtime
+                        queue ;; runtime
                         ]
   component/Lifecycle
   (start [this]
@@ -147,9 +148,10 @@
                                                    (set/union to-add to-reload))
             new-compiled-streams (->> streams-configs-to-compile
                                       ;; new io are injected into streams
-                                      (map (fn [[k v]] [k (compile-stream!
-                                                           {:memtable-engine memtable-engine
-                                                            :io compiled-io} v)]))
+                                      (mapv (fn [[k v]] [k (compile-stream!
+                                                            {:memtable-engine memtable-engine
+                                                             :io compiled-io
+                                                             :queue queue} v)]))
                                       (into {})
                                       (merge (apply dissoc
                                                     compiled-real-time-streams to-remove)))]
@@ -182,7 +184,7 @@
                                                 compiled-stream)]
         (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
   (remove-dynamic-stream [this stream-name]
-    (log/infof {} "Adding removing stream %s" stream-name)
+    (log/infof {} "Removing dynamic stream %s" stream-name)
     (locking lock
       (let [new-compiled-dynamic-streams (assoc compiled-dynamic-streams
                                                 stream-name)]
