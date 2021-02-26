@@ -161,11 +161,12 @@
     (if (= :streaming stream)
       (doseq [[_ s] compiled-real-time-streams]
         (stream! s event))
-      (if-let [[_ s] (get compiled-dynamic-streams stream)]
+      (if-let [s (get compiled-dynamic-streams stream)]
         (stream! s event)
         (throw (ex/ex-incorrect (format "Stream %s not found" stream))))))
   (add-dynamic-stream [this stream-name stream-configuration]
     (locking lock
+      (log/infof {} "Adding dynamic stream %s" stream-name)
       (let [compiled-stream (compile-stream!
                              {:memtable-engine memtable-engine
                               :io compiled-io}
@@ -175,6 +176,7 @@
                                                 compiled-stream)]
         (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
   (remove-dynamic-stream [this stream-name]
+    (log/infof {} "Adding removing stream %s" stream-name)
     (locking lock
       (let [new-compiled-dynamic-streams (assoc compiled-dynamic-streams
                                                 stream-name)]
