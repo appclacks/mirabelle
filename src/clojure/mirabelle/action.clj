@@ -1239,7 +1239,7 @@
 
 (s/def ::percentiles (s/cat :points (s/coll-of number?)))
 
-  ;; Copyright Riemann authors (riemann.io), thanks to them!
+;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn percentiles
   "Over each period of interval seconds, aggregates events and selects one
   event from that period for each point. If point is 0, takes the lowest metric
@@ -1256,6 +1256,29 @@
   (spec/valid? ::percentiles [points])
   {:action :percentiles
    :params [points]
+   :children children})
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn by-fn
+  [fields new-fork]
+  (let [fields (flatten [fields])
+        f (if (= 1 (count fields))
+            (first fields)
+            (apply juxt fields))
+        table (atom {})]
+    (fn stream [event]
+      (let [fork-name (f event)
+            fork (if-let [fork (@table fork-name)]
+                   fork
+                   ((swap! table assoc fork-name (new-fork)) fork-name))]
+        (call-rescue event fork)))))
+
+(s/def ::by (s/cat :fields (s/coll-of keyword?)))
+(defn by
+  [fields & children]
+  (spec/valid? ::by [fields])
+  {:action :by
+   :params [fields]
    :children children})
 
 (def action->fn

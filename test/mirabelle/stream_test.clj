@@ -157,6 +157,7 @@
     (entrypoint {:metric 1 :time 1})
     (is (= [{:metric 2 :time 1}] @recorder))))
 
+
 (deftest io-file-test
   (let [stream {:name "my-stream"
                 :description "foo"
@@ -176,6 +177,37 @@
            "{:state \"critical\" :time 2}"]
        (string/split result #"\n")))))
 
+(deftest by-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/by [:host]
+                          (a/fixed-event-window 2
+                           (a/test-action recorder)))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:host "foo" :metric 1 :time 1})
+    (entrypoint {:host "foo" :metric 2 :time 1})
+    (entrypoint {:host "bar" :metric 3 :time 1})
+    (entrypoint {:host "bar" :metric 4 :time 1})
+    (is (= [[{:host "foo" :metric 1 :time 1}
+             {:host "foo" :metric 2 :time 1}]
+            [{:host "bar" :metric 3 :time 1}
+             {:host "bar" :metric 4 :time 1}]]
+           @recorder))
+    (entrypoint {:host "bar" :metric 5 :time 2})
+    (entrypoint {:host "bar" :metric 6 :time 2})
+    (entrypoint {:host "baz" :metric 4 :time 1})
+    (entrypoint {:host "baz" :metric 7 :time 4})
+    (is (= [[{:host "foo" :metric 1 :time 1}
+             {:host "foo" :metric 2 :time 1}]
+            [{:host "bar" :metric 3 :time 1}
+             {:host "bar" :metric 4 :time 1}]
+            [{:host "bar" :metric 5 :time 2}
+             {:host "bar" :metric 6 :time 2}]
+            [{:host "baz" :metric 4 :time 1}
+             {:host "baz" :metric 7 :time 4}]]
+           @recorder))))
+
 (deftest full-test
   (let [stream {:name "my-stream"
                 :description "foo"
@@ -184,6 +216,8 @@
                           (a/between-dt 10 20 30)
                           (a/decrement)
                           (a/sdissoc :foo)
+                          (a/by [:host])
+                          (a/by [:host :service])
                           (a/sdissoc [:host :service])
                           (a/throttle 10)
                           (a/warning)

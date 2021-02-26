@@ -1,4 +1,4 @@
-(ns mirabelle.db.pool
+(ns mirabelle.pool
   (:import java.util.concurrent.Executors
            java.util.concurrent.LinkedBlockingQueue
            java.util.concurrent.ThreadPoolExecutor

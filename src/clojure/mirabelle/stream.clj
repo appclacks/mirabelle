@@ -13,12 +13,16 @@
   [context stream]
   (when (seq stream)
     (for [s stream]
-      (let [children (compile! context (:children s))
-            func (get action/action->fn (:action s))
+      (let [action (:action s)
+            func (get action/action->fn action)
             params (:params s)]
-        (if (seq params)
-          (apply func context (concat params children))
-          (apply func context children))))))
+        (if (= :by action)
+          (action/by-fn (first params)
+                        #(compile! context (:children s)))
+          (let [children (compile! context (:children s))]
+            (if (seq params)
+              (apply func context (concat params children))
+              (apply func context children))))))))
 
 (defn compile-stream!
   "Compile a stream to functions and associate to it its entrypoint."
