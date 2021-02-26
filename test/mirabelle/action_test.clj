@@ -722,7 +722,7 @@
                   {:metric 2}
                   {:metric 3}])))
 
-(deftest sdissoc*-test
+(deftest percentiles*-test
   (let [[rec state] (recorder)]
     (test-action (a/percentiles* nil
                                  [0 0.5 1]
@@ -732,3 +732,21 @@
                  [{:metric 1 :quantile "0"}
                   {:metric 2 :quantile "0.5"}
                   {:metric 3 :quantile "1"}])))
+
+(deftest tagged-all*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/tagged-all* nil
+                                "foo"
+                                rec)
+                 state
+                 [{:metric 3} {:metric 1 :tags ["a"]} {:metric 2 :tags ["foo"]}]
+                 [{:metric 2 :tags ["foo"]}])
+    (test-action (a/tagged-all* nil
+                                ["foo" "bar"]
+                                rec)
+                 state
+                 [{:metric 3}
+                  {:metric 1 :tags ["a"]}
+                  {:metric 2 :tags ["foo"]}
+                  {:metric 3 :tags ["foo" "bar"]}]
+                 [{:metric 3 :tags ["foo" "bar"]}])))

@@ -213,6 +213,8 @@
                           (a/ddt)
                           (a/moving-event-window 3)
                           (a/ddt-pos)
+                          (a/tagged-all ["foo" "bar"])
+                          (a/tagged-all "bar")
                           (a/untag "foo")
                           (a/tag ["foo" "bar"])
                           (a/untag ["foo" "bar"])

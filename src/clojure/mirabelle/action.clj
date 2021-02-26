@@ -748,6 +748,35 @@
    :children children})
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn tagged-all*
+  [_ tags & children]
+  (let [tag-coll (set (flatten [tags]))]
+    (fn stream [event]
+      (when (e/tagged-all? tag-coll event)
+        (call-rescue event children)
+        true))))
+
+(s/def ::tagged-all (s/cat :tags (s/or :single string?
+                                       :multiple (s/coll-of string?))))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn tagged-all
+  "Passes on events where all tags are present. This stream returns true if an
+  event it receives matches those tags, nil otherwise.
+
+  Can be used as a predicate in a where form.
+
+  ```clojure
+  (tagged-all \"foo\" (info))
+  (tagged-all [\"foo\" \"bar\"] (info))
+  ```"
+  [tags & children]
+  (spec/valid? ::tagged-all [tags])
+  {:action :tagged-all
+   :params [tags]
+   :children children})
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn ddt*
   [_ remove-neg? & children]
   (let [prev (atom nil)]
@@ -1263,6 +1292,7 @@
    :sdissoc sdissoc*
    :sdo sdo*
    :tag tag*
+   :tagged-all tagged-all*
    :test-action test-action*
    :throttle throttle*
    :under under*

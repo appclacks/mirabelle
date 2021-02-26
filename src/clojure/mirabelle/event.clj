@@ -1,5 +1,6 @@
 (ns mirabelle.event
-  (:require [mirabelle.time :as t]))
+  (:require [mirabelle.time :as t]
+            [clojure.set :as set]))
 
 (defn most-recent
   "Get the most recent event from an event list"
@@ -33,3 +34,10 @@
   "Verifies if an event is warning"
   [event]
   (= (:state event) "warning"))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn tagged-all?
+  "Predicate function to check if a collection of tags is
+  present in the tags of event."
+  [tags event]
+  (set/subset? (set tags) (set (:tags event))))
