@@ -1274,7 +1274,19 @@
         (call-rescue event fork)))))
 
 (s/def ::by (s/cat :fields (s/coll-of keyword?)))
+
 (defn by
+  "Split stream by field
+  Every time an event arrives with a new value of field, this action invokes
+  its child forms to return a *new*, distinct set of streams for that
+  particular value.
+
+  ```clojure
+  (by [:host :service]
+    (moving-time-window 5))
+  ```
+
+  Generates a moving window for each host/service combination."
   [fields & children]
   (spec/valid? ::by [fields])
   {:action :by

@@ -16,6 +16,8 @@
       (let [action (:action s)
             func (get action/action->fn action)
             params (:params s)]
+        ;; pass an fn compiling children to by
+        ;; in order to generate one children per fork
         (if (= :by action)
           (action/by-fn (first params)
                         #(compile! context (:children s)))

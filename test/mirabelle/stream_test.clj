@@ -178,35 +178,36 @@
        (string/split result #"\n")))))
 
 (deftest by-test
-  (let [recorder (atom [])
-        stream {:name "my-stream"
-                :description "foo"
-                :actions (a/by [:host]
-                          (a/fixed-event-window 2
-                           (a/test-action recorder)))}
-        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
-    (entrypoint {:host "foo" :metric 1 :time 1})
-    (entrypoint {:host "foo" :metric 2 :time 1})
-    (entrypoint {:host "bar" :metric 3 :time 1})
-    (entrypoint {:host "bar" :metric 4 :time 1})
-    (is (= [[{:host "foo" :metric 1 :time 1}
-             {:host "foo" :metric 2 :time 1}]
-            [{:host "bar" :metric 3 :time 1}
-             {:host "bar" :metric 4 :time 1}]]
-           @recorder))
-    (entrypoint {:host "bar" :metric 5 :time 2})
-    (entrypoint {:host "bar" :metric 6 :time 2})
-    (entrypoint {:host "baz" :metric 4 :time 1})
-    (entrypoint {:host "baz" :metric 7 :time 4})
-    (is (= [[{:host "foo" :metric 1 :time 1}
-             {:host "foo" :metric 2 :time 1}]
-            [{:host "bar" :metric 3 :time 1}
-             {:host "bar" :metric 4 :time 1}]
-            [{:host "bar" :metric 5 :time 2}
-             {:host "bar" :metric 6 :time 2}]
-            [{:host "baz" :metric 4 :time 1}
-             {:host "baz" :metric 7 :time 4}]]
-           @recorder))))
+  (testing "simple example"
+    (let [recorder (atom [])
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/by [:host]
+                                 (a/fixed-event-window 2
+                                                       (a/test-action recorder)))}
+          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+      (entrypoint {:host "foo" :metric 1 :time 1})
+      (entrypoint {:host "foo" :metric 2 :time 1})
+      (entrypoint {:host "bar" :metric 3 :time 1})
+      (entrypoint {:host "bar" :metric 4 :time 1})
+      (is (= [[{:host "foo" :metric 1 :time 1}
+               {:host "foo" :metric 2 :time 1}]
+              [{:host "bar" :metric 3 :time 1}
+               {:host "bar" :metric 4 :time 1}]]
+             @recorder))
+      (entrypoint {:host "bar" :metric 5 :time 2})
+      (entrypoint {:host "bar" :metric 6 :time 2})
+      (entrypoint {:host "baz" :metric 4 :time 1})
+      (entrypoint {:host "baz" :metric 7 :time 4})
+      (is (= [[{:host "foo" :metric 1 :time 1}
+               {:host "foo" :metric 2 :time 1}]
+              [{:host "bar" :metric 3 :time 1}
+               {:host "bar" :metric 4 :time 1}]
+              [{:host "bar" :metric 5 :time 2}
+               {:host "bar" :metric 6 :time 2}]
+              [{:host "baz" :metric 4 :time 1}
+               {:host "baz" :metric 7 :time 4}]]
+             @recorder)))))
 
 (deftest full-test
   (let [stream {:name "my-stream"
