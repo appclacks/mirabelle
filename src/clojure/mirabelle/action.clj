@@ -515,8 +515,10 @@
 (defn push-io!*
   [context io-name]
   (if-let [io-component (get-in context [:io io-name :component])]
-    (fn [event]
-      (io/inject! io-component event))
+    (let [discard-fn #(= "discard" %)]
+      (fn [event]
+        (when (some discard-fn (:tags event))
+          (io/inject! io-component event))))
     (throw (ex/ex-incorrect (format "IO %s not found"
                                     io-name)))))
 
