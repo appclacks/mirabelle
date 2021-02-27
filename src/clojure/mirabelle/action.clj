@@ -725,8 +725,8 @@
 (defn tag
   "Adds a new tag, or set of tags, to events which flow through.
 
-  (tag \"foo\" index)
-  (tag [\"foo\" \"bar\"] index)"
+  (tag \"foo\" (info))
+  (tag [\"foo\" \"bar\"] (info))"
   [tags & children]
   (spec/valid? ::tag [tags])
   {:action :tag

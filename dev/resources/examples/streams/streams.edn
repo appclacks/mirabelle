@@ -27,6 +27,4 @@
         :params [[:= :service "reinjected"]],
         :children [{:action :info
                     :params [],
-                    :children nil}]}
-
- }}
+                    :children nil}]}}}

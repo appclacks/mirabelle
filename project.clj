@@ -20,6 +20,10 @@
   :main ^:skip-aot mirabelle.core
   :target-path "target/%s"
   :source-paths ["src/clojure"]
+  :plugins [[lein-codox "0.10.7"]]
+  :codox {:source-uri "https://github.com/mcorbin/mirabelle/blob/{version}/{filepath}#L{line}"
+          :output-path "site/api"
+          :metadata   {:doc/format :markdown}}
   :java-source-paths ["src/java/src"]
   :profiles {:dev {:dependencies [[pjstadig/humane-test-output "0.10.0"]
                                   [org.clojure/tools.namespace "1.1.0"]]
