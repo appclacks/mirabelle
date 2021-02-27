@@ -614,7 +614,7 @@
   (at best).
 
   ```clojure
-  (coalesce 10 [:host \"service\"]
+  (coalesce 10 [:host :service]
     (debug)
   ```
 
@@ -1257,7 +1257,7 @@
 
   ```clojure
   (fixed-event-window 10
-    (percentiles [0.5 .0.75 0.98 0.99]))
+    (percentiles [0.5 0.75 0.98 0.99]))
   ```"
   [points & children]
   (spec/valid? ::percentiles [points])
