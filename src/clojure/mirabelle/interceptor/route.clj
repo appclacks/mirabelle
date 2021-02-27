@@ -13,6 +13,7 @@
 (def routes
   ["/"
    [["api/v1" v1]
+    [#"metrics/?" :system/metrics]
     [#"healthz/?" :system/healthz]
     [#"health/?" :system/healthz]
     [true :system/not-found]]])
@@ -32,10 +33,11 @@
         :stream/list (handler/list-streams handler request)
         :stream/add (handler/add-stream handler request)
         :stream/remove (handler/remove-stream handler request)
+        :system/metrics (handler/metrics handler request)
         :system/healthz (handler/healthz handler request)
         :system/not-found (handler/not-found handler request)
-        (throw (ex/ex-fault "unknown handler"
-                            {:handler handler}))))))
+        (throw (ex/ex-fault (format "unknown handler %s" req-handler)
+                            {:handler req-handler}))))))
 
 (defn route
   [handler registry]

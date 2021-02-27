@@ -4,6 +4,7 @@
             [clojure.set :as set]
             [clojure.string :as string]
             [corbihttp.log :as log]
+            [corbihttp.metric :as metric]
             [com.stuartsierra.component :as component]
             [exoscale.ex :as ex]
             [mirabelle.action :as action]
@@ -108,14 +109,15 @@
 
 (deftype StreamHandler [streams-directories ;; config
                         io-directories;; config
-                        lock ;; runtime
+                        lock
                         ^:volatile-mutable streams-configurations ;; runtime, the streams config
                         ^:volatile-mutable io-configurations;; runtime, the io config
                         ^:volatile-mutable compiled-real-time-streams
                         ^:volatile-mutable compiled-dynamic-streams
                         ^:volatile-mutable compiled-io
-                        memtable-engine ;; runtime
-                        queue ;; runtime
+                        memtable-engine
+                        queue
+                        registry
                         ]
   component/Lifecycle
   (start [this]

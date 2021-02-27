@@ -124,6 +124,23 @@
     (is (= [{:metric 3 :time 2}
             {:metric (/ -4 10) :time 12}] @recorder))))
 
+
+(deftest coll-rate-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions
+                (a/coll-rate (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint
+     [{:host "341694922644", :service "2", :state nil, :description nil, :metric 20, :tags nil, :time 1.614428853E9, :ttl nil}
+      {:host "341694922644", :service "2", :state nil, :description nil, :metric 20, :tags nil, :time 1.614428853E9, :ttl nil}
+      {:host "341694922644", :service "2", :state nil, :description nil, :metric 20, :tags nil, :time 1.614428853E9, :ttl nil}
+      {:host "341694922644", :service "2", :state nil, :description nil, :metric 20, :tags nil, :time 1.614428853E9, :ttl nil}
+      {:host "341694922644", :service "2", :state nil, :description nil, :metric 20, :tags nil, :time 1.614428853E9, :ttl nil}])
+    (is (= [{:host "341694922644", :service "2", :state nil, :description nil, :metric 100, :tags nil, :time 1.614428853E9, :ttl nil}]
+           @recorder))))
+
 (deftest ddt-pos-test
   (let [recorder (atom [])
         stream {:name "my-stream"

@@ -19,6 +19,8 @@
 (deftest rate-test
   (is (nil? (math/rate [])))
   (is (= {:metric 1 :time 1} (math/rate [{:metric 1 :time 1}])))
+  (is (= {:metric 2 :time 1} (math/rate [{:metric 1 :time 1}
+                                         {:metric 1 :time 1}])))
   (is (= {:metric 11 :time 1} (math/rate [{:metric 1 :time 1}
                                          {:metric 10 :time 1}])))
   (is (= {:metric (/ 3 9) :time 10}

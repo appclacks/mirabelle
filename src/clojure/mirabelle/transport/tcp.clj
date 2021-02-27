@@ -3,6 +3,7 @@
 (ns mirabelle.transport.tcp
   (:import [java.net InetSocketAddress]
            (javax.net.ssl SSLContext)
+           [java.util.concurrent TimeUnit]
            [io.netty.bootstrap ServerBootstrap]
            [io.netty.channel ChannelOption
                              ChannelHandlerContext
@@ -15,12 +16,12 @@
            [io.netty.channel.epoll EpollEventLoopGroup EpollServerSocketChannel]
            [io.netty.channel.kqueue KQueueEventLoopGroup KQueueServerSocketChannel]
            [io.netty.channel.nio NioEventLoopGroup]
-           [io.netty.channel.socket.nio NioServerSocketChannel])
+           [io.netty.channel.socket.nio NioServerSocketChannel]
+           [io.micrometer.core.instrument Timer])
   (:require [less.awful.ssl :as ssl]
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
-            [mirabelle.stream :as stream]
-            [mirabelle.action :as a]
+            [corbihttp.metric :as metric]
             [mirabelle.transport :as transport]))
 
 (defn int32-frame-decoder
@@ -40,14 +41,14 @@
 
   Automatically handles channel closure, and handles exceptions thrown by the
   handler by logging an error and closing the channel."
-  [stream-handler ^ChannelGroup channel-group handler]
+  [stream-handler registry ^ChannelGroup channel-group handler]
   (proxy [ChannelInboundHandlerAdapter] []
     (channelActive [ctx]
       (.add channel-group (.channel ctx)))
 
     (channelRead [^ChannelHandlerContext ctx ^Object message]
       (try
-        (handler stream-handler ctx message)
+        (handler stream-handler registry ctx message)
         (catch java.nio.channels.ClosedChannelException _
           (log/info {} "channel closed"))))
 
@@ -84,7 +85,7 @@
 (defn tcp-handler
   "Given a core, a channel, and a message, applies the message to core and
   writes a response back on this channel."
-  [stream-handler ^ChannelHandlerContext ctx ^Object message]
+  [stream-handler ^Timer tcp-timer ^ChannelHandlerContext ctx ^Object message]
   (let [t1 (:decode-time message)]
     (.. ctx
       ; Actually handle request
@@ -94,9 +95,7 @@
       (addListener
         (reify ChannelFutureListener
           (operationComplete [this fut]
-            (comment (metrics/update! stats
-                                      (- (System/nanoTime) t1)))
-            nil))))))
+            (.record tcp-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS)))))))
 
 (defn ssl-handler
   "Given an SSLContext, creates a new SSLEngine and a corresponding Netty
@@ -113,7 +112,7 @@
 
 (defn build-initializer
   "A channel pipeline initializer for a TCP server."
-  [stream-handler shared-event-executor channel-group ssl-context]
+  [stream-handler ^Timer tcp-timer shared-event-executor channel-group ssl-context]
   ; Gross hack; should re-work the pipeline macro
   (if ssl-context
     (transport/channel-initializer
@@ -125,7 +124,7 @@
       ^:shared msg-decoder         (transport/msg-decoder)
       ^:shared msg-encoder         (transport/msg-encoder)
       ^{:shared true :executor shared-event-executor} handler
-      (gen-tcp-handler stream-handler channel-group tcp-handler))
+      (gen-tcp-handler stream-handler tcp-timer channel-group tcp-handler))
 
     (transport/channel-initializer
                int32-frame-decoder  (int32-frame-decoder)
@@ -135,7 +134,7 @@
       ^:shared msg-decoder          (transport/msg-decoder)
       ^:shared msg-encoder          (transport/msg-encoder)
       ^{:shared true :executor shared-event-executor} handler
-      (gen-tcp-handler stream-handler channel-group tcp-handler))))
+      (gen-tcp-handler stream-handler tcp-timer channel-group tcp-handler))))
 
 (defrecord TCPServer [host ;; config
                       port ;; config
@@ -145,6 +144,7 @@
                       so-backlog ;; config
                       channel-group ;; runtime
                       initializer ;; runtime
+                      tcp-timer ;;runtime
                       killer ;; runtime
                       registry ;; dependency
                       stream-handler ;; dependency
@@ -154,6 +154,9 @@
   (start [this]
     (log/info {} "starting" (str "tcp-server " host ":" port))
     (let [killer (atom nil)
+          timer (metric/get-timer! registry
+                                   :tcp-request-duration
+                                   {})
           channel-grp (transport/channel-group
                        (str "tcp-server " host ":" port))
 
@@ -161,12 +164,14 @@
                         (let [ssl-context (ssl/ssl-context
                                            key cert cacert)]
                           (build-initializer stream-handler
+                                             timer
                                              shared-event-executor
                                              channel-grp
                                              ssl-context))
 
                         ;; A standard handler
                         (build-initializer stream-handler
+                                           timer
                                            shared-event-executor
                                            channel-grp
                                            nil))]
@@ -204,10 +209,14 @@
                           @w
                           @b)
                         (log/info {} "TCP server" host port "shut down")))))))
-      (assoc this :channel-group channel-grp :initializer initializer :killer killer)))
+      (assoc this
+             :channel-group channel-grp
+             :initializer initializer
+             :tcp-timer timer
+             :killer killer)))
 
   (stop [this]
-         (locking this
-           (when @killer
-             (@killer)
-             (reset! killer nil)))))
+    (locking this
+      (when @killer
+        (@killer)
+        (reset! killer nil)))))

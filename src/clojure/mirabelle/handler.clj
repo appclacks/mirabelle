@@ -1,5 +1,6 @@
 (ns mirabelle.handler
   (:require [clojure.edn :as edn]
+            [corbihttp.metric :as metric]
             [mirabelle.db.memtable :as memtable]
             [mirabelle.stream :as stream])
   (:import java.util.Base64))
@@ -10,7 +11,8 @@
   (add-stream [this request] "add a new stream")
   (remove-stream [this request] "remove a stream")
   (list-streams [this request] "list dynamic streams")
-  (not-found [this request] "Not found handler"))
+  (not-found [this request] "Not found handler")
+  (metrics [this request] "Return the metrics"))
 
 (defn get-serie-values
   [memtable-engine request]
@@ -27,7 +29,9 @@
   [s]
   (String. #^bytes (.decode (Base64/getDecoder) ^String s)))
 
-(defrecord Handler [memtable-engine stream-handler]
+(defrecord Handler [memtable-engine
+                    stream-handler
+                    registry]
   IHandler
   (get-serie [this request]
     {:status 200
@@ -51,4 +55,8 @@
      :body (stream/list-dynamic-streams stream-handler)})
   (not-found [this request]
     {:status 404
-     :body {:error "not found"}}))
+     :body {:error "not found"}})
+  (metrics [this request]
+    {:status 200
+     :headers {"Content-Type" "text/plain"}
+     :body (.getBytes (metric/scrape registry))}))

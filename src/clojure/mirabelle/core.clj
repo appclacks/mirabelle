@@ -38,11 +38,12 @@
                                      {}
                                      {}
                                      memtable-engine
-                                     queue-component)
+                                     queue-component
+                                     registry)
      :handler (-> (http/map->ChainHandler {})
                   (component/using [:api-handler :registry]))
      :api-handler (-> (handler/map->Handler {:memtable-engine memtable-engine})
-                      (component/using [:stream-handler]))
+                      (component/using [:stream-handler :registry]))
      :shared-event-executor (transport/event-executor)
      :tcp-server (-> (tcp/map->TCPServer tcp)
                      (component/using [:shared-event-executor

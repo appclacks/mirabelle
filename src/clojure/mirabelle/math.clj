@@ -79,9 +79,9 @@
             :min-time (:time (first events))}
            events)
           interval (- (:time base) min-time)]
-      (if (= 0 interval)
+      (if (zero? interval)
         (assoc base :metric sum)
-        (assoc base :metric (/ sum (- (:time base) min-time)))))))
+        (assoc base :metric (/ sum interval))))))
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn sorted-sample-extract
