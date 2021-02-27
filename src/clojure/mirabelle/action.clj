@@ -1309,9 +1309,24 @@
           (queue/write! queue events))))))
 
 (defn write!
+  "Write events into the on-disk queue."
   []
   {:action :write!
    :params []})
+
+(defn reinject!*
+  [context destination-stream]
+  (let [reinject-fn (:reinject context)]
+    (fn [event]
+      (reinject-fn event destination-stream))))
+
+(defn reinject!
+  "Reinject an event into the streaming system."
+  ([]
+   (reinject! :streaming))
+  ([destination-stream]
+   {:action :reinject!
+    :params [destination-stream]}))
 
 (def action->fn
   {:above-dt cond-dt*
@@ -1343,6 +1358,7 @@
    :over over*
    :percentiles percentiles*
    :push-io! push-io!*
+   :reinject! reinject!*
    :scale scale*
    :sflatten sflatten*
    :split split*

@@ -1,7 +1,9 @@
 {:foo {:actions {:action :sdo,
                  :children
                  ({:action :where,
-                   :params [[:> :metric 11]],
+                   :params [[:and
+                             [:> :metric 11]
+                             [:not= :service "reinjected"]]],
                    :children
                    ({:action :increment,
                      :children
@@ -10,8 +12,21 @@
                       {:action :info
                        :params [],
                        :children nil}
+                      {:action :with
+                       :params [{:service "reinjected"}]
+                       :children [{:action :reinject!
+                                   :params [:streaming]}]
+                       }
                       {:action :push-io!
                        :params [:file-example],
                        :children nil}
                       {:action :write!
-                       :params []})})})}}}
+                       :params []})})})}}
+ :bar {:actions
+       {:action :where,
+        :params [[:= :service "reinjected"]],
+        :children [{:action :info
+                    :params [],
+                    :children nil}]}
+
+ }}

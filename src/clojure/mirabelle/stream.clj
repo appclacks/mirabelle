@@ -12,19 +12,20 @@
 (defn compile!
   [context stream]
   (when (seq stream)
-    (for [s stream]
-      (let [action (:action s)
-            func (get action/action->fn action)
-            params (:params s)]
-        ;; pass an fn compiling children to by
-        ;; in order to generate one children per fork
-        (if (= :by action)
-          (action/by-fn (first params)
-                        #(compile! context (:children s)))
-          (let [children (compile! context (:children s))]
-            (if (seq params)
-              (apply func context (concat params children))
-              (apply func context children))))))))
+    (doall
+     (for [s stream]
+       (let [action (:action s)
+             func (get action/action->fn action)
+             params (:params s)]
+         ;; pass an fn compiling children to by
+         ;; in order to generate one children per fork
+         (if (= :by action)
+           (action/by-fn (first params)
+                         #(compile! context (:children s)))
+           (let [children (compile! context (:children s))]
+             (if (seq params)
+               (apply func context (concat params children))
+               (apply func context children)))))))))
 
 (defn compile-stream!
   "Compile a stream to functions and associate to it its entrypoint."
@@ -148,10 +149,12 @@
                                                    (set/union to-add to-reload))
             new-compiled-streams (->> streams-configs-to-compile
                                       ;; new io are injected into streams
-                                      (mapv (fn [[k v]] [k (compile-stream!
-                                                            {:memtable-engine memtable-engine
-                                                             :io compiled-io
-                                                             :queue queue} v)]))
+                                      (mapv (fn [[k v]]
+                                              [k (compile-stream!
+                                                  {:memtable-engine memtable-engine
+                                                   :io compiled-io
+                                                   :queue queue
+                                                   :reinject #(push! this %1 %2)} v)]))
                                       (into {})
                                       (merge (apply dissoc
                                                     compiled-real-time-streams to-remove)))]
@@ -164,7 +167,8 @@
           (log/infof {} "Adding new streams %s" (string/join #", " to-add)))
 
         ;; mutate what is needed
-        (set! compiled-real-time-streams new-compiled-streams))))
+        (set! compiled-real-time-streams new-compiled-streams)
+        (set! streams-configurations new-streams-configurations))))
   (push! [this event stream]
     (if (= :streaming stream)
       (doseq [[_ s] compiled-real-time-streams]
@@ -177,7 +181,8 @@
       (log/infof {} "Adding dynamic stream %s" stream-name)
       (let [compiled-stream (compile-stream!
                              {:memtable-engine memtable-engine
-                              :io compiled-io}
+                              :io compiled-io
+                              :queue queue}
                              stream-configuration)
             new-compiled-dynamic-streams (assoc compiled-dynamic-streams
                                                 stream-name

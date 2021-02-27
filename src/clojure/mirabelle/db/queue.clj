@@ -22,6 +22,4 @@
     (assoc this :queue nil :appender nil))
   IQueue
   (write! [this events]
-    (appender/write! appender events)
-    )
-  )
+    (appender/write! appender events)))
