@@ -8,6 +8,7 @@
             [com.stuartsierra.component :as component]
             [exoscale.ex :as ex]
             [mirabelle.action :as action]
+            [qbits.tape.tailer :as tailer]
             [mirabelle.io.file :as io-file]))
 
 (defn compile!
@@ -131,7 +132,19 @@
                    (string/join #", " io)))
       (set! io-configurations new-io-configurations)
       (set! compiled-io new-compiled-io)
-      (set! compiled-dynamic-streams {}))
+      (set! compiled-dynamic-streams {})
+      (reload this)
+      ;; reload events from the queue
+      (let [tailer (tailer/make (:queue queue))
+            events-count (atom 0)
+            continue? (atom true)]
+        (while @continue?
+          (if-let [events (tailer/read! tailer)]
+            (doseq [event events]
+              (swap! events-count inc)
+              (push! this (update event :tags concat ["discard"]) :streaming))
+            (reset! continue? false)))
+        (log/infof {} "Re-injected %s events from the queue" @events-count)))
     this)
   (stop [this]
     (doseq [[_ io] compiled-io]

@@ -8,6 +8,4 @@
               ({:action :fixed-event-window,
                 :params [5],
                 :children
-                ({:action :info}
-                 {:action :coll-rate,
-                  :children ({:action :write!, :params []})})})})}}}
+                ({:action :info})})})}}}

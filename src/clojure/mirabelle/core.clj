@@ -74,8 +74,7 @@
           _ (start-logging! (:logging config))
           _ (init-system config)
           sys (component/start-system system)]
-      (alter-var-root #'system (constantly sys))
-      (reload!))
+      (alter-var-root #'system (constantly sys)))
     (catch Exception e
       (log/error {} e "fail to start the system")
       (throw e))))

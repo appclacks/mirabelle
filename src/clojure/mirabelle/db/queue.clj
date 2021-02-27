@@ -1,6 +1,7 @@
 (ns mirabelle.db.queue
   (:require [com.stuartsierra.component :as component]
             [qbits.tape.appender :as appender]
+            [qbits.tape.tailer :as tailer]
             [qbits.tape.queue :as queue]))
 
 
