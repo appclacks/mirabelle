@@ -3,7 +3,7 @@
   :url "https://github.com/mcorbin/mirabelle"
   :license {:name "EPL-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
-  :dependencies [[cc.qbits/tape "0.3.3"]
+  :dependencies [[cc.qbits/tape "0.3.4"]
                  [io.netty/netty-all "4.1.58.Final"]
                  [io.netty/netty-codec "4.1.58.Final"]
                  [io.netty/netty-handler "4.1.58.Final"]
