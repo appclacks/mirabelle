@@ -5,7 +5,4 @@
              {:action :by,
               :params [[:host :service]],
               :children
-              ({:action :fixed-event-window,
-                :params [5],
-                :children
-                ({:action :info})})})}}}
+              ()})}}}

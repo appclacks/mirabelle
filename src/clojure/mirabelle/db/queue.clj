@@ -1,14 +1,14 @@
 (ns mirabelle.db.queue
   (:require [clojure.core.protocols :as p]
+            [corbihttp.log :as log]
             [com.stuartsierra.component :as component]
+            [mirabelle.event :as event]
             [qbits.tape.appender :as appender]
             [qbits.tape.codec :as codec]
-            [qbits.tape.queue :as queue])
-  (:import (net.openhft.chronicle.queue ChronicleQueue
-                                        ExcerptAppender)
+            [qbits.tape.queue :as queue]
+            [qbits.tape.tailer :as tailer])
+  (:import (net.openhft.chronicle.queue ExcerptAppender)
            (net.openhft.chronicle.bytes Bytes)))
-
-
 
 (defn make
   "Creates a new appender instance.
@@ -58,7 +58,8 @@
                :queue queue}))))))
 
 (defprotocol IQueue
-  (write! [this event] "push an event in the queue"))
+  (write! [this event] "push an event in the queue")
+  (read-all! [this action] "read all events from the queue, callling (action events) for each event."))
 
 (defrecord ChroniqueQueue [directory ;; config
                            queue ;; runtime
@@ -75,4 +76,20 @@
     (assoc this :queue nil :appender nil))
   IQueue
   (write! [this events]
-    (appender/write! appender events)))
+    (appender/write! appender (event/sequential-events events)))
+  (read-all! [this action]
+    (let [start-time (System/currentTimeMillis)
+          tailer (tailer/make queue)
+          events-count (atom 0)
+          continue? (atom true)]
+      (while @continue?
+        (if-let [events (tailer/read! tailer)]
+          (doseq [event events]
+            (swap! events-count inc)
+            (action event))
+          (reset! continue? false)))
+      (log/infof {}
+                 "Read %s events in %s milliseconds"
+                 @events-count
+                 (- (System/currentTimeMillis) start-time)))))
+

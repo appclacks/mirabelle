@@ -355,7 +355,32 @@
 
 (deftest streams-names-test
   (is (= #{:foo :bar}
-         (stream/streams-names {:foo {} :bar {}}))))
+         (stream/streams-names {:foo {} :bar {}})))
+  (is (= #{}
+         (stream/streams-names {}))))
 
-
-
+(deftest new-config-test
+  (testing "same config"
+    (let [old-config {:foo {} :bar {}}
+          new-config {:foo {} :bar {}}]
+      (is (empty? (:to-remove (stream/new-config old-config new-config))))
+      (is (empty? (:to-add (stream/new-config old-config new-config))))
+      (is (empty? (:to-reload (stream/new-config old-config new-config))))))
+  (testing "to-add"
+    (let [old-config {:foo {} :bar {}}
+          new-config {:foo {} :bar {} :baz {}}]
+      (is (empty? (:to-remove (stream/new-config old-config new-config))))
+      (is (= #{:baz} (:to-add (stream/new-config old-config new-config))))
+      (is (empty? (:to-reload (stream/new-config old-config new-config))))))
+  (testing "to-reload"
+    (let [old-config {:foo {} :bar {}}
+          new-config {:foo {} :bar {:foo 1} :baz {}}]
+      (is (empty? (:to-remove (stream/new-config old-config new-config))))
+      (is (= #{:baz} (:to-add (stream/new-config old-config new-config))))
+      (is (= #{:bar} (:to-reload (stream/new-config old-config new-config))))))
+    (testing "to-remove"
+    (let [old-config {:foo {} :bar {}}
+          new-config {:foo {}}]
+      (is (= #{:bar} (:to-remove (stream/new-config old-config new-config))))
+      (is (empty? (:to-add (stream/new-config old-config new-config))))
+      (is (empty? (:to-reload (stream/new-config old-config new-config)))))))

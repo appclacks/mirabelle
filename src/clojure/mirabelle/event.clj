@@ -41,3 +41,7 @@
   present in the tags of event."
   [tags event]
   (set/subset? (set tags) (set (:tags event))))
+
+(defn sequential-events
+  [event]
+  (if (sequential? event) event (list event)))

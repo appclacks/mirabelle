@@ -8,7 +8,7 @@
             [com.stuartsierra.component :as component]
             [exoscale.ex :as ex]
             [mirabelle.action :as action]
-            [qbits.tape.tailer :as tailer]
+            [mirabelle.db.queue :as q]
             [mirabelle.io.file :as io-file]))
 
 (defn compile!
@@ -78,14 +78,13 @@
   (let [old-names (config-keys old-config)
         new-names (config-keys new-config)
         to-remove (set/difference old-names new-names)
-        to-add (set/difference  new-names old-names)
-        to-compare (set/union old-names new-names)
-        to-reload (remove
-                   (fn [n]
-                     (= (get old-config n)
-                        (get new-config n)))
-                   to-compare)]
-
+        to-add (set/difference new-names old-names)
+        to-compare (set/intersection old-names new-names)
+        to-reload (set (remove
+                        (fn [n]
+                          (= (get old-config n)
+                             (get new-config n)))
+                        to-compare))]
     {:to-remove to-remove
      :to-add to-add
      :to-reload to-reload}))
@@ -98,6 +97,7 @@
   (push! [this event streams] "Inject an event into a list of streams"))
 
 (defn read-edn-dirs
+  "returns the content of a edn directory. All files in this directory are read."
   [dirs-path]
   (->> (map (fn [path] (.listFiles (io/file path))) dirs-path)
        (map (fn [files]
@@ -135,16 +135,9 @@
       (set! compiled-dynamic-streams {})
       (reload this)
       ;; reload events from the queue
-      (let [tailer (tailer/make (:queue queue))
-            events-count (atom 0)
-            continue? (atom true)]
-        (while @continue?
-          (if-let [events (tailer/read! tailer)]
-            (doseq [event events]
-              (swap! events-count inc)
-              (push! this (update event :tags concat ["discard"]) :streaming))
-            (reset! continue? false)))
-        (log/infof {} "Re-injected %s events from the queue" @events-count)))
+      (q/read-all! queue #(push! this
+                                 (update %1 :tags concat ["discard"])
+                                 :streaming)))
     this)
   (stop [this]
     (doseq [[_ io] compiled-io]

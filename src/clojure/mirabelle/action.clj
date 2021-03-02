@@ -34,6 +34,23 @@
    :not-nil? (comp not nil?)
    :not= not=})
 
+(defn discard-fn
+  [e]
+  (some #(= "discard" %) (:tags e)))
+
+(defn keep-non-discarded-events
+  "Takes an event or a list of events. Returns an event (or a list of events
+  depending of the input) with all events tagged \"discard\" filtered.
+  Returns nil if all events are filtered."
+  [events]
+  (if (sequential? events)
+    (let [result (remove discard-fn
+                         events)]
+      (when-not (empty? result)
+        result))
+    (when-not (discard-fn events)
+      events)))
+
 (defn valid-condition?
   [condition]
   (and
@@ -143,11 +160,19 @@
   {:action :decrement
    :children children})
 
-(defn debug*
-  [_ & children]
+(defn log-action
+  "generic logger"
+  [level]
   (fn [event]
-    (log/debug {} (pr-str event))
-    (call-rescue event children)))
+    (when-let [event (keep-non-discarded-events event)]
+      (condp = level
+        :debug (log/debug {} (pr-str event))
+        :info (log/info {} (pr-str event))
+        :error (log/error {} (pr-str event))))))
+
+(defn debug*
+  [_]
+  (log-action :debug))
 
 (defn debug
   "Print the event in the logs using the debug level
@@ -156,32 +181,26 @@
   (increment
     (debug))
   ```"
-  [& children]
-  {:action :debug
-   :children children})
+  []
+  {:action :debug})
 
 (defn info*
-  [_ & children]
-  (fn [event]
-    (log/info {} (pr-str event))
-    (call-rescue event children)))
+  [_]
+  (log-action :info))
 
 (defn info
   "Print the event in the logs using the info level
 
   ```clojure
   (increment
-    (debug))
+    (info))
   ```"
-  [& children]
-  {:action :info
-   :children children})
+  []
+  {:action :info})
 
 (defn error*
-  [_ & children]
-  (fn [event]
-    (log/error {} (pr-str event))
-    (call-rescue event children)))
+  [_]
+  (log-action :error))
 
 (defn error
   "Print the event in the logs using the error level
@@ -190,9 +209,8 @@
   (increment
     (debug))
   ```"
-  [& children]
-  {:action :error
-   :children children})
+  []
+  {:action :error})
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn fixed-event-window*
@@ -513,18 +531,11 @@
    :params [field value]
    :children children})
 
-(defn discard-fn [t] (= "discard" t))
-
-(defn keep-non-discarded-events
-  [events]
-  (remove #(some discard-fn (:tags %))
-          (if (sequential? events) events (list events))))
-
 (defn push-io!*
   [context io-name]
   (if-let [io-component (get-in context [:io io-name :component])]
     (fn [event]
-      (let [events (keep-non-discarded-events event)]
+      (when-let [events (keep-non-discarded-events event)]
         (io/inject! io-component events)))
     (throw (ex/ex-incorrect (format "IO %s not found"
                                     io-name)))))
@@ -1304,9 +1315,8 @@
   [context]
   (let [queue (:queue context)]
     (fn [events]
-      (let [events (keep-non-discarded-events events)]
-        (when-not (empty? events)
-          (queue/write! queue events))))))
+      (when-let [events (keep-non-discarded-events events)]
+        (queue/write! queue events)))))
 
 (defn write!
   "Write events into the on-disk queue."

@@ -16,6 +16,14 @@
     (action event))
   (is (= expected @state)))
 
+(deftest keep-non-discarded-events-test
+  (is (nil? (a/keep-non-discarded-events {:tags ["discard"]})))
+  (is (= {:tags ["foo"]} (a/keep-non-discarded-events {:tags ["foo"]})))
+  (is (= [{:tags ["foo"]}] (a/keep-non-discarded-events [{:tags ["foo"]}])))
+  (is (nil? (a/keep-non-discarded-events [{:tags ["discard"]}])))
+  (is (= [{:tags ["ok"]}]
+         (a/keep-non-discarded-events [{:tags ["discard"]} {:tags ["ok"]}]))))
+
 (deftest valid-condition?-test
   (are [condition] (a/valid-condition? condition)
     [:> :metric 10]

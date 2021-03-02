@@ -1,5 +1,6 @@
 (ns mirabelle.io.file
-  (:require [mirabelle.io :as io]))
+  (:require [mirabelle.event :as event]
+            [mirabelle.io :as io]))
 
 (defrecord FileIO [path]
   io/IO
@@ -7,6 +8,6 @@
     (= (:path this)
        (:path other)))
   (inject! [this event]
-    (let [events (if (sequential? event) event (list event))]
+    (let [events (event/sequential-events event)]
       (doseq [event events]
         (spit path (str (pr-str event) "\n") :append true)))))
