@@ -20,13 +20,15 @@
   :main ^:skip-aot mirabelle.core
   :target-path "target/%s"
   :source-paths ["src/clojure"]
+  :jvm-opts ["-Djdk.attach.allowAttachSelf"]
   :plugins [[lein-codox "0.10.7"]]
   :codox {:source-uri "https://github.com/mcorbin/mirabelle/blob/{version}/{filepath}#L{line}"
           :output-path "site/api"
           :metadata   {:doc/format :markdown}}
   :java-source-paths ["src/java/src"]
   :profiles {:dev {:dependencies [[pjstadig/humane-test-output "0.10.0"]
-                                  [org.clojure/tools.namespace "1.1.0"]]
+                                  [org.clojure/tools.namespace "1.1.0"]
+                                  [com.clojure-goes-fast/clj-memory-meter "0.1.3"]]
                    :plugins [[lein-ancient "0.6.15"]
                              [lein-environ "1.1.0"]]
                    :source-paths ["dev"]

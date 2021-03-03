@@ -150,12 +150,9 @@
 
 (defn handle
   "Handles a msg with the given handler."
-  [stream-handler msg]
+  [handler-fn msg]
   (try
-    (doseq [event (:events msg)]
-      (stream/push! stream-handler event
-                    (or (:stream event)
-                        :streaming)))
+    (run! handler-fn (:events msg))
     {:ok true}
 
     ;; Some kind of error happened

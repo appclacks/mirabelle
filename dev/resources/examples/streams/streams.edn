@@ -1,8 +1,5 @@
 {:foo
- {:actions {:action :sdo,
+ {:actions {:action :fixed-event-window,
+            :params [100]
             :children
-            ({:action :write!, :params []}
-             {:action :by,
-              :params [[:host :service]],
-              :children
-              ()})}}}
+            ({:action :restore!, :params []})}}}

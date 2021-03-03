@@ -22,6 +22,7 @@
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
             [corbihttp.metric :as metric]
+            [mirabelle.stream :as stream]
             [mirabelle.transport :as transport]))
 
 (defn int32-frame-decoder
@@ -42,21 +43,25 @@
   Automatically handles channel closure, and handles exceptions thrown by the
   handler by logging an error and closing the channel."
   [stream-handler registry ^ChannelGroup channel-group handler]
-  (proxy [ChannelInboundHandlerAdapter] []
-    (channelActive [ctx]
-      (.add channel-group (.channel ctx)))
+  (let [handler-fn (fn [event]
+                     (stream/push! stream-handler event
+                                   (or (:stream event)
+                                       :streaming)))]
+    (proxy [ChannelInboundHandlerAdapter] []
+      (channelActive [ctx]
+        (.add channel-group (.channel ctx)))
 
-    (channelRead [^ChannelHandlerContext ctx ^Object message]
-      (try
-        (handler stream-handler registry ctx message)
-        (catch java.nio.channels.ClosedChannelException _
-          (log/info {} "channel closed"))))
+      (channelRead [^ChannelHandlerContext ctx ^Object message]
+        (try
+          (handler handler-fn registry ctx message)
+          (catch java.nio.channels.ClosedChannelException _
+            (log/info {} "channel closed"))))
 
-    (exceptionCaught [^ChannelHandlerContext ctx ^Throwable cause]
-      (log/error {} cause "TCP handler caught")
-      (.close (.channel ctx)))
+      (exceptionCaught [^ChannelHandlerContext ctx ^Throwable cause]
+        (log/error {} cause "TCP handler caught")
+        (.close (.channel ctx)))
 
-    (isSharable [] true)))
+      (isSharable [] true))))
 
 (defn kqueue-netty-implementation
    []

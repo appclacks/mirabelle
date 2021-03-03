@@ -9,7 +9,8 @@
             [exoscale.ex :as ex]
             [mirabelle.action :as action]
             [mirabelle.db.queue :as q]
-            [mirabelle.io.file :as io-file]))
+            [mirabelle.io.file :as io-file])
+  (:import [java.util.concurrent TimeUnit]))
 
 (defn compile!
   [context stream]
@@ -116,6 +117,7 @@
                         ^:volatile-mutable compiled-real-time-streams
                         ^:volatile-mutable compiled-dynamic-streams
                         ^:volatile-mutable compiled-io
+                        ^:volatile-mutable stream-timer
                         memtable-engine
                         queue
                         registry
@@ -125,7 +127,10 @@
     (let [new-io-configurations (read-edn-dirs io-directories)
           new-compiled-io (->> new-io-configurations
                                (map (fn [[k v]] [k (compile-io! v)]))
-                               (into {}))]
+                               (into {}))
+          timer (metric/get-timer! registry
+                                   :stream-duration
+                                   {})]
       (when-let [io (seq (map first new-io-configurations))]
         (log/infof {}
                    "Adding IO %s"
@@ -133,6 +138,7 @@
       (set! io-configurations new-io-configurations)
       (set! compiled-io new-compiled-io)
       (set! compiled-dynamic-streams {})
+      (set! stream-timer timer)
       (reload this)
       ;; reload events from the queue
       (q/read-all! queue #(push! this
@@ -180,7 +186,9 @@
   (push! [this event stream]
     (if (= :streaming stream)
       (doseq [[_ s] compiled-real-time-streams]
-        (stream! s event))
+        (let [t1 (System/nanoTime)]
+          (stream! s event)
+          (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS)))
       (if-let [s (get compiled-dynamic-streams stream)]
         (stream! s event)
         (throw (ex/ex-incorrect (format "Stream %s not found" stream))))))

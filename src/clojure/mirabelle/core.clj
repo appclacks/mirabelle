@@ -37,6 +37,7 @@
                                      {}
                                      {}
                                      {}
+                                     nil
                                      memtable-engine
                                      queue-component
                                      registry)

@@ -1311,17 +1311,17 @@
    :params [fields]
    :children children})
 
-(defn write!*
+(defn restore!*
   [context]
   (let [queue (:queue context)]
     (fn [events]
       (when-let [events (keep-non-discarded-events events)]
         (queue/write! queue events)))))
 
-(defn write!
+(defn restore!
   "Write events into the on-disk queue."
   []
-  {:action :write!
+  {:action :restore!
    :params []})
 
 (defn reinject!*
@@ -1383,4 +1383,4 @@
    :warning warning*
    :where where*
    :with with*
-   :write! write!*})
+   :restore! restore!*})
