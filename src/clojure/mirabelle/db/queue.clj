@@ -81,14 +81,14 @@
     (let [start-time (System/currentTimeMillis)
           tailer (tailer/make queue)
           events-count (volatile! 0)
-          continue? (atom true)
+          continue? (volatile! true)
           run-fn (fn [event]
                    (vswap! events-count inc)
                    (action event))]
       (while @continue?
         (if-let [events (tailer/read! tailer)]
           (run! run-fn events)
-          (reset! continue? false)))
+          (vreset! continue? false)))
       (log/infof {}
                  "Read %s events in %s milliseconds"
                  @events-count
