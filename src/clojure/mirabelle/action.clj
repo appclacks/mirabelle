@@ -1202,7 +1202,7 @@
 (s/def ::index! (s/cat :labels (s/coll-of keyword?)))
 
 (defn index!
-  "Push events to an external system"
+  "Index events in memory."
   [labels]
   (spec/valid? ::index! [labels])
   {:action :index
@@ -1338,8 +1338,27 @@
    {:action :reinject!
     :params [destination-stream]}))
 
+(defn async-queue!*
+  [context queue-name & children]
+  (println context)
+  (if-let [^Executor executor (get-in context [:io queue-name :component])]
+    (fn [event]
+      (.execute executor
+                (fn []
+                  (call-rescue event children))))
+    (throw (ex/ex-incorrect (format "Async queue %s not found"
+                                    queue-name)))))
+
+(defn async-queue!
+  "Execute children into the specific async queue."
+  [queue-name & children]
+  {:action :async-queue!
+   :params [queue-name]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
+   :async-queue! async-queue!*
    :between-dt cond-dt*
    :changed changed*
    :coalesce coalesce*

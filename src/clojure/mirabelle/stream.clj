@@ -9,8 +9,9 @@
             [exoscale.ex :as ex]
             [mirabelle.action :as action]
             [mirabelle.db.queue :as q]
-            [mirabelle.io.file :as io-file])
-  (:import [java.util.concurrent TimeUnit]))
+            [mirabelle.io.file :as io-file]
+            [mirabelle.pool :as pool])
+  (:import [java.util.concurrent TimeUnit Executor]))
 
 (defn compile!
   [context stream]
@@ -45,9 +46,12 @@
   Adds the :component key to the IO"
   [io-config]
   (condp = (:type io-config)
-    :file (assoc io-config
-                 :component
-                 (io-file/map->FileIO (:config io-config)))
+    :async-queue
+    (assoc io-config :component (pool/dynamic-thread-pool-executor (:config io-config)))
+    :file
+    (assoc io-config
+           :component
+           (io-file/map->FileIO (:config io-config)))
     (throw (ex/ex-incorrect
             (format "Invalid IO: %s" (:type io-config))
             io-config))))
@@ -146,7 +150,11 @@
                                  :streaming)))
     this)
   (stop [this]
-    (doseq [[_ io] compiled-io]
+    ;; stop executors first to let them finish ongoing tasks
+    (doseq [[_ queue] (filter #(= :async-queue (:type %)) compiled-io)]
+      (let [^Executor executor (:component queue)]
+        (pool/shutdown executor)))
+    (doseq [[_ io] (remove #(= :async-queue (:type %)) compiled-io)]
       (component/stop io)))
   IStreamHandler
   (reload [this]

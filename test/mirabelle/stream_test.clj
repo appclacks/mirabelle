@@ -5,6 +5,7 @@
             [mirabelle.action :as a]
             [mirabelle.io.file :as io-file]
             [mirabelle.io :refer [IO]]
+            [mirabelle.pool :as pool]
             [mirabelle.stream :as stream]))
 
 (deftest compile!-test
@@ -384,3 +385,19 @@
       (is (= #{:bar} (:to-remove (stream/new-config old-config new-config))))
       (is (empty? (:to-add (stream/new-config old-config new-config))))
       (is (empty? (:to-reload (stream/new-config old-config new-config)))))))
+
+(deftest async-queue-test
+  (let [recorder (atom [])
+        queue {:component (pool/dynamic-thread-pool-executor {})}
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/async-queue! :foo
+                          (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {:io {:foo queue}} stream)]
+    (entrypoint {:metric 12 :time 1})
+    (entrypoint {:metric 13 :time 1})
+    (Thread/sleep 200)
+    (is (= [{:metric 12 :time 1}
+            {:metric 13 :time 1}]
+           @recorder))
+    (pool/shutdown (:component queue))))
