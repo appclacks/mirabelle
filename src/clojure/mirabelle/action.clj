@@ -1361,6 +1361,20 @@
   [_]
   (fn [_] nil))
 
+(defn tap*
+  [context tape-name]
+  (let [tap (:tap context)]
+    (fn [event]
+      (swap! tap
+             (fn [tap]
+               (update tap tape-name (fn [v] (if v (conj v event) [event]))))))))
+
+(defn tap
+    "Save events into the tap. Noop outside tests"
+  [tap-name]
+  {:action :tap
+   :params [tap-name]})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1401,6 +1415,7 @@
    :sdo sdo*
    :tag tag*
    :tagged-all tagged-all*
+   :tap tap*
    :test-action test-action*
    :throttle throttle*
    :under under*

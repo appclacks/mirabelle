@@ -27,11 +27,21 @@
                     (resolve func-action)
                     func-action)
              params (:params s)]
+         ;; verify if the fn is found or if we are in the special
+         ;; case of the by stream
          (if (or (= :by action)
                  func)
 
+           ;; todo this code should probably be cleaned
            (cond
-             ;; todo refactor
+             ;; tap are only useful in test mode
+             (= :tap action)
+             (if test-mode
+               ;; call the tap
+               (apply func context params)
+               ;; discard in non-test
+               (action/io* context))
+             ;; handle io in test more
              (= :io action)
              (if test-mode
                ;; discard everything for IO in test mode

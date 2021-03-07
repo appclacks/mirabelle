@@ -468,8 +468,7 @@
 
 (deftest io-test
   (testing "Not in test mode"
-    (let [custom-actions {:my-custom-action 'mirabelle.action/where*}
-          recorder (atom [])
+    (let [recorder (atom [])
           stream {:description "foo"
                   :actions {:action :io
                             :children [{:action :test-action
@@ -477,14 +476,13 @@
                                        {:action :test-action
                                         :params [recorder]}]}}
           {:keys [entrypoint]} (stream/compile-stream!
-                                {:custom-actions custom-actions}
+                                {}
                                 stream)]
      (is (fn? entrypoint))
      (entrypoint {:metric 12})
      (is (= [{:metric 12} {:metric 12}]  @recorder))))
   (testing "In test mode"
-    (let [custom-actions {:my-custom-action 'mirabelle.action/where*}
-          recorder (atom [])
+    (let [recorder (atom [])
           stream {:description "foo"
                   :actions {:action :io
                             :children [{:action :test-action
@@ -492,9 +490,64 @@
                                        {:action :test-action
                                         :params [recorder]}]}}
           {:keys [entrypoint]} (stream/compile-stream!
-                                {:custom-actions custom-actions
-                                 :test-mode? true}
+                                {:test-mode? true}
                                 stream)]
      (is (fn? entrypoint))
      (entrypoint {:metric 12})
      (is (= []  @recorder)))))
+
+(deftest tap-test
+  (testing "outside tests"
+    (let [tap (atom {})
+          stream {:description "foo"
+                  :actions {:action :sdo
+                            :children [{:action :tap
+                                        :params [:foo]}]}}
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:test-mode? false
+                                 :tap tap}
+                                stream)]
+     (is (fn? entrypoint))
+     (entrypoint {:metric 12})
+     (is (= {} @tap))))
+  (testing "in tests"
+    (let [tap (atom {})
+          stream {:description "foo"
+                  :actions {:action :sdo
+                            :children [{:action :tap
+                                        :params [:foo]}]}}
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:test-mode? true
+                                 :tap tap}
+                                stream)]
+     (is (fn? entrypoint))
+     (entrypoint {:metric 12})
+     (is (= {:foo [{:metric 12}]} @tap))))
+  (testing "multiple taps"
+    (let [tap (atom {})
+          stream {:description "foo"
+                  :actions {:action :sdo
+                            :children [{:action :tap
+                                        :params [:foo]}
+                                       {:action :increment
+                                        :children [{:action :tap
+                                                    :params [:bar]}]}]}}
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:test-mode? true
+                                 :tap tap}
+                                stream)]
+     (is (fn? entrypoint))
+     (entrypoint {:metric 12})
+     (is (= {:foo [{:metric 12}]
+             :bar [{:metric 13}]} @tap))))
+  (testing "tap top level"
+    (let [tap (atom {})
+          stream {:description "foo"
+                  :actions {:action :tap
+                            :parmas [:foo]}}
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:test-mode? false
+                                 :tap tap}
+                                stream)]
+     (is (fn? entrypoint))
+     (entrypoint {:metric 12}))))
