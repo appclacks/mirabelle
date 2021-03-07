@@ -19,6 +19,7 @@
     (doall
      (for [s stream]
        (let [action (:action s)
+             test-mode (:test-mode? context)
              func-action (get (merge action/action->fn
                                      (:custom-actions context))
                               action)
@@ -28,11 +29,22 @@
              params (:params s)]
          (if (or (= :by action)
                  func)
-           ;; pass an fn compiling children to by
-           ;; in order to generate one children per fork
-           (if (= :by action)
+
+           (cond
+             ;; todo refactor
+             (= :io action)
+             (if test-mode
+               ;; discard everything for IO in test mode
+               (func context)
+               ;; compile children
+               (apply action/sdo* context (compile! context (:children s))))
+             ;; pass an fn compiling children to by
+             ;; in order to generate one children per fork
+             (= :by action)
              (action/by-fn (first params)
                            #(compile! context (:children s)))
+
+             :else
              (let [children (compile! context (:children s))]
                (if (seq params)
                  (apply func context (concat params children))

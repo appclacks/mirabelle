@@ -1356,6 +1356,11 @@
    :params [queue-name]
    :children children})
 
+(defn io*
+  "Discard all events. For tests."
+  [_]
+  (fn [_] nil))
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1381,6 +1386,7 @@
    :fixed-time-window fixed-time-window*
    :increment increment*
    :index! index!*
+   :io io*
    :moving-event-window moving-event-window*
    :not-expired not-expired*
    :outside-dt cond-dt*

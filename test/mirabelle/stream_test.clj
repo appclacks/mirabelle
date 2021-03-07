@@ -466,3 +466,35 @@
       (is (= streams-configurations new-streams))
       (is (= (set (keys compiled-real-time-streams)) #{:bar :baz})))))
 
+(deftest io-test
+  (testing "Not in test mode"
+    (let [custom-actions {:my-custom-action 'mirabelle.action/where*}
+          recorder (atom [])
+          stream {:description "foo"
+                  :actions {:action :io
+                            :children [{:action :test-action
+                                        :params [recorder]}
+                                       {:action :test-action
+                                        :params [recorder]}]}}
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:custom-actions custom-actions}
+                                stream)]
+     (is (fn? entrypoint))
+     (entrypoint {:metric 12})
+     (is (= [{:metric 12} {:metric 12}]  @recorder))))
+  (testing "In test mode"
+    (let [custom-actions {:my-custom-action 'mirabelle.action/where*}
+          recorder (atom [])
+          stream {:description "foo"
+                  :actions {:action :io
+                            :children [{:action :test-action
+                                        :params [recorder]}
+                                       {:action :test-action
+                                        :params [recorder]}]}}
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:custom-actions custom-actions
+                                 :test-mode? true}
+                                stream)]
+     (is (fn? entrypoint))
+     (entrypoint {:metric 12})
+     (is (= []  @recorder)))))
