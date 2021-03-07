@@ -1,6 +1,5 @@
 (ns mirabelle.spec
-  (:require [clojure.spec.alpha :as s]
-            [exoscale.ex :as ex]))
+  (:require [exoscale.ex :as ex]))
 
 (defn not-null [v] (not (nil? v)))
 

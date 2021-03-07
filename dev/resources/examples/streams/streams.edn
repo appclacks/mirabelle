@@ -1,5 +1,3 @@
 {:foo
- {:actions {:action :fixed-event-window,
-            :params [100]
-            :children
-            ({:action :restore!, :params []})}}}
+ {:actions {:action :info
+            }}}

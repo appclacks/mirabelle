@@ -34,6 +34,7 @@
                                      (Object.)
                                      {}
                                      {}
+                                     (:actions stream {})
                                      {}
                                      {}
                                      {}
@@ -83,6 +84,9 @@
 (defn -main
   "Starts the application"
   [& args]
+  (when (and (seq args)
+             (= (first args) "compile"))
+    (System/exit 0))
   (with-handler :term
     (log/info {} "SIGTERM, stopping")
     (stop!)

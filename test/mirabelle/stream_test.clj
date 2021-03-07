@@ -10,10 +10,29 @@
             [mirabelle.stream :as stream])
   (:import mirabelle.stream.StreamHandler))
 
+(deftest custom-action-test
+  (testing "can compile with a custom action"
+    (let [custom-actions {:my-custom-action 'mirabelle.action/where*}
+          recorder (atom [])
+          stream {:description "foo"
+                  :actions {:action :my-custom-action
+                            :params [[:> :metric 10]]
+                            :children [{:action :test-action
+                                        :params [recorder]}]}}
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:custom-actions custom-actions}
+                                stream)]
+     (is (fn? entrypoint))
+     (entrypoint {:metric 12})
+     (is (= [{:metric 12}] @recorder))
+     (entrypoint {:metric 9})
+     (is (= [{:metric 12}] @recorder))
+     (entrypoint {:metric 13})
+     (is (= [{:metric 12} {:metric 13}] @recorder)))))
+
 (deftest compile!-test
   (let [recorder (atom [])
-        stream {:name "my-stream"
-                :description "foo"
+        stream {:description "foo"
                 :actions (a/sdo
                           (a/decrement
                            (a/test-action recorder))
@@ -422,6 +441,7 @@
         handler (StreamHandler. [streams-path]
                                 [io-path]
                                 (Object.)
+                                {}
                                 {}
                                 {}
                                 {}

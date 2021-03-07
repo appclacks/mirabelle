@@ -19,17 +19,25 @@
     (doall
      (for [s stream]
        (let [action (:action s)
-             func (get action/action->fn action)
+             func-action (get (merge action/action->fn
+                                     (:custom-actions context))
+                              action)
+             func (if (symbol? func-action)
+                    (resolve func-action)
+                    func-action)
              params (:params s)]
-         ;; pass an fn compiling children to by
-         ;; in order to generate one children per fork
-         (if (= :by action)
-           (action/by-fn (first params)
-                         #(compile! context (:children s)))
-           (let [children (compile! context (:children s))]
-             (if (seq params)
-               (apply func context (concat params children))
-               (apply func context children)))))))))
+         (if (or (= :by action)
+                 func)
+           ;; pass an fn compiling children to by
+           ;; in order to generate one children per fork
+           (if (= :by action)
+             (action/by-fn (first params)
+                           #(compile! context (:children s)))
+             (let [children (compile! context (:children s))]
+               (if (seq params)
+                 (apply func context (concat params children))
+                 (apply func context children))))
+           (ex/ex-incorrect! (format "Action %s not found" action))))))))
 
 (defn compile-stream!
   "Compile a stream to functions and associate to it its entrypoint."
@@ -95,6 +103,7 @@
      :to-reload to-reload}))
 
 (defprotocol IStreamHandler
+  (context [this] "Return the streams context")
   (reload [this] "Add the new configuration")
   (add-dynamic-stream [this stream-name stream-configuration] "Add a new stream")
   (remove-dynamic-stream [this stream-name] "Remove a stream by name")
@@ -113,11 +122,13 @@
        (map edn/read-string)
        (apply merge)))
 
+;; I should simplify this crappy code
 (deftype StreamHandler [streams-directories ;; config
                         io-directories;; config
                         lock
                         ^:volatile-mutable streams-configurations ;; runtime, the streams config
                         ^:volatile-mutable io-configurations;; runtime, the io config
+                        ^:volatile-mutable custom-actions
                         ^:volatile-mutable compiled-real-time-streams
                         ^:volatile-mutable compiled-dynamic-streams
                         ^:volatile-mutable compiled-io
@@ -157,8 +168,13 @@
     (doseq [[_ io] (remove #(= :async-queue (:type %)) compiled-io)]
       (component/stop io)))
   IStreamHandler
+  (context [this]
+    {:memtable-engine memtable-engine
+     :io compiled-io
+     :queue queue
+     :custom-actions custom-actions
+     :reinject #(push! this %1 %2)})
   (reload [this]
-    ;; I should simplify this crappy code
     (locking lock
       (log/info {} "Reloading streams")
       (let [new-streams-configurations (read-edn-dirs streams-directories)
@@ -173,14 +189,11 @@
                                       ;; new io are injected into streams
                                       (mapv (fn [[k v]]
                                               [k (compile-stream!
-                                                  {:memtable-engine memtable-engine
-                                                   :io compiled-io
-                                                   :queue queue
-                                                   :reinject #(push! this %1 %2)} v)]))
+                                                  (context this)
+                                                  v)]))
                                       (into {})
                                       (merge (apply dissoc
                                                     compiled-real-time-streams to-remove)))]
-
         (when (seq to-remove)
           (log/infof {} "Removing streams %s" (string/join #", " to-remove)))
         (when (seq to-reload)
@@ -206,9 +219,7 @@
     (locking lock
       (log/infof {} "Adding dynamic stream %s" stream-name)
       (let [compiled-stream (compile-stream!
-                             {:memtable-engine memtable-engine
-                              :io compiled-io
-                              :queue queue}
+                             (context this)
                              stream-configuration)
             new-compiled-dynamic-streams (assoc compiled-dynamic-streams
                                                 stream-name
