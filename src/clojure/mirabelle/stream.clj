@@ -190,7 +190,9 @@
 
         ;; mutate what is needed
         (set! compiled-real-time-streams new-compiled-streams)
-        (set! streams-configurations new-streams-configurations))))
+        (set! streams-configurations new-streams-configurations)
+        {:compiled-real-time-streams compiled-real-time-streams
+         :streams-configurations new-streams-configurations})))
   (push! [this event stream]
     (if (= :streaming stream)
       (doseq [[_ s] compiled-real-time-streams]

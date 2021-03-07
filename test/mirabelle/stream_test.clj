@@ -2,11 +2,13 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
             [clojure.test :refer :all]
+            [corbihttp.metric :as metric]
             [mirabelle.action :as a]
             [mirabelle.io.file :as io-file]
             [mirabelle.io :refer [IO]]
             [mirabelle.pool :as pool]
-            [mirabelle.stream :as stream]))
+            [mirabelle.stream :as stream])
+  (:import mirabelle.stream.StreamHandler))
 
 (deftest compile!-test
   (let [recorder (atom [])
@@ -401,3 +403,46 @@
             {:metric 13 :time 1}]
            @recorder))
     (pool/shutdown (:component queue))))
+
+(deftest stream-component-test
+  (let [streams-path (.getPath (io/resource "streams"))
+        io-path (.getPath (io/resource "ios"))
+        streams {:foo {:actions {:action :fixed-event-window
+                                 :params [100]
+                                 :children []}}
+                 :bar {:actions {:action :above-dt
+                                 :params [[:> :metric 100] 200]
+                                 :children []}}}
+        new-streams {:bar {:actions {:action :above-dt
+                                     :params [[:> :metric 200] 200]
+                                     :children []}}
+                     :baz {:actions {:action :fixed-event-window
+                                     :params [200]
+                                     :children []}}}
+        handler (StreamHandler. [streams-path]
+                                [io-path]
+                                (Object.)
+                                {}
+                                {}
+                                {}
+                                {}
+                                {}
+                                nil
+                                nil
+                                nil
+                                (metric/registry-component {}))]
+    (spit (str streams-path "/" "streams.edn") (pr-str streams))
+    (let [{:keys [compiled-real-time-streams
+                  streams-configurations]} (stream/reload handler)]
+      (is (= streams-configurations streams))
+      (is (= (set (keys compiled-real-time-streams)) #{:foo :bar})))
+    (spit (str streams-path "/" "streams.edn") (pr-str new-streams))
+    (let [{:keys [compiled-real-time-streams
+                  streams-configurations]} (stream/reload handler)]
+      (is (= streams-configurations new-streams))
+      (is (= (set (keys compiled-real-time-streams)) #{:bar :baz})))
+    (let [{:keys [compiled-real-time-streams
+                  streams-configurations]} (stream/reload handler)]
+      (is (= streams-configurations new-streams))
+      (is (= (set (keys compiled-real-time-streams)) #{:bar :baz})))))
+

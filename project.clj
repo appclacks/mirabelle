@@ -31,6 +31,7 @@
                                   [com.clojure-goes-fast/clj-memory-meter "0.1.3"]]
                    :plugins [[lein-ancient "0.6.15"]
                              [lein-environ "1.1.0"]]
+                   :resource-paths ["resources" "test/resources" "gen-resources"]
                    :source-paths ["dev"]
                    :repl-options {:init-ns user}
                    :env {:mirabelle-configuration "dev/resources/config.edn"}
