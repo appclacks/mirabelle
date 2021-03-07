@@ -1,10 +1,14 @@
 (ns mirabelle.config
   (:require [aero.core :as aero]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
             [environ.core :as env]
             [exoscale.cloak :as cloak]
-            [exoscale.ex :as ex]))
+            [exoscale.ex :as ex]
+            [mirabelle.action :refer :all]
+            [mirabelle.path :as path])
+  (:import java.io.File))
 
 (s/def ::file-spec (fn [path]
                      (let [file (io/file path)]
@@ -52,3 +56,33 @@
       (throw (ex/ex-info
               "Invalid configuration"
               [::invalid [:corbi/user ::ex/incorrect]])))))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn- config-file?
+  "Is the given File a configuration file?"
+  [^File file]
+  (let [filename (.getName file)]
+    (and (.isFile file)
+         (or (.matches filename ".*\\.clj$")
+             (.matches filename ".*\\.config$")))))
+
+(defn name->compiled
+  "Get a file, returns a vector where the first value is the file name and the
+  second value the compiled version of it."
+  [^File f]
+  [(.getName f)
+   (->> (.getPath f)
+        slurp
+        edn/read-string
+        eval)])
+
+(defn compile-config!
+  [src-dir dest-dir]
+  (->> src-dir
+       io/file
+       file-seq
+       (filter config-file?)
+       (sort)
+       (map name->compiled)
+       (map #(spit (path/new-path dest-dir (first %)) (pr-str (second %))))
+       dorun))
