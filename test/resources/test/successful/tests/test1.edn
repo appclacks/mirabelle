@@ -1,0 +1,7 @@
+{:t1 {:input [{:metric 13}]
+      :tap-results {:foo [{:metric 13}]}}
+ :t2 {:input [{:metric 101}]
+      :tap-results {:foo [{:metric 101}]}}
+ :t3 {:input [{:metric 101 :service "aa"}]
+      :tap-results {:foo [{:metric 101 :service "aa"}]
+                    :baz [{:metric 101 :service "aa"}]}}}

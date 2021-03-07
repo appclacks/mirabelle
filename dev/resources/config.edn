@@ -3,6 +3,8 @@
  :http {:host "0.0.0.0"
         :port 5666}
  :queue {:directory "dev/queue"}
- :stream {:streams-directories ["dev/resources/examples/streams"]
-          :io-directories ["dev/resources/examples/io"]
-          :actions {}}}
+ :stream {:directories ["dev/resources/examples/streams"]
+          :actions {:custom mirabelle.action/where*}}
+ :io {:directories ["dev/resources/examples/io"]
+      :custom {}}
+ :test {:directories ["dev/resources/examples/config/tests/"]}}

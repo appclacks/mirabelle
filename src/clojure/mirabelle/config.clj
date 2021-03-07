@@ -6,7 +6,6 @@
             [environ.core :as env]
             [exoscale.cloak :as cloak]
             [exoscale.ex :as ex]
-            [mirabelle.action :refer :all]
             [mirabelle.path :as path])
   (:import java.io.File))
 
@@ -32,17 +31,20 @@
                               ::cert
                               ::key]))
 
-(s/def ::streams-directories (s/coll-of ::directory-spec))
-(s/def ::io-directories (s/coll-of ::directory-spec))
-(s/def ::actions (s/map-of keyword? symbol?))
+(s/def ::directories (s/coll-of ::directory-spec))
 
-(s/def ::stream (s/keys :opt-un [::streams-directories
+(s/def ::actions (s/map-of keyword? symbol?))
+(s/def ::stream (s/keys :opt-un [::directories
                                  ::io-directories
                                  ::actions]))
+
+(s/def ::io (s/keys :opt-un [::directories]))
+(s/def ::test (s/keys :opt-un [::directories]))
+
 (s/def ::directory ::directory-spec)
 (s/def ::queue (s/keys :req-un [::directory]))
 (s/def ::config (s/keys :req-un [::tcp ::queue]
-                        :opt-un [::stream]))
+                        :opt-un [::stream ::io ::test]))
 
 (defmethod aero/reader 'secret
   [_ _ value]

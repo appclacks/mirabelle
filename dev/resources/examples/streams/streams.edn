@@ -1,3 +1,11 @@
 {:foo
- {:actions {:action :info
-            }}}
+ {:actions {:action :custom
+            :params [[:> :metric 10]]
+            :children [{:action :tap
+                        :params [:foo]}]}}
+ :bar
+ {:actions {:action :custom
+            :params [[:> :metric 10]]
+            :children [{:action :tap
+                        :params [:foo]}]}}
+ }

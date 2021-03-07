@@ -29,7 +29,6 @@
                      ;; a borked file, trigger rollback on any exception.
                      (try
                        (-> ctx .wire .write (.bytes rw))
-                       (.index ctx)
                        (catch Throwable t
                          (.rollbackOnClose ctx)
                          t)))]
@@ -93,4 +92,3 @@
                  "Read %s events in %s milliseconds"
                  @events-count
                  (- (System/currentTimeMillis) start-time)))))
-

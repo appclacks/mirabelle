@@ -7,8 +7,7 @@
             [mirabelle.io.file :as io-file]
             [mirabelle.io :refer [IO]]
             [mirabelle.pool :as pool]
-            [mirabelle.stream :as stream])
-  (:import mirabelle.stream.StreamHandler))
+            [mirabelle.stream :as stream]))
 
 (deftest custom-action-test
   (testing "can compile with a custom action"
@@ -22,13 +21,13 @@
           {:keys [entrypoint]} (stream/compile-stream!
                                 {:custom-actions custom-actions}
                                 stream)]
-     (is (fn? entrypoint))
-     (entrypoint {:metric 12})
-     (is (= [{:metric 12}] @recorder))
-     (entrypoint {:metric 9})
-     (is (= [{:metric 12}] @recorder))
-     (entrypoint {:metric 13})
-     (is (= [{:metric 12} {:metric 13}] @recorder)))))
+      (is (fn? entrypoint))
+      (entrypoint {:metric 12})
+      (is (= [{:metric 12}] @recorder))
+      (entrypoint {:metric 9})
+      (is (= [{:metric 12}] @recorder))
+      (entrypoint {:metric 13})
+      (is (= [{:metric 12} {:metric 13}] @recorder)))))
 
 (deftest compile!-test
   (let [recorder (atom [])
@@ -51,7 +50,7 @@
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/above-dt 5 10
-                          (a/test-action recorder))}
+                                     (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:metric 12 :time 1})
     (is (= [] @recorder))
@@ -72,7 +71,7 @@
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/between-dt 20 30 10
-                          (a/test-action recorder))}
+                                       (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:metric 21 :time 1})
     (is (= [] @recorder))
@@ -93,7 +92,7 @@
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/outside-dt 20 30 10
-                          (a/test-action recorder))}
+                                       (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:metric 1 :time 1})
     (is (= [] @recorder))
@@ -114,7 +113,7 @@
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/critical-dt 10
-                          (a/test-action recorder))}
+                                        (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:state "critical" :time 1})
     (is (= [] @recorder))
@@ -145,7 +144,6 @@
     (entrypoint {:metric 0 :time 12})
     (is (= [{:metric 3 :time 2}
             {:metric (/ -4 10) :time 12}] @recorder))))
-
 
 (deftest coll-rate-test
   (let [recorder (atom [])
@@ -183,7 +181,7 @@
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/with {:foo 1 :metric 2}
-                          (a/test-action recorder))}
+                                 (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:metric 1 :time 1})
     (is (= [{:metric 2 :time 1 :foo 1}] @recorder)))
@@ -191,32 +189,41 @@
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/with :metric 2
-                          (a/test-action recorder))}
+                                 (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:metric 1 :time 1})
     (is (= [{:metric 2 :time 1}] @recorder))))
 
 (deftest io-file-test
-  (let [stream {:name "my-stream"
-                :description "foo"
-                :actions (a/push-io! :file-example-io)}
-        file "/tmp/mirabelle-test-io"
-        io-component (io-file/map->FileIO {:path file})
-        {:keys [entrypoint]} (stream/compile-stream!
-                              {:io {:file-example-io {:component io-component}}}
-                              stream)]
-    (entrypoint {:state "critical" :time 1})
-    (entrypoint {:state "critical" :time 1 :tags ["discard"]})
-    (entrypoint [{:state "critical" :time 1 :tags ["discard"]}
-                 {:state "critical" :time 1 :tags ["discard"]}
-                 {:state "critical" :time 1 :tags ["ok"]}])
-    (entrypoint {:state "critical" :time 2})
-    (let [result (slurp file)]
-      (is (= ["{:state \"critical\", :time 1}"
-              "{:state \"critical\", :time 1, :tags [\"ok\"]}"
-              "{:state \"critical\", :time 2}"]
-             (string/split result #"\n"))))
-    (io/delete-file file)))
+  (testing "non-test mode"
+    (let [stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/push-io! :file-example-io)}
+          file "/tmp/mirabelle-test-io"
+          io-component (io-file/map->FileIO {:path file})
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:io {:file-example-io {:component io-component}}}
+                                stream)]
+      (entrypoint {:state "critical" :time 1})
+      (entrypoint {:state "critical" :time 1 :tags ["discard"]})
+      (entrypoint [{:state "critical" :time 1 :tags ["discard"]}
+                   {:state "critical" :time 1 :tags ["discard"]}
+                   {:state "critical" :time 1 :tags ["ok"]}])
+      (entrypoint {:state "critical" :time 2})
+      (let [result (slurp file)]
+        (is (= ["{:state \"critical\", :time 1}"
+                "{:state \"critical\", :time 1, :tags [\"ok\"]}"
+                "{:state \"critical\", :time 2}"]
+               (string/split result #"\n"))))
+      (io/delete-file file)))
+  (testing "test mode"
+    (let [stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/push-io! :file-example-io)}
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:test-mode? true}
+                                stream)]
+      (entrypoint {:state "critical" :time 1}))))
 
 (deftest by-test
   (testing "simple example"
@@ -266,6 +273,10 @@
                           (a/ewma-timeless 1)
                           (a/over 1)
                           (a/under 1)
+                          (a/tap :foo)
+                          (a/io)
+                          (a/io
+                           (a/by [:host]))
                           (a/fixed-time-window 3)
                           (a/split
                            [:> :metric 10] (a/critical))
@@ -371,15 +382,22 @@
            @recorder))))
 
 (deftest compile-io!-test
-  (let [io-compiled (stream/compile-io! {:type :file
-                                         :confg {:path "/tmp/foo"}})]
-    (is (satisfies? IO (:component io-compiled)))))
+  (testing "file io"
+    (let [io-compiled (stream/compile-io! {:type :file
+                                           :config {:path "/tmp/foo"}}
+                                          {})]
+      (is (satisfies? IO (:component io-compiled)))))
+  (testing "custom io"
+    (let [io-compiled (stream/compile-io! {:type :custom
+                                           :config {:path "/tmp/foo"}}
+                                          {:custom 'mirabelle.io.file/map->FileIO})]
+      (is (satisfies? IO (:component io-compiled))))))
 
-(deftest streams-names-test
+(deftest config-keys-test
   (is (= #{:foo :bar}
-         (stream/streams-names {:foo {} :bar {}})))
+         (stream/config-keys {:foo {} :bar {}})))
   (is (= #{}
-         (stream/streams-names {}))))
+         (stream/config-keys {}))))
 
 (deftest new-config-test
   (testing "same config"
@@ -400,7 +418,7 @@
       (is (empty? (:to-remove (stream/new-config old-config new-config))))
       (is (= #{:baz} (:to-add (stream/new-config old-config new-config))))
       (is (= #{:bar} (:to-reload (stream/new-config old-config new-config))))))
-    (testing "to-remove"
+  (testing "to-remove"
     (let [old-config {:foo {} :bar {}}
           new-config {:foo {}}]
       (is (= #{:bar} (:to-remove (stream/new-config old-config new-config))))
@@ -408,20 +426,34 @@
       (is (empty? (:to-reload (stream/new-config old-config new-config)))))))
 
 (deftest async-queue-test
-  (let [recorder (atom [])
-        queue {:component (pool/dynamic-thread-pool-executor {})}
-        stream {:name "my-stream"
-                :description "foo"
-                :actions (a/async-queue! :foo
-                          (a/test-action recorder))}
-        {:keys [entrypoint]} (stream/compile-stream! {:io {:foo queue}} stream)]
-    (entrypoint {:metric 12 :time 1})
-    (entrypoint {:metric 13 :time 1})
-    (Thread/sleep 200)
-    (is (= [{:metric 12 :time 1}
-            {:metric 13 :time 1}]
-           @recorder))
-    (pool/shutdown (:component queue))))
+  (testing "non-test mode"
+    (let [recorder (atom [])
+          queue {:component (pool/dynamic-thread-pool-executor {})}
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/async-queue! :foo
+                                           (a/test-action recorder))}
+          {:keys [entrypoint]} (stream/compile-stream! {:io {:foo queue}} stream)]
+      (entrypoint {:metric 12 :time 1})
+      (entrypoint {:metric 13 :time 1})
+      (Thread/sleep 200)
+      (is (= [{:metric 12 :time 1}
+              {:metric 13 :time 1}]
+             @recorder))
+      (pool/shutdown (:component queue))))
+  (testing "test-mode"
+    (let [recorder (atom [])
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/async-queue! :foo
+                                           (a/test-action recorder))}
+          {:keys [entrypoint]} (stream/compile-stream! {:test-mode? true}
+                                                       stream)]
+      (entrypoint {:metric 12 :time 1})
+      (entrypoint {:metric 13 :time 1})
+      (is (= [{:metric 12 :time 1}
+              {:metric 13 :time 1}]
+             @recorder)))))
 
 (deftest stream-component-test
   (let [streams-path (.getPath (io/resource "streams"))
@@ -438,19 +470,9 @@
                      :baz {:actions {:action :fixed-event-window
                                      :params [200]
                                      :children []}}}
-        handler (StreamHandler. [streams-path]
-                                [io-path]
-                                (Object.)
-                                {}
-                                {}
-                                {}
-                                {}
-                                {}
-                                {}
-                                nil
-                                nil
-                                nil
-                                (metric/registry-component {}))]
+        handler (stream/map->StreamHandler {:streams-directories [streams-path]
+                                            :io-directories [io-path]
+                                            :registry (metric/registry-component {})})]
     (spit (str streams-path "/" "streams.edn") (pr-str streams))
     (let [{:keys [compiled-real-time-streams
                   streams-configurations]} (stream/reload handler)]
@@ -478,9 +500,9 @@
           {:keys [entrypoint]} (stream/compile-stream!
                                 {}
                                 stream)]
-     (is (fn? entrypoint))
-     (entrypoint {:metric 12})
-     (is (= [{:metric 12} {:metric 12}]  @recorder))))
+      (is (fn? entrypoint))
+      (entrypoint {:metric 12})
+      (is (= [{:metric 12} {:metric 12}]  @recorder))))
   (testing "In test mode"
     (let [recorder (atom [])
           stream {:description "foo"
@@ -492,9 +514,9 @@
           {:keys [entrypoint]} (stream/compile-stream!
                                 {:test-mode? true}
                                 stream)]
-     (is (fn? entrypoint))
-     (entrypoint {:metric 12})
-     (is (= []  @recorder)))))
+      (is (fn? entrypoint))
+      (entrypoint {:metric 12})
+      (is (= []  @recorder)))))
 
 (deftest tap-test
   (testing "outside tests"
@@ -507,9 +529,9 @@
                                 {:test-mode? false
                                  :tap tap}
                                 stream)]
-     (is (fn? entrypoint))
-     (entrypoint {:metric 12})
-     (is (= {} @tap))))
+      (is (fn? entrypoint))
+      (entrypoint {:metric 12})
+      (is (= {} @tap))))
   (testing "in tests"
     (let [tap (atom {})
           stream {:description "foo"
@@ -520,9 +542,9 @@
                                 {:test-mode? true
                                  :tap tap}
                                 stream)]
-     (is (fn? entrypoint))
-     (entrypoint {:metric 12})
-     (is (= {:foo [{:metric 12}]} @tap))))
+      (is (fn? entrypoint))
+      (entrypoint {:metric 12})
+      (is (= {:foo [{:metric 12}]} @tap))))
   (testing "multiple taps"
     (let [tap (atom {})
           stream {:description "foo"
@@ -536,18 +558,18 @@
                                 {:test-mode? true
                                  :tap tap}
                                 stream)]
-     (is (fn? entrypoint))
-     (entrypoint {:metric 12})
-     (is (= {:foo [{:metric 12}]
-             :bar [{:metric 13}]} @tap))))
+      (is (fn? entrypoint))
+      (entrypoint {:metric 12})
+      (is (= {:foo [{:metric 12}]
+              :bar [{:metric 13}]} @tap))))
   (testing "tap top level"
     (let [tap (atom {})
           stream {:description "foo"
                   :actions {:action :tap
-                            :parmas [:foo]}}
+                            :params [:foo]}}
           {:keys [entrypoint]} (stream/compile-stream!
                                 {:test-mode? false
                                  :tap tap}
                                 stream)]
-     (is (fn? entrypoint))
-     (entrypoint {:metric 12}))))
+      (is (fn? entrypoint))
+      (entrypoint {:metric 12}))))
