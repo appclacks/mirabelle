@@ -61,12 +61,13 @@
   (read-all! [this action] "read all events from the queue, callling (action events) for each event."))
 
 (defrecord ChroniqueQueue [directory ;; config
+                           roll-cycle ;; config
                            queue ;; runtime
                            appender ;;runtime
                            ]
   component/Lifecycle
   (start [this]
-    (let [q (queue/make directory {:roll-cycle :hourly})
+    (let [q (queue/make directory {:roll-cycle (or roll-cycle :half-hourly)})
           a (make q)]
       (assoc this :queue q :appender a)))
   (stop [this]

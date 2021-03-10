@@ -1,5 +1,6 @@
 (ns mirabelle.core
-  (:require [com.stuartsierra.component :as component]
+  (:require [clojure.spec.alpha :as s]
+            [com.stuartsierra.component :as component]
             [corbihttp.http :as corbihttp]
             [corbihttp.log :as log]
             [corbihttp.metric :as metric]
@@ -80,7 +81,19 @@
   [& args]
   (when (seq args)
     (condp = (first args)
-      "compile" ""
+      "compile" (do (log/info {} "compiling streams")
+                    (when-not (= 3 (count args))
+                      (log/error {} "Invalid parameters")
+                      (System/exit 1))
+                    (let [src-dir (second args)
+                          dst-dir (nth args 2)]
+                      (when-not (s/valid? ::config/directory-spec src-dir)
+                        (log/error {} (format "%s is not a directory" src-dir))
+                        (System/exit 1))
+                      (when-not (s/valid? ::config/directory-spec dst-dir)
+                        (log/error {} (format "%s is not a directory" src-dir))
+                        (System/exit 1))
+                      (config/compile-config! src-dir dst-dir)))
       "test" (do (log/info {} "launching tests")
                  (let [config (config/load-config)
                        test-result (test/launch-tests
