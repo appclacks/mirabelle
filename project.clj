@@ -18,7 +18,6 @@
                  [riemann-clojure-client "0.5.1"]]
   :main ^:skip-aot mirabelle.core
   :target-path "target/%s"
-  :java-source-paths ["src/java/src/main/java"]
   :source-paths ["src/clojure"]
   :plugins [[lein-codox "0.10.7"]]
   :codox {:source-uri "https://github.com/mcorbin/mirabelle/blob/{version}/{filepath}#L{line}"
