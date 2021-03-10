@@ -1,5 +1,6 @@
 (ns mirabelle.action
-  (:require [clojure.spec.alpha :as s]
+  (:require [cheshire.core :as json]
+            [clojure.spec.alpha :as s]
             [corbihttp.log :as log]
             [exoscale.ex :as ex]
             [mirabelle.db.queue :as queue]
@@ -1371,8 +1372,6 @@
   {:action :io
    :children children})
 
-(s/def ::tap (s/cat :tap-name keyword?))
-
 (defn tap*
   [context tape-name]
   (if (:test-mode? context)
@@ -1384,12 +1383,39 @@
     ;; discard in non-tests
     (fn [_] nil)))
 
+(s/def ::tap (s/cat :tap-name keyword?))
+
 (defn tap
   "Save events into the tap. Noop outside tests"
   [tap-name]
   (spec/valid? ::tap [tap-name])
   {:action :tap
    :params [tap-name]})
+
+(defn json-fields*
+  [_ fields & children]
+  (fn [event]
+    (call-rescue
+     (reduce (fn [event field]
+               (if (get event field)
+                 (update event field json/parse-string true)
+                 event))
+             event
+             fields)
+     children)))
+
+(s/def ::json-fields (s/cat :fields
+                             (s/or :single keyword?
+                                   :multiple (s/coll-of keyword?))))
+
+(defn json-fields
+  "Takes a field or a list of fields, and converts the values associated to these
+  fields from json to edn."
+  [fields & children]
+  (spec/valid? ::json-fields [fields])
+  {:action :tap
+   :params [(if (keyword? fields) [fields] fields)]
+   :children children})
 
 (def action->fn
   {:above-dt cond-dt*
@@ -1417,6 +1443,7 @@
    :increment increment*
    :index! index!*
    :io io*
+   :json-fields json-fields*
    :moving-event-window moving-event-window*
    :not-expired not-expired*
    :outside-dt cond-dt*

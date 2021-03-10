@@ -758,3 +758,28 @@
                   {:metric 2 :tags ["foo"]}
                   {:metric 3 :tags ["foo" "bar"]}]
                  [{:metric 3 :tags ["foo" "bar"]}])))
+
+(deftest json-fields*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/json-fields* nil
+                                 [:foo]
+                                 rec)
+                 state
+                 [{:foo "{\"bar\": \"baz\"}"}]
+                 [{:foo {:bar "baz"}}])
+    (test-action (a/json-fields* nil
+                                 [:foo :bar]
+                                 rec)
+                 state
+                 [{:foo "{\"bar\": \"baz\"}"
+                   :host "h"
+                   :bar "{\"a\": \"b\"}"}]
+                 [{:foo {:bar "baz"}
+                   :host "h"
+                   :bar {:a "b"}}])
+    (test-action (a/json-fields* nil
+                                 [:foo]
+                                 rec)
+                 state
+                 [{:host "aa"}]
+                 [{:host "aa"}])))

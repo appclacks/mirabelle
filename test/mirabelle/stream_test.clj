@@ -306,6 +306,8 @@
                           (a/untag "foo")
                           (a/tag ["foo" "bar"])
                           (a/untag ["foo" "bar"])
+                          (a/json-fields [:foo :bar])
+                          (a/json-fields :foo)
                           (a/outside-dt 2 10 20)
                           (a/coalesce 2 [:host])
                           (a/scale 100)
