@@ -96,6 +96,7 @@
                       (config/compile-config! src-dir dst-dir)))
       "test" (do (log/info {} "launching tests")
                  (let [config (config/load-config)
+                       _ (start-logging! (:logging config))
                        test-result (test/launch-tests
                                     config)]
                    (println test-result))))

@@ -5,4 +5,5 @@
    :params [[:> :metric 10]],
    :children
    ({:action :info}
-    {:action :increment, :children ({:action :info})})}}}
+    {:action :increment,
+     :children ({:action :tap, :params [:foo]} {:action :info})})}}}
