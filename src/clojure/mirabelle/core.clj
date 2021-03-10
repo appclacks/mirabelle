@@ -8,19 +8,19 @@
             [mirabelle.db.memtable :as memtable]
             [mirabelle.handler :as handler]
             [mirabelle.http :as http]
+            [mirabelle.test :as test]
             [mirabelle.transport :as transport]
             [mirabelle.transport.tcp :as tcp]
             [mirabelle.stream :as stream]
             [signal.handler :refer [with-handler]]
             [unilog.config :refer [start-logging!]])
-  (:import mirabelle.stream.StreamHandler)
   (:gen-class))
 
 (defonce ^:redef system
   nil)
 
 (defn build-system
-  [{:keys [tcp stream http queue]}]
+  [{:keys [tcp stream http queue test io]}]
   (let [registry (metric/registry-component {})
         memtable-engine (component/start (memtable/map->MemtableEngine {:memtable-max-ttl 3600
                                                                         :memtable-cleanup-duration 1000}))
@@ -29,19 +29,13 @@
      :registry registry
      :http (-> (corbihttp/map->Server {:config http})
                (component/using [:handler]))
-     :stream-handler (StreamHandler. (:streams-directories stream)
-                                     (:io-directories stream)
-                                     (Object.)
-                                     {}
-                                     {}
-                                     (:actions stream {})
-                                     {}
-                                     {}
-                                     {}
-                                     nil
-                                     memtable-engine
-                                     queue-component
-                                     registry)
+     :stream-handler (stream/map->StreamHandler
+                      {:streams-directories (:directories stream)
+                       :io-directories (:directories io)
+                       :custom-actions (:actions stream)
+                       :memtable-engine memtable-engine
+                       :queue queue-component
+                       :registry registry})
      :handler (-> (http/map->ChainHandler {})
                   (component/using [:api-handler :registry]))
      :api-handler (-> (handler/map->Handler {:memtable-engine memtable-engine})
@@ -84,8 +78,15 @@
 (defn -main
   "Starts the application"
   [& args]
-  (when (and (seq args)
-             (= (first args) "compile"))
+  (when (seq args)
+    (condp = (first args)
+      "compile" ""
+      "test" (do (log/info {} "launching tests")
+                 (let [config (config/load-config)
+                       test-result (test/launch-tests
+                                    config)]
+                   (println test-result))))
+
     (System/exit 0))
   (with-handler :term
     (log/info {} "SIGTERM, stopping")

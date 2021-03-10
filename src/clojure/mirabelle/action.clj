@@ -533,12 +533,15 @@
 
 (defn push-io!*
   [context io-name]
-  (if-let [io-component (get-in context [:io io-name :component])]
-    (fn [event]
-      (when-let [events (keep-non-discarded-events event)]
-        (io/inject! io-component events)))
-    (throw (ex/ex-incorrect (format "IO %s not found"
-                                    io-name)))))
+  ;; discard io in test mode
+  (if (:test-mode? context)
+    (fn [_] nil)
+    (if-let [io-component (get-in context [:io io-name :component])]
+      (fn [event]
+        (when-let [events (keep-non-discarded-events event)]
+          (io/inject! io-component events)))
+      (throw (ex/ex-incorrect (format "IO %s not found"
+                                      io-name))))))
 
 (s/def ::push-io! (s/cat :io-name keyword?))
 
@@ -1330,48 +1333,68 @@
     (fn [event]
       (reinject-fn event destination-stream))))
 
+(s/def ::reinject (s/cat :destination-stream keyword?))
+
 (defn reinject!
   "Reinject an event into the streaming system."
   ([]
    (reinject! :streaming))
   ([destination-stream]
+   (spec/valid? ::reinject [destination-stream])
    {:action :reinject!
     :params [destination-stream]}))
 
+(s/def ::async-queue! (s/cat :queue-name keyword?))
+
 (defn async-queue!*
   [context queue-name & children]
-  (println context)
-  (if-let [^Executor executor (get-in context [:io queue-name :component])]
-    (fn [event]
-      (.execute executor
-                (fn []
-                  (call-rescue event children))))
-    (throw (ex/ex-incorrect (format "Async queue %s not found"
-                                    queue-name)))))
+  (if (:test-mode? context)
+    (apply sdo* context children)
+    (if-let [^Executor executor (get-in context [:io queue-name :component])]
+      (fn [event]
+        (.execute executor
+                  (fn []
+                    (call-rescue event children))))
+      (throw (ex/ex-incorrect (format "Async queue %s not found"
+                                      queue-name))))))
 
 (defn async-queue!
   "Execute children into the specific async queue."
   [queue-name & children]
+  (spec/valid? ::async-queue! [queue-name])
   {:action :async-queue!
    :params [queue-name]
    :children children})
 
 (defn io*
-  "Discard all events. For tests."
-  [_]
-  (fn [_] nil))
+  [context & children]
+  (if (:test-mode? context)
+    (fn [_] nil)
+    (apply sdo* context children)))
+
+(defn io
+  "Discard all events in test mode. Else, forward to children"
+  [& children]
+  {:action :io
+   :children children})
+
+(s/def ::tap (s/cat :tap-name keyword?))
 
 (defn tap*
   [context tape-name]
-  (let [tap (:tap context)]
-    (fn [event]
-      (swap! tap
-             (fn [tap]
-               (update tap tape-name (fn [v] (if v (conj v event) [event]))))))))
+  (if (:test-mode? context)
+    (let [tap (:tap context)]
+      (fn [event]
+        (swap! tap
+               (fn [tap]
+                 (update tap tape-name (fn [v] (if v (conj v event) [event])))))))
+    ;; discard in non-tests
+    (fn [_] nil)))
 
 (defn tap
-    "Save events into the tap. Noop outside tests"
+  "Save events into the tap. Noop outside tests"
   [tap-name]
+  (spec/valid? ::tap [tap-name])
   {:action :tap
    :params [tap-name]})
 

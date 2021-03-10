@@ -19,42 +19,22 @@
     (doall
      (for [s stream]
        (let [action (:action s)
-             test-mode (:test-mode? context)
              func-action (get (merge action/action->fn
                                      (:custom-actions context))
                               action)
              func (if (symbol? func-action)
-                    (resolve func-action)
+                    (requiring-resolve func-action)
                     func-action)
              params (:params s)]
          ;; verify if the fn is found or if we are in the special
          ;; case of the by stream
          (if (or (= :by action)
                  func)
-
-           ;; todo this code should probably be cleaned
-           (cond
-             ;; tap are only useful in test mode
-             (= :tap action)
-             (if test-mode
-               ;; call the tap
-               (apply func context params)
-               ;; discard in non-test
-               (action/io* context))
-             ;; handle io in test more
-             (= :io action)
-             (if test-mode
-               ;; discard everything for IO in test mode
-               (func context)
-               ;; compile children
-               (apply action/sdo* context (compile! context (:children s))))
+           (if (= :by action)
              ;; pass an fn compiling children to by
              ;; in order to generate one children per fork
-             (= :by action)
              (action/by-fn (first params)
                            #(compile! context (:children s)))
-
-             :else
              (let [children (compile! context (:children s))]
                (if (seq params)
                  (apply func context (concat params children))
@@ -74,31 +54,31 @@
   {:type :file :config {:path ...}}.
 
   Adds the :component key to the IO"
-  [io-config]
-  (condp = (:type io-config)
-    :async-queue
-    (assoc io-config :component (pool/dynamic-thread-pool-executor (:config io-config)))
-    :file
-    (assoc io-config
-           :component
-           (io-file/map->FileIO (:config io-config)))
-    (throw (ex/ex-incorrect
-            (format "Invalid IO: %s" (:type io-config))
-            io-config))))
+  [io-config custom-io]
+  (let [t (:type io-config)]
+    (cond
+      ;; it's a custom IO
+      ;; need to resolve the fn from the config
+      (get custom-io t)
+      (assoc io-config
+             :component
+             ((requiring-resolve (get custom-io t)) (:config io-config)))
+
+      (= :async-queue t)
+      (assoc io-config :component (pool/dynamic-thread-pool-executor (:config io-config)))
+
+      (= :file t)
+      (assoc io-config
+             :component
+             (io-file/map->FileIO (:config io-config)))
+      :else
+      (throw (ex/ex-incorrect
+              (format "Invalid IO: %s" t)
+              io-config)))))
 
 (defn stream!
   [stream event]
   ((:entrypoint stream) event))
-
-(defn streams-names
-  "Returns, from a configuration, the streams names as a set"
-  [streams-config]
-  (->> streams-config
-       keys
-       (map keyword)
-       set))
-
-(def io-names streams-names)
 
 (defn config-keys
   "Returns, from a configuration, the keys as a set"
@@ -133,7 +113,8 @@
   (push! [this event streams] "Inject an event into a list of streams"))
 
 (defn read-edn-dirs
-  "returns the content of a edn directory. All files in this directory are read."
+  "returns the edn content from a list of directories.
+  All files in the directories are read."
   [dirs-path]
   (->> (map (fn [path] (.listFiles (io/file path))) dirs-path)
        (map (fn [files]
@@ -150,7 +131,8 @@
                         lock
                         ^:volatile-mutable streams-configurations ;; runtime, the streams config
                         ^:volatile-mutable io-configurations;; runtime, the io config
-                        ^:volatile-mutable custom-actions
+                        custom-actions
+                        custom-io
                         ^:volatile-mutable compiled-real-time-streams
                         ^:volatile-mutable compiled-dynamic-streams
                         ^:volatile-mutable compiled-io
@@ -158,12 +140,14 @@
                         memtable-engine
                         queue
                         registry
+                        tap
+                        test-mode?
                         ]
   component/Lifecycle
   (start [this]
     (let [new-io-configurations (read-edn-dirs io-directories)
           new-compiled-io (->> new-io-configurations
-                               (map (fn [[k v]] [k (compile-io! v)]))
+                               (map (fn [[k v]] [k (compile-io! v custom-io)]))
                                (into {}))
           timer (metric/get-timer! registry
                                    :stream-duration
@@ -178,9 +162,10 @@
       (set! stream-timer timer)
       (reload this)
       ;; reload events from the queue
-      (q/read-all! queue #(push! this
-                                 (update %1 :tags concat ["discard"])
-                                 :streaming)))
+      (when queue
+        (q/read-all! queue #(push! this
+                                   (update %1 :tags concat ["discard"])
+                                   :streaming))))
     this)
   (stop [this]
     ;; stop executors first to let them finish ongoing tasks
@@ -194,6 +179,8 @@
     {:memtable-engine memtable-engine
      :io compiled-io
      :queue queue
+     :tap tap
+     :test-mode? test-mode?
      :custom-actions custom-actions
      :reinject #(push! this %1 %2)})
   (reload [this]
@@ -255,3 +242,43 @@
         (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
   (list-dynamic-streams [this]
     (keys compiled-dynamic-streams)))
+
+(defn map->StreamHandler
+  [{:keys [streams-directories
+           io-directories
+           streams-configurations
+           io-configurations
+           custom-actions
+           custom-io
+           compiled-real-time-streams
+           compiled-dynamic-streams
+           compiled-io
+           stream-timer
+           memtable-engine
+           queue
+           registry
+           test-mode?]
+    :or {streams-configurations {}
+         io-configurations {}
+         custom-actions {}
+         custom-io {}
+         compiled-real-time-streams {}
+         compiled-dynamic-streams {}
+         compiled-io {}
+         test-mode? false}}]
+  (->StreamHandler streams-directories
+                   io-directories
+                   (Object.)
+                   streams-configurations
+                   io-configurations
+                   custom-actions
+                   custom-io
+                   compiled-real-time-streams
+                   compiled-dynamic-streams
+                   compiled-io
+                   stream-timer
+                   memtable-engine
+                   queue
+                   registry
+                   (atom {})
+                   test-mode?))
