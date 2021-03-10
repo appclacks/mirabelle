@@ -43,9 +43,11 @@
 
 (s/def ::io (s/keys :opt-un [::directories]))
 (s/def ::test (s/keys :opt-un [::directories]))
+(s/def ::roll-cycle keyword?)
 
 (s/def ::directory ::directory-spec)
-(s/def ::queue (s/keys :req-un [::directory]))
+(s/def ::queue (s/keys :req-un [::directory]
+                       :opt-un [::roll-cycle]))
 (s/def ::config (s/keys :req-un [::tcp ::queue]
                         :opt-un [::stream ::io ::test]))
 

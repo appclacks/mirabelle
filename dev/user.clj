@@ -1,7 +1,6 @@
 (ns user
   (:require [clojure.tools.namespace.repl :refer [refresh]]
-            [mirabelle.core :as core]
-            [mirabelle.db.memtable :as memtable]))
+            [mirabelle.core :as core]))
 
 (defn start!
   []
@@ -22,11 +21,3 @@
 (defn reload!
   []
   (core/reload!))
-
-(defn mem-events
-  [service labels]
-  (let [memtable-engine (:memtable-engine @(:stream-handler core/system))]
-    (memtable/values memtable-engine service labels
-     )
-    )
-  )

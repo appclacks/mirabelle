@@ -2,7 +2,6 @@
   (:require [clojure.spec.alpha :as s]
             [corbihttp.log :as log]
             [exoscale.ex :as ex]
-            [mirabelle.db.memtable :as memtable]
             [mirabelle.db.queue :as queue]
             [mirabelle.event :as e]
             [mirabelle.io :as io]
@@ -1193,14 +1192,8 @@
 
 (defn index!*
   [context labels]
-  (let [memtable-engine (get-in context [:memtable-engine])
-        labels (sort (or labels []))]
-    (fn [event]
-      (when (and (:time event)
-                 (:service event))
-        (memtable/inject! memtable-engine
-                          event
-                          labels)))))
+  (fn [event]
+    "TODO"))
 
 (s/def ::index! (s/cat :labels (s/coll-of keyword?)))
 

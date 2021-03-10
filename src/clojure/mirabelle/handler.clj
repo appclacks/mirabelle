@@ -1,7 +1,6 @@
 (ns mirabelle.handler
   (:require [clojure.edn :as edn]
             [corbihttp.metric :as metric]
-            [mirabelle.db.memtable :as memtable]
             [mirabelle.stream :as stream])
   (:import java.util.Base64))
 
@@ -14,28 +13,13 @@
   (not-found [this request] "Not found handler")
   (metrics [this request] "Return the metrics"))
 
-(defn get-serie-values
-  [memtable-engine request]
-  (let [params (:query-params request)
-        service (:service (:route-params request))
-        from (:from params)
-        to (:to params)
-        labels (dissoc params :from :to)]
-    (if (and from to)
-      (memtable/values-in memtable-engine service labels from to)
-      (memtable/values memtable-engine service labels))))
-
 (defn from-base64
   [s]
   (String. #^bytes (.decode (Base64/getDecoder) ^String s)))
 
-(defrecord Handler [memtable-engine
-                    stream-handler
+(defrecord Handler [stream-handler
                     registry]
   IHandler
-  (get-serie [this request]
-    {:status 200
-     :body (or (get-serie-values memtable-engine request) [])})
   (healthz [this request]
     {:status 200
      :body {:message "ok"}})

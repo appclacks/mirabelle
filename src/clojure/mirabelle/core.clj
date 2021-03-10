@@ -6,7 +6,6 @@
             [corbihttp.metric :as metric]
             [mirabelle.config :as config]
             [mirabelle.db.queue :as queue]
-            [mirabelle.db.memtable :as memtable]
             [mirabelle.handler :as handler]
             [mirabelle.http :as http]
             [mirabelle.test :as test]
@@ -23,8 +22,6 @@
 (defn build-system
   [{:keys [tcp stream http queue test io]}]
   (let [registry (metric/registry-component {})
-        memtable-engine (component/start (memtable/map->MemtableEngine {:memtable-max-ttl 3600
-                                                                        :memtable-cleanup-duration 1000}))
         queue-component (component/start (queue/map->ChroniqueQueue queue))]
     (component/system-map
      :registry registry
@@ -34,12 +31,11 @@
                       {:streams-directories (:directories stream)
                        :io-directories (:directories io)
                        :custom-actions (:actions stream)
-                       :memtable-engine memtable-engine
                        :queue queue-component
                        :registry registry})
      :handler (-> (http/map->ChainHandler {})
                   (component/using [:api-handler :registry]))
-     :api-handler (-> (handler/map->Handler {:memtable-engine memtable-engine})
+     :api-handler (-> (handler/map->Handler {})
                       (component/using [:stream-handler :registry]))
      :shared-event-executor (transport/event-executor)
      :tcp-server (-> (tcp/map->TCPServer tcp)

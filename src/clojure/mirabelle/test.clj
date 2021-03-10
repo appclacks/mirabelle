@@ -3,7 +3,6 @@
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
             [corbihttp.metric :as metric]
-            [mirabelle.db.memtable :as memtable]
             [mirabelle.stream :as stream]))
 
 (defn test-result->message
@@ -37,14 +36,10 @@
     (doseq [[test-name test-config] tests]
       (log/infof {} "launching test %s" test-name)
       (try
-        (let [memtable-engine (component/start
-                               (memtable/map->MemtableEngine {:memtable-max-ttl 3600
-                                                              :memtable-cleanup-duration 1000}))
-              stream-handler (component/start
+        (let [stream-handler (component/start
                               (stream/map->StreamHandler
                                {:streams-directories (:directories stream)
                                 :custom-actions (:actions stream)
-                                :memtable-engine memtable-engine
                                 :registry registry
                                 :test-mode? true}))
               tap (:tap (stream/context stream-handler))]

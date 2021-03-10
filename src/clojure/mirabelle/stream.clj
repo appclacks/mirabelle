@@ -137,7 +137,6 @@
                         ^:volatile-mutable compiled-dynamic-streams
                         ^:volatile-mutable compiled-io
                         ^:volatile-mutable stream-timer
-                        memtable-engine
                         queue
                         registry
                         tap
@@ -176,8 +175,7 @@
       (component/stop io)))
   IStreamHandler
   (context [this]
-    {:memtable-engine memtable-engine
-     :io compiled-io
+    {:io compiled-io
      :queue queue
      :tap tap
      :test-mode? test-mode?
@@ -254,7 +252,6 @@
            compiled-dynamic-streams
            compiled-io
            stream-timer
-           memtable-engine
            queue
            registry
            test-mode?]
@@ -277,7 +274,6 @@
                    compiled-dynamic-streams
                    compiled-io
                    stream-timer
-                   memtable-engine
                    queue
                    registry
                    (atom {})
