@@ -796,3 +796,27 @@
     (is (= "mirabelle-exception" (:service (first @state))))
     (is (instance? Exception (:exception (first @state))))))
 
+(deftest streams-test
+  (is (= {:foo {:actions {:action :sdo
+                          :children [{:action :increment
+                                      :children nil}]}}}
+         (a/streams
+          (a/stream
+           {:name :foo}
+           (a/increment)))))
+  (is (= {:foo {:actions {:action :sdo
+                          :children [{:action :increment
+                                      :children nil}]}}
+          :bar {:actions {:action :sdo
+                          :children [{:action :decrement
+                                      :children nil}
+                                     {:action :increment
+                                      :children nil}]}}}
+         (a/streams
+          (a/stream
+           {:name :foo}
+           (a/increment))
+          (a/stream
+           {:name :bar}
+           (a/decrement)
+           (a/increment))))))

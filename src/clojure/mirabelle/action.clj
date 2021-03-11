@@ -1454,6 +1454,18 @@
   {:action :exception-stream
    :children children})
 
+(defn stream
+  [config & children]
+  (-> (assoc config :actions (apply sdo children))))
+
+(defn streams
+  [& streams]
+  (reduce
+   (fn [state stream-config]
+     (assoc state (:name stream-config) (dissoc stream-config :name)))
+   {}
+   streams))
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
