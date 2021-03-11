@@ -783,3 +783,16 @@
                  state
                  [{:host "aa"}]
                  [{:host "aa"}])))
+
+(deftest exception-stream*-test
+  (let [[rec state] (recorder)
+        stream (a/exception-stream* nil
+                                    (fn [_]
+                                      (throw (ex-info "boom" {})))
+                                    rec)]
+    (stream {:foo 1})
+    (is (= 1 (count @state)))
+    (is (= "error" (:state (first @state))))
+    (is (= "mirabelle-exception" (:service (first @state))))
+    (is (instance? Exception (:exception (first @state))))))
+

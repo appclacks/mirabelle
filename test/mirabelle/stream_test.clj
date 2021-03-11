@@ -265,6 +265,9 @@
                           (a/between-dt 10 20 30)
                           (a/decrement)
                           (a/sdissoc :foo)
+                          (a/exception-stream
+                           (a/by [:host])
+                           (a/decrement))
                           (a/by [:host])
                           (a/by [:host :service])
                           (a/sdissoc [:host :service])

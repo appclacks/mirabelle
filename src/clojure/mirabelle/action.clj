@@ -1,6 +1,7 @@
 (ns mirabelle.action
   (:require [cheshire.core :as json]
             [clojure.spec.alpha :as s]
+            [clojure.string :as string]
             [corbihttp.log :as log]
             [exoscale.ex :as ex]
             [mirabelle.db.queue :as queue]
@@ -1417,6 +1418,42 @@
    :params [(if (keyword? fields) [fields] fields)]
    :children children})
 
+(defn exception->event
+  "Build a new event from an Exception and from the event which caused it."
+  [^Exception e base-event]
+  {:time (:time base-event)
+   :service "mirabelle-exception"
+   :state "error"
+   :metric 1
+   :tags ["exception" (.getName (class e))]
+   :exception e
+   :base-event base-event
+   :description (str e "\n\n" (string/join "\n" (.getStackTrace e)))})
+
+(defn exception-stream*
+  [_ success-child failure-child]
+  (fn [event]
+    (try
+      (success-child event)
+      (catch Exception e
+        (failure-child (exception->event e event))))))
+
+(defn exception-stream
+  "Takes two actions. If an exception is thrown in the first action, an event
+  representing this exception is emitted in in the second action.
+
+  ```
+  (exception-stream
+    (bad-action)
+    (alert))
+  ```"
+  [& children]
+  (when-not (= 2 (count children))
+    (ex/ex-incorrect! "The exception-stream action should take 2 children"
+                      {}))
+  {:action :exception-stream
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1437,6 +1474,7 @@
    :info info*
    :error error*
    :ewma-timeless ewma-timeless*
+   :exception-stream exception-stream*
    :expired expired*
    :fixed-event-window fixed-event-window*
    :fixed-time-window fixed-time-window*
