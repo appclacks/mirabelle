@@ -1,3 +1,2 @@
 {:test1 {:input [{:metric 10} {:metric 11}]
-         :tap-results {:foo [{:metric 12}]}}
- }
+         :tap-results {:foo [{:metric 12}]}}}

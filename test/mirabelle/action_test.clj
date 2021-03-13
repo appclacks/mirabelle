@@ -24,30 +24,6 @@
   (is (= [{:tags ["ok"]}]
          (a/keep-non-discarded-events [{:tags ["discard"]} {:tags ["ok"]}]))))
 
-(deftest valid-condition?-test
-  (are [condition] (a/valid-condition? condition)
-    [:> :metric 10]
-    [:regex :host "foo"]
-    [:< :metric 10]
-    [:= :host "foo"]
-    [:nil? :metric]
-    [:and
-     [:= :host "foo"]
-     [:not-nil? :metric]]
-    [:or
-     [:= :host "foo"]
-     [:not-nil? :metric]])
-  (are [condition] (not (a/valid-condition? condition))
-    [[:> :metric 10]]
-    [:?? :metric 10]
-    [:= "host" "foo"]
-    [:foo :metric]
-    [:foo
-     [:= :host "foo"]
-     [:not-nil? :metric]]
-    [[[:= :host "foo"]
-      [:not-nil? :metric]]]))
-
 (deftest where*-test
   (let [[rec state] (recorder)]
     (test-action (a/where* nil [:pos? :metric] rec)

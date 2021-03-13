@@ -1,8 +1,8 @@
-{:foo
- {:description "bar"
-  :actions
+(streams
+ (stream
+  {:name :foo}
   (where [:> :metric 10]
          (info)
          (increment
           (tap :foo)
-          (info)))}}
+          (info)))))

@@ -4,6 +4,7 @@
             [clojure.string :as string]
             [corbihttp.log :as log]
             [exoscale.ex :as ex]
+            [mirabelle.action.condition :as cd]
             [mirabelle.db.queue :as queue]
             [mirabelle.event :as e]
             [mirabelle.io :as io]
@@ -15,25 +16,6 @@
   [event children]
   (doseq [child children]
     (child event)))
-
-(def condition->fn
-  "Map containing the functions associated to the where options"
-  {:pos? pos?
-   :neg? neg?
-   :zero? zero?
-   :> >
-   :>= >=
-   :< <
-   :<= <=
-   := =
-   :always-true (constantly true)
-   :contains (fn [field value]
-               (some #(= value %) field))
-   :absent (fn [field value] (not (some #( = value %) field)))
-   :regex #(re-matches %2 %1)
-   :nil? nil?
-   :not-nil? (comp not nil?)
-   :not= not=})
 
 (defn discard-fn
   [e]
@@ -52,65 +34,14 @@
     (when-not (discard-fn events)
       events)))
 
-(defn valid-condition?
-  [condition]
-  (and
-   (sequential? condition)
-   (cond
-     (or (= :or (first condition))
-         (= :and (first condition)))
-     (every? identity (map #(valid-condition? %) (rest condition)))
-
-     (= :always-true (first condition))
-     true
-
-     :else
-     (and ((-> condition->fn keys set)
-           (first condition))
-          (keyword? (second condition))))))
-
-(defn compile-condition
-  [[condition field & args]]
-  (let [condition-fn (get condition->fn condition)
-        regex? (= :regex condition)
-        args (if regex?
-               [(-> (first args) re-pattern)]
-               args)]
-    (fn [event] (apply condition-fn
-                       (get event field)
-                       args))))
-
-(defn compile-conditions
-  "Takes a condition and returns a function which can be applied to an
-  event to check if the condition is valid for this event"
-  [conditions]
-  (let [compile-conditions-fn
-        (fn [cd] (reduce
-                  (fn [state condition]
-                    (conj state (compile-condition condition)))
-                  []
-                  cd))]
-    (cond
-      (= :or (first conditions))
-      (let [cond-fns (compile-conditions-fn (rest conditions))]
-        (fn [event] (some identity (map #(% event) cond-fns))))
-
-      (= :and (first conditions))
-      (let [cond-fns (compile-conditions-fn (rest conditions))]
-        (fn [event] (every? identity (map #(% event) cond-fns))))
-
-      :else
-      (let [cond-fn (compile-condition conditions)]
-        (fn [event] (cond-fn event))))))
-
 (defn where*
   [_ conditions & children]
-  (let [condition-fn (compile-conditions conditions)]
+  (let [condition-fn (cd/compile-conditions conditions)]
     (fn [event]
       (when (condition-fn event)
         (call-rescue event children)))))
 
-(s/def ::condition valid-condition?)
+(s/def ::condition cd/valid-condition?)
 (s/def ::where (s/cat :conditions ::condition))
 
 (defn where
@@ -382,7 +313,7 @@
   If the condition is valid for all events received during at least the period `dt`, valid events received after the `dt` period will be passed on until an invalid event arrives.
   Skips events that are too old or that do not have a timestamp."
   [_ conditions dt & children]
-  (let [condition-fn (compile-conditions conditions)
+  (let [condition-fn (cd/compile-conditions conditions)
         last-changed-state (atom {:ok false
                                   :time nil})]
     (fn [event]
@@ -856,7 +787,7 @@
                   [(nth clauses index) (nth children index)])
         comp-clauses (->> clauses
                           (map (fn [clause]
-                                 [(compile-conditions (first clause))
+                                 [(cd/compile-conditions (first clause))
                                   (second clause)])))]
     (fn [event]
       (when-let [stream (reduce (fn [state clause]
@@ -1131,8 +1062,7 @@
 
 (defn project*
   [_ conditions & children]
-  (let [conditions-fns (map compile-conditions conditions)
-        n (count conditions)
+  (let [conditions-fns (map cd/compile-conditions conditions)
         state (atom {:buffer (reduce #(assoc %1 %2 nil)
                                      {}
                                      (range 0 (count conditions)))
