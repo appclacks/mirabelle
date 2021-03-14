@@ -47,25 +47,26 @@
                        (get event field)
                        args))))
 
-(defn compile-conditions
+(def compile-conditions
   "Takes a condition and returns a function which can be applied to an
   event to check if the condition is valid for this event"
-  [conditions]
-  (let [compile-conditions-fn
-        (fn [cd] (reduce
-                  (fn [state condition]
-                    (conj state (compile-condition condition)))
-                  []
-                  cd))]
-    (cond
-      (= :or (first conditions))
-      (let [cond-fns (compile-conditions-fn (rest conditions))]
-        (fn [event] (some identity (map #(% event) cond-fns))))
+  (memoize
+   (fn [conditions]
+     (let [compile-conditions-fn
+           (fn [cd] (reduce
+                     (fn [state condition]
+                       (conj state (compile-condition condition)))
+                     []
+                     cd))]
+       (cond
+         (= :or (first conditions))
+         (let [cond-fns (compile-conditions-fn (rest conditions))]
+           (fn [event] (some identity (map #(% event) cond-fns))))
 
-      (= :and (first conditions))
-      (let [cond-fns (compile-conditions-fn (rest conditions))]
-        (fn [event] (every? identity (map #(% event) cond-fns))))
+         (= :and (first conditions))
+         (let [cond-fns (compile-conditions-fn (rest conditions))]
+           (fn [event] (every? identity (map #(% event) cond-fns))))
 
-      :else
-      (let [cond-fn (compile-condition conditions)]
-        (fn [event] (cond-fn event))))))
+         :else
+         (let [cond-fn (compile-condition conditions)]
+           (fn [event] (cond-fn event))))))))
