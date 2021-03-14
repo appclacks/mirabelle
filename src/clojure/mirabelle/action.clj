@@ -1243,10 +1243,12 @@
 
 (defn restore!*
   [context]
-  (let [queue (:queue context)]
-    (fn [events]
-      (when-let [events (keep-non-discarded-events events)]
-        (queue/write! queue events)))))
+  (if (:test-mode? context)
+    (fn [_] nil)
+    (let [queue (:queue context)]
+      (fn [events]
+        (when-let [events (keep-non-discarded-events events)]
+          (queue/write! queue events))))))
 
 (defn restore!
   "Write events into the on-disk queue."

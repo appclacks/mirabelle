@@ -126,6 +126,19 @@
        (map edn/read-string)
        (apply merge)))
 
+
+(defn build-reaper
+  "Creates a tasks which will expire events from the index every interval seconds.
+  Returns the executor"
+  [stream-handler index interval]
+  (let [task (fn []
+               (let [events (index/expire index)]
+                 (doseq [event events]
+                   (push! stream-handler (assoc event :state "expired") :streaming))))]
+    (log/info {} (format "Starting reaper, it will expire events every %d seconds" interval))
+    (pool/schedule! task {:initial-delay-ms 2000
+                          :interval-ms (* 1000 interval)})))
+
 ;; I should simplify this crappy code
 (deftype StreamHandler [streams-directories ;; config
                         io-directories;; config
@@ -143,6 +156,8 @@
                         tap
                         test-mode?
                         index
+                        reaper-interval
+                        ^:volatile-mutable reaper
                         ]
   component/Lifecycle
   (start [this]
@@ -166,9 +181,14 @@
       (when queue
         (q/read-all! queue #(push! this
                                    (update %1 :tags concat ["discard"])
-                                   :streaming))))
+                                   :streaming)))
+      ;; start the reaper
+      (when-not test-mode?
+        (let [executor (build-reaper this index 10)]
+          (set! reaper executor))))
     this)
   (stop [this]
+    (some-> reaper .shutdown)
     ;; stop executors first to let them finish ongoing tasks
     (doseq [[_ queue] (filter #(= :async-queue (:type %)) compiled-io)]
       (let [^Executor executor (:component queue)]
@@ -218,10 +238,13 @@
          :streams-configurations new-streams-configurations})))
   (push! [this event stream]
     (if (= :streaming stream)
-      (doseq [[_ s] compiled-real-time-streams]
-        (let [t1 (System/nanoTime)]
-          (stream! s event)
-          (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS)))
+      (do
+        (when-let [t (:time event)]
+          (index/new-time? index t))
+        (doseq [[_ s] compiled-real-time-streams]
+          (let [t1 (System/nanoTime)]
+            (stream! s event)
+            (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS))))
       (if-let [s (get compiled-dynamic-streams stream)]
         (stream! s event)
         (throw (ex/ex-incorrect (format "Stream %s not found" stream))))))
@@ -261,7 +284,9 @@
            queue
            registry
            test-mode?
-           index]
+           index
+           reaper-interval
+           reaper]
     :or {streams-configurations {}
          io-configurations {}
          custom-actions {}
@@ -269,6 +294,7 @@
          compiled-real-time-streams {}
          compiled-dynamic-streams {}
          compiled-io {}
+         reaper-interval 20
          test-mode? false}}]
   (->StreamHandler streams-directories
                    io-directories
@@ -285,4 +311,6 @@
                    registry
                    (atom {})
                    test-mode?
-                   index))
+                   index
+                   reaper-interval
+                   reaper))

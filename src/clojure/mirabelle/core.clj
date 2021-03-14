@@ -24,7 +24,7 @@
   [{:keys [tcp stream http queue io]}]
   (let [registry (metric/registry-component {})
         queue-component (component/start (queue/map->ChroniqueQueue queue))
-        index (index/map->Index {})]
+        index (component/start (index/map->Index {}))]
     (component/system-map
      :registry registry
      :index index

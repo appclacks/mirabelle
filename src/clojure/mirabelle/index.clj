@@ -58,11 +58,10 @@
          (try
            (let [age (- @current-time (:time event))
                  ttl (or (:ttl event) t/default-ttl)]
-             (println "age " age)
-             (println "ttl " ttl)
-             (when (< ttl age)
-               (delete this labels)
-               (conj state event)))
+             (if (< ttl age)
+               (do (delete this labels)
+                   (conj state event))
+               state))
            (catch Exception e
              (log/error {}
                         e

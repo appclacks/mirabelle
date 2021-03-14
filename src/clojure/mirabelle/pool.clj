@@ -2,6 +2,7 @@
   (:import java.util.concurrent.Executor
            java.util.concurrent.Executors
            java.util.concurrent.LinkedBlockingQueue
+           java.util.concurrent.ScheduledThreadPoolExecutor
            java.util.concurrent.ThreadPoolExecutor
            java.util.concurrent.TimeUnit))
 
@@ -40,3 +41,14 @@
 (defn fixed-thread-pool-executor
   [size]
   (Executors/newFixedThreadPool size))
+
+(defn schedule!
+  ^ScheduledThreadPoolExecutor
+  [f {:keys [initial-delay-ms interval-ms]}]
+  (let [executor (ScheduledThreadPoolExecutor. 1)]
+    (.scheduleWithFixedDelay executor
+                             ^Runnable f
+                             (long initial-delay-ms)
+                             (long interval-ms)
+                             TimeUnit/MILLISECONDS)
+    executor))
