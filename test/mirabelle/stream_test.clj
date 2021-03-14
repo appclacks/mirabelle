@@ -2,8 +2,10 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
             [clojure.test :refer :all]
+            [com.stuartsierra.component :as component]
             [corbihttp.metric :as metric]
             [mirabelle.action :as a]
+            [mirabelle.index :as index]
             [mirabelle.io.file :as io-file]
             [mirabelle.io :refer [IO]]
             [mirabelle.pool :as pool]
@@ -578,3 +580,16 @@
                                 stream)]
       (is (fn? entrypoint))
       (entrypoint {:metric 12}))))
+
+(deftest index-test
+  (let [index (component/start (index/map->Index {}))
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/index [:host])}
+        {:keys [entrypoint]} (stream/compile-stream! {:index index} stream)]
+    (entrypoint {:host "f" :metric 12 :time 1})
+    (entrypoint {:host "a" :metric 13 :time 1})
+    (is (= 2 (index/size-index index)))
+    (is (= (set [{:host "f" :metric 12 :time 1}
+                 {:host "a" :metric 13 :time 1}])
+           (set (index/search index [:always-true]))))))

@@ -48,8 +48,8 @@
     @current-time)
   (new-time? [this t]
     (swap! current-time (fn [current] (max t current))))
-  (delete [this labels]
-    (.remove index labels))
+  (delete [this k]
+    (.remove index k))
   (expire [this]
     (reduce
      (fn [state ^java.util.Map$Entry map-entry]
@@ -84,8 +84,8 @@
         (delete this labels)
         (.put index (select-keys event labels) event))))
 
-  (lookup [this labels]
-    (.get index labels)))
+  (lookup [this k]
+    (.get index k)))
 
 (defrecord DiscardIndex []
   IIndex

@@ -7,6 +7,7 @@
             [mirabelle.action.condition :as cd]
             [mirabelle.db.queue :as queue]
             [mirabelle.event :as e]
+            [mirabelle.index :as index]
             [mirabelle.io :as io]
             [mirabelle.math :as math]
             [mirabelle.spec :as spec])
@@ -1122,17 +1123,18 @@
         (when (seq events)
           (call-rescue events children))))))
 
-(defn index!*
+(defn index*
   [context labels]
-  (fn [event]
-    "TODO"))
+  (let [i (:index context)]
+    (fn [event]
+      (index/insert i event labels))))
 
-(s/def ::index! (s/cat :labels (s/coll-of keyword?)))
+(s/def ::index (s/cat :labels (s/coll-of keyword?)))
 
-(defn index!
-  "Index events in memory."
+(defn index
+  "Insert events into the index."
   [labels]
-  (spec/valid? ::index! [labels])
+  (spec/valid? ::index [labels])
   {:action :index
    :params [labels]})
 
@@ -1421,7 +1423,7 @@
    :fixed-event-window fixed-event-window*
    :fixed-time-window fixed-time-window*
    :increment increment*
-   :index! index!*
+   :index index*
    :io io*
    :json-fields json-fields*
    :moving-event-window moving-event-window*
