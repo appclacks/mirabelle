@@ -9,6 +9,7 @@
             [exoscale.ex :as ex]
             [mirabelle.action :as action]
             [mirabelle.db.queue :as q]
+            [mirabelle.index :as index]
             [mirabelle.io.file :as io-file]
             [mirabelle.pool :as pool])
   (:import [java.util.concurrent TimeUnit Executor]))
@@ -129,8 +130,8 @@
 (deftype StreamHandler [streams-directories ;; config
                         io-directories;; config
                         lock
-                        ^:volatile-mutable streams-configurations ;; runtime, the streams config
-                        ^:volatile-mutable io-configurations;; runtime, the io config
+                        ^:volatile-mutable streams-configurations
+                        ^:volatile-mutable io-configurations
                         custom-actions
                         custom-io
                         ^:volatile-mutable compiled-real-time-streams
@@ -141,6 +142,7 @@
                         registry
                         tap
                         test-mode?
+                        index
                         ]
   component/Lifecycle
   (start [this]
@@ -176,6 +178,7 @@
   IStreamHandler
   (context [this]
     {:io compiled-io
+     :index index
      :queue queue
      :tap tap
      :test-mode? test-mode?
@@ -226,7 +229,9 @@
     (locking lock
       (log/infof {} "Adding dynamic stream %s" stream-name)
       (let [compiled-stream (compile-stream!
-                             (context this)
+                             (assoc (context this)
+                                    :index
+                                    (index/map->Index {}))
                              stream-configuration)
             new-compiled-dynamic-streams (assoc compiled-dynamic-streams
                                                 stream-name
@@ -235,8 +240,8 @@
   (remove-dynamic-stream [this stream-name]
     (log/infof {} "Removing dynamic stream %s" stream-name)
     (locking lock
-      (let [new-compiled-dynamic-streams (assoc compiled-dynamic-streams
-                                                stream-name)]
+      (let [new-compiled-dynamic-streams (dissoc compiled-dynamic-streams
+                                                 stream-name)]
         (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
   (list-dynamic-streams [this]
     (keys compiled-dynamic-streams)))
@@ -254,7 +259,8 @@
            stream-timer
            queue
            registry
-           test-mode?]
+           test-mode?
+           index]
     :or {streams-configurations {}
          io-configurations {}
          custom-actions {}
@@ -277,4 +283,5 @@
                    queue
                    registry
                    (atom {})
-                   test-mode?))
+                   test-mode?
+                   index))

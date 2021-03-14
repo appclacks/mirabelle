@@ -30,9 +30,11 @@
 (defrecord Index [^NonBlockingHashMap index current-time]
   component/Lifecycle
   (start [this]
-    (assoc this
-           :index (NonBlockingHashMap.)
-           :current-time (atom 0)))
+    (if-not index
+      (assoc this
+             :index (NonBlockingHashMap.)
+             :current-time (atom 0))
+      this))
   (stop [this]
     (assoc this
            :index nil

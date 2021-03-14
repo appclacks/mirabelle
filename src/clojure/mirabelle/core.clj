@@ -8,6 +8,7 @@
             [mirabelle.db.queue :as queue]
             [mirabelle.handler :as handler]
             [mirabelle.http :as http]
+            [mirabelle.index :as index]
             [mirabelle.test :as test]
             [mirabelle.transport :as transport]
             [mirabelle.transport.tcp :as tcp]
@@ -20,21 +21,25 @@
   nil)
 
 (defn build-system
-  [{:keys [tcp stream http queue test io]}]
+  [{:keys [tcp stream http queue io]}]
   (let [registry (metric/registry-component {})
-        queue-component (component/start (queue/map->ChroniqueQueue queue))]
+        queue-component (component/start (queue/map->ChroniqueQueue queue))
+        index (index/map->Index {})]
     (component/system-map
      :registry registry
+     :index index
      :http (-> (corbihttp/map->Server {:config http})
                (component/using [:handler]))
      :stream-handler (stream/map->StreamHandler
                       {:streams-directories (:directories stream)
                        :io-directories (:directories io)
                        :custom-actions (:actions stream)
+                       :index index
                        :queue queue-component
                        :registry registry})
      :handler (-> (http/map->ChainHandler {})
                   (component/using [:api-handler :registry]))
+     :index index
      :api-handler (-> (handler/map->Handler {})
                       (component/using [:stream-handler :registry]))
      :shared-event-executor (transport/event-executor)

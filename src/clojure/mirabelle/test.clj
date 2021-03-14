@@ -3,6 +3,7 @@
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
             [corbihttp.metric :as metric]
+            [mirabelle.index :as index]
             [mirabelle.stream :as stream]))
 
 (defn test-result->message
@@ -41,7 +42,8 @@
                                {:streams-directories (:directories stream)
                                 :custom-actions (:actions stream)
                                 :registry registry
-                                :test-mode? true}))
+                                :test-mode? true
+                                :index (index/map->Index {})}))
               tap (:tap (stream/context stream-handler))]
           (if-let [target (:target test-config)]
             (do (stream/add-dynamic-stream stream-handler
