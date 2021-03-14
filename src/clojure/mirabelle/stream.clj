@@ -229,9 +229,10 @@
     (locking lock
       (log/infof {} "Adding dynamic stream %s" stream-name)
       (let [compiled-stream (compile-stream!
+                             ;; set an useless index for dynamic streams
                              (assoc (context this)
                                     :index
-                                    (index/map->Index {}))
+                                    (index/map->DiscardIndex {}))
                              stream-configuration)
             new-compiled-dynamic-streams (assoc compiled-dynamic-streams
                                                 stream-name

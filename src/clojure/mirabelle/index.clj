@@ -86,3 +86,27 @@
 
   (lookup [this labels]
     (.get index labels)))
+
+(defrecord DiscardIndex []
+  IIndex
+  (size-index [this]
+    0)
+  (clear-index [this]
+    nil)
+  (current-time [this]
+    0)
+  (new-time? [this t]
+    0)
+  (delete [this labels]
+    nil)
+  (expire [this]
+    [])
+
+  (search [this condition]
+    [])
+
+  (insert [this event labels]
+    nil)
+
+  (lookup [this labels]
+    nil))
