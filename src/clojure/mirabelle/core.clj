@@ -43,7 +43,8 @@
      :index index
      :api-handler (-> (handler/map->Handler {})
                       (component/using [:stream-handler :registry]))
-     :shared-event-executor (transport/event-executor)
+     :shared-event-executor (transport/event-executor
+                             (:event-executor-size tcp))
      :tcp-server (-> (tcp/map->TCPServer tcp)
                      (component/using [:shared-event-executor
                                        :stream-handler

@@ -27,11 +27,13 @@
 (s/def ::cacert ::file-spec)
 (s/def ::cert ::file-spec)
 (s/def ::key ::file-spec)
+(s/def ::event-executor-size pos-int?)
 
 (s/def ::tcp (s/keys :req-un [::host
                               ::port]
                      :opt-un [::cacert
                               ::cert
+                              ::event-executor-size
                               ::key]))
 
 (s/def ::directories (s/coll-of ::directory-spec))

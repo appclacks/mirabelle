@@ -145,8 +145,9 @@
 (defn event-executor
   "Creates a new netty execution handler for processing events. Defaults to 1
   thread per core."
-  []
-  (DefaultEventExecutorGroup. (.. Runtime getRuntime availableProcessors)))
+  [nb-core]
+  (DefaultEventExecutorGroup. (or nb-core
+                                  (.. Runtime getRuntime availableProcessors))))
 
 (defn handle
   "Handles a msg with the given handler."
