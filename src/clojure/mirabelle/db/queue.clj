@@ -67,9 +67,11 @@
                            ]
   component/Lifecycle
   (start [this]
-    (let [q (queue/make directory {:roll-cycle (or roll-cycle :half-hourly)})
-          a (make q)]
-      (assoc this :queue q :appender a)))
+    (if-not queue
+      (let [q (queue/make directory {:roll-cycle (or roll-cycle :half-hourly)})
+            a (make q)]
+        (assoc this :queue q :appender a))
+      this))
   (stop [this]
     (when queue
       (queue/close! queue))

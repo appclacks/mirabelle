@@ -28,6 +28,7 @@
     (component/system-map
      :registry registry
      :index index
+     :queue queue
      :http (-> (corbihttp/map->Server {:config http})
                (component/using [:handler]))
      :stream-handler (stream/map->StreamHandler
