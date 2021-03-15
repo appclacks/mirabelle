@@ -9,10 +9,11 @@
 (defn shutdown
   "Graceful shutdown of an executor"
   [^Executor executor]
-  (.shutdown executor)
-  (.awaitTermination executor
-                     (long (* 2 60 1000))
-                     TimeUnit/MILLISECONDS))
+  (when executor
+    (.shutdown executor)
+    (.awaitTermination executor
+                       (long (* 2 60 1000))
+                       TimeUnit/MILLISECONDS)))
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn dynamic-thread-pool-executor
