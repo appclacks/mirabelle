@@ -21,3 +21,25 @@
 (defn reload!
   []
   (core/reload!))
+
+(comment
+  (require '[riemann.codec :as c])
+  (require '[clj-memory-meter.core :as mm])
+  (require '[clojure.data.fressian :as fress])
+  (mm/measure [(c/map->Event
+                {:host "foo" :service "bar" :metric 10 :time 1 :ttl 60 :tags ["prod" "db"] :description "blablabla eaz az azr za aza zaz aze aze azazeaaz az az" :state "ok" :env "prod" :location "gv2" :foo "bar"})
+               (c/map->Event
+                {:host "foo" :service "bar" :metric 10 :time 1 :ttl 60 :tags ["prod" "db"] :description "blablabla eaz az azr za aza zaz aze aze azazeaaz az az" :state "ok" :env "prod" :location "gv2" :foo "bar"})
+               (c/map->Event
+                {:host "foo" :service "bar" :metric 10 :time 1 :ttl 60 :tags ["prod" "db"] :description "blablabla eaz az azr za aza zaz aze aze azazeaaz az az" :state "ok" :env "prod" :location "gv2" :foo "bar"})
+               (c/map->Event
+                {:host "foo" :service "bar" :metric 10 :time 1 :ttl 60 :tags ["prod" "db"] :description "blablabla eaz az azr za aza zaz aze aze azazeaaz az az" :state "ok" :env "prod" :location "gv2" :foo "bar"})
+               (c/map->Event
+                {:host "foo" :service "bar" :metric 10 :time 1 :ttl 60 :tags ["prod" "db"] :description "blablabla eaz az azr za aza zaz aze aze azazeaaz az az" :state "ok" :env "prod" :location "gv2" :foo "bar"})
+               (c/map->Event
+                {:host "foo" :service "bar" :metric 10 :time 1 :ttl 60 :tags ["prod" "db"] :description "blablabla eaz az azr za aza zaz aze aze azazeaaz az az" :state "ok" :env "prod" :location "gv2" :foo "bar"})
+               (c/map->Event
+                {:host "foo" :service "bar" :metric 10 :time 1 :ttl 60 :tags ["prod" "db"] :description "blablabla eaz az azr za aza zaz aze aze azazeaaz az az" :state "ok" :env "prod" :location "gv2" :foo "bar"})]))
+
+
+

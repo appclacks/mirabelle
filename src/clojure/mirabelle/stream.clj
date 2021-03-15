@@ -12,7 +12,9 @@
             [mirabelle.index :as index]
             [mirabelle.io.file :as io-file]
             [mirabelle.pool :as pool])
-  (:import [java.util.concurrent TimeUnit Executor]))
+  (:import [io.micrometer.core.instrument Timer]
+           [java.io File]
+           [java.util.concurrent TimeUnit Executor]))
 
 (defn compile!
   [context stream]
@@ -120,12 +122,11 @@
   (->> (map (fn [path] (.listFiles (io/file path))) dirs-path)
        (map (fn [files]
               (for [f files]
-                (.getPath f))))
+                (.getPath ^File f))))
        (reduce #(concat %2 %1) [])
        (map slurp)
        (map edn/read-string)
        (apply merge)))
-
 
 (defn build-reaper
   "Creates a tasks which will expire events from the index every interval seconds.
@@ -150,7 +151,7 @@
                         ^:volatile-mutable compiled-real-time-streams
                         ^:volatile-mutable compiled-dynamic-streams
                         ^:volatile-mutable compiled-io
-                        ^:volatile-mutable stream-timer
+                        ^:volatile-mutable ^Timer stream-timer
                         queue
                         registry
                         tap
@@ -188,7 +189,7 @@
           (set! reaper executor))))
     this)
   (stop [this]
-    (some-> reaper .shutdown)
+    (pool/shutdown reaper)
     ;; stop executors first to let them finish ongoing tasks
     (doseq [[_ queue] (filter #(= :async-queue (:type %)) compiled-io)]
       (let [^Executor executor (:component queue)]
