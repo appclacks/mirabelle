@@ -339,7 +339,7 @@
                           ;; => last-changed-state is now ko with a new time
                           {:ok false :time event-time}
                           ;; default value, return the state
-                          :default state)))
+                          :else state)))
           (when (and valid-event
                       ;; we already had an ok event
                      ok

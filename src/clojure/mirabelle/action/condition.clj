@@ -40,7 +40,7 @@
   [[condition field & args]]
   (let [condition-fn (get condition->fn condition)
         regex? (= :regex condition)
-        args (if regex?
+        args (if (and regex? (string? (first args)))
                [(-> (first args) re-pattern)]
                args)]
     (fn [event] (apply condition-fn

@@ -68,6 +68,16 @@
                   {:host "baz" :metric 3}]
                  [{:host "foo" :metric 2}
                   {:host "foobar" :metric 2}])
+    (test-action (a/where* nil
+                           [:regex :host #"foo.*"]
+                           rec)
+                 state
+                 [{:host "bar" :metric 1}
+                  {:host "foo" :metric 2}
+                  {:host "foobar" :metric 2}
+                  {:host "baz" :metric 3}]
+                 [{:host "foo" :metric 2}
+                  {:host "foobar" :metric 2}])
     (test-action (a/where* nil [:contains :tags "foo"] rec)
                  state
                  [{:metric 10} {:metric 10 :tags ["foo"]} {:tags []}]
