@@ -29,6 +29,24 @@
       (entrypoint {:metric 9})
       (is (= [{:metric 12}] @recorder))
       (entrypoint {:metric 13})
+      (is (= [{:metric 12} {:metric 13}] @recorder))))
+
+  (testing "can use the custom function to build the stream"
+    (let [custom-actions {:my-custom-action 'mirabelle.action/where*}
+          recorder (atom [])
+          stream {:description "foo"
+                  :actions (a/custom :my-custom-action
+                                     [[:> :metric 10]]
+                                     (a/test-action recorder))}
+          {:keys [entrypoint]} (stream/compile-stream!
+                                {:custom-actions custom-actions}
+                                stream)]
+      (is (fn? entrypoint))
+      (entrypoint {:metric 12})
+      (is (= [{:metric 12}] @recorder))
+      (entrypoint {:metric 9})
+      (is (= [{:metric 12}] @recorder))
+      (entrypoint {:metric 13})
       (is (= [{:metric 12} {:metric 13}] @recorder)))))
 
 (deftest compile!-test

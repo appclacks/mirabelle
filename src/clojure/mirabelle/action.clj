@@ -1400,6 +1400,13 @@
    {}
    streams))
 
+(defn custom
+  "Creates a custom action"
+  [action-name params & children]
+  {:action action-name
+   :params (or params [])
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*

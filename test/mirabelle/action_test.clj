@@ -806,3 +806,23 @@
            {:name :bar}
            (a/decrement)
            (a/increment))))))
+
+(deftest custom-test
+  (is (= {:action :foo
+          :params []
+          :children [{:action :decrement
+                      :children nil}]}
+         (a/custom :foo nil
+                   (a/decrement))))
+  (is (= {:action :foo
+          :params []
+          :children [{:action :decrement
+                      :children nil}]}
+         (a/custom :foo []
+                   (a/decrement))))
+  (is (= {:action :foo
+          :params [:a 1 "a"]
+          :children [{:action :decrement
+                      :children nil}]}
+         (a/custom :foo [:a 1 "a"]
+          (a/decrement)))))
