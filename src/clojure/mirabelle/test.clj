@@ -43,8 +43,8 @@
                                 :custom-actions (:actions stream)
                                 :registry registry
                                 :test-mode? true
-                                ;; no index support in test mode
-                                :index (index/map->DiscardIndex {})}))
+                                ;; dedicated index in test mode
+                                :index (index/map->Index {})}))
               tap (:tap (stream/context stream-handler))]
           (if-let [target (:target test-config)]
             (do (stream/add-dynamic-stream stream-handler

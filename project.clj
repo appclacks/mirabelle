@@ -16,6 +16,7 @@
                  [mcorbin/corbihttp "0.9.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/spec.alpha "0.2.194"]
+                 [com.influxdb/influxdb-client-java "2.0.0"]
                  [riemann-clojure-client "0.5.1"]]
   :main ^:skip-aot mirabelle.core
   :global-vars {*warn-on-reflection* true}
