@@ -1127,6 +1127,8 @@
   [context labels]
   (let [i (:index context)]
     (fn [event]
+      (when-let [t (:time event)]
+        (index/new-time? i t))
       (index/insert i event labels))))
 
 (s/def ::index (s/cat :labels (s/coll-of keyword?)))
@@ -1407,21 +1409,8 @@
    :params (or params [])
    :children children})
 
-(defn advance-index*
-  [context]
-  (let [index (:index context)]
-    (fn [event]
-      (when-let [t (:time event)]
-        (index/new-time? index t)))))
-
-(defn advance-index
-  []
-  {:action :advance-index
-   :params []})
-
 (def action->fn
   {:above-dt cond-dt*
-   :advance-index advance-index*
    :async-queue! async-queue!*
    :between-dt cond-dt*
    :changed changed*

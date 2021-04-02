@@ -607,27 +607,13 @@
         {:keys [entrypoint]} (stream/compile-stream! {:index index} stream)]
     (entrypoint {:host "f" :metric 12 :time 1})
     (entrypoint {:host "a" :metric 13 :time 1})
-    (is (= 2 (index/size-index index)))
-    (is (= (set [{:host "f" :metric 12 :time 1}
-                 {:host "a" :metric 13 :time 1}])
-           (set (index/search index [:always-true]))))))
-
-(deftest index-advance-test
-  (let [index (component/start (index/map->Index {}))
-        stream {:name "my-stream"
-                :description "foo"
-                :actions (a/sdo (a/index [:host]) (a/advance-index))}
-        {:keys [entrypoint context]} (stream/compile-stream! {:index index} stream)]
-    (entrypoint {:host "f" :metric 12 :time 1})
-    (entrypoint {:host "a" :metric 13 :time 1})
-    (is (= 1 (index/current-time (:index context))))
+    (is (= 1 (index/current-time index)))
     (is (= 2 (index/size-index index)))
     (is (= (set [{:host "f" :metric 12 :time 1}
                  {:host "a" :metric 13 :time 1}])
            (set (index/search index [:always-true]))))
     (entrypoint {:host "a" :metric 13 :time 10})
-    (is (= 10 (index/current-time (:index context))))
     (entrypoint {:host "a" :metric 13 :time 9})
-    (is (= 10 (index/current-time (:index context))))
-    (entrypoint {:host "a" :metric 13 :time 11})
-    (is (= 11 (index/current-time (:index context))))))
+    (is (= 10 (index/current-time index)))
+    (entrypoint {:host "a" :metric 13 :time 12})
+    (is (= 12 (index/current-time index)))))
