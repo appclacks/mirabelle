@@ -472,7 +472,7 @@
     (if-let [io-component (get-in context [:io io-name :component])]
       (fn [event]
         (when-let [events (keep-non-discarded-events event)]
-          (io/inject! io-component events)))
+          (io/inject! io-component (e/sequential-events events))))
       (throw (ex/ex-incorrect (format "IO %s not found"
                                       io-name))))))
 
@@ -1416,7 +1416,6 @@
     (fn [_]
       (doseq [event (index/expire index)]
         (reinject-fn event destination-stream)))))
-
 
 (s/def ::reaper (s/cat :destination-stream keyword?))
 

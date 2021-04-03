@@ -99,7 +99,6 @@
                                    h-name
                                    h-expr)))
                    handlers)]
-;    (prn forms)
     `(let [~@(apply concat shared)]
        (proxy [ChannelInitializer] []
          (initChannel [~'ch]
