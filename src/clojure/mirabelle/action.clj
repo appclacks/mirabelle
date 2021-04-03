@@ -1409,6 +1409,21 @@
    :params (or params [])
    :children children})
 
+(defn reaper*
+  [context destination-stream]
+  (let [index (:index context)
+        reinject-fn (:reinject context)]
+    (fn [_]
+      (doseq [event (index/expire index)]
+        (reinject-fn event destination-stream)))))
+
+(defn reaper
+  ([] (reaper :streaming))
+  ([destination-stream]
+   {:action :reaper
+    :params [destination-stream]
+    :children []}))
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1443,6 +1458,7 @@
    :over over*
    :percentiles percentiles*
    :push-io! push-io!*
+   :reaper reaper*
    :reinject! reinject!*
    :scale scale*
    :sflatten sflatten*

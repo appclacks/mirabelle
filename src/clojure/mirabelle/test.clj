@@ -45,7 +45,9 @@
                                 :test-mode? true
                                 ;; dedicated index in test mode
                                 :index (index/map->Index {})}))
-              tap (:tap (stream/context stream-handler))]
+              ;; the context source stream is not important here
+              ;; because we only want the tap
+              tap (:tap (stream/context stream-handler :test))]
           (if-let [target (:target test-config)]
             (do (stream/add-dynamic-stream stream-handler
                                            target

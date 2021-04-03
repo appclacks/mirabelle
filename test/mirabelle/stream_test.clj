@@ -617,3 +617,26 @@
     (is (= 10 (index/current-time index)))
     (entrypoint {:host "a" :metric 13 :time 12})
     (is (= 12 (index/current-time index)))))
+
+(deftest reaper-test
+  (let [index (component/start (index/map->Index {}))
+        recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/sdo (a/index [:host])
+                                (a/reaper))}
+        {:keys [entrypoint]} (stream/compile-stream!
+                              {:index index
+                               :reinject (fn [event _]
+                                           (swap! recorder conj event))}
+                              stream)]
+    (entrypoint {:host "f" :metric 12 :time 1 :ttl 15})
+    (is (= 1 (index/current-time index)))
+    (is (= 1 (index/size-index index)))
+    (entrypoint {:host "b" :metric 12 :time 17})
+    (is (= 17 (index/current-time index)))
+    (is (= 1 (index/size-index index)))
+    (is (= [{:host "b" :metric 12 :time 17}]
+           (index/search index [:always-true])))
+    (is (= [{:host "f" :metric 12 :time 1 :ttl 15}]
+           @recorder))))

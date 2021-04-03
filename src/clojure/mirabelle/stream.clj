@@ -110,7 +110,7 @@
      :to-reload to-reload}))
 
 (defprotocol IStreamHandler
-  (context [this] "Return the streams context")
+  (context [this source-stream] "Return the streams context")
   (reload [this] "Add the new configuration")
   (add-dynamic-stream [this stream-name stream-configuration] "Add a new stream")
   (remove-dynamic-stream [this stream-name] "Remove a stream by name")
@@ -129,6 +129,8 @@
        (map slurp)
        (map edn/read-string)
        (apply merge)))
+
+(def streaming :streaming)
 
 ;; I should simplify this crappy code
 (deftype StreamHandler [streams-directories ;; config
@@ -180,12 +182,13 @@
     (doseq [[_ io] (remove #(= :async-queue (:type %)) compiled-io)]
       (component/stop io)))
   IStreamHandler
-  (context [this]
+  (context [this source-stream]
     {:io compiled-io
      :index index
      :queue queue
      :tap tap
      :test-mode? test-mode?
+     :source-stream source-stream
      :custom-actions custom-actions
      :reinject #(push! this %1 %2)})
   (reload [this]
@@ -203,7 +206,7 @@
                                       ;; new io are injected into streams
                                       (mapv (fn [[k v]]
                                               [k (compile-stream!
-                                                  (context this)
+                                                  (context this streaming)
                                                   v)]))
                                       (into {})
                                       (merge (apply dissoc
@@ -221,7 +224,7 @@
         {:compiled-real-time-streams compiled-real-time-streams
          :streams-configurations new-streams-configurations})))
   (push! [this event stream]
-    (if (= :streaming stream)
+    (if (= streaming stream)
       (doseq [[_ s] compiled-real-time-streams]
         (let [t1 (System/nanoTime)]
           (stream! s event)
@@ -234,7 +237,7 @@
       (log/infof {} "Adding dynamic stream %s" stream-name)
       (let [compiled-stream (compile-stream!
                              ;; dedicated index for dyn streams
-                             (assoc (context this)
+                             (assoc (context this stream-name)
                                     :index
                                     (index/map->Index {}))
                              stream-configuration)
