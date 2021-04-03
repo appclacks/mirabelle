@@ -1417,9 +1417,13 @@
       (doseq [event (index/expire index)]
         (reinject-fn event destination-stream)))))
 
+
+(s/def ::reaper (s/cat :destination-stream keyword?))
+
 (defn reaper
   ([] (reaper :streaming))
   ([destination-stream]
+   (spec/valid? ::reaper [destination-stream])
    {:action :reaper
     :params [destination-stream]
     :children []}))
