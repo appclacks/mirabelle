@@ -39,6 +39,13 @@
   (let [^InfluxDBClientOptions options (influxdb-options config)]
     (InfluxDBClientFactory/create options)))
 
+(defn converts-double
+  "if n if a ratio, converts it to double. Returns n otherwise."
+  [n]
+  (if (ratio? n)
+    (double n)
+    n))
+
 (defn event->point
   "Converts an event to an InfluxDB Point."
   [config event]
@@ -56,7 +63,7 @@
     (doseq [[k v] tags]
       (.addTag point (name k) v))
     (doseq [[k v] fields]
-      (.addField point (name k) v))
+      (.addField point (name k) (converts-double v)))
     (.time point
            ^Long (long (* 1000000 (:time event)))
            WritePrecision/US)
@@ -74,6 +81,10 @@
 (s/def ::default-tags (s/map-of ::spec/keyword-or-str
                                 ::spec/keyword-or-str))
 
+(def default-config
+  {:tags []
+   :fields []})
+
 (s/def ::influxdb (s/keys :req-un [::connection-string
                                    ::bucket
                                    ::measurement
@@ -85,6 +96,7 @@
                                    ::token
                                    ::default-tags]))
 
+;; in Influxn tags are indexed, not fields
 (defrecord InfluxIO [config
                      ^InfluxDBClient client
                      ^WriteApi write-api
@@ -92,8 +104,12 @@
   component/Lifecycle
   (start [this]
     (spec/valid? ::influxdb config)
-    (let [c (influxdb-client config)]
-      (assoc this :client c :write-api (.getWriteApi c))))
+    (let [config (merge default-config config)
+          c (influxdb-client config)]
+      (assoc this
+             :config config
+             :client c
+             :write-api (.getWriteApi c))))
   (stop [this]
     (.close client)
     (assoc this :client nil :write-api nil))

@@ -7,8 +7,8 @@
                      :password "mirabelle"
                      :measurement :service
                      :default-tags {"project" "mirabelle"}
-                     :tags [:environment :state]
-                     :fields [:host :metric]}
+                     :tags []
+                     :fields []}
             :type :influxdb}
  :thread-pool {:type :async-queue
                :config {}}}

@@ -3,5 +3,8 @@
   {:name :foo}
   (where [:> :metric 10]
          (increment
-          (push-io! :influxdb)
-          (info)))))
+          (with {:influxdb/tags [:environment :state :host]
+                 :influxdb/fields [:metric]}
+                (info)
+                (push-io! :influxdb))
+          ))))

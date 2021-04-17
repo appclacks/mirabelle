@@ -7,4 +7,9 @@
      :children
      ({:action :increment,
        :children
-       ({:action :push-io!, :params [:influxdb]} {:action :info})})})}}}
+       ({:action :with,
+         :children
+         ({:action :info} {:action :push-io!, :params [:influxdb]}),
+         :params
+         [{:influxdb/tags [:environment :state],
+           :influxdb/fields [:host :metric]}]})})})}}}
