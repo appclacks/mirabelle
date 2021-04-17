@@ -7,7 +7,6 @@
             [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [exoscale.ex :as ex]
-            [mirabelle.event :as event]
             [mirabelle.io :as io]
             [mirabelle.spec :as spec]
             [mirabelle.time :as time])
@@ -103,13 +102,12 @@
     (spec/valid? ::pagerduty this))
   (stop [this] this)
   io/IO
-  (inject! [this event]
-    (let [events (event/sequential-events event)]
-      (doseq [event events]
-        (send-event this
-                    (or (:pagerduty-action event)
-                        (condp = (:state event)
-                          "critical" :trigger
-                          "ok" :resolve
-                          :trigger))
-                    event)))))
+  (inject! [this events]
+    (doseq [event events]
+      (send-event this
+                  (or (:pagerduty/action event)
+                      (condp = (:state event)
+                        "critical" :trigger
+                        "ok" :resolve
+                        :trigger))
+                  event))))

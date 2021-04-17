@@ -1,5 +1,10 @@
 (ns mirabelle.spec
-  (:require [exoscale.ex :as ex]))
+  (:require [clojure.spec.alpha :as s]
+            [exoscale.ex :as ex]))
+
+(s/def ::ne-string (s/and string? (complement empty?)))
+(s/def ::keyword-or-str (s/or :keyword keyword?
+                              :string ::ne-string))
 
 (defn not-null [v] (not (nil? v)))
 

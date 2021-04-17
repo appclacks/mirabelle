@@ -66,17 +66,17 @@
 (defn kqueue-netty-implementation
    []
    {:event-loop-group-fn #(KQueueEventLoopGroup.)
-     :channel KQueueServerSocketChannel})
+    :channel KQueueServerSocketChannel})
 
 (defn epoll-netty-implementation
    []
    {:event-loop-group-fn #(EpollEventLoopGroup.)
-     :channel EpollServerSocketChannel})
+    :channel EpollServerSocketChannel})
 
 (defn nio-netty-implementation
    []
    {:event-loop-group-fn #(NioEventLoopGroup.)
-     :channel NioServerSocketChannel})
+    :channel NioServerSocketChannel})
 
 (def netty-implementation
   (let [mac-or-freebsd? (re-find #"(mac|freebsd)" (System/getProperty "os.name"))
@@ -84,8 +84,8 @@
        sfbit? (re-find #"(x86_64|amd64)" (System/getProperty "os.arch"))
        native?  (= (System/getProperty "netty.native.implementation") "true")]
     (cond (and native? sfbit? linux?) (epoll-netty-implementation)
-             (and native? sfbit? mac-or-freebsd?) (kqueue-netty-implementation)
-             :else (nio-netty-implementation))))
+          (and native? sfbit? mac-or-freebsd?) (kqueue-netty-implementation)
+          :else (nio-netty-implementation))))
 
 (defn tcp-handler
   "Given a core, a channel, and a message, applies the message to core and

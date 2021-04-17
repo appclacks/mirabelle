@@ -11,6 +11,7 @@
             [mirabelle.db.queue :as q]
             [mirabelle.index :as index]
             [mirabelle.io.file :as io-file]
+            [mirabelle.io.influxdb :as influxdb]
             [mirabelle.pool :as pool])
   (:import [io.micrometer.core.instrument Timer]
            [java.io File]
@@ -76,6 +77,12 @@
       (assoc io-config
              :component
              (io-file/map->FileIO (:config io-config)))
+
+      (= :influxdb t)
+      (assoc io-config
+             :component
+             (component/start (influxdb/map->InfluxIO
+                               {:config (:config io-config)})))
       :else
       (throw (ex/ex-incorrect
               (format "Invalid IO: %s" t)
