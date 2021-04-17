@@ -3,7 +3,6 @@
 (ns mirabelle.transport
   (:require [clojure.tools.logging :as log]
             [mirabelle.time :as time]
-            [mirabelle.stream :as stream]
             [riemann.codec  :as codec])
   (:import
     (java.util List)

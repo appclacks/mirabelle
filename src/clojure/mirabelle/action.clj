@@ -606,7 +606,7 @@
 
     :else
     (let [[k v & children] args]
-      (if (or (not k) (not v))
+      (when (or (not k) (not v))
         (throw (ex/ex-info "Invalid parameters for with: %s %s" k v)))
       {:action :with
        :children children
