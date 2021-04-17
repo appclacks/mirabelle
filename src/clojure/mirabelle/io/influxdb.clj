@@ -105,7 +105,7 @@
   (start [this]
     (spec/valid? ::influxdb config)
     (let [config (merge default-config config)
-          c (influxdb-client config)]
+          ^InfluxDBClient c (influxdb-client config)]
       (assoc this
              :config config
              :client c
