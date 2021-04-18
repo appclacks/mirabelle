@@ -827,7 +827,7 @@
          (a/custom :foo [:a 1 "a"]
           (a/decrement)))))
 
-(deftest to-base64-test
+(deftest to-base64*-test
   (let [[rec state] (recorder)]
     (test-action (a/to-base64* nil
                                [:host :service]
@@ -838,7 +838,7 @@
                  [{:host "YWE=" :service "YmI="}
                   {:host "YmI=" :service "YWE=" :state "critical"}])))
 
-(deftest from-base64-test
+(deftest from-base64*-test
   (let [[rec state] (recorder)]
     (test-action (a/from-base64* nil
                                  [:host :service]
@@ -848,3 +848,28 @@
                   {:host "YmI=" :service "YWE=" :state "critical"}]
                  [{:host "aa" :service "bb"}
                   {:host "bb" :service "aa" :state "critical"}])))
+
+(deftest sformat*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/sformat* nil
+                             "%s-cc-%s"
+                             :format-test
+                             [:host :service]
+                             rec)
+                 state
+                 [{:host "aa" :service "bb"}
+                  {:host "bb" :service "aa" :state "critical"}]
+                 [{:host "aa" :service "bb" :format-test "aa-cc-bb"}
+                  {:host "bb"
+                   :service "aa"
+                   :state "critical"
+                   :format-test "bb-cc-aa"}]))
+  (let [[rec state] (recorder)]
+    (test-action (a/sformat* nil
+                             "%s-cc"
+                             :service
+                             [:host]
+                             rec)
+                 state
+                 [{:host "aa" :service "bb"}]
+                 [{:host "aa" :service "aa-cc"}])))

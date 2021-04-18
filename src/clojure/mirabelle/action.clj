@@ -1480,6 +1480,38 @@
      :params [fields]
      :children children}))
 
+(defn sformat*
+  [_ template target-field fields & children]
+  (let [value-fn (fn [event] (reduce #(conj %1 (get event %2)) [] fields))]
+    (fn [event]
+      (call-rescue
+       (assoc event
+              target-field
+              (apply format template (value-fn event)))
+       children))))
+
+(s/def ::sformat (s/cat :template string?
+                        :target-field keyword?
+                        :fields (s/coll-of keyword?)))
+
+(defn sformat
+  "Convert a field or multiple fields from base64 to string.
+  Fields values should be string.
+
+  ```clojure
+  (sdo
+    ;; you can pass one field
+    (from-base64 :host)
+    ;; or a list of fields
+    (from-base64 [:host :service]))
+  ```
+  "
+  [template target-field fields & children]
+  (spec/valid? ::sformat [template target-field fields])
+  {:action :sformat
+   :params [template target-field fields]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1522,6 +1554,7 @@
    :split split*
    :sdissoc sdissoc*
    :sdo sdo*
+   :sformat sformat*
    :tag tag*
    :tagged-all tagged-all*
    :tap tap*
