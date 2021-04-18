@@ -5,7 +5,8 @@
    ({:action :where,
      :params [[:> :metric 10]],
      :children
-     ({:action :increment,
+     ({:action :index, :params [[:host]]}
+      {:action :increment,
        :children
        ({:action :with,
          :children ({:action :info}),

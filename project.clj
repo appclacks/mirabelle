@@ -30,6 +30,7 @@
                                   [org.clojure/tools.namespace "1.1.0"]
                                   [org.clojure/data.fressian "1.0.0"]
                                   [com.clojure-goes-fast/clj-memory-meter "0.1.3"]]
+                   :source-paths ["dev"]
                    :plugins [[lein-ancient "0.6.15"]
                              [lein-environ "1.1.0"]]
                    :resource-paths ["resources" "test/resources" "gen-resources"]
