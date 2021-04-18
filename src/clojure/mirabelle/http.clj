@@ -11,8 +11,8 @@
 
 (defn interceptor-chain
   [api-handler registry]
-  [(itc-error/last-error registry) ;;error
-   itc-response/response ;;leave
+  [itc-response/response ;;leave
+   (itc-error/last-error registry) ;;error
    (itc-metric/response-metrics registry) ;; leave
    itc-json/json ;; leave
    itc-error/error ;; error
