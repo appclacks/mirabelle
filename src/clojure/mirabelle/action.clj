@@ -5,6 +5,7 @@
             [corbihttp.log :as log]
             [exoscale.ex :as ex]
             [mirabelle.action.condition :as cd]
+            [mirabelle.b64 :as b64]
             [mirabelle.db.queue :as queue]
             [mirabelle.event :as e]
             [mirabelle.index :as index]
@@ -1427,6 +1428,58 @@
     :params [destination-stream]
     :children []}))
 
+(s/def ::to-base64 (s/cat :fields (s/coll-of keyword?)))
+
+(defn to-base64*
+  [_ fields & children]
+  (fn [event]
+    (call-rescue (reduce #(update %1 %2 b64/to-base64) event fields) children)))
+
+(defn to-base64
+  "Convert a field or multiple fields to base64.
+  Fields values should be string.
+
+  ```clojure
+  (sdo
+    ;; you can pass one field
+    (to-base64 :host)
+    ;; or a list of fields
+    (to-base64 [:host :service]))
+  ```
+  "
+  [field & children]
+  (let [fields (if (keyword? field) [field] field)]
+    (spec/valid? ::to-base64 [fields])
+    {:action :to-base64
+     :params [fields]
+     :children children}))
+
+(defn from-base64*
+  [_ fields & children]
+  (fn [event]
+    (call-rescue (reduce #(update %1 %2 b64/from-base64) event fields) children)))
+
+(s/def ::from-base64 (s/cat :fields (s/coll-of keyword?)))
+
+(defn from-base64
+  "Convert a field or multiple fields from base64 to string.
+  Fields values should be string.
+
+  ```clojure
+  (sdo
+    ;; you can pass one field
+    (from-base64 :host)
+    ;; or a list of fields
+    (from-base64 [:host :service]))
+  ```
+  "
+  [field & children]
+  (let [fields (if (keyword? field) [field] field)]
+    (spec/valid? ::from-base64 [fields])
+    {:action :from-base64
+     :params [fields]
+     :children children}))
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1451,6 +1504,7 @@
    :expired expired*
    :fixed-event-window fixed-event-window*
    :fixed-time-window fixed-time-window*
+   :from-base64 from-base64*
    :increment increment*
    :index index*
    :io io*
@@ -1473,6 +1527,7 @@
    :tap tap*
    :test-action test-action*
    :throttle throttle*
+   :to-base64 to-base64*
    :under under*
    :untag untag*
    :warning warning*

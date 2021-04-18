@@ -284,6 +284,10 @@
                           (a/above-dt 10 20)
                           (a/between-dt 10 20 30)
                           (a/decrement)
+                          (a/to-base64 :host
+                                       (a/from-base64 :host))
+                          (a/to-base64 [:host :service]
+                                       (a/from-base64 [:host :service]))
                           (a/sdissoc :foo)
                           (a/exception-stream
                            (a/by [:host])
@@ -344,10 +348,10 @@
                                     [:> :metric 1]]))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (is (fn? entrypoint))
-    (entrypoint {:state "ok" :time 2 :metric 1 :host "foo"})
-    (entrypoint {:state "ok" :time 4 :metric 1 :host "foo"})
-    (entrypoint {:state "ok" :time 100 :metric 1 :host "foo"})
-    (entrypoint {:state "ok" :time 200 :metric 1 :host "foo"})))
+    (entrypoint {:state "ok" :time 2 :metric 1 :host "foo" :service "a"})
+    (entrypoint {:state "ok" :time 4 :metric 1 :host "foo" :service "a"})
+    (entrypoint {:state "ok" :time 100 :metric 1 :host "foo" :service "b"})
+    (entrypoint {:state "ok" :time 200 :metric 1 :host "foo" :service "a"})))
 
 (deftest split-test
   (let [recorder (atom [])

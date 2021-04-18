@@ -1,8 +1,8 @@
 (ns mirabelle.handler
   (:require [clojure.edn :as edn]
             [corbihttp.metric :as metric]
-            [mirabelle.stream :as stream])
-  (:import java.util.Base64))
+            [mirabelle.b64 :as b64]
+            [mirabelle.stream :as stream]))
 
 (defprotocol IHandler
   (get-serie [this request] "Get a serie")
@@ -13,10 +13,6 @@
   (not-found [this request] "Not found handler")
   (metrics [this request] "Return the metrics"))
 
-(defn from-base64
-  [s]
-  (String. #^bytes (.decode (Base64/getDecoder) ^String s)))
-
 (defrecord Handler [stream-handler
                     registry]
   IHandler
@@ -25,7 +21,7 @@
      :body {:message "ok"}})
   (add-stream [this request]
     (let [stream-name (:stream-name (:route-params request))
-          config (-> request :body :config from-base64 edn/read-string)]
+          config (-> request :body :config b64/from-base64 edn/read-string)]
       (stream/add-dynamic-stream stream-handler stream-name config)
       {:status 200
        :body {:message "stream added"}}))
@@ -43,4 +39,4 @@
   (metrics [this request]
     {:status 200
      :headers {"Content-Type" "text/plain"}
-     :body (.getBytes (metric/scrape registry))}))
+     :body (.getBytes ^String (metric/scrape registry))}))

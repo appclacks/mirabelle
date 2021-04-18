@@ -826,3 +826,25 @@
                       :children nil}]}
          (a/custom :foo [:a 1 "a"]
           (a/decrement)))))
+
+(deftest to-base64-test
+  (let [[rec state] (recorder)]
+    (test-action (a/to-base64* nil
+                               [:host :service]
+                               rec)
+                 state
+                 [{:host "aa" :service "bb"}
+                  {:host "bb" :service "aa" :state "critical"}]
+                 [{:host "YWE=" :service "YmI="}
+                  {:host "YmI=" :service "YWE=" :state "critical"}])))
+
+(deftest from-base64-test
+  (let [[rec state] (recorder)]
+    (test-action (a/from-base64* nil
+                                 [:host :service]
+                                 rec)
+                 state
+                 [{:host "YWE=" :service "YmI="}
+                  {:host "YmI=" :service "YWE=" :state "critical"}]
+                 [{:host "aa" :service "bb"}
+                  {:host "bb" :service "aa" :state "critical"}])))
