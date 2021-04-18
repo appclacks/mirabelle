@@ -122,6 +122,7 @@
   (add-dynamic-stream [this stream-name stream-configuration] "Add a new stream")
   (remove-dynamic-stream [this stream-name] "Remove a stream by name")
   (list-dynamic-streams [this] "List dynamic streams")
+  (get-dynamic-stream [this stream-name] "Get a dynamic stream")
   (push! [this event streams] "Inject an event into a list of streams"))
 
 (defn read-edn-dirs
@@ -246,7 +247,7 @@
                              ;; dedicated index for dyn streams
                              (assoc (context this stream-name)
                                     :index
-                                    (index/map->Index {}))
+                                    (component/start (index/map->Index {})))
                              stream-configuration)
             new-compiled-dynamic-streams (assoc compiled-dynamic-streams
                                                 stream-name
@@ -259,7 +260,13 @@
                                                  stream-name)]
         (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
   (list-dynamic-streams [this]
-    (keys compiled-dynamic-streams)))
+    (keys compiled-dynamic-streams))
+  (get-dynamic-stream [this stream-name]
+    (if-let [stream (get compiled-dynamic-streams stream-name)]
+      stream
+      (throw (ex/ex-info
+              (format "stream %s not found" stream-name)
+              [::not-found [:corbi/user ::ex/not-found]])))))
 
 (defn map->StreamHandler
   [{:keys [streams-directories

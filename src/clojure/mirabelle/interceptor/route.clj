@@ -8,6 +8,7 @@
   {[#"/serie/" :service #"/?"] {:get :serie/get}
    [#"/stream/" :stream-name #"/?"] {:post :stream/add}
    [#"/stream/" :stream-name #"/?"] {:delete :stream/remove}
+   [#"/stream/" :stream-name #"/?"] {:get :stream/get}
    [#"/stream/?"] {:get :stream/list}})
 
 (def routes
@@ -33,6 +34,7 @@
         :stream/list (handler/list-streams handler request)
         :stream/add (handler/add-stream handler request)
         :stream/remove (handler/remove-stream handler request)
+        :stream/get (handler/get-stream handler request)
         :system/metrics (handler/metrics handler request)
         :system/healthz (handler/healthz handler request)
         :system/not-found (handler/not-found handler request)

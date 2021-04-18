@@ -20,7 +20,8 @@
 
 (defn reload!
   []
-  (core/reload!))
+  (core/reload!)
+  "reloaded")
 
 (comment
   (require '[riemann.codec :as c])

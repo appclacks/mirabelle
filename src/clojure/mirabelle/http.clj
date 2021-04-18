@@ -28,7 +28,6 @@
 (defn execute!
   [request chain]
   (interceptor/execute {:request request} chain))
-
 (defrecord ChainHandler [api-handler itc-chain registry]
   component/Lifecycle
   (start [this]

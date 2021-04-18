@@ -2,12 +2,14 @@
   (:require [clojure.edn :as edn]
             [corbihttp.metric :as metric]
             [mirabelle.b64 :as b64]
+            [mirabelle.index :as index]
             [mirabelle.stream :as stream]))
 
 (defprotocol IHandler
   (get-serie [this request] "Get a serie")
   (healthz [this request] "Healthz handler")
   (add-stream [this request] "add a new stream")
+  (get-stream [this request] "Get a stream")
   (remove-stream [this request] "remove a stream")
   (list-streams [this request] "list dynamic streams")
   (not-found [this request] "Not found handler")
@@ -30,6 +32,17 @@
       (stream/remove-dynamic-stream stream-handler stream-name)
       {:status 200
        :body {:message "stream removed"}}))
+  (get-stream [this request]
+    (let [stream-name (:stream-name (:route-params request))
+          stream (stream/get-dynamic-stream stream-handler stream-name)
+          config (-> stream
+                     (dissoc :context :entrypoint)
+                     pr-str
+                     b64/to-base64)
+          index (get-in stream [:context :index])]
+      {:status 200
+       :body {:config config
+              :current-time (index/current-time index)}}))
   (list-streams [this request]
     {:status 200
      :body (stream/list-dynamic-streams stream-handler)})
