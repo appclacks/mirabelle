@@ -4,6 +4,7 @@
             [corbihttp.interceptor.id :as itc-id]
             [corbihttp.interceptor.json :as itc-json]
             [corbihttp.interceptor.metric :as itc-metric]
+            [corbihttp.interceptor.params :as itc-params]
             [corbihttp.interceptor.ring :as itc-ring]
             [corbihttp.interceptor.response :as itc-response]
             [exoscale.interceptor :as interceptor]
@@ -22,6 +23,7 @@
    itc-ring/params ;; enter
    itc-ring/keyword-params ;; enter
    itc-json/request-params ;; enter
+   itc-params/merge-params ;; enter
    (itc-route/route api-handler registry) ;; enter
    ])
 
