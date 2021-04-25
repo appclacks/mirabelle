@@ -19,7 +19,8 @@
                                 (:message r))
 
                   ( = (:type r) :exception)
-                  (str (:exception r) "\n" (map str (.getStackTrace (:exception r))))
+                  (str (:exception r) "\n" (map str (.getStackTrace ^Exception
+                                                                    (:exception r))))
 
                   ( = (:type r) :tap)
                   (str (format "expected: %s\nactual: %s"

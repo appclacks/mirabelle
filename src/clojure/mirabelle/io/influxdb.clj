@@ -18,7 +18,6 @@
                   (.connectionString (:connection-string config))
                   (.bucket (:bucket config))
                   (.org (:org config)))]
-    (println config)
     (when (and (:username config) (:password config))
       (log/info "Using username/password authentication for influxdb")
       (.authenticate options

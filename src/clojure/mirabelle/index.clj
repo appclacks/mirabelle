@@ -7,6 +7,12 @@
             [mirabelle.time :as t])
   (:import (org.cliffc.high_scale_lib NonBlockingHashMap)))
 
+(defn channel
+  "Build the index channel name for ws subscriptions for a given stream."
+  [stream-name]
+  (-> (format "%s-index" (name stream-name))
+      keyword))
+
 (defprotocol IIndex
   (size-index [this]
     "Returns the index size")

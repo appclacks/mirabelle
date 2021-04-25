@@ -1,16 +1,14 @@
 (ns mirabelle.interceptor.route
   (:require [bidi.bidi :as bidi]
             [exoscale.ex :as ex]
-            [mirabelle.handler :as handler]
-            [corbihttp.metric :as metric]))
+            [mirabelle.handler :as handler]))
 
 (def v1
-  {[#"/serie/" :service #"/?"] {:get :serie/get}
-   [#"/stream/" :name #"/?"] {:post :stream/add}
+  {[#"/stream/" :name #"/?"] {:post :stream/add}
    [#"/stream/" :name #"/?"] {:put :stream/event}
    [#"/stream/" :name #"/?"] {:delete :stream/remove}
-   [#"/index/search/?"] {:post :index/search}
    [#"/stream/" :name #"/?"] {:get :stream/get}
+   [#"/index/" :name #"/search/?"] {:post :index/search}
    [#"/current-time/?"] {:get :stream/current-time}
    [#"/stream/?"] {:get :stream/list}})
 

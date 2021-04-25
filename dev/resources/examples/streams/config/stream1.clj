@@ -7,6 +7,8 @@
           (with {:influxdb/tags [:environment :state :host]
                  :influxdb/fields [:metric]}
                 (info)
+                (where [:= :service "abc"]
+                       (publish! :bar))
                 ;(push-io! :influxdb)
                 )
           ))))

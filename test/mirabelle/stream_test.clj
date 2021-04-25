@@ -9,6 +9,7 @@
             [mirabelle.io.file :as io-file]
             [mirabelle.io :refer [IO]]
             [mirabelle.pool :as pool]
+            [mirabelle.pubsub :as pubsub]
             [mirabelle.stream :as stream]))
 
 (deftest custom-action-test
@@ -606,12 +607,24 @@
 
 (deftest index-test
   (let [index (component/start (index/map->Index {}))
+        pubsub (component/start (pubsub/map->PubSub {}))
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/index [:host])}
-        {:keys [entrypoint]} (stream/compile-stream! {:index index} stream)]
+        pubsub-result (atom [])
+        {:keys [entrypoint]} (stream/compile-stream! {:index index
+                                                      :pubsub pubsub
+                                                      :stream-name :streaming}
+                                                     stream)]
+    (pubsub/add pubsub (index/channel :streaming) (fn [event]
+                                                    (swap! pubsub-result conj event)))
     (entrypoint {:host "f" :metric 12 :time 1})
+    (is (= [{:host "f" :metric 12 :time 1}]
+           @pubsub-result))
     (entrypoint {:host "a" :metric 13 :time 1})
+    (is (= [{:host "f" :metric 12 :time 1}
+            {:host "a" :metric 13 :time 1}]
+           @pubsub-result))
     (is (= 1 (index/current-time index)))
     (is (= 2 (index/size-index index)))
     (is (= (set [{:host "f" :metric 12 :time 1}
@@ -626,12 +639,15 @@
 (deftest reaper-test
   (let [index (component/start (index/map->Index {}))
         recorder (atom [])
+        pubsub (component/start (pubsub/map->PubSub {}))
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/sdo (a/index [:host])
                                 (a/reaper))}
         {:keys [entrypoint]} (stream/compile-stream!
                               {:index index
+                               :pubsub pubsub
+                               :stream-name :streaming
                                :reinject (fn [event _]
                                            (swap! recorder conj event))}
                               stream)]

@@ -17,9 +17,11 @@
 (s/def :mirabelle.stream/config ::ne-string)
 (s/def :mirabelle.stream/event map?)
 
-(s/def :mirabelle.http.index/search (s/keys :req-un [:mirabelle.index/query]))
+(s/def :mirabelle.http.index/search (s/keys :req-un [:mirabelle.index/query
+                                                     :mirabelle.stream/name]))
 (s/def :mirabelle.http.stream/add (s/keys :req-un [:mirabelle.stream/name
                                                    :mirabelle.stream/config]))
+(s/def :mirabelle.http.stream/get (s/keys :req-un [:mirabelle.stream/name]))
 (s/def :mirabelle.http.stream/event (s/keys :req-un [:mirabelle.stream/name
                                                      :mirabelle.stream/event]))
 (s/def :mirabelle.http.stream/remove (s/keys :req-un [:mirabelle.stream/name]))
