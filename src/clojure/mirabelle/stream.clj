@@ -1,3 +1,4 @@
+;; the code from this namespace is BAD
 (ns mirabelle.stream
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
@@ -157,6 +158,7 @@
                         tap
                         test-mode?
                         index
+                        pubsub
                         ]
   component/Lifecycle
   (start [this]
@@ -192,12 +194,14 @@
   IStreamHandler
   (context [this source-stream]
     {:io compiled-io
+     :stream-name streaming
      :index index
      :queue queue
      :tap tap
      :test-mode? test-mode?
      :source-stream source-stream
      :custom-actions custom-actions
+     :pubsub pubsub
      :reinject #(push! this %1 %2)})
   (reload [this]
     (locking lock
@@ -239,7 +243,9 @@
           (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS)))
       (if-let [s (get compiled-dynamic-streams stream)]
         (stream! s event)
-        (throw (ex/ex-incorrect (format "Stream %s not found" stream))))))
+        (throw (ex/ex-info
+                (format "Stream %s not found" stream)
+                [::not-found [:corbi/user ::ex/not-found]])))))
   (add-dynamic-stream [this stream-name stream-configuration]
     (locking lock
       (log/infof {} "Adding dynamic stream %s" stream-name)
@@ -247,7 +253,9 @@
                              ;; dedicated index for dyn streams
                              (assoc (context this stream-name)
                                     :index
-                                    (component/start (index/map->Index {})))
+                                    (component/start (index/map->Index {}))
+                                    :dynamic? true
+                                    :stream-name stream-name)
                              stream-configuration)
             new-compiled-dynamic-streams (assoc compiled-dynamic-streams
                                                 stream-name
@@ -260,7 +268,7 @@
                                                  stream-name)]
         (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
   (list-dynamic-streams [this]
-    (keys compiled-dynamic-streams))
+    (or (keys compiled-dynamic-streams) []))
   (get-dynamic-stream [this stream-name]
     (if-let [stream (get compiled-dynamic-streams stream-name)]
       stream
@@ -282,7 +290,8 @@
            queue
            registry
            test-mode?
-           index]
+           index
+           pubsub]
     :or {streams-configurations {}
          io-configurations {}
          custom-actions {}
@@ -306,4 +315,5 @@
                    registry
                    (atom {})
                    test-mode?
-                   index))
+                   index
+                   pubsub))

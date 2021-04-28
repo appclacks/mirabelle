@@ -11,6 +11,7 @@
             [mirabelle.index :as index]
             [mirabelle.io :as io]
             [mirabelle.math :as math]
+            [mirabelle.pubsub :as pubsub]
             [mirabelle.spec :as spec])
   (:import java.util.concurrent.Executor))
 
@@ -1126,10 +1127,14 @@
 
 (defn index*
   [context labels]
-  (let [i (:index context)]
+  (let [i (:index context)
+        channel (index/channel (:stream-name context))
+        pubsub (:pubsub context)]
     (fn [event]
       (when-let [t (:time event)]
         (index/new-time? i t))
+      (when-not (:test-mode? context)
+        (pubsub/publish! pubsub channel event))
       (index/insert i event labels))))
 
 (s/def ::index (s/cat :labels (s/coll-of keyword?)))
@@ -1512,6 +1517,28 @@
    :params [template target-field fields]
    :children children})
 
+(defn publish!*
+  [context channel]
+  (let [pubsub (:pubsub context)]
+    (fn [event]
+      (when-not (:test-mode? context)
+        (pubsub/publish! pubsub channel event)))))
+
+(s/def ::publish! (s/cat :channel keyword?))
+
+(defn publish!
+  "Publish events in the given channel.
+
+  ```clojure
+  (publish! :my-channel)
+  ```
+  "
+  [channel]
+  (spec/valid? ::publish! [channel])
+  {:action :publish!
+   :params [channel]
+   :children []})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1546,6 +1573,7 @@
    :outside-dt cond-dt*
    :over over*
    :percentiles percentiles*
+   :publish! publish!*
    :push-io! push-io!*
    :reaper reaper*
    :reinject! reinject!*

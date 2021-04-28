@@ -8,7 +8,6 @@
             [mirabelle.stream :as stream]))
 
 (defprotocol IHandler
-  (get-serie [this params] "Get a serie")
   (healthz [this params] "Healthz handler")
   (add-stream [this params] "add a new stream")
   (get-stream [this params] "Get a stream")
@@ -27,11 +26,14 @@
     {:status 200
      :body {:message "ok"}})
   (search-index [_ {:keys [params]}]
-    (let [query (-> params :query b64/from-base64 edn/read-string)]
+    (let [query (-> params :query b64/from-base64 edn/read-string)
+          stream-name (:name params)
+          compiled-stream (-> (stream/get-dynamic-stream stream-handler stream-name))]
       {:status 200
-       :body {:events (-> (stream/context stream-handler :streaming)
-                           :index
-                           (index/search query))}}))
+       :body {:events (-> compiled-stream
+                          :context
+                          :index
+                          (index/search query))}}))
   (add-stream [_ {:keys [params]}]
     (let [stream-name (:name params)
           config (-> params :config b64/from-base64 edn/read-string)]
@@ -61,7 +63,7 @@
               :current-time (index/current-time index)}}))
   (list-streams [_ _]
     {:status 200
-     :body (stream/list-dynamic-streams stream-handler)})
+     :body {:streams (stream/list-dynamic-streams stream-handler)}})
   (current-time [_ _]
     {:status 200
      :body {:current-time (-> (stream/context stream-handler :streaming)
@@ -76,8 +78,7 @@
      :body (.getBytes ^String (metric/scrape registry))}))
 
 (def dispatch-map
-  {:serie/get {:handler-fn get-serie}
-   :index/search {:handler-fn search-index
+  {:index/search {:handler-fn search-index
                   :spec :mirabelle.http.index/search}
    :stream/list {:handler-fn list-streams}
    :stream/event {:handler-fn push-event
@@ -108,7 +109,6 @@
         :http.request.duration
         {"uri" (str (:uri request))
          "method"  (-> request :request-method name)}
-        (println request)
         (->> (c/coerce spec (:all-params request {}))
              (assert-spec-valid spec)
              (hash-map :params)

@@ -9,7 +9,12 @@
       {:action :increment,
        :children
        ({:action :with,
-         :children ({:action :info}),
+         :children
+         ({:action :info}
+          {:action :where,
+           :params [[:= :service "abc"]],
+           :children
+           ({:action :publish!, :params [:bar], :children []})}),
          :params
          [{:influxdb/tags [:environment :state :host],
            :influxdb/fields [:metric]}]})})})}}}
