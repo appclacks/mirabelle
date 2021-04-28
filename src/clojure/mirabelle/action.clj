@@ -517,7 +517,7 @@
 (defn warning
   "Keep all events in state warning.
 
-    ```clojure
+  ```clojure
   (warning
     (warning))
   ```
@@ -691,7 +691,6 @@
 
   A map can also be provided:
 
-  ```
   ```clojure
   (with {:service \"foo\" :state \"critical\"}
     (debug))
