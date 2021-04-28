@@ -78,7 +78,13 @@
                  children)))
 
 (defn increment
-  "Decrement the event :metric field."
+  "Increment the event :metric field.
+
+  ```
+  (increment
+    (index [:host]))
+  ```
+  "
   [& children]
   {:action :increment
    :children children})
@@ -90,13 +96,19 @@
                  children)))
 
 (defn decrement
-  "Decrement the event :metric field."
+  "Decrement the event :metric field.
+
+  ```
+  (decrement
+    (index [:host]))
+  ```
+  "
   [& children]
   {:action :decrement
    :children children})
 
 (defn log-action
-  "generic logger"
+  "Generic logger"
   [level]
   (fn [event]
     (when-let [event (keep-non-discarded-events event)]
@@ -163,7 +175,7 @@
 (s/def ::fixed-event-window (s/cat :size pos-int?))
 
 (defn fixed-event-window
-  "Returns a fixed-sized window of events
+  "Returns a fixed-sized window of events.
 
   ```clojure
   (fixed-event-window 5
@@ -257,13 +269,18 @@
     (call-rescue event children)))
 
 (defn sdo
-  "Send events to children
+  "Send events to children. useful when you want to send the same
+  events to multiple downstream actions.
 
   ```clojure
   (sdo
     (increment)
     (decrement))
-  ```"
+  ```
+
+  Here, events arriving in sdo will be forwarded to both increment and
+  decrement.
+  "
   [& children]
   {:action :sdo
    :children children})
@@ -279,12 +296,15 @@
           (call-rescue event children))))))
 
 (defn expired
-  "Keep expired events
+  "Keep expired events.
 
   ```clojure
   (expired
     (increment))
-  ```"
+  ```
+
+  In this example, all expired events will be forwarded to the `increment`stream.
+  "
   [& children]
   {:action :expired
    :children children})
@@ -300,11 +320,13 @@
           (call-rescue event children))))))
 
 (defn not-expired
-  "Keep non-expired events
+  "Keep non-expired events.
 
   ```clojure
   (not-expired
     (increment))
+
+  In this example, all non-expired events will be forwarded to the `increment`stream.
   ```"
   [& children]
   {:action :not-expired
@@ -353,10 +375,18 @@
 
 (defn above-dt
    "Takes a number `threshold` and a time period in seconds `dt`.
-  If the condition `the event metric is > to the threshold` is valid for all events
+  If the condition \"the event metric is > to the threshold\" is valid for all events
   received during at least the period `dt`, valid events received after the `dt`
   period will be passed on until an invalid event arrives.
-  `:metric` should not be nil (it will produce exceptions)."
+  `:metric` should not be nil (it will produce exceptions).
+
+  ```clojure
+  (above-dt 100 10
+    (debug))
+  ```
+
+  In this example, if the events `:metric` field are greater than 100 for more than 10 seconds, events are passed downstream.
+  "
   [threshold dt & children]
   (spec/valid? ::above-dt [threshold dt])
   {:action :above-dt
@@ -370,7 +400,15 @@
   If the condition `the event metric is < to the threshold` is valid for all
   events received during at least the period `dt`, valid events received after
   the `dt` period will be passed on until an invalid event arrives.
-  `:metric` should not be nil (it will produce exceptions)."
+  `:metric` should not be nil (it will produce exceptions).
+
+    ```clojure
+  (below-dt 100 10
+    (debug))
+  ```
+
+  In this example, if the events `:metric` field are lower than 100 for more than 10 seconds, events are passed downstream.
+  "
   [threshold dt & children]
   (spec/valid? ::below-dt [threshold dt])
   {:action :below-dt
@@ -384,7 +422,15 @@
   If the condition `the event metric is > low and < high` is valid for all events
   received during at least the period `dt`, valid events received after the `dt`
   period will be passed on until an invalid event arrives.
-  `:metric` should not be nil (it will produce exceptions)."
+  `:metric` should not be nil (it will produce exceptions).
+
+  ```clojure
+  (between-dt 50 100 10
+    (debug))
+  ```
+
+  In this example, if the events `:metric` field are between 50 ans 100 for more than 10 seconds, events are passed downstream.
+  "
   [low high dt & children]
   (spec/valid? ::between-dt [low high dt])
   {:action :between-dt
@@ -401,7 +447,16 @@
   If the condition `the event metric is < low or > high` is valid for all events
   received during at least the period `dt`, valid events received after the `dt`
   period will be passed on until an invalid event arrives.
-  `:metric` should not be nil (it will produce exceptions)."
+  `:metric` should not be nil (it will produce exceptions).
+
+
+  ```clojure
+  (outside-dt 50 100 10
+    (debug))
+  ```
+
+  In this example, if the events `:metric` field are outside the 50-100 range for more than 10 seconds, events are passed downstream.
+  "
   [low high dt & children]
   (spec/valid? ::outside-dt [low high dt])
   {:action :outside-dt
@@ -417,7 +472,15 @@
   "Takes a time period in seconds `dt`.
   If all events received during at least the period `dt` have `:state` critical,
   new critical events received after the `dt` period will be passed on until
-  an invalid event arrives."
+  an invalid event arrives.
+
+  ```clojure
+  (critical-dt 10
+    (debug))
+  ```
+
+  In this example, if the events `:state` are \"critical\" for more than 10 seconds, events are passed downstream.
+  "
   [dt & children]
   (spec/valid? ::critical-dt [dt])
   {:action :critical-dt
@@ -432,7 +495,15 @@
       (call-rescue event children))))
 
 (defn critical
-  "Keep all events in state critical"
+  "Keep all events in state critical.
+
+  ```clojure
+  (critical
+    (error))
+  ```
+
+  In this example, all events with `:state` \"critical\" will be logged.
+  "
   [& children]
   {:action :critical
    :children children})
@@ -444,7 +515,15 @@
       (call-rescue event children))))
 
 (defn warning
-  "Keep all events in state warning"
+  "Keep all events in state warning.
+
+    ```clojure
+  (warning
+    (warning))
+  ```
+
+  In this example, all events with `:state` \"warning\" will be logged.
+  "
   [& children]
   {:action :warning
    :children children})
@@ -459,7 +538,15 @@
 (s/def ::default (s/cat :field spec/not-null :value any?))
 
 (defn default
-  "Set a default value for an event"
+  "Set a default value for an event
+
+  ```clojure
+  (default :state \"ok\"
+    (info))
+  ```
+
+  In this example, all events where `:state` is not set will be updated with
+  `:state` to \"ok\"."
   [field value & children]
   (spec/valid? ::default [field value])
   {:action :default
@@ -481,7 +568,16 @@
 (s/def ::push-io! (s/cat :io-name keyword?))
 
 (defn push-io!
-  "Push events to an external system"
+  "Push events to an external system.
+
+  I/O are defined in a dedicated file. If you create a new I/O named `:influxdb`
+  for example, you can use push-io! to push all events into this I/O:
+
+  ```clojure
+  (push-io! :influxdb)
+  ```
+
+  I/O are automatically discarded in test mode."
   [io-name]
   (spec/valid? ::push-io! [io-name])
   {:action :push-io!
@@ -568,7 +664,9 @@
   ```
 
   In this example, the latest event for each host/service combination will be
-  kept and forwarded downstream. Expired events will be removed from the list.
+  kept and forwarded downstream. The `debug` action will then receive this list
+  of events.
+  Expired events will be removed from the list.
   "
   [dt fields & children]
   (spec/valid? ::coalesce [dt fields])
@@ -589,18 +687,20 @@
     (debug))
   ```
 
+  This example set the field `:state` to \"critical\" for events.
+
   A map can also be provided:
 
   ```
   ```clojure
-  (with {:host nil :state \"critical\"}
+  (with {:service \"foo\" :state \"critical\"}
     (debug))
   ```
 
-  This example set the field :state to critical for events."
+  This example set the the field `:service` to \"foo\" and the field `:state`
+  to \"critical\" for events."
   [& args]
   (cond
-
     (map? (first args))
     {:action :with
      :children (rest args)
@@ -654,7 +754,13 @@
   Events should be a sequence.
 
   This stream can be used to \"flat\" a sequence of events (emitted
-  by a time window stream for example)."
+  by a time window stream for example).
+
+  ```clojure
+  (fixed-event-window 5
+    (sflatten
+      (info)))
+  ```"
   [& children]
   {:action :sflatten
    :children children})
@@ -674,8 +780,18 @@
 (defn tag
   "Adds a new tag, or set of tags, to events which flow through.
 
-  (tag \"foo\" (info))
-  (tag [\"foo\" \"bar\"] (info))"
+  ```clojure
+  (tag \"foo\"
+    (info))
+  ```
+
+  This example adds the tag \"foo\" to events.
+
+  ```clojure
+  (tag [\"foo\" \"bar\"] (info))
+  ```
+
+  This example adds the tag \"foo\" and \"bar\" to events."
   [tags & children]
   (spec/valid? ::tag [tags])
   {:action :tag
@@ -697,8 +813,17 @@
 (defn untag
   "Removes a tag, or set of tags, from events which flow through.
 
+  ```clojure
   (untag \"foo\" index)
-  (untag [\"foo\" \"bar\"] index)"
+  ```
+
+  This example removes the tag \"foo\" from events.
+
+  ```clojure
+  (untag [\"foo\" \"bar\"] index)
+  ```
+
+  This example removes the tags \"foo\" and \"bar\" from events"
   [tags & children]
   (spec/valid? ::untag [tags])
   {:action :untag
@@ -719,15 +844,21 @@
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn tagged-all
-  "Passes on events where all tags are present. This stream returns true if an
-  event it receives matches those tags, nil otherwise.
-
-  Can be used as a predicate in a where form.
+  "Passes on events where all tags are present.
 
   ```clojure
-  (tagged-all \"foo\" (info))
+  (tagged-all \"foo\"
+    (info))
+  ```
+
+  This example keeps only events tagged \"foo\".
+
+  ```clojure
   (tagged-all [\"foo\" \"bar\"] (info))
-  ```"
+  ```
+
+  This example keeps only events tagged \"foo\" and \"bar\".
+  "
   [tags & children]
   (spec/valid? ::tagged-all [tags])
   {:action :tagged-all
@@ -755,7 +886,15 @@
   followed by child streams.
   Emits an event for each event received, but with metric equal to
   the difference between the current event and the previous one, divided by the
-  difference in their times. Skips events without metrics."
+  difference in their times. Skips events without metrics.
+
+  ```clojure
+  (ddt
+    (info))
+  ```
+
+  If ddt receives {:metric 1 :time 1} and {:metric 10 :time 4}, it will produce
+  {:metric (/ 9 3) :time 4}."
   [& children]
   {:action :ddt
    :params [false]
@@ -777,7 +916,15 @@
 (s/def ::scale (s/cat :factor number?))
 
 (defn scale
-  "Multiplies the event :metric field by :factor"
+  "Multiplies the event :metric field by the factor passed as parameter.
+
+  ```clojure
+  (scale 1000
+    (info
+  ```
+
+  This example will multiply the :metric field for all events by 1000.
+  "
   [factor & children]
   (spec/valid? ::scale [factor])
   {:action :scale
@@ -928,7 +1075,14 @@
   event is emitted, all events *older or equal* to that emitted event are
   silently dropped.
 
-  Events without times accrue in the current window."
+  Events without times accrue in the current window.
+
+  ```clojure
+  (fixed-time-window 60
+    (coll-max
+      (info)))
+  ```
+  "
   [n & children]
   (spec/valid? ::scale [n])
   {:action :fixed-time-window
@@ -953,7 +1107,8 @@
   event times. Example:
 
   ```clojure
-  (moving-event-window 5 (coll-mean (info))
+  (moving-event-window 5
+    (coll-mean (info))
   ```"
   [n & children]
   (spec/valid? ::moving-event-window [n])
@@ -1002,7 +1157,12 @@
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn over
-  "Passes on events only when their metric is greater than x"
+  "Passes on events only when their metric is greater than x.
+
+  ```clojure
+  (over 10
+    (info))
+  ```"
   [n & children]
   (spec/valid? ::over [n])
   {:action :over
@@ -1021,7 +1181,13 @@
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn under
-  "Passes on events only when their metric is greater than x"
+  "Passes on events only when their metric is greater than x.
+
+  ```clojure
+  (under 10
+    (info))
+  ```
+  "
   [n & children]
   (spec/valid? ::under [n])
   {:action :under
@@ -1140,7 +1306,15 @@
 (s/def ::index (s/cat :labels (s/coll-of keyword?)))
 
 (defn index
-  "Insert events into the index."
+  "Insert events into the index.
+  Events are indexed using the keys passed as parameter.
+
+  ```clojure
+  (index [:host :service])
+  ```
+
+  This example will index events by host and services.
+  "
   [labels]
   (spec/valid? ::index [labels])
   {:action :index
@@ -1158,7 +1332,13 @@
   "Count the number of events.
   Should receive a list of events from the previous stream.
   The most recent event is used as a base to create the new event, and
-  its :metric field is set to the number of events received as input."
+  its :metric field is set to the number of events received as input.
+
+  ```clojure
+  (fixed-time-window 60
+    (coll-count
+      (debug)))
+  ```"
   [& children]
   {:action :coll-count
    :children children})
@@ -1173,13 +1353,13 @@
                  children)))
 
 (defn sdissoc
-  "Remove a key (or a list of keys) from the event
+  "Remove a key (or a list of keys) from the events/
 
   ```clojure
   (sdissoc :host (info))
 
   (sdissoc [:environment :host] (info))
-  "
+  ```"
   [fields & children]
   (spec/valid? ::sdissoc [fields])
   {:action :sdissoc
@@ -1242,7 +1422,7 @@
     (moving-time-window 5))
   ```
 
-  Generates a moving window for each host/service combination."
+  This example generates a moving window for each host/service combination."
   [fields & children]
   (spec/valid? ::by [fields])
   {:action :by
@@ -1273,7 +1453,21 @@
 (s/def ::reinject (s/cat :destination-stream keyword?))
 
 (defn reinject!
-  "Reinject an event into the streaming system."
+  "Reinject an event into the streaming system.
+  By default, events are reinject into the real time engine. You can reinject
+  events to a specific stream by passing the destination stream as parameter.
+
+  ```clojure
+  (reinject)
+  ```
+
+  This example reinjects events into the real stream engine.
+
+  ```clojure
+  (reinject :foo)
+  ```
+
+  This example reinjects events into the stream named `:foo`."
   ([]
    (reinject! :streaming))
   ([destination-stream]
@@ -1296,7 +1490,13 @@
                                       queue-name))))))
 
 (defn async-queue!
-  "Execute children into the specific async queue."
+  "Execute children into the specific async queue.
+  The async queue should be defined in the I/O configuration file.
+
+  ```clojure
+  (async-queue! :my-queue
+    (info))
+  ```"
   [queue-name & children]
   (spec/valid? ::async-queue! [queue-name])
   {:action :async-queue!
@@ -1310,7 +1510,8 @@
     (apply sdo* context children)))
 
 (defn io
-  "Discard all events in test mode. Else, forward to children"
+  "Discard all events in test mode. Else, forward to children.
+  You can use this stream to avoid side effects in test mode."
   [& children]
   {:action :io
    :children children})
@@ -1329,7 +1530,15 @@
 (s/def ::tap (s/cat :tap-name keyword?))
 
 (defn tap
-  "Save events into the tap. Noop outside tests"
+  "Save events into the tap. Noop outside tests.
+
+  ```clojure
+  (where [:= :service \"foo\"]
+    (tap :foo)
+  ```
+
+  In test mode, all events with `:service` \"foo\" will be saved in a tap
+  named `:foo`"
   [tap-name]
   (spec/valid? ::tap [tap-name])
   {:action :tap
@@ -1353,7 +1562,17 @@
 
 (defn json-fields
   "Takes a field or a list of fields, and converts the values associated to these
-  fields from json to edn."
+  fields from json to edn.
+
+  ```clojure
+  (with :my-field \"{\"foo\": \"bar\"}
+    (json-fields [:my-field]))
+  ```
+
+  In this example, we associate to `:my-field` a json string and then we call
+  `json-fields` on it. `:my-field` will now contain an edn map built from the json
+  data, with keywords as keys.
+  "
   [fields & children]
   (spec/valid? ::json-fields [fields])
   {:action :tap
@@ -1387,8 +1606,11 @@
   ```
   (exception-stream
     (bad-action)
-    (alert))
-  ```"
+    (error))
+  ```
+
+  Here, if `bad-action` throws, an event will be built (using the `exception->event`
+  function) and sent to the `error` action (which will log it)."
   [& children]
   (when-not (= 2 (count children))
     (ex/ex-incorrect! "The exception-stream action should take 2 children"
@@ -1397,10 +1619,21 @@
    :children children})
 
 (defn stream
+  "Creates a new stream. This action takes a map where the `:name` key, which
+  will be the name of the stream, is mandatory."
   [config & children]
   (-> (assoc config :actions (apply sdo children))))
 
 (defn streams
+  "Entrypoint for all streams.
+
+  ```clojure
+  (streams
+    (stream {:name :fobar}
+      (info))
+    (stream {:name :foo}
+      (info)))
+  ```"
   [& streams]
   (reduce
    (fn [state stream-config]
@@ -1409,7 +1642,14 @@
    streams))
 
 (defn custom
-  "Creates a custom action"
+  "Executes a custom action.
+  Custom actions are defined in the Mirabelle configuration file.
+  The actomn can then be called (by name) using this `custom` action.
+
+  ```clojure
+  (custom :my-custom-action [\"parameters\"]
+    (info))
+  ```"
   [action-name params & children]
   {:action action-name
    :params (or params [])
@@ -1426,6 +1666,17 @@
 (s/def ::reaper (s/cat :destination-stream keyword?))
 
 (defn reaper
+  "Everytime this action receives an event, it will expires events from the
+  index and reinject them into a stream (default to the real time stream processing
+  engine).
+
+  ```clojure
+  (reaper)
+  ```
+
+  ```clojure
+  (reaper :custom-stream
+  ```"
   ([] (reaper :streaming))
   ([destination-stream]
    (spec/valid? ::reaper [destination-stream])
@@ -1500,17 +1751,19 @@
                         :fields (s/coll-of keyword?)))
 
 (defn sformat
-  "Convert a field or multiple fields from base64 to string.
-  Fields values should be string.
+  "Takes the content of multiple event keys, and use them to build a string value
+  and assign it to a given key.
 
   ```clojure
-  (sdo
-    ;; you can pass one field
-    (from-base64 :host)
-    ;; or a list of fields
-    (from-base64 [:host :service]))
+  (sformat \"%s-foo-%s\" :format-test [:host :service])
   ```
-  "
+
+  If the event `{:host \"machine\" :service \"bar\"}` is passed to this action
+  the event will become
+  `{:host \"machine\" :service \"bar\" :format-test \"machine-foo-bar\"}`.
+
+  More information about availables formatters in the Clojure documentation:
+  https://clojuredocs.org/clojure.core/format"
   [template target-field fields & children]
   (spec/valid? ::sformat [template target-field fields])
   {:action :sformat
@@ -1532,7 +1785,8 @@
   ```clojure
   (publish! :my-channel)
   ```
-  "
+
+  Users can then subscribe to channels using the websocket engine."
   [channel]
   (spec/valid? ::publish! [channel])
   {:action :publish!
