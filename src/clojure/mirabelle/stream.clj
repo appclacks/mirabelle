@@ -13,6 +13,7 @@
             [mirabelle.index :as index]
             [mirabelle.io.file :as io-file]
             [mirabelle.io.influxdb :as influxdb]
+            [mirabelle.io.pagerduty :as pagerduty]
             [mirabelle.pool :as pool])
   (:import [io.micrometer.core.instrument Timer]
            [java.io File]
@@ -78,6 +79,11 @@
       (assoc io-config
              :component
              (io-file/map->FileIO (:config io-config)))
+
+      (= :pagerduty t)
+      (assoc io-config
+             :component
+             (pagerduty/map->Pagerduty (:config io-config)))
 
       (= :influxdb t)
       (assoc io-config

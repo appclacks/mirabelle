@@ -1,0 +1,7 @@
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "Mirabelle"
+theme = "hugo-theme-learn"
+
+[params]
+  disableInlineCopyToClipBoard = true

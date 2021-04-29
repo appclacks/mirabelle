@@ -1,9 +1,9 @@
 {:tcp {:host "0.0.0.0"
        :port 5555}
  :http {:host "0.0.0.0"
-        :port 5666}
+        :port 5558}
  :websocket {:host "0.0.0.0"
-             :port 8888}
+             :port 5556}
  :queue {:directory "dev/queue"}
  :stream {:directories ["dev/resources/examples/streams/compiled"]
           :actions {:custom mirabelle.action/where*}}

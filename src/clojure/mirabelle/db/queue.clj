@@ -95,3 +95,10 @@
                  "Read %s events in %s milliseconds"
                  @events-count
                  (- (System/currentTimeMillis) start-time)))))
+
+(defrecord DummyQueue []
+  IQueue
+  (write! [this events]
+    nil)
+  (read-all! [this action]
+    nil))

@@ -4,6 +4,7 @@
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
             [clojure.spec.alpha :as s]
+            [corbihttp.error :as error]
             [corbihttp.log :as log]
             [environ.core :as env]
             [exoscale.cloak :as cloak]
@@ -53,8 +54,8 @@
 (s/def ::directory ::directory-spec)
 (s/def ::queue (s/keys :req-un [::directory]
                        :opt-un [::roll-cycle]))
-(s/def ::config (s/keys :req-un [::tcp ::queue ::websocket]
-                        :opt-un [::stream ::io ::test]))
+(s/def ::config (s/keys :req-un [::tcp ::websocket]
+                        :opt-un [::stream ::io ::test ::queue]))
 
 (defmethod aero/reader 'secret
   [_ _ value]
@@ -66,7 +67,8 @@
     (if (s/valid? ::config config)
       config
       (throw (ex/ex-info
-              "Invalid configuration"
+              (format "Invalid configuration: %s"
+                      (s/explain-str ::config config))
               [::invalid [:corbi/user ::ex/incorrect]])))))
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
@@ -91,13 +93,20 @@
 
 (defn compile-config!
   [src-dir dest-dir]
-  (binding [*ns* (find-ns 'mirabelle.config)]
-    (->> src-dir
-         io/file
-         file-seq
-         (filter config-file?)
-         (sort)
-         (map name->compiled)
-         (map #(pprint/pprint (second %)
-                              (io/writer (path/new-path dest-dir (first %)))))
-         dorun)))
+  (try
+    (binding [*ns* (find-ns 'mirabelle.config)]
+      (->> src-dir
+           io/file
+           file-seq
+           (filter config-file?)
+           (sort)
+           (map name->compiled)
+           (map #(pprint/pprint (second %)
+                                (io/writer (path/new-path dest-dir (first %)))))
+           dorun))
+    (catch Exception e
+      (if (ex/type? e ::ex/invalid-spec)
+        (do (log/error {} e)
+            (throw (ex/ex-incorrect (error/spec-ex->message e)
+                                    {})))
+        (throw e)))))
