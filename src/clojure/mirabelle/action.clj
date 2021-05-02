@@ -954,12 +954,12 @@
   (split
     [:> :metric 10] (debug)
     [:> :metric 5] (info)
-    (critical)
+    (error)
   ```
 
   In this example, all events with :metric > 10 will go into the debug stream,
   all events with :metric > 5 in the info stream, and other events will to the
-  default stream which is \"critical\".
+  default stream which is \"error\".
 
   The default stream is optional, if not set all events not matching a condition
   will be discarded."
@@ -1795,6 +1795,7 @@
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
+   :below-dt cond-dt*
    :between-dt cond-dt*
    :changed changed*
    :coalesce coalesce*

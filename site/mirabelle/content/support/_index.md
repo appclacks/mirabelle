@@ -1,5 +1,5 @@
 ---
 title: Support and contributions
-weight: 14
+weight: 30
 chapter: true
 ---

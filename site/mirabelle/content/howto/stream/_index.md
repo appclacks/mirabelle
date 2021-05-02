@@ -15,14 +15,14 @@ Mirabelle ships with a complete, extensible DSL to define streams. The DSL is he
 Events are represented as an immutable map. An event has standard fields. All fields are optional.
 
 - `:host`: the event source. It can be an hostname for example.
-- `:service`: What is measured. `http_requests_duration_seconds` for example
+- `:service`: What is measured. `http_requests_duration_seconds` for example.
 - `:state`: A string representing the event state. By convention, `ok`, `warning` or `critical` are often used.
-- `:metric`: 
-- `:time`: 
-- `:description`:
-- `:ttl`:
-- `:tags`
-- Extra fields can also be added.
+- `:metric`: A number associated to the event (the value of what is measured).
+- `:time`: The event time in second, as a timestamp (`1619988803` for example). It could also be a float (`1619988803,173413` for example), the Mirabelle/Riemann protocol supports microsecond resolution.
+- `:description`: The event description.
+- `:ttl`: The duration that the event is considered valid. See the [Index](/index) documentation for more information about the index.
+- `:tags`: A list of tags associated to the event (like `["foo" "bar"]` for example).
+- Extra fields can also be added if you want to.
 
 ### Streams
 
@@ -192,7 +192,11 @@ You can check the [I/O documentation](/action-io-ref/) to have details about how
 
 ### More examples
 
-This section shows more advanced use cases for streams. Not all actions are described here, the list of all actions is is available [here](/action-io-ref/).
+This section shows more advanced use cases for streams. Not all actions are described here, the list of all actions is available [here](/action-io-ref/).
+
+#### Events time
+
+In Mirabelle, **all** streams use the events time as a wall clock. TODO: describe more
 
 #### Filtering events
 
@@ -218,17 +222,114 @@ A lot of predicates can be used in `where`:
 
 You can combine then with `:or` or `:and`. For example, `[:and [:= :service "foo"] [:> :metric 10]]` will keep all events with `:service` "foo" and `:metric` greater than 10.
 
+The `split` action is a more powerful `where`:
+
+```
+(split
+  [:> :metric 10] (debug)
+  [:> :metric 5] (info)
+  (error))
+```
+
+In this example, `debug` will be called if the metric is greater than 10, if not `info` is called if the metric is greater than 5, and by default `error` is called if nothing matches (the default stream is optional, the event is discarded if not set).
+
 the `over` and `under` streams can also be used to filter events with `:metric` over or under a threshold: `(over 3)`, `(under 4)`.
 
 You can also filter all events with `:state` "critical" using `(critical)`, filter events with `:state` "warning" using `(warning)`, and expired events using `(expired)`.
 
+Some streams can also be used to only let pass events if a condition is true for a given period of time.  
+For example, the `above-dt` stream will only let events pass if all events received have their `:metric` fields above a threshold for a certain duration:
+
+```clojure
+(above-dt 1 60
+  (error)))
+```
+
+In this example, `above-dt` will let events pass (to log them as error) only if it receives events with `:metric` greater than 1 during more than 6O seconds.
+
+The streams `below-dt`, `between-dt`, `outside-dt`, `critical-dt` also work that way. They are useful to avoid alerting on spikes for examples.
+
+The `tagged-all` stream is also available to keep only events containing one tag or a set of tags: `(tagged-all "foo")` or `(tagged-all ["foo" "bar"])`.
+
 #### Modifying events
+
+A lot of actions allow you to modify events. The first one, `with`, allows you to set a field (or multiple fields) to some specific values:
+
+```clojure
+(with :state "critical"
+  (info))
+(with {:state "critical" :ttl 60}
+  (info))
+```
+
+The `default` action is similar to `with` but it only accepts one value, and will only set the value if the value is not already defined in the event:
+
+```clojure
+(default :ttl 60
+  (info))
+```
+
+The `sdissoc` action takes a field or a list of fields and will remove them from the vent. For example, `(sdissoc :host)` or `(sdissoc [:host :service])`.
+
+Some actions can modify the `:metric` field. `increment` and `decrement` will add +1 or -1 to it, and you can use `scale` to multiply it with a value: `(scale 1000)` for example.
 
 #### Detect state transitions
 
+The `changed` action can be used to detect state transitions.
+
+```clojure
+(changed :state "ok"
+  (error))
+```
+
+In this example, events will only be passed downstream to the `error` action if the `:state` value is updated, the default value being `ok`. For example:
+
+```clojure
+{:state "ok"} ;; filtered
+{:state "critical"} passed downstream
+{:state "critical"} filtered
+{:state "critical"} filtered
+{:state "ok"} passed downstream
+```
+
 #### Events Windows
 
-#### Math operations
+You have three windows types availables in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
+It means you should be careful about which action you will use downstream. It should be actions working on list of events.
+
+The first one, `fixed-time-window`, will buffer all events during a defined duration and then flush them downstream. For example, `(fixed-time-window 60)` will create windows of 60 seconds.
+
+The `fixed-event-window` action will created windows not based on time, but based on the number of events the action receives. For example, `(fixed-event-window 10)` will buffer events until 10 are buffered, and then pass the window downstream.
+
+The `moving-event-window` action works like `fixed-event-window` but will pass events downstream for every event received. For example, `(moving-event-window 10)` will in that case always send downstream the last 10 events.
+
+#### Actions on list of events
+
+Several actions can be executed on list of events (produced by windows for example).
+
+Let's take this example which creates windows of 10 events and forwards them to multiple streams:
+
+```clojure
+(fixed-event-window 10
+  (coll-max
+    (info))
+  (coll-min
+    (info))
+  (coll-mean
+    (info))
+  (coll-rate
+    (info))
+  (coll-count
+    (info)))
+```
+
+`coll-max` will forward downstream the event with the biggest `:metric` field, `coll-min` will forward the event with the smallest `:metric`.
+
+`coll-mean` will compute the mean based on the event `:metric` fields. `coll-rate` compute the rate of events (the sum of all `:metrics` divided by the time range, based on the most ancient and most recent events), and `coll-count` will return a new event with `:metric` being the number of events in the window.  
+The three previous streams use the latest event from the list of events to build the new event.
+
+
+
 
 #### Coalesce/Project/by
 
