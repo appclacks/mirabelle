@@ -286,10 +286,10 @@ In this example, events will only be passed downstream to the `error` action if 
 
 ```clojure
 {:state "ok"} ;; filtered
-{:state "critical"} passed downstream
-{:state "critical"} filtered
-{:state "critical"} filtered
-{:state "ok"} passed downstream
+{:state "critical"} ;; passed downstream
+{:state "critical"} ;; filtered
+{:state "critical"} ;; filtered
+{:state "ok"} ;; passed downstream
 ```
 
 #### Events Windows
