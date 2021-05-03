@@ -338,7 +338,7 @@ The `percentiles` action can also be used to compute percentiles on a list of ev
 
 In this example, we generate 60-seconds time windows and pass them to the `percentiles` action. The action takes que wanted quantiles as parameter.
 
-The `percentiles` action will produce for each quantile an event with the `:quantile` key set to the quantile value, and the `;metric` field set to the value computed from the list of events for this quantile.
+The `percentiles` action will produce for each quantile an event with the `:quantile` key set to the quantile value, and the `;metric` field set to the value computed from the list of events for this quantile. The quantiles `0` and `1` can also be used to get the smallest of biggest event.
 
 If needed, you can also flatten a list of events, to get back a single event using `flatten`:
 
