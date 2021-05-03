@@ -54,7 +54,7 @@ You could write a Mirabelle stream which will compute on the fly the quantiles f
       (fixed-time-window 60
         (percentiles [0.5 0.75 0.99]
           (where [:and [:= :quantile 0.99]
-                       [:> :metric &]]
+                       [:> :metric 1]]
             (with :state "critical"
               (tap :alert)
               (push-io! :pagerduty))))))))
@@ -77,11 +77,11 @@ A test for this stream would be:
                :tap-results {:alert [{:service "http_request_duration_seconds"
                                       :metric 1.2
                                       :time 30
-                                      :quantile "0,99"
+                                      :quantile 0.99
                                       :state "critical"}]}}}
 ```
 
-In this test, we inject into the `:percentiles` stream three events, and we verify that the tap named `:alert` contains the expected alert (the `0,99` quantile is greater than 1) generated for these events.
+In this test, we inject into the `:percentiles` stream three events, and we verify that the tap named `:alert` contains the expected alert (the `0.99` quantile is greater than 1) generated for these events.
 
 Thanks to Clojure datastructures, these is *no side effects between streams and actions*. It's OK to modify events in parallel (in multiple threads) and to have multiple branches per stream. You can even pass events between streams (like described [here](todo)). You are free to organize streams and how they communicate between each other exactly how you want to, the tool and its DSL will not limit you on than.
 

@@ -723,9 +723,9 @@
                                  rec)
                  state
                  [[{:metric 3} {:metric 1} {:metric 2}]]
-                 [{:metric 1 :quantile "0"}
-                  {:metric 2 :quantile "0.5"}
-                  {:metric 3 :quantile "1"}])))
+                 [{:metric 1 :quantile 0}
+                  {:metric 2 :quantile 0.5}
+                  {:metric 3 :quantile 1}])))
 
 (deftest tagged-all*-test
   (let [[rec state] (recorder)]

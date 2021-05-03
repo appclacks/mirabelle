@@ -111,10 +111,7 @@
 
   When s is empty, returns an empty list."
   [s points]
-  (let [[points pnames] (if (vector? points)
-                         [points (map #(str %) points)]
-                         (apply map vector points))]
-    (map (fn [pname event]
-           (assoc event :quantile pname))
-         pnames
-         (sorted-sample-extract s points))))
+  (map (fn [pname event]
+         (assoc event :quantile pname))
+       points
+       (sorted-sample-extract s points)))
