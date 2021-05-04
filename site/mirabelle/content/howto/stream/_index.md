@@ -350,7 +350,31 @@ If needed, you can also flatten a list of events, to get back a single event usi
 
 here, the events produced by `moving-event-window` will be sent one by one to `info`.
 
-#### Coalesce/Project/by
+#### Split streams by fields
+
+You will often need to split streams for a given field. For example, imagine you want to count the number of events emitted every 60 seconds **by host**. If you write this stream:
+
+```clojure
+(fixed-time-window 60
+  (coll-count
+    (info)))
+```
+
+You will have the number of events for all hosts.
+
+But if you write:
+
+```clojure
+(by [:host]
+  (fixed-time-window 60
+    (coll-count
+      (info))))
+```
+
+The `by` action takes a list of fields as parameter and will generate a new instance of the downstream actions for each unique values associated to the fields. Here for example, the computation will be done in isolation for each different `:host`.
+
+#### Coalesce and project
+
 
 #### Handle exceptions (errors)
 

@@ -284,6 +284,17 @@
                    {:metric 5}]]
                  [{:metric 10}])))
 
+(deftest coll-sum*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/coll-sum* nil rec)
+                 state
+                 [[{:metric 1}
+                   {:metric 10 :time 0 :tags ["a"]}
+                   {}
+                   {}
+                   {:metric 5}]]
+                 [{:metric 16  :time 0 :tags ["a"]}])))
+
 (deftest coll-min*-test
   (let [[rec state] (recorder)]
     (test-action (a/coll-min* nil rec)

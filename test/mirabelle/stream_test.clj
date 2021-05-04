@@ -285,6 +285,8 @@
                           (a/above-dt 10 20)
                           (a/between-dt 10 20 30)
                           (a/decrement)
+                          (a/project [[:= :host "foo"]
+                                      [:= :service "bar"]])
                           (a/to-base64 :host
                                        (a/from-base64 :host))
                           (a/to-base64 [:host :service]
@@ -316,6 +318,7 @@
                           (a/error)
                           (a/expired)
                           (a/fixed-event-window 3
+                                                (a/coll-sum)
                                                 (a/percentiles [0 0.5 1])
                                                 (a/coll-mean
                                                  (a/sflatten))

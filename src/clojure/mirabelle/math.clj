@@ -1,6 +1,7 @@
 (ns mirabelle.math
   (:require [mirabelle.event :as event]))
 
+;; TODO: optimize fn to not iterate twice
 (defn mean
   "Takes a list of event and returns the metrics mean.
   The latest event is used as a base to build the event returned by
@@ -9,7 +10,7 @@
   (when (seq events)
     (assoc (event/most-recent events)
            :metric
-           (-> (reduce #(+ (:metric %2) %1) 0 events)
+           (-> (reduce #(+ (:metric %2 0) %1) 0 events)
                (/ (count events))))))
 
 (defn count-events
@@ -48,6 +49,15 @@
   the biggest metric"
   [events]
   (extremum >= events))
+
+(defn sum-events
+  "Sum all events :metric.
+  Use the most recent event as a base for the new event."
+  [events]
+  (when (seq events)
+    (assoc (event/most-recent events)
+           :metric
+           (reduce #(+ (:metric %2 0) %1) 0 events))))
 
 (defn min-event
   "Takes a list of event and returns the event with

@@ -230,6 +230,26 @@
   {:action :coll-max
    :children children})
 
+(defn coll-sum*
+  [_ & children]
+  (fn [events]
+    (call-rescue (math/sum-events events) children)))
+
+(defn coll-sum
+  "Sum all the events :metric fields
+  Should receive a list of events from the previous stream.
+
+  ```clojure
+  (fixed-event-window 10
+    (coll-sum
+      (debug)))
+  ```
+
+  Sum all :metric fields for windows of 10 events"
+  [& children]
+  {:action :coll-sum
+   :children children})
+
 (defn coll-min*
   [_ & children]
   (fn [events]
@@ -1290,6 +1310,28 @@
         (when (seq events)
           (call-rescue events children))))))
 
+(s/def ::project (s/cat :conditions (s/coll-of ::condition)))
+
+(defn project
+  "Takes a list of conditions.
+  Like coalesce, project will return the most recent events matching
+  the conditions.
+
+  ```clojure
+  (project [[:= :service \"enqueues\"]
+            [:= \"dequeues\"]]
+    (coll-quotient
+      (with :service \"enqueues per dequeue\"
+        (info))))
+  ```
+
+  "
+  [conditions & children]
+  (spec/valid? ::project [conditions])
+  {:action :project
+   :params [conditions]
+   :children children})
+
 (defn index*
   [context labels]
   (let [i (:index context)
@@ -1799,11 +1841,12 @@
    :between-dt cond-dt*
    :changed changed*
    :coalesce coalesce*
+   :coll-count coll-count*
    :coll-max coll-max*
    :coll-mean coll-mean*
    :coll-min coll-min*
    :coll-rate coll-rate*
-   :coll-count coll-count*
+   :coll-sum coll-sum*
    :critical critical*
    :critical-dt cond-dt*
    :debug debug*
@@ -1827,6 +1870,7 @@
    :outside-dt cond-dt*
    :over over*
    :percentiles percentiles*
+   :project project*
    :publish! publish!*
    :push-io! push-io!*
    :reaper reaper*
