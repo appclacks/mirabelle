@@ -284,6 +284,15 @@
                    {:metric 5}]]
                  [{:metric 10}])))
 
+(deftest coll-quotient*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/coll-quotient* nil rec)
+                 state
+                 [[{:metric 1}
+                   {:metric 10}
+                   {:metric 5}]]
+                 [{:metric (/ 1 10 5)}])))
+
 (deftest coll-sum*-test
   (let [[rec state] (recorder)]
     (test-action (a/coll-sum* nil rec)

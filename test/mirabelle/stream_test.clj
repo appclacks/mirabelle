@@ -323,6 +323,7 @@
                                                 (a/coll-mean
                                                  (a/sflatten))
                                                 (a/coll-max)
+                                                (a/coll-quotient)
                                                 (a/coll-min)
                                                 (a/coll-count)
                                                 (a/coll-rate))

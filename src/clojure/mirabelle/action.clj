@@ -230,6 +230,20 @@
   {:action :coll-max
    :children children})
 
+(defn coll-quotient*
+  [_ & children]
+  (fn [events]
+    (call-rescue (math/quotient events) children)))
+
+(defn coll-quotient
+  "Divide the first event `:metrìc` field by all subsequent events `:metric`.
+  Return a new event containing the new `:metric`.
+
+  Should receive a list of events from the previous stream."
+  [& children]
+  {:action :coll-quotient
+   :children children})
+
 (defn coll-sum*
   [_ & children]
   (fn [events]
@@ -728,7 +742,8 @@
     :else
     (let [[k v & children] args]
       (when (or (not k) (not v))
-        (throw (ex/ex-info "Invalid parameters for with: %s %s" k v)))
+        (throw (ex/ex-info (format "Invalid parameters for with: %s %s" k v)
+                           {})))
       {:action :with
        :children children
        :params [{k v}]})))
@@ -1319,12 +1334,14 @@
 
   ```clojure
   (project [[:= :service \"enqueues\"]
-            [:= \"dequeues\"]]
+            [:= :service \"dequeues\"]]
     (coll-quotient
       (with :service \"enqueues per dequeue\"
         (info))))
   ```
 
+  We divide here the latest event for the \"enqueues\" :service by the
+  latest event from the \"dequeues\" one.
   "
   [conditions & children]
   (spec/valid? ::project [conditions])
@@ -1845,6 +1862,7 @@
    :coll-max coll-max*
    :coll-mean coll-mean*
    :coll-min coll-min*
+   :coll-quotient coll-quotient*
    :coll-rate coll-rate*
    :coll-sum coll-sum*
    :critical critical*

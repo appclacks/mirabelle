@@ -2,8 +2,9 @@
   (:require [mirabelle.event :as event]))
 
 ;; TODO: optimize fn to not iterate twice
+
 (defn mean
-  "Takes a list of event and returns the metrics mean.
+  "Takes a list of events and returns the metrics mean.
   The latest event is used as a base to build the event returned by
   this funcion."
   [events]
@@ -12,6 +13,18 @@
            :metric
            (-> (reduce #(+ (:metric %2 0) %1) 0 events)
                (/ (count events))))))
+
+(defn quotient
+  "Takes a list of events
+  Divide the first event `:metrìc` field by all subsequent events `:metric`
+
+  Throws if it divides by zero."
+  [events]
+  (when (seq events)
+    (assoc (event/most-recent events)
+           :metric
+           (->> (map :metric events)
+                (reduce #(/ %1 %2))))))
 
 (defn count-events
   "Count the number of events.

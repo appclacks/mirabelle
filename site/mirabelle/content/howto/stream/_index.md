@@ -315,6 +315,10 @@ Let's take this example which creates windows of 10 events and forwards them to 
     (info))
   (coll-min
     (info))
+  (coll-sum
+    (info))
+  (coll-quotient
+    (info))
   (coll-mean
     (info))
   (coll-rate
@@ -324,6 +328,8 @@ Let's take this example which creates windows of 10 events and forwards them to 
 ```
 
 `coll-max` will forward downstream the event with the biggest `:metric` field, `coll-min` will forward the event with the smallest `:metric`.
+`coll-sum` will sum all events `:metric` together.
+`coll-quotient` will divide the first event `:metric` by the value of the next events.
 
 `coll-mean` will compute the mean based on the event `:metric` fields. `coll-rate` compute the rate of events (the sum of all `:metrics` divided by the time range, based on the most ancient and most recent events), and `coll-count` will return a new event with `:metric` being the number of events in the window.  
 The three previous streams use the latest event from the list of events to build the new event.
@@ -375,7 +381,33 @@ The `by` action takes a list of fields as parameter and will generate a new inst
 
 #### Coalesce and project
 
+These two streams can help you doing computation on events from multiple sources.
+
+```clojure
+(where [:= :service "http_requests_duration_seconds"]
+  (coalesce 10 [:host :environment]
+    (percentiles [0.5 0.75 0.98 0.99]
+      (info))))
+```
+
+`coalesce` will return periodically (here, every 10 seconds) the latest event for each, in this example, `:host` and `environment`. For example, if you have 20 unique host/environment combination push event regularly, coalesce will emit a list of 20 events (the latest for each combination).
+
+Expired events are not emitted, so if a host stops pushing, its event will not be emitted once the event is expired.
+
+`project` works like coalesce but instead to get the latest event based on some fields, you should provide `where` clauses:
+
+```clojure
+(project [[:= :service "enqueues"]
+          [:= :service "dequeues"]]
+  (coll-quotient
+    (with :service "enqueues per dequeue"
+      (info))))
+```
+
+In this example, we pass to project two `where` clauses, for example to divide the `:metric` from the first event with the other one.
 
 #### Handle exceptions (errors)
+
+
 
 #### Move events between streams

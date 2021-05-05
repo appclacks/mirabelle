@@ -1,14 +1,10 @@
-{:http_requests_duration
+{:foo
  {:actions
   {:action :sdo,
    :children
-   ({:action :where,
-     :params [[:= :service "http_requests_duration_seconds"]],
+   ({:action :exception-stream,
      :children
-     ({:action :info}
-      {:action :over,
-       :params [1.5],
-       :children
-       ({:action :with,
-         :children ({:action :error}),
-         :params [{:state "critical"}]})})})}}}
+     ({:action :with,
+       :children ({:action :increment, :children nil}),
+       :params [{:metric "invalid!"}]}
+      {:action :info})})}}}
