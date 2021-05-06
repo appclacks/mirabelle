@@ -23,7 +23,7 @@
   - :core-pool-size             Default 1
   - :max-pool-size              Default 8
   - :keep-alive-time            Default 5000 (milliseconds)
-  - :queue-size                 Default 1000"
+  - :queue-size                 Default 10000"
   [{:keys [core-pool-size
            max-pool-size
            keep-alive-time
@@ -31,7 +31,7 @@
     :or {core-pool-size 1
          max-pool-size 8
          keep-alive-time 5000
-         queue-size 1000}}]
+         queue-size 10000}}]
   (ThreadPoolExecutor.
    core-pool-size
    max-pool-size
