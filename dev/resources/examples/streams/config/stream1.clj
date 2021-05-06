@@ -1,5 +1,13 @@
 (streams
  (stream
   {:name :foo}
-  (async-queue! :thread-pool
-    (info))))
+  (where [:= :service "foo"]
+    (info)
+    (tap :foo)))
+ (stream
+  {:name :bar}
+  (where [:> :metric 100]
+    (info)
+    (tap :bar))))
+
+

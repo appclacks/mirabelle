@@ -1,2 +1,7 @@
-{:test1 {:input [{:metric 10} {:metric 11}]
-         :tap-results {:foo [{:metric 12}]}}}
+{:test1 {:input [{:metric 10
+                  :service "foo"}
+                 {:metric 101
+                  :service "bar"}]
+         :target :foo
+         :tap-results {:foo [{:metric 10
+                              :service "foo"}]}}}
