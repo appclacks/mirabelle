@@ -1,12 +1,14 @@
 ---
 title: Production advices
 weight: 2
-chapter: true
+chapter: false
 ---
 
 # Production advices
 
 In this section, I will discuss the Mirabelle streams guarantees, metrics exposed by Mirabelle
+
+### Streams guarantees and performances
 
 ## Metrics
 
