@@ -1,21 +1,5 @@
-;; (streams
-;;  (stream
-;;   {:name :foo}
-;;   (where [:> :metric 10]
-;;          (index [:host])
-;;          (increment
-;;           (with {:influxdb/tags [:environment :state :host]
-;;                  :influxdb/fields [:metric]}
-;;                 (info)
-;;                 (where [:= :service "abc"]
-;;                        (publish! :bar))
-;;                 ;(push-io! :influxdb)
-;;                 )
-;;           ))))
-
 (streams
- (stream {:name :foo}
-   (exception-stream
-    (with :metric "invalid!"
-      (increment))
-     (info))))
+ (stream
+  {:name :foo}
+  (async-queue! :thread-pool
+    (info))))

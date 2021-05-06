@@ -1,4 +1,5 @@
 (ns mirabelle.pool
+  (:require [corbihttp.metric :as metric])
   (:import java.util.concurrent.Executor
            java.util.concurrent.Executors
            java.util.concurrent.LinkedBlockingQueue
@@ -15,6 +16,25 @@
                        (long (* 2 60 1000))
                        TimeUnit/MILLISECONDS)))
 
+(defn thread-pool-executor-metrics
+  "Register metrics for a threadPoolExecutor"
+  [registry ^ThreadPoolExecutor executor executor-name]
+  (metric/gauge! registry
+                 :executor.queue.remaining.capacity
+                 {:executor executor-name}
+                 (fn [] (.remainingCapacity
+                         (.getQueue ^ThreadPoolExecutor executor))))
+  (metric/gauge! registry
+                 :executor.queue.tasks
+                 {:executor executor-name
+                  :state "completed"}
+                 (fn [] (.getCompletedTaskCount executor)))
+  (metric/gauge! registry
+                 :executor.queue.tasks
+                 {:executor executor-name
+                  :state "accepted"}
+                 (fn [] (.getTaskCount executor))))
+
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn dynamic-thread-pool-executor
   "a ThreadPoolExecutor with core and
@@ -24,7 +44,9 @@
   - :max-pool-size              Default 8
   - :keep-alive-time            Default 5000 (milliseconds)
   - :queue-size                 Default 10000"
-  [{:keys [core-pool-size
+  [registry
+   executor-name
+   {:keys [core-pool-size
            max-pool-size
            keep-alive-time
            queue-size]
@@ -32,12 +54,14 @@
          max-pool-size 8
          keep-alive-time 5000
          queue-size 10000}}]
-  (ThreadPoolExecutor.
-   core-pool-size
-   max-pool-size
-   keep-alive-time
-   TimeUnit/MILLISECONDS
-   (LinkedBlockingQueue. ^int queue-size)))
+  (let [executor (ThreadPoolExecutor.
+                  core-pool-size
+                  max-pool-size
+                  keep-alive-time
+                  TimeUnit/MILLISECONDS
+                  (LinkedBlockingQueue. ^int queue-size))]
+    (thread-pool-executor-metrics registry executor executor-name)
+    executor))
 
 (defn fixed-thread-pool-executor
   [size]

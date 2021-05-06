@@ -418,12 +418,16 @@
 
 (deftest compile-io!-test
   (testing "file io"
-    (let [io-compiled (stream/compile-io! {:type :file
+    (let [io-compiled (stream/compile-io! nil
+                                          :foo
+                                          {:type :file
                                            :config {:path "/tmp/foo"}}
                                           {})]
       (is (satisfies? IO (:component io-compiled)))))
   (testing "custom io"
-    (let [io-compiled (stream/compile-io! {:type :custom
+    (let [io-compiled (stream/compile-io! nil
+                                          :foo
+                                          {:type :custom
                                            :config {:path "/tmp/foo"}}
                                           {:custom 'mirabelle.io.file/map->FileIO})]
       (is (satisfies? IO (:component io-compiled))))))
@@ -463,7 +467,7 @@
 (deftest async-queue-test
   (testing "non-test mode"
     (let [recorder (atom [])
-          queue {:component (pool/dynamic-thread-pool-executor {})}
+          queue {:component (pool/dynamic-thread-pool-executor nil :foo {})}
           stream {:name "my-stream"
                   :description "foo"
                   :actions (a/async-queue! :foo

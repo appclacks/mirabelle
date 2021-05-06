@@ -62,7 +62,7 @@
   {:type :file :config {:path ...}}.
 
   Adds the :component key to the IO"
-  [io-config custom-io]
+  [registry io-name io-config custom-io]
   (let [t (:type io-config)]
     (cond
       ;; it's a custom IO
@@ -73,7 +73,9 @@
              ((requiring-resolve (get custom-io t)) (:config io-config)))
 
       (= :async-queue t)
-      (assoc io-config :component (pool/dynamic-thread-pool-executor (:config io-config)))
+      (assoc io-config :component (pool/dynamic-thread-pool-executor registry
+                                                                     io-name
+                                                                     (:config io-config)))
 
       (= :file t)
       (assoc io-config
@@ -170,7 +172,10 @@
   (start [this]
     (let [new-io-configurations (read-edn-dirs io-directories)
           new-compiled-io (->> new-io-configurations
-                               (map (fn [[k v]] [k (compile-io! v custom-io)]))
+                               (map (fn [[k v]] [k (compile-io! registry
+                                                                k
+                                                                v
+                                                                custom-io)]))
                                (into {}))
           timer (metric/get-timer! registry
                                    :stream-duration
