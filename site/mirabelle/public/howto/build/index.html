@@ -12,20 +12,20 @@
     <title>Install or build Mirabelle :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1620507254" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1620507254" rel="stylesheet">
-    <link href="/css/hybrid.css?1620507254" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1620507254" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1620507254" rel="stylesheet">
-    <link href="/css/auto-complete.css?1620507254" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1620507254" rel="stylesheet">
-    <link href="/css/theme.css?1620507254" rel="stylesheet">
-    <link href="/css/tabs.css?1620507254" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1620507254" rel="stylesheet">
+    <link href="/css/nucleus.css?1620511993" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1620511993" rel="stylesheet">
+    <link href="/css/hybrid.css?1620511993" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1620511993" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1620511993" rel="stylesheet">
+    <link href="/css/auto-complete.css?1620511993" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1620511993" rel="stylesheet">
+    <link href="/css/theme.css?1620511993" rel="stylesheet">
+    <link href="/css/tabs.css?1620511993" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1620511993" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1620507254"></script>
+    <script src="/js/jquery-3.3.1.min.js?1620511993"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1620507254"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1620507254"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1620511993"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1620511993"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/example.org\/";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1620507254"></script>
+<script type="text/javascript" src="/js/search.js?1620511993"></script>
 
     
   </div>
@@ -577,9 +577,28 @@
 <p>Releases are available on <a href="https://github.com/mcorbin/mirabelle/releases">Github</a>.</p>
 <p>You can then run Mirabelle by launching <code>java -jar mirabelle.jar</code>.</p>
 <h2 id="using-docker">Using Docker</h2>
-<p>TODO</p>
-<h2 id="using-leiningen">Using Leiningen</h2>
-<p><code>lein run</code> should work. The configuration used is the file <code>dev/resources/config.yaml</code>.</p>
+<p>Let&rsquo;s say your I/O are in <code>/etc/mirabelle/io</code>, your EDN (compiled) streams in <code>/etc/mirabelle/streams</code>, your configuration file in <code>/etc/mirabelle/config.edn</code>. The configuration file contains:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:tcp</span> {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;0.0.0.0&#34;</span>
+       <span style="color:#e6db74">:port</span> <span style="color:#ae81ff">5555</span>}
+ <span style="color:#e6db74">:http</span> {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;0.0.0.0&#34;</span>
+        <span style="color:#e6db74">:port</span> <span style="color:#ae81ff">5558</span>}
+ <span style="color:#e6db74">:websocket</span> {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;0.0.0.0&#34;</span>
+             <span style="color:#e6db74">:port</span> <span style="color:#ae81ff">5556</span>}
+ <span style="color:#e6db74">:stream</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;/streams&#34;</span>]
+          <span style="color:#e6db74">:actions</span> {}}
+ <span style="color:#e6db74">:io</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;/io&#34;</span>]
+      <span style="color:#e6db74">:custom</span> {}}
+ <span style="color:#e6db74">:logging</span> {<span style="color:#e6db74">:level</span> <span style="color:#e6db74">&#34;info&#34;</span>
+           <span style="color:#e6db74">:console</span> {<span style="color:#e6db74">:encoder</span> <span style="color:#e6db74">:json</span>}}}
+</code></pre></div><p>You should now be able to launch Mirabelle using Docker:</p>
+<pre><code>docker run -p 5555:5555 -p 5556:5556 -p 5558:5558 \
+-v /etc/mirabelle/io:/io \
+-v /etc/mirabelle/streams:/streams \
+-v /etc/mirabelle/config.edn:/config/config.edn \
+-e MIRABELLE_CONFIGURATION=/config/config.edn \
+mcorbin/mirabelle:v0.0.2-alpha1
+</code></pre><h2 id="using-leiningen">Using Leiningen</h2>
+<p><code>lein run</code> should work. The configuration used is the file <code>dev/resources/config.edn</code>. You should replace the path in this file by your own paths.</p>
 
 
 
@@ -884,19 +903,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1620507254"></script>
-    <script src="/js/perfect-scrollbar.min.js?1620507254"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1620507254"></script>
-    <script src="/js/jquery.sticky.js?1620507254"></script>
-    <script src="/js/featherlight.min.js?1620507254"></script>
-    <script src="/js/highlight.pack.js?1620507254"></script>
+    <script src="/js/clipboard.min.js?1620511993"></script>
+    <script src="/js/perfect-scrollbar.min.js?1620511993"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1620511993"></script>
+    <script src="/js/jquery.sticky.js?1620511993"></script>
+    <script src="/js/featherlight.min.js?1620511993"></script>
+    <script src="/js/highlight.pack.js?1620511993"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1620507254"></script>
-    <script src="/js/learn.js?1620507254"></script>
-    <script src="/js/hugo-learn.js?1620507254"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1620511993"></script>
+    <script src="/js/learn.js?1620511993"></script>
+    <script src="/js/hugo-learn.js?1620511993"></script>
     
         
-            <script src="/mermaid/mermaid.js?1620507254"></script>
+            <script src="/mermaid/mermaid.js?1620511993"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });
