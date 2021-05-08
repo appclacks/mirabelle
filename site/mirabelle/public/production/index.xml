@@ -2,9 +2,9 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Mirabelle in production on Mirabelle</title>
-    <link>http://example.org/production/</link>
+    <link>https://www.mirabelle.mcorbin.fr/production/</link>
     <description>Recent content in Mirabelle in production on Mirabelle</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="http://example.org/production/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language><atom:link href="https://www.mirabelle.mcorbin.fr/production/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

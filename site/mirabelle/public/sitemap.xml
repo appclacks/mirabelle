@@ -3,76 +3,76 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://example.org/howto/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/howto/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/howto/build/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/howto/build/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/production/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/production/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/howto/configuration/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/howto/configuration/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/howto/stream/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/howto/stream/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/howto/tests/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/howto/tests/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/api/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/api/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/howto/action-io-ref/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/howto/action-io-ref/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/extension/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/extension/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/howto/index/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/howto/index/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/integration/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/integration/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/howto/pubsub/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/howto/pubsub/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/riemann-diff/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/riemann-diff/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/howto/on-disk-queue/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/howto/on-disk-queue/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/support/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/support/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://example.org/categories/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/categories/</loc>
   </url>
   
   <url>
-    <loc>http://example.org/tags/</loc>
+    <loc>https://www.mirabelle.mcorbin.fr/tags/</loc>
   </url>
   
 </urlset>

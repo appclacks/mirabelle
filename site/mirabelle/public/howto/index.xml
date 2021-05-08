@@ -2,9 +2,9 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>How to on Mirabelle</title>
-    <link>http://example.org/howto/</link>
+    <link>https://www.mirabelle.mcorbin.fr/howto/</link>
     <description>Recent content in How to on Mirabelle</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="http://example.org/howto/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language><atom:link href="https://www.mirabelle.mcorbin.fr/howto/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
