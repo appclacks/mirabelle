@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="description" content="">
+
+
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+
+    <title>Mirabelle in production :: Mirabelle</title>
+
+    
+    <link href="/css/nucleus.css?1620502812" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1620502812" rel="stylesheet">
+    <link href="/css/hybrid.css?1620502812" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1620502812" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1620502812" rel="stylesheet">
+    <link href="/css/auto-complete.css?1620502812" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1620502812" rel="stylesheet">
+    <link href="/css/theme.css?1620502812" rel="stylesheet">
+    <link href="/css/tabs.css?1620502812" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1620502812" rel="stylesheet">
+    
+    
+
+    <script src="/js/jquery-3.3.1.min.js?1620502812"></script>
+
+    <style>
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+        :not(pre) > code + span.copy-to-clipboard {
+            display: none;
+        }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/production/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a id="logo" href="http://example.org/">
+  <h2>Mirabelle</p>
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/js/lunr.min.js?1620502812"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1620502812"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/example.org\/";
+    
+</script>
+<script type="text/javascript" src="/js/search.js?1620502812"></script>
+
+    
+  </div>
+  
+    <section id="homelinks">
+      <ul>
+        <li>
+            <a class="padding" href='/'><i class='fas fa-home'></i> Home</a>
+        </li>
+      </ul>
+    </section>
+  
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/" title="How to" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/">
+          How to
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+
+        
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/build/" title="Install or build Mirabelle" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/build/">
+          Install or build Mirabelle
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/configuration/" title="Configuration" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/stream/" title="Writing streams" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/stream/">
+          Writing streams
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/tests/" title="Writing tests" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/tests/">
+          Writing tests
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/action-io-ref/" title="I/O and actions reference" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/action-io-ref/">
+          I/O and actions reference
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/index/" title="The index" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/index/">
+          The index
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/pubsub/" title="Publish Subscribe" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/pubsub/">
+          Publish Subscribe
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/on-disk-queue/" title="On Disk queue" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/on-disk-queue/">
+          On Disk queue
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/production/" title="Mirabelle in production" class="dd-item
+        parent
+        active
+        
+        ">
+      <a href="/production/">
+          Mirabelle in production
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/api/" title="HTTP API" class="dd-item
+        
+        
+        
+        ">
+      <a href="/api/">
+          HTTP API
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/extension/" title="Extend Mirabelle" class="dd-item
+        
+        
+        
+        ">
+      <a href="/extension/">
+          Extend Mirabelle
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/integration/" title="Clients and integrations" class="dd-item
+        
+        
+        
+        ">
+      <a href="/integration/">
+          Clients and integrations
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/riemann-diff/" title="Differences with Riemann" class="dd-item
+        
+        
+        
+        ">
+      <a href="/riemann-diff/">
+          Differences with Riemann
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/support/" title="Support and contributions" class="dd-item
+        
+        
+        
+        ">
+      <a href="/support/">
+          Support and contributions
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+        
+    </ul>
+
+    
+    
+
+    
+    <section id="footer">
+      <b><p>Powered by <a href="https://mcorbin.fr">mcorbin</a></p></b>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  
+                  <span id="toc-menu"><i class="fas fa-list-alt"></i></span>
+                  
+                  <span class="links">
+                 
+                 
+                    
+          
+          
+            
+            
+          
+          
+            <a href='/'></a> > Mirabelle in production
+          
+        
+          
+        
+                 
+                  </span>
+                </div>
+                
+                    <div class="progress">
+    <div class="wrapper">
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#streams-guarantees-and-performances">Streams guarantees and performances</a></li>
+    <li><a href="#use-cases">Use cases</a></li>
+    <li><a href="#fault-tolerance">Fault tolerance</a></li>
+    <li><a href="#metrics">Metrics</a>
+      <ul>
+        <li><a href="#tcp-server">TCP server</a></li>
+        <li><a href="#http-server">HTTP server</a></li>
+        <li><a href="#websocket-server">Websocket server</a></li>
+        <li><a href="#streams">Streams</a></li>
+        <li><a href="#async-queues">Async queues</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+</div>
+
+                
+              </div>
+            </div>
+            
+        <div id="head-tags">
+        
+        </div>
+        
+        <div id="body-inner">
+          
+            <h1>
+              
+              Mirabelle in production
+            </h1>
+          
+
+        
+
+
+
+	<p><em>Warning</em>: Mirabelle is for now not ready for production, it&rsquo;s still an alpha software.</p>
+<p>Is section is about the Mirabelle streams guarantees, Mirabelle use cases, fault tolerance and the metrics exposed by Mirabelle.</p>
+<h2 id="streams-guarantees-and-performances">Streams guarantees and performances</h2>
+<p>Like in Riemann, Mirabelle acknowledges events. Behaviors describe in <a href="http://riemann.io/howto.html#client-backpressure-latency-and-queues">this section</a> of the Riemann documentation are also true for Mirabelle (note that a couple of stuff, like some metrics, are renamed/a bit different in Mirabelle).</p>
+<p>it&rsquo;s up to you to use (or not) <a href="/howto/stream/#io-and-async-queues">asynchronous queues</a> if you want to.</p>
+<p>Although Mirabelle supports receiving events on its HTTP server, please use the TCP/protobuf one if possible: performances will be <em>way</em> better.</p>
+<h2 id="use-cases">Use cases</h2>
+<p>Streams in Mirabelle can be either configured in <a href="/howto/configuration/">configuration files</a> or using <a href="/api/">the API</a>.</p>
+<p>As explained in <a href="/howto/stream/#streams">this section</a> of the documentation, events received by the Mirabelle TCP server will go by default into streams which have the tag <code>:default</code>. If you pass the <code>stream</code> attribute to an event, the event will be routed into the specified stream.</p>
+<p>For example, if I sent to the Mirabelle TCP server this event:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;foo&#34;</span>
+ <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>
+ <span style="color:#e6db74">:time</span> <span style="color:#e6db74">&#34;1620495335&#34;</span>
+ <span style="color:#e6db74">:stream</span> <span style="color:#e6db74">&#34;bar&#34;</span>}
+</code></pre></div><p>The event will be routed to the stream named <code>bar</code>. Other streams (defined in the configuration or using this API) will not see the event.</p>
+<p>Remember, in Mirabelle, each stream has its own &ldquo;clock&rdquo; based on the time of the events it receives.</p>
+<p>Also, all streams created using the API will have a dedicated <a href="/howto/index/">index</a>. The streams from the configuration share the same index instance.</p>
+<p>Mirabelle is also able to <a href="/howto/stream/#move-events-between-streams">move events between streams</a>.</p>
+<p>It means you can have streams for various use cases. For example, you could have streams:</p>
+<ul>
+<li>Defined in the configuration with <code>:default</code> to <code>true</code> in order to do &ldquo;real time&rdquo; computation on events.</li>
+<li>Defined in the configuration but without <code>:default</code>, and then send events to them specifically using the Mirabelle TCP or HTTP server.</li>
+<li>Create streams using the API on demand. Streams with <code>:default true</code> created through the API will also receive all events flowing through the Mirabelle TCP server. You could like that enable a stream, and then remove it once you&rsquo;re done.</li>
+</ul>
+<p>You can also perform continuous queries using Mirabelle. Indeed, if you compute things on the fly using events coming from multiple hosts (like, time windows on events coming from various hosts or services), Mirabelle may only be able to do approximation on the computations.</p>
+<p>As I said before, Mirabelle streams use the events time for their clocks, so &ldquo;old&rdquo; events could be removed from computations. But it&rsquo;s OK, because there are ways of mitigating that (accept events un actions until they are not expired, so if your events have a TTL of 60 seconds, it&rsquo;s OK if they arrive a few seconds late). I also like the Riemann philosophy which is <code>mostly correct information right now is more useful, than totally correct information only available once the failure is over</code>.</p>
+<p>But what if you want totally correct information ? In that case, you can just:</p>
+<ul>
+<li>Forward all raw events to an external system (timeserie database for example)</li>
+<li>Reinject them a bit later, sorted, into Mirabelle. It could be a dedicated Mirabelle instance, or a dedicated stream on your first instance. In this mode, you should have totally correct computations.</li>
+</ul>
+<p>You can even use Mirabelle to play with old data, like &ldquo;let&rsquo;s reinject all data from 2 weeks ago into Mirabelle in order to compute some statistics, or detect weird things over time&rdquo; !</p>
+<p>And don&rsquo;t forget the <a href="/howto/pubsub/">Pub Sub</a>, which can really help you to see what is currently happening into Mirabelle.</p>
+<h2 id="fault-tolerance">Fault tolerance</h2>
+<p>Mirabelle is not a distributed system. Like in Riemann, streams states (like time windows) and the index are lost after a crash. You could use the <a href="/howto/on-disk-queue/">On Disk queue</a> in Mirabelle in order to rebuild the states but it has a lot of limitations (check the link for more information).</p>
+<p>You can always use continuous queries (and replay events if needed) in order to achieve fault tolerance. A computation failed because the machine crashes ? Just relaunch it with the same data.</p>
+<p>You can also put a thing like <a href="https://kafka.apache.org/">Kafka</a> in front of Riemann (or even push Riemann metrics to Kafka).</p>
+<p>I will soon add the possibility to forward events between Mirabelle instances, and I will also build a proxy which will be able to forward events to various Mirabelle instances based on some criterias/algorithms (duplicates to everyone, consistent hashing&hellip;).</p>
+<h2 id="metrics">Metrics</h2>
+<p>Mirabelle exposes a <code>/metrics</code> endpoint. For example, a lot of JVM internal metrics are exposed. Here are describe some interesting metrics.</p>
+<h3 id="tcp-server">TCP server</h3>
+<ul>
+<li><code>tcp_request_duration_seconds</code>: the TCP requests duration (quantiles), for example <code>tcp_request_duration_seconds{quantile=&quot;0.5&quot;,} 0.0</code>.</li>
+<li><code>netty_event_executor_queue_size</code>: the Netty queue size. If this metric is high, it means your streams are not processing fast enough.</li>
+</ul>
+<h3 id="http-server">HTTP server</h3>
+<ul>
+<li>
+<p><code>http_request_duration_seconds</code>: the HTTP requests duration (quantiles), for example: <code>http_request_duration_seconds{method=&quot;put&quot;,uri=&quot;/api/v1/stream/streaming&quot;,quantile=&quot;0.75&quot;,} 0.002490368</code></p>
+</li>
+<li>
+<p><code>http_responses_total</code>: HTTP responses count, for example: <code>http_responses_total{method=&quot;put&quot;,status=&quot;200&quot;,uri=&quot;/api/v1/stream/streaming&quot;,} 1.0</code></p>
+</li>
+</ul>
+<h3 id="websocket-server">Websocket server</h3>
+<ul>
+<li><code>websocket_connection_count</code>: Number of actives websocket connections</li>
+</ul>
+<h3 id="streams">Streams</h3>
+<ul>
+<li><code>stream_duration_seconds</code>: The time events pass into the streaming engine (quantiles) for example <code>stream_duration_seconds{quantile=&quot;0.5&quot;,} 3.4816E-5</code>.</li>
+</ul>
+<h3 id="async-queues">Async queues</h3>
+<p>For each async queues, you have these metrics (the <code>executor</code> label is the async quee name):</p>
+<ul>
+<li><code>executor_queue_remaining_capacity</code>: The remaining capacity of the executor queue, example <code>executor_queue_remaining_capacity{executor=&quot;thread-pool&quot;,} 10000.0</code>.</li>
+<li><code>executor_queue_tasks</code>: the accepted and completed tasks in the executor, for example <code>executor_queue_tasks{executor=&quot;thread-pool&quot;,state=&quot;accepted&quot;,}</code> or <code>executor_queue_tasks{executor=&quot;thread-pool&quot;,state=&quot;completed&quot;,}</code></li>
+</ul>
+
+
+
+
+
+<footer class=" footline" >
+	
+</footer>
+
+        
+        </div>
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+
+        
+
+
+	 
+	 
+		
+			<a class="nav nav-prev" href="/howto/on-disk-queue/" title="On Disk queue"> <i class="fa fa-chevron-left"></i></a>
+		
+		
+			<a class="nav nav-next" href="/api/" title="HTTP API" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+		
+	
+    </div>
+
+    </section>
+
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/js/clipboard.min.js?1620502812"></script>
+    <script src="/js/perfect-scrollbar.min.js?1620502812"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1620502812"></script>
+    <script src="/js/jquery.sticky.js?1620502812"></script>
+    <script src="/js/featherlight.min.js?1620502812"></script>
+    <script src="/js/highlight.pack.js?1620502812"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/js/modernizr.custom-3.6.0.js?1620502812"></script>
+    <script src="/js/learn.js?1620502812"></script>
+    <script src="/js/hugo-learn.js?1620502812"></script>
+    
+        
+            <script src="/mermaid/mermaid.js?1620502812"></script>
+        
+        <script>
+            mermaid.initialize({ startOnLoad: true });
+        </script>
+    
+    
+
+  </body>
+</html>

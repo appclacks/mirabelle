@@ -1371,8 +1371,7 @@
   (index [:host :service])
   ```
 
-  This example will index events by host and services.
-  "
+  This example will index events by host and services."
   [labels]
   (spec/valid? ::index [labels])
   {:action :index
@@ -1832,7 +1831,8 @@
   (let [pubsub (:pubsub context)]
     (fn [event]
       (when-not (:test-mode? context)
-        (pubsub/publish! pubsub channel event)))))
+        (when-let [event (keep-non-discarded-events event)]
+          (pubsub/publish! pubsub channel event))))))
 
 (s/def ::publish! (s/cat :channel keyword?))
 

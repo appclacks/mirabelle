@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="description" content="">
+
+
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+
+    <title>Writing tests :: Mirabelle</title>
+
+    
+    <link href="/css/nucleus.css?1620502812" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1620502812" rel="stylesheet">
+    <link href="/css/hybrid.css?1620502812" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1620502812" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1620502812" rel="stylesheet">
+    <link href="/css/auto-complete.css?1620502812" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1620502812" rel="stylesheet">
+    <link href="/css/theme.css?1620502812" rel="stylesheet">
+    <link href="/css/tabs.css?1620502812" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1620502812" rel="stylesheet">
+    
+    
+
+    <script src="/js/jquery-3.3.1.min.js?1620502812"></script>
+
+    <style>
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+        :not(pre) > code + span.copy-to-clipboard {
+            display: none;
+        }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/howto/tests/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a id="logo" href="http://example.org/">
+  <h2>Mirabelle</p>
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/js/lunr.min.js?1620502812"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1620502812"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/example.org\/";
+    
+</script>
+<script type="text/javascript" src="/js/search.js?1620502812"></script>
+
+    
+  </div>
+  
+    <section id="homelinks">
+      <ul>
+        <li>
+            <a class="padding" href='/'><i class='fas fa-home'></i> Home</a>
+        </li>
+      </ul>
+    </section>
+  
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/" title="How to" class="dd-item
+        parent
+        
+        
+        ">
+      <a href="/howto/">
+          How to
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+
+        
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/build/" title="Install or build Mirabelle" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/build/">
+          Install or build Mirabelle
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/configuration/" title="Configuration" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/stream/" title="Writing streams" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/stream/">
+          Writing streams
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/tests/" title="Writing tests" class="dd-item
+        parent
+        active
+        
+        ">
+      <a href="/howto/tests/">
+          Writing tests
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/action-io-ref/" title="I/O and actions reference" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/action-io-ref/">
+          I/O and actions reference
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/index/" title="The index" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/index/">
+          The index
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/pubsub/" title="Publish Subscribe" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/pubsub/">
+          Publish Subscribe
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/on-disk-queue/" title="On Disk queue" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/on-disk-queue/">
+          On Disk queue
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/production/" title="Mirabelle in production" class="dd-item
+        
+        
+        
+        ">
+      <a href="/production/">
+          Mirabelle in production
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/api/" title="HTTP API" class="dd-item
+        
+        
+        
+        ">
+      <a href="/api/">
+          HTTP API
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/extension/" title="Extend Mirabelle" class="dd-item
+        
+        
+        
+        ">
+      <a href="/extension/">
+          Extend Mirabelle
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/integration/" title="Clients and integrations" class="dd-item
+        
+        
+        
+        ">
+      <a href="/integration/">
+          Clients and integrations
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/riemann-diff/" title="Differences with Riemann" class="dd-item
+        
+        
+        
+        ">
+      <a href="/riemann-diff/">
+          Differences with Riemann
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/support/" title="Support and contributions" class="dd-item
+        
+        
+        
+        ">
+      <a href="/support/">
+          Support and contributions
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+        
+    </ul>
+
+    
+    
+
+    
+    <section id="footer">
+      <b><p>Powered by <a href="https://mcorbin.fr">mcorbin</a></p></b>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  
+                  <span id="toc-menu"><i class="fas fa-list-alt"></i></span>
+                  
+                  <span class="links">
+                 
+                 
+                    
+          
+          
+            
+            
+          
+          
+            
+            
+          
+          
+            <a href='/'></a> > <a href='/howto/'>How to</a> > Writing tests
+          
+        
+          
+        
+          
+        
+                 
+                  </span>
+                </div>
+                
+                    <div class="progress">
+    <div class="wrapper">
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#running-tests">Running tests</a></li>
+    <li><a href="#things-excluded-from-tests">Things excluded from tests</a></li>
+  </ul>
+</nav>
+    </div>
+</div>
+
+                
+              </div>
+            </div>
+            
+        <div id="head-tags">
+        
+        </div>
+        
+        <div id="body-inner">
+          
+            <h1>
+              
+              Writing tests
+            </h1>
+          
+
+        
+
+
+
+	<p>Mirabelle ships with a complete test framework for streams.</p>
+<h2 id="running-tests">Running tests</h2>
+<p>First, let&rsquo;s define and <a href="/howto/stream/#edn-representation-and-compilation">compile</a> some streams:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+
+ (<span style="color:#a6e22e">stream</span>
+  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:foo</span>}
+  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>]
+    (<span style="color:#a6e22e">info</span>)
+    (<span style="color:#a6e22e">tap</span> <span style="color:#e6db74">:foo</span>)))
+
+ (<span style="color:#a6e22e">stream</span>
+  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:bar</span>}
+  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:&gt;</span> <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">100</span>]
+    (<span style="color:#a6e22e">info</span>)
+    (<span style="color:#a6e22e">tap</span> <span style="color:#e6db74">:bar</span>))))
+</code></pre></div><p>The first stream named <code>:foo</code> will only keep all events with <code>:service</code> &ldquo;foo&rdquo; and log them. These events will also be registered into a <code>tap</code> named <code>:foo</code>.</p>
+<p>A tap is a Mirabelle action which only has an effect in test mode. Events will be saved into tap, and you will be able to check what was registered on the taps.</p>
+<p>Our second stream is also simple: it keeps all events with <code>:metric</code> greater to 100, log them, and push them into a tap named <code>:bar</code>.</p>
+<p>Let&rsquo;s write a test file for these streams. The tests file should be referenced in the <code>:test</code> section of the <a href="/howto/configuration/">configuration</a>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:test1</span> {<span style="color:#e6db74">:input</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
+                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}
+                 {<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">101</span>
+                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>}]
+
+         <span style="color:#e6db74">:tap-results</span> {<span style="color:#e6db74">:foo</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
+                              <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}]
+                       <span style="color:#e6db74">:bar</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">101</span>
+                              <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>}]}}}
+</code></pre></div><p>We defined here a test named <code>:test1</code>. You could have add more tests to the map (or in another files), all tests are run in isolation.</p>
+<p>This <code>:test1</code> key contains a map with two keys:</p>
+<ul>
+<li><code>:input</code>: the events which will be injected into the streams</li>
+<li><code>:tap-results</code>: the expected contents of the tap.</li>
+</ul>
+<p>Here, we see that the tap <code>:foo</code> should contain the first event (with <code>:service</code> &ldquo;foo&rdquo;), and the tap <code>:bar</code> the second (with <code>:metric</code> greater than 100).</p>
+<p>You can low run your tests:</p>
+<pre><code>export MIRABELLE_CONFIGURATION=/path/to/mirabelle/config.edn
+java -jar mirabelle.jar test
+
+All tests successful
+</code></pre><p>If a test fails (let&rsquo;s say we modify the <code>:foo</code> tap result, you should get:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#ae81ff">1</span> errors
+Error in test <span style="color:#e6db74">:test1</span>
+Invalid result for tap <span style="color:#e6db74">:foo</span>
+expected<span style="color:#960050;background-color:#1e0010">:</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>, <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;not-good&#34;</span>}]
+actual<span style="color:#960050;background-color:#1e0010">:</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>, <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}]
+</code></pre></div><p>Tests can also take a <code>:target</code> configuration, for example:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:test1</span> {<span style="color:#e6db74">:input</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
+                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}
+                 {<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">101</span>
+                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>}]
+         <span style="color:#e6db74">:target</span> <span style="color:#e6db74">:foo</span>
+         <span style="color:#e6db74">:tap-results</span> {<span style="color:#e6db74">:foo</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
+                              <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}]}}}
+</code></pre></div><p>In this example, events in <code>:input</code> will only be injected into the <code>:foo</code> stream.</p>
+<p>One dedicated <a href="/howto/index/">index</a> is created for each test.</p>
+<h2 id="things-excluded-from-tests">Things excluded from tests</h2>
+<p>In test mode, some streams behave differently than in the regular mode:</p>
+<ul>
+<li>All I/O (so <code>push-io</code> actions) are discarded.</li>
+<li>The <code>publish!</code> action is also discarded in test mode.</li>
+<li><code>async-queue</code> actions are replaced by a simple stream which forward all events to children. It allows you to test streams using async queues without dealing with their side effects.</li>
+<li>Everything wrapped in <code>io</code> will be discarded. The <code>io</code> action will in test mode discard all of its children (and on regular mode, just forward events to children).</li>
+</ul>
+
+
+
+
+
+<footer class=" footline" >
+	
+</footer>
+
+        
+        </div>
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+
+        
+
+
+	 
+	 
+		
+			<a class="nav nav-prev" href="/howto/stream/" title="Writing streams"> <i class="fa fa-chevron-left"></i></a>
+		
+		
+			<a class="nav nav-next" href="/howto/action-io-ref/" title="I/O and actions reference" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+		
+	
+    </div>
+
+    </section>
+
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/js/clipboard.min.js?1620502812"></script>
+    <script src="/js/perfect-scrollbar.min.js?1620502812"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1620502812"></script>
+    <script src="/js/jquery.sticky.js?1620502812"></script>
+    <script src="/js/featherlight.min.js?1620502812"></script>
+    <script src="/js/highlight.pack.js?1620502812"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/js/modernizr.custom-3.6.0.js?1620502812"></script>
+    <script src="/js/learn.js?1620502812"></script>
+    <script src="/js/hugo-learn.js?1620502812"></script>
+    
+        
+            <script src="/mermaid/mermaid.js?1620502812"></script>
+        
+        <script>
+            mermaid.initialize({ startOnLoad: true });
+        </script>
+    
+    
+
+  </body>
+</html>

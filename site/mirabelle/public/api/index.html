@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="description" content="">
+
+
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+
+    <title>HTTP API :: Mirabelle</title>
+
+    
+    <link href="/css/nucleus.css?1620502812" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1620502812" rel="stylesheet">
+    <link href="/css/hybrid.css?1620502812" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1620502812" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1620502812" rel="stylesheet">
+    <link href="/css/auto-complete.css?1620502812" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1620502812" rel="stylesheet">
+    <link href="/css/theme.css?1620502812" rel="stylesheet">
+    <link href="/css/tabs.css?1620502812" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1620502812" rel="stylesheet">
+    
+    
+
+    <script src="/js/jquery-3.3.1.min.js?1620502812"></script>
+
+    <style>
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+        :not(pre) > code + span.copy-to-clipboard {
+            display: none;
+        }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/api/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a id="logo" href="http://example.org/">
+  <h2>Mirabelle</p>
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/js/lunr.min.js?1620502812"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1620502812"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/example.org\/";
+    
+</script>
+<script type="text/javascript" src="/js/search.js?1620502812"></script>
+
+    
+  </div>
+  
+    <section id="homelinks">
+      <ul>
+        <li>
+            <a class="padding" href='/'><i class='fas fa-home'></i> Home</a>
+        </li>
+      </ul>
+    </section>
+  
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/" title="How to" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/">
+          How to
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+
+        
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/build/" title="Install or build Mirabelle" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/build/">
+          Install or build Mirabelle
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/configuration/" title="Configuration" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/stream/" title="Writing streams" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/stream/">
+          Writing streams
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/tests/" title="Writing tests" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/tests/">
+          Writing tests
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/action-io-ref/" title="I/O and actions reference" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/action-io-ref/">
+          I/O and actions reference
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/index/" title="The index" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/index/">
+          The index
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/pubsub/" title="Publish Subscribe" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/pubsub/">
+          Publish Subscribe
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/on-disk-queue/" title="On Disk queue" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/on-disk-queue/">
+          On Disk queue
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/production/" title="Mirabelle in production" class="dd-item
+        
+        
+        
+        ">
+      <a href="/production/">
+          Mirabelle in production
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/api/" title="HTTP API" class="dd-item
+        parent
+        active
+        
+        ">
+      <a href="/api/">
+          HTTP API
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/extension/" title="Extend Mirabelle" class="dd-item
+        
+        
+        
+        ">
+      <a href="/extension/">
+          Extend Mirabelle
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/integration/" title="Clients and integrations" class="dd-item
+        
+        
+        
+        ">
+      <a href="/integration/">
+          Clients and integrations
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/riemann-diff/" title="Differences with Riemann" class="dd-item
+        
+        
+        
+        ">
+      <a href="/riemann-diff/">
+          Differences with Riemann
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/support/" title="Support and contributions" class="dd-item
+        
+        
+        
+        ">
+      <a href="/support/">
+          Support and contributions
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+        
+    </ul>
+
+    
+    
+
+    
+    <section id="footer">
+      <b><p>Powered by <a href="https://mcorbin.fr">mcorbin</a></p></b>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  
+                  <span id="toc-menu"><i class="fas fa-list-alt"></i></span>
+                  
+                  <span class="links">
+                 
+                 
+                    
+          
+          
+            
+            
+          
+          
+            <a href='/'></a> > HTTP API
+          
+        
+          
+        
+                 
+                  </span>
+                </div>
+                
+                    <div class="progress">
+    <div class="wrapper">
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#health">Health</a></li>
+    <li><a href="#metrics">Metrics</a></li>
+    <li><a href="#stream">Stream</a>
+      <ul>
+        <li><a href="#add-a-stream">Add a stream</a></li>
+        <li><a href="#list-streams">List streams</a></li>
+        <li><a href="#get-a-stream">Get a stream</a></li>
+        <li><a href="#remove-a-stream">Remove a stream</a></li>
+        <li><a href="#push-an-event">Push an event</a></li>
+        <li><a href="#query-the-index">Query the index</a></li>
+        <li><a href="#get-the-default-index-current-time">Get the default index current time</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+</div>
+
+                
+              </div>
+            </div>
+            
+        <div id="head-tags">
+        
+        </div>
+        
+        <div id="body-inner">
+          
+            <h1>
+              
+              HTTP API
+            </h1>
+          
+
+        
+
+
+
+	<h2 id="health">Health</h2>
+<ul>
+<li><strong>GET</strong> /healthz or /health</li>
+</ul>
+<hr>
+<pre><code>curl localhost:5558/healthz
+
+{&quot;message&quot;:&quot;ok&quot;}
+</code></pre><h2 id="metrics">Metrics</h2>
+<ul>
+<li><strong>GET</strong> /metrics</li>
+</ul>
+<p>Mirabelle metrics are returned as Prometheus format.</p>
+<h2 id="stream">Stream</h2>
+<h3 id="add-a-stream">Add a stream</h3>
+<ul>
+<li><strong>POST</strong> api/v1/stream/<!-- raw HTML omitted --></li>
+</ul>
+<p>The body is a json string like <code>{&quot;config&quot;: &quot;&lt;stream-config&gt;&quot;}</code>.</p>
+<p><!-- raw HTML omitted --> should be the stream EDN configuration as base64. For example <code>{:actions {:action :info}}</code> as base64 would be <code>ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfX0=</code>.</p>
+<p>You can also pass the <code>:default</code> option, like in the configuration, in order to specify if you want your stream to be used by default.</p>
+<hr>
+<pre><code>curl -H &quot;Content-Type: application/json&quot; -X POST --data  '{&quot;config&quot;: &quot;ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfX0=&quot;}' 127.0.0.1:5558/api/v1/stream/foobar
+
+{&quot;message&quot;:&quot;stream added&quot;}
+</code></pre><h3 id="list-streams">List streams</h3>
+<ul>
+<li><strong>GET</strong> api/v1/stream/</li>
+</ul>
+<p>List all streams configured in Mirabelle.</p>
+<hr>
+<pre><code> curl localhost:5558/api/v1/stream
+{&quot;streams&quot;:[&quot;bar&quot;,&quot;foo&quot;,&quot;trololo&quot;]}
+</code></pre><h3 id="get-a-stream">Get a stream</h3>
+<ul>
+<li><strong>GET</strong> api/v1/stream/<!-- raw HTML omitted --></li>
+</ul>
+<p>Get a stream configuration and the time of its index.</p>
+<pre><code>curl localhost:5558/api/v1/stream/trololo
+
+{&quot;config&quot;:&quot;ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfSwgOmRlZmF1bHQgZmFsc2V9&quot;,&quot;current-time&quot;:0}
+</code></pre><h3 id="remove-a-stream">Remove a stream</h3>
+<ul>
+<li><strong>DELETE</strong> api/v1/stream/<!-- raw HTML omitted --></li>
+</ul>
+<p>Delete a stream by name.</p>
+<hr>
+<pre><code>curl -X DELETE localhost:5558/api/v1/stream/trololo
+
+{&quot;message&quot;:&quot;stream removed&quot;}
+</code></pre><h3 id="push-an-event">Push an event</h3>
+<ul>
+<li><strong>PUT</strong> api/v1/stream/<!-- raw HTML omitted --></li>
+</ul>
+<p>Push an event to the specified stream.</p>
+<hr>
+<pre><code>curl -H &quot;Content-Type: application/json&quot; -X PUT --data '{&quot;event&quot;: {&quot;service&quot;: &quot;foo&quot;, &quot;metric&quot;: 10}}' 127.0.0.1:5558/api/v1/stream/foo
+
+{&quot;message&quot;:&quot;ok&quot;}
+</code></pre><h3 id="query-the-index">Query the index</h3>
+<ul>
+<li><strong>GET</strong> api/v1/index/<!-- raw HTML omitted -->/search</li>
+</ul>
+<p>Returns events matching the query for the index of the stream <code>&lt;stream-name&gt;</code>. The query passed in the body should be a <a href="/howto/stream/#filtering-events">where query</a>.</p>
+<hr>
+<pre><code>curl -H &quot;Content-Type: application/json&quot; -X POST --data '{&quot;query&quot;: &quot;Wzo9IDpzZXJ2aWNlICJmb28iXQ==&quot;}' 127.0.0.1:5558/api/v1/index/default/search
+
+{&quot;events&quot;:[]}
+</code></pre><h3 id="get-the-default-index-current-time">Get the default index current time</h3>
+<p>get the current time for the default index</p>
+<hr>
+<pre><code>curl localhost:5558/api/v1/current-time
+{&quot;current-time&quot;:0}
+</code></pre>
+
+
+
+
+<footer class=" footline" >
+	
+</footer>
+
+        
+        </div>
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+
+        
+
+
+	 
+	 
+		
+			<a class="nav nav-prev" href="/production/" title="Mirabelle in production"> <i class="fa fa-chevron-left"></i></a>
+		
+		
+			<a class="nav nav-next" href="/extension/" title="Extend Mirabelle" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+		
+	
+    </div>
+
+    </section>
+
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/js/clipboard.min.js?1620502812"></script>
+    <script src="/js/perfect-scrollbar.min.js?1620502812"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1620502812"></script>
+    <script src="/js/jquery.sticky.js?1620502812"></script>
+    <script src="/js/featherlight.min.js?1620502812"></script>
+    <script src="/js/highlight.pack.js?1620502812"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/js/modernizr.custom-3.6.0.js?1620502812"></script>
+    <script src="/js/learn.js?1620502812"></script>
+    <script src="/js/hugo-learn.js?1620502812"></script>
+    
+        
+            <script src="/mermaid/mermaid.js?1620502812"></script>
+        
+        <script>
+            mermaid.initialize({ startOnLoad: true });
+        </script>
+    
+    
+
+  </body>
+</html>

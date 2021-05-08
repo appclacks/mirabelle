@@ -36,8 +36,8 @@ The Mirabelle configuration is defined in [EDN](https://github.com/edn-format/ed
  ;; The "real time" streams configuration.
  ;; The directories parameter is a list of directories containing streams definitions
  ;; The actions parameter can be used to define custom actions which can then
- ;; be used inside streams. Check this section of the documentation for more
- ;; information: 
+ ;; be used inside streams. Check the "On Disk queue" section of the
+ ;; documentation for more information.
  :stream {:directories ["/usr/lib/mirabelle/streams/"]
           :actions {}}
 

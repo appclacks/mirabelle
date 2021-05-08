@@ -102,8 +102,7 @@
 
             (catch Exception e
               (log/error {} e "Error in the websocket handler")
-              (http/close ch)))
-          )))))
+              (http/close ch))))))))
 
 (defrecord WebsocketServer [host port server pubsub registry]
   component/Lifecycle

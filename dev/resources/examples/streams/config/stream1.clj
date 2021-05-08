@@ -7,7 +7,7 @@
  (stream
   {:name :bar :default true}
   (where [:= :service "bar"]
-    (info)
-    (tap :bar))))
+    (index [:host])
+    (publish! :channel))))
 
 

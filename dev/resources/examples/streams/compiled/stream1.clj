@@ -13,4 +13,7 @@
    :children
    ({:action :where,
      :params [[:= :service "bar"]],
-     :children ({:action :error} {:action :tap, :params [:bar]})})}}}
+     :children
+     ({:action :index, :params [[:host]]}
+      {:action :publish!, :params [:channel], :children []}
+      {:action :tap, :params [:bar]})})}}}

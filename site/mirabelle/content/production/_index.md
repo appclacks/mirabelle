@@ -1,10 +1,12 @@
 ---
-title: Production advices
+title: Mirabelle in production
 weight: 2
 chapter: false
 ---
 
-In this section, I will discuss the Mirabelle streams guarantees, metrics exposed by Mirabelle
+*Warning*: Mirabelle is for now not ready for production, it's still an alpha software.
+
+Is section is about the Mirabelle streams guarantees, Mirabelle use cases, fault tolerance and the metrics exposed by Mirabelle.
 
 ## Streams guarantees and performances
 

@@ -16,3 +16,4 @@ java.iml
 .idea
 *.iml
 /dev/queue
+venv
