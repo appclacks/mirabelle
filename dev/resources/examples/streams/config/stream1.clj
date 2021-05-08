@@ -1,12 +1,12 @@
 (streams
  (stream
-  {:name :foo}
+  {:name :foo :default true}
   (where [:= :service "foo"]
     (info)
     (tap :foo)))
  (stream
-  {:name :bar}
-  (where [:> :metric 100]
+  {:name :bar :default true}
+  (where [:= :service "bar"]
     (info)
     (tap :bar))))
 

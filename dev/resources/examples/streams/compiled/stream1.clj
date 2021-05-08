@@ -1,14 +1,16 @@
 {:foo
- {:actions
+ {:default true,
+  :actions
   {:action :sdo,
    :children
    ({:action :where,
      :params [[:= :service "foo"]],
      :children ({:action :info} {:action :tap, :params [:foo]})})}},
  :bar
- {:actions
+ {:default true,
+  :actions
   {:action :sdo,
    :children
    ({:action :where,
-     :params [[:> :metric 100]],
-     :children ({:action :info} {:action :tap, :params [:bar]})})}}}
+     :params [[:= :service "bar"]],
+     :children ({:action :error} {:action :tap, :params [:bar]})})}}}

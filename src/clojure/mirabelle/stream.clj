@@ -226,11 +226,7 @@
                                       (mapv (fn [[k v]]
                                               [k (compile-stream!
                                                   (context this :default)
-                                                  (assoc v
-                                                         :default
-                                                         (if (contains? v :default)
-                                                           (:default v)
-                                                           true)))]))
+                                                  (update v :default boolean))]))
                                       (into {})
                                       (merge (apply dissoc
                                                     compiled-streams to-remove)))]
@@ -267,8 +263,7 @@
                                     :index
                                     (component/start (index/map->Index {}))
                                     :stream-name stream-name)
-                             (assoc stream-configuration
-                                    :default false))
+                             (update stream-configuration :default boolean))
             new-compiled-streams (assoc compiled-streams
                                         stream-name
                                         compiled-stream)]
