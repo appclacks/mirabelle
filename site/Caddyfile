@@ -1,0 +1,15 @@
+{
+    admin :2019
+}
+
+:7000 {
+  root * /static
+
+  file_server
+  metrics /metrics
+
+  log {
+    level INFO
+    format json
+  }
+}

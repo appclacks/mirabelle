@@ -76,6 +76,8 @@ You can also add the `:influxdb/measurement`, `:influxdb/fields` and `:influxdb/
 
 ## Actions
 
+The [generated documentation](/generated-doc/mirabelle.action.html) from the code contains explanations about the available actions. Here is the list:
+
 - above-dt
 - async-queue!
 - below-dt
