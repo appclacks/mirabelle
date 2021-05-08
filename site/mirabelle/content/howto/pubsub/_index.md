@@ -25,7 +25,7 @@ If you create a stream using the API, the channel will be `<stream-name>-index`.
 
 Users can also subscribe to other channels, not related to indexes. It's what `publish!` does. In this example, all users subscribing to the `:my-channel` channel will receive the events.
 
-You can test that yourself by running the `websocket.py` script available here. You will need Python 3, and to install the dependencies listed in `requirements.txt` using `pip install -r requirements.txt`.
+You can test that yourself by running the `websocket.py` script available [here](https://github.com/mcorbin/mirabelle/tree/master/pubsub). You will need Python 3, and to install the dependencies listed in `requirements.txt` using `pip install -r requirements.txt`.
 
 When you subscribe to a channel, you should provide a valid [where clause](/howto/stream/#filtering-events) in base64. For example, the query `[:always-true]` which matches everything would be `WzphbHdheXMtdHJ1ZV0=`.
 
