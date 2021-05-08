@@ -34,15 +34,15 @@
                                      [:= :foo "bar"]]))))
     (index/new-time? index 122)
     (is (= 122 (index/current-time index)))
-    (is (= #{{:host "foo" :time 1}
-             {:host "foo" :service "bar" :time 1 :foo "bar"}}
+    (is (= #{{:host "foo" :time 1 :state "expired"}
+             {:host "foo" :service "bar" :time 1 :foo "bar" :state "expired"}}
            (set (index/expire index))))
     (is (= 0 (index/size-index index)))
     (is (= #{}
            (set (index/expire index))))
     (index/insert index {:host "foo" :time 110 :ttl 1} [:host])
     (index/insert index {:host "bar" :time 110 :ttl 100} [:host])
-    (is (= #{{:host "foo" :time 110 :ttl 1}}
+    (is (= #{{:host "foo" :time 110 :ttl 1 :state "expired"}}
            (set (index/expire index))))
     (is (= 1 (index/size-index index)))
     (is (= {:host "bar" :time 110 :ttl 100}

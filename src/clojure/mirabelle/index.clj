@@ -66,7 +66,7 @@
                  ttl (or (:ttl event) t/default-ttl)]
              (if (< ttl age)
                (do (delete this labels)
-                   (conj state event))
+                   (conj state (assoc event :state "expired")))
                state))
            (catch Exception e
              (log/error {}

@@ -667,5 +667,5 @@
     (is (= 1 (index/size-index index)))
     (is (= [{:host "b" :metric 12 :time 17}]
            (index/search index [:always-true])))
-    (is (= [{:host "f" :metric 12 :time 1 :ttl 15}]
+    (is (= [{:host "f" :metric 12 :time 1 :ttl 15 :state "expired"}]
            @recorder))))

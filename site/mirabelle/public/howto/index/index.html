@@ -12,20 +12,20 @@
     <title>The index :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1620502812" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1620502812" rel="stylesheet">
-    <link href="/css/hybrid.css?1620502812" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1620502812" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1620502812" rel="stylesheet">
-    <link href="/css/auto-complete.css?1620502812" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1620502812" rel="stylesheet">
-    <link href="/css/theme.css?1620502812" rel="stylesheet">
-    <link href="/css/tabs.css?1620502812" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1620502812" rel="stylesheet">
+    <link href="/css/nucleus.css?1620504250" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1620504250" rel="stylesheet">
+    <link href="/css/hybrid.css?1620504250" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1620504250" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1620504250" rel="stylesheet">
+    <link href="/css/auto-complete.css?1620504250" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1620504250" rel="stylesheet">
+    <link href="/css/theme.css?1620504250" rel="stylesheet">
+    <link href="/css/tabs.css?1620504250" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1620504250" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1620502812"></script>
+    <script src="/js/jquery-3.3.1.min.js?1620504250"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1620502812"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1620502812"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1620504250"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1620504250"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/example.org\/";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1620502812"></script>
+<script type="text/javascript" src="/js/search.js?1620504250"></script>
 
     
   </div>
@@ -536,6 +536,9 @@
 <nav id="TableOfContents">
   <ul>
     <li><a href="#how-to-push-events-into-the-index">How to push events into the index</a></li>
+    <li><a href="#expiration">Expiration</a></li>
+    <li><a href="#queries">Queries</a></li>
+    <li><a href="#pub-sub">Pub Sub</a></li>
   </ul>
 </nav>
     </div>
@@ -569,7 +572,32 @@
   {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:bar</span> <span style="color:#e6db74">:default</span> true}
   (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>]
     (index [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>])))
-</code></pre></div>
+</code></pre></div><p>In this example, all events with <code>:service</code> &ldquo;bar&rdquo; will be added to the index. They will be indexed by their <code>:host</code> and <code>:service</code> key.</p>
+<p>For example, if these two events <code>{:host &quot;foo&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code> and <code>{:host &quot;mirabelle&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code> arrive in the system, the index would contain two keys:</p>
+<p><code>{:host &quot;foo&quot; :service &quot;bar&quot;}</code> -&gt; <code>{:host &quot;foo&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code>
+<code>{:host &quot;mirabelle&quot; :service &quot;bar&quot;}</code> -&gt; <code>{:host &quot;mirabelle&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code></p>
+<p>If a new event arrives for an already existing key, the old key is overrided.</p>
+<p>You can have multiple calls to <code>index</code> in Mirabelle, and index events based on the fields you want.</p>
+<h2 id="expiration">Expiration</h2>
+<p>In Mirabelle, events have a <code>:time</code> (when the event was generated) and optionally a TTL. The default TTL for events in the index is <code>120</code> (in seconds). You could also add another default TTL using the <code>with</code> stream.</p>
+<p>For example, an event with <code>:time</code> 1 and <code>:ttl</code> 120 would be expired at time 122.</p>
+<p>Expiration is important. First, a lot of streams which work on windows of events will remove expired events automatically. Indeed, if you use for example <a href="/howto/stream/#coalesce-and-project">coalesce</a>, you don&rsquo;t want to keep forever the latest event for a host which does not emit anymore. When the event is expired, it&rsquo;s removed from the action.</p>
+<p>Expiration can also be used to detect services which stopped emitting.</p>
+<p>Indeed, if an event stored in the index is expired, it will be reinjected into the stream with <code>:state &quot;expired&quot;</code>. You could then catch it with something like:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">expired</span>
+  (<span style="color:#a6e22e">error</span>))
+</code></pre></div><p>By forwarding expired events into dedicated actions, you can for example trigger alerts based on that.</p>
+<p>In order to trigger event expiration from events stored into the index, we should use the <code>reaper</code> action. All streams in Riemann are using the events clocks to trigger side effects, and the reaper action will update the index clock if needed, trigger events expiration, and then reinject the events into streams:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">reaper</span>)
+(<span style="color:#a6e22e">reaper</span> <span style="color:#e6db74">:custom-stream</span>)
+</code></pre></div><p>By default, events are reinjected into the <code>:default</code> stream. You can also pass a stream name to the reaper action in order to reinject events into another stream.</p>
+<p>I recommand you to not call forward all events to the reaper (it will impact performances). Instead, identify a couple of events arriving regularly, and forward them to the reaper in order to update the index clock.</p>
+<h2 id="queries">Queries</h2>
+<p>You can query the events stored into the index. The query should be a valid <a href="/howto/stream/#filtering-events">where clause</a> in base64. For example <code>[:and [:&gt; :metric 10] [:= :service &quot;bar&quot;]]</code> would be <code>WzphbmQgWzo+IDptZXRyaWMgMTBdIFs6PSA6c2VydmljZSAiYmFyIl1d</code>.</p>
+<p>You can send queries using the Mirabelle (or Riemann) TCP clients, or using the <a href="http://localhost:1313/api/#query-the-index">HTTP API</a>.</p>
+<h2 id="pub-sub">Pub Sub</h2>
+<p>Users can subscribe to the index using Websocket, in order to see in real time which events are indexed. Check the <a href="howto/pubsub/">pubsub documentation</a> for more information.</p>
+
 
 
 
@@ -876,19 +904,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1620502812"></script>
-    <script src="/js/perfect-scrollbar.min.js?1620502812"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1620502812"></script>
-    <script src="/js/jquery.sticky.js?1620502812"></script>
-    <script src="/js/featherlight.min.js?1620502812"></script>
-    <script src="/js/highlight.pack.js?1620502812"></script>
+    <script src="/js/clipboard.min.js?1620504250"></script>
+    <script src="/js/perfect-scrollbar.min.js?1620504250"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1620504250"></script>
+    <script src="/js/jquery.sticky.js?1620504250"></script>
+    <script src="/js/featherlight.min.js?1620504250"></script>
+    <script src="/js/highlight.pack.js?1620504250"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1620502812"></script>
-    <script src="/js/learn.js?1620502812"></script>
-    <script src="/js/hugo-learn.js?1620502812"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1620504250"></script>
+    <script src="/js/learn.js?1620504250"></script>
+    <script src="/js/hugo-learn.js?1620504250"></script>
     
         
-            <script src="/mermaid/mermaid.js?1620502812"></script>
+            <script src="/mermaid/mermaid.js?1620504250"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

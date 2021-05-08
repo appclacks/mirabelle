@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1620502812" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1620502812" rel="stylesheet">
-    <link href="/css/hybrid.css?1620502812" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1620502812" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1620502812" rel="stylesheet">
-    <link href="/css/auto-complete.css?1620502812" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1620502812" rel="stylesheet">
-    <link href="/css/theme.css?1620502812" rel="stylesheet">
-    <link href="/css/tabs.css?1620502812" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1620502812" rel="stylesheet">
+    <link href="/css/nucleus.css?1620504250" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1620504250" rel="stylesheet">
+    <link href="/css/hybrid.css?1620504250" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1620504250" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1620504250" rel="stylesheet">
+    <link href="/css/auto-complete.css?1620504250" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1620504250" rel="stylesheet">
+    <link href="/css/theme.css?1620504250" rel="stylesheet">
+    <link href="/css/tabs.css?1620504250" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1620504250" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1620502812"></script>
+    <script src="/js/jquery-3.3.1.min.js?1620504250"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1620502812"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1620502812"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1620504250"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1620504250"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/example.org\/";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1620502812"></script>
+<script type="text/javascript" src="/js/search.js?1620504250"></script>
 
     
   </div>
@@ -577,11 +577,11 @@
 <ul>
 <li><code>:host</code>: the event source. It can be an hostname for example.</li>
 <li><code>:service</code>: What is measured. <code>http_requests_duration_seconds</code> for example.</li>
-<li><code>:state</code>: A string representing the event state. By convention, <code>ok</code>, <code>warning</code> or <code>critical</code> are often used.</li>
+<li><code>:state</code>: A string representing the event state. By convention, <code>ok</code>, <code>warning</code>, <code>critical</code> or <code>expired</code> are often used.</li>
 <li><code>:metric</code>: A number associated to the event (the value of what is measured).</li>
 <li><code>:time</code>: The event time in second, as a timestamp (<code>1619988803</code> for example). It could also be a float (<code>1619988803,173413</code> for example), the Mirabelle/Riemann protocol supports microsecond resolution.</li>
 <li><code>:description</code>: The event description.</li>
-<li><code>:ttl</code>: The duration that the event is considered valid. See the <a href="/index">Index</a> documentation for more information about the index.</li>
+<li><code>:ttl</code>: The duration that the event is considered valid. See the <a href="/index">Index</a> documentation for more information about the index and events expiration.</li>
 <li><code>:tags</code>: A list of tags associated to the event (like <code>[&quot;foo&quot; &quot;bar&quot;]</code> for example).</li>
 <li>Extra fields can also be added if you want to. One important extra field is <code>:stream</code>. It can be used to specify on which stream the event should be send. By default, events are sent to all streags with <code>:default</code> in their configurations.</li>
 </ul>
@@ -1155,19 +1155,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1620502812"></script>
-    <script src="/js/perfect-scrollbar.min.js?1620502812"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1620502812"></script>
-    <script src="/js/jquery.sticky.js?1620502812"></script>
-    <script src="/js/featherlight.min.js?1620502812"></script>
-    <script src="/js/highlight.pack.js?1620502812"></script>
+    <script src="/js/clipboard.min.js?1620504250"></script>
+    <script src="/js/perfect-scrollbar.min.js?1620504250"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1620504250"></script>
+    <script src="/js/jquery.sticky.js?1620504250"></script>
+    <script src="/js/featherlight.min.js?1620504250"></script>
+    <script src="/js/highlight.pack.js?1620504250"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1620502812"></script>
-    <script src="/js/learn.js?1620502812"></script>
-    <script src="/js/hugo-learn.js?1620502812"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1620504250"></script>
+    <script src="/js/learn.js?1620504250"></script>
+    <script src="/js/hugo-learn.js?1620504250"></script>
     
         
-            <script src="/mermaid/mermaid.js?1620502812"></script>
+            <script src="/mermaid/mermaid.js?1620504250"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

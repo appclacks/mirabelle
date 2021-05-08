@@ -16,11 +16,11 @@ Events are represented as an immutable map. An event has standard fields. All fi
 
 - `:host`: the event source. It can be an hostname for example.
 - `:service`: What is measured. `http_requests_duration_seconds` for example.
-- `:state`: A string representing the event state. By convention, `ok`, `warning` or `critical` are often used.
+- `:state`: A string representing the event state. By convention, `ok`, `warning`, `critical` or `expired` are often used.
 - `:metric`: A number associated to the event (the value of what is measured).
 - `:time`: The event time in second, as a timestamp (`1619988803` for example). It could also be a float (`1619988803,173413` for example), the Mirabelle/Riemann protocol supports microsecond resolution.
 - `:description`: The event description.
-- `:ttl`: The duration that the event is considered valid. See the [Index](/index) documentation for more information about the index.
+- `:ttl`: The duration that the event is considered valid. See the [Index](/index) documentation for more information about the index and events expiration.
 - `:tags`: A list of tags associated to the event (like `["foo" "bar"]` for example).
 - Extra fields can also be added if you want to. One important extra field is `:stream`. It can be used to specify on which stream the event should be send. By default, events are sent to all streags with `:default` in their configurations.
 
