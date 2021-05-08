@@ -22,7 +22,7 @@ Events are represented as an immutable map. An event has standard fields. All fi
 - `:description`: The event description.
 - `:ttl`: The duration that the event is considered valid. See the [Index](/index) documentation for more information about the index.
 - `:tags`: A list of tags associated to the event (like `["foo" "bar"]` for example).
-- Extra fields can also be added if you want to.
+- Extra fields can also be added if you want to. One important extra field is `:stream`. It can be used to specify on which stream the event should be send. By default, events are sent to all streags with `:default` in their configurations.
 
 ### Streams
 
@@ -30,11 +30,12 @@ Steams have a name, and are composed by actions. Let's define a simple stream na
 
 ```clojure
 (streams
-  (stream {:name :log}
+  (stream {:name :log :default true}
     (info)))
 ```
 
 The `streams` action is the top level one, and will wrap all defined steams. Then, the `stream` action will define a stream. The action tapes a map as parameter which indicates the stream name in the `:name` key.
+The `:default` key indicates that events arriving to the Mirabelle TCP server should be sent to this stream (multiple streams can have `:default` set, in that case events will be forwarded by default to all of these streams).
 
 The `info` action will simply log all events flowing throught it.
 
@@ -42,7 +43,7 @@ Let's now define another stream:
 
 ```clojure
 (streams
-  (stream {:name :log}
+  (stream {:name :log :default true}
     (info))
   (stream {:name :http_requests_duration}
     (where [:= :service "http_requests_duration_seconds"]
@@ -152,6 +153,10 @@ You will see in the Mirabelle logs:
 As you can see, the event is logged twice: one time by our `info` action, and the second time by `error` (you can see the `level` key in the log). In the second log, the `:state` was set to "critical". Our threshold works !
 
 More examples are available at the bottom on this page, and availables actions are listed in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
+
+Streams can also be created dynamically using [the API](/howto/dynamic-streams/).
+
+Mirabelle supports hot reload on a SIGKILL. On a reload, only streams which had their configurations modified will be reloaded. Streams created using the API will be unchanged.
 
 ### I/O and async queues
 

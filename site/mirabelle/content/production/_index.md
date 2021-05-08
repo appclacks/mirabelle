@@ -4,11 +4,15 @@ weight: 2
 chapter: false
 ---
 
-# Production advices
-
 In this section, I will discuss the Mirabelle streams guarantees, metrics exposed by Mirabelle
 
-### Streams guarantees and performances
+## Streams guarantees and performances
+
+Like in Riemann, Mirabelle acknowledges events. Behaviors describe in [this section](http://riemann.io/howto.html#client-backpressure-latency-and-queues) of the Riemann documentation are also true for Mirabelle (note that a couple of stuff, like some metrics, are renamed/a bit different in Mirabelle).
+
+it's up to you to use (or not) [asynchronous queues](/howto/stream/#io-and-async-queues) if you want to.
+
+Although Mirabelle supports receiving events on its HTTP server, please use the TCP/protobuf one if possible: performances will be *way* better.
 
 ## Metrics
 

@@ -86,16 +86,16 @@
 
 (s/def ::influxdb (s/keys :req-un [::connection-string
                                    ::bucket
-                                   ::measurement
                                    ::org]
                           :opt-un [::username
                                    ::tags
+                                   ::measurement
                                    ::fields
                                    ::password
                                    ::token
                                    ::default-tags]))
 
-;; in Influxn tags are indexed, not fields
+;; in Influx tags are indexed, not fields
 (defrecord InfluxIO [config
                      ^InfluxDBClient client
                      ^WriteApi write-api
