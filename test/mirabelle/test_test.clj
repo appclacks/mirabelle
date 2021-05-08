@@ -14,5 +14,5 @@
                 {:stream {:actions {:custom mirabelle.action/where*}
                           :directories [(.getPath (io/resource "test/failed/streams"))]}
                  :test {:directories [(.getPath (io/resource "test/failed/tests"))]}})]
-    (is (.contains result "1 errors"))
-    (is (.contains result "in test :t2"))))
+    (is (.contains ^String result "1 errors"))
+    (is (.contains ^String result "in test :t2"))))

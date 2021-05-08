@@ -68,7 +68,7 @@
   (current-time [_ _]
     {:status 200
      :body {:current-time (-> (stream/context stream-handler :default)
-                              :index>
+                              :index
                               index/current-time)}})
   (not-found [_ _]
     {:status 404
