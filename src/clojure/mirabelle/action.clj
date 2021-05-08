@@ -1487,7 +1487,7 @@
    :params [fields]
    :children children})
 
-(defn restore!*
+(defn disk-queue!*
   [context]
   (if (:test-mode? context)
     (fn [_] nil)
@@ -1496,10 +1496,10 @@
         (when-let [events (keep-non-discarded-events events)]
           (queue/write! queue events))))))
 
-(defn restore!
+(defn disk-queue!
   "Write events into the on-disk queue."
   []
-  {:action :restore!
+  {:action :disk-queue!
    :params []})
 
 (defn reinject!*
@@ -1909,4 +1909,4 @@
    :warning warning*
    :where where*
    :with with*
-   :restore! restore!*})
+   :disk-queue! disk-queue!*})
