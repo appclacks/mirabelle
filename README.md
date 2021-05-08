@@ -8,8 +8,8 @@ Parts of this codebase are taken from the Riemann (https://riemann.io/) codebase
 
 
 docker run -p 5555:5555 -p 5556:5556 -p 5558:5558 \
--v /home/mathieu/prog/clojure/mirabelle/dev/resources/examples/io:/io \
--v /home/mathieu/prog/clojure/mirabelle/dev/resources/examples/streams/compiled:/streams \
--v /home/mathieu/prog/clojure/mirabelle/build/:/config \
+-v /etc/mirabelle/io:/io \
+-v /etc/mirabelle/streams:/streams \
+-v /etc/mirabelle/config.edn:/config/config.edn \
 -e MIRABELLE_CONFIGURATION=/config/config.edn \
-mirabelle
+460b3e492eaa
