@@ -513,19 +513,19 @@
                                             :io-directories [io-path]
                                             :registry (metric/registry-component {})})]
     (spit (str streams-path "/" "streams.edn") (pr-str streams))
-    (let [{:keys [compiled-real-time-streams
+    (let [{:keys [compiled-streams
                   streams-configurations]} (stream/reload handler)]
       (is (= streams-configurations streams))
-      (is (= (set (keys compiled-real-time-streams)) #{:foo :bar})))
+      (is (= (set (keys compiled-streams)) #{:foo :bar})))
     (spit (str streams-path "/" "streams.edn") (pr-str new-streams))
-    (let [{:keys [compiled-real-time-streams
+    (let [{:keys [compiled-streams
                   streams-configurations]} (stream/reload handler)]
       (is (= streams-configurations new-streams))
-      (is (= (set (keys compiled-real-time-streams)) #{:bar :baz})))
-    (let [{:keys [compiled-real-time-streams
+      (is (= (set (keys compiled-streams)) #{:bar :baz})))
+    (let [{:keys [compiled-streams
                   streams-configurations]} (stream/reload handler)]
       (is (= streams-configurations new-streams))
-      (is (= (set (keys compiled-real-time-streams)) #{:bar :baz})))))
+      (is (= (set (keys compiled-streams)) #{:bar :baz})))))
 
 (deftest io-test
   (testing "Not in test mode"

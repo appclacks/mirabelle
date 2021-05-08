@@ -147,8 +147,6 @@
        (map edn/read-string)
        (apply merge)))
 
-(def streaming :streaming)
-
 ;; I should simplify this crappy code
 (deftype StreamHandler [streams-directories ;; config
                         io-directories;; config
@@ -157,8 +155,7 @@
                         ^:volatile-mutable io-configurations
                         custom-actions
                         custom-io
-                        ^:volatile-mutable compiled-real-time-streams
-                        ^:volatile-mutable compiled-dynamic-streams
+                        ^:volatile-mutable compiled-streams
                         ^:volatile-mutable compiled-io
                         ^:volatile-mutable ^Timer stream-timer
                         queue
@@ -186,14 +183,14 @@
                    (string/join #", " io)))
       (set! io-configurations new-io-configurations)
       (set! compiled-io new-compiled-io)
-      (set! compiled-dynamic-streams {})
+      (set! compiled-streams {})
       (set! stream-timer timer)
       (reload this)
       ;; reload events from the queue
       (when queue
         (q/read-all! queue #(push! this
                                    (update %1 :tags concat ["discard"])
-                                   :streaming))))
+                                   :default))))
     this)
   (stop [this]
     ;; stop executors first to let them finish ongoing tasks
@@ -205,7 +202,7 @@
   IStreamHandler
   (context [this source-stream]
     {:io compiled-io
-     :stream-name streaming
+     :stream-name source-stream
      :index index
      :queue queue
      :tap tap
@@ -226,14 +223,17 @@
             streams-configs-to-compile (select-keys new-streams-configurations
                                                    (set/union to-add to-reload))
             new-compiled-streams (->> streams-configs-to-compile
-                                      ;; new io are injected into streams
                                       (mapv (fn [[k v]]
                                               [k (compile-stream!
-                                                  (context this streaming)
-                                                  v)]))
+                                                  (context this :default)
+                                                  (assoc v
+                                                         :default
+                                                         (if (contains? v :default)
+                                                           (:default v)
+                                                           true)))]))
                                       (into {})
                                       (merge (apply dissoc
-                                                    compiled-real-time-streams to-remove)))]
+                                                    compiled-streams to-remove)))]
         (when (seq to-remove)
           (log/infof {} "Removing streams %s" (string/join #", " to-remove)))
         (when (seq to-reload)
@@ -242,17 +242,18 @@
           (log/infof {} "Adding new streams %s" (string/join #", " to-add)))
 
         ;; mutate what is needed
-        (set! compiled-real-time-streams new-compiled-streams)
+        (set! compiled-streams new-compiled-streams)
         (set! streams-configurations new-streams-configurations)
-        {:compiled-real-time-streams compiled-real-time-streams
+        {:compiled-streams compiled-streams
          :streams-configurations new-streams-configurations})))
   (push! [this event stream]
-    (if (= streaming stream)
-      (doseq [[_ s] compiled-real-time-streams]
-        (let [t1 (System/nanoTime)]
-          (stream! s event)
-          (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS)))
-      (if-let [s (get compiled-dynamic-streams stream)]
+    (if (= :default stream)
+      (doseq [[_ s] compiled-streams]
+        (when (:default s)
+          (let [t1 (System/nanoTime)]
+            (stream! s event)
+            (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS))))
+      (if-let [s (get compiled-streams stream)]
         (stream! s event)
         (throw (ex/ex-info
                 (format "Stream %s not found" stream)
@@ -265,23 +266,23 @@
                              (assoc (context this stream-name)
                                     :index
                                     (component/start (index/map->Index {}))
-                                    :dynamic? true
                                     :stream-name stream-name)
-                             stream-configuration)
-            new-compiled-dynamic-streams (assoc compiled-dynamic-streams
-                                                stream-name
-                                                compiled-stream)]
-        (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
+                             (assoc stream-configuration
+                                    :default false))
+            new-compiled-streams (assoc compiled-streams
+                                        stream-name
+                                        compiled-stream)]
+        (set! compiled-streams new-compiled-streams))))
   (remove-dynamic-stream [this stream-name]
     (log/infof {} "Removing dynamic stream %s" stream-name)
     (locking lock
-      (let [new-compiled-dynamic-streams (dissoc compiled-dynamic-streams
-                                                 stream-name)]
-        (set! compiled-dynamic-streams new-compiled-dynamic-streams))))
+      (let [new-compiled-streams (dissoc compiled-streams
+                                         stream-name)]
+        (set! compiled-streams new-compiled-streams))))
   (list-dynamic-streams [this]
-    (or (keys compiled-dynamic-streams) []))
+    (or (keys compiled-streams) []))
   (get-dynamic-stream [this stream-name]
-    (if-let [stream (get compiled-dynamic-streams stream-name)]
+    (if-let [stream (get compiled-streams stream-name)]
       stream
       (throw (ex/ex-info
               (format "stream %s not found" stream-name)
@@ -294,8 +295,7 @@
            io-configurations
            custom-actions
            custom-io
-           compiled-real-time-streams
-           compiled-dynamic-streams
+           compiled-streams
            compiled-io
            stream-timer
            queue
@@ -307,8 +307,7 @@
          io-configurations {}
          custom-actions {}
          custom-io {}
-         compiled-real-time-streams {}
-         compiled-dynamic-streams {}
+         compiled-streams {}
          compiled-io {}
          test-mode? false}}]
   (->StreamHandler streams-directories
@@ -318,8 +317,7 @@
                    io-configurations
                    custom-actions
                    custom-io
-                   compiled-real-time-streams
-                   compiled-dynamic-streams
+                   compiled-streams
                    compiled-io
                    stream-timer
                    queue

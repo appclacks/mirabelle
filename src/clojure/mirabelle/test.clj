@@ -56,7 +56,7 @@
                 (doseq [event (:input test-config)]
                   (stream/push! stream-handler event target)))
             (doseq [event (:input test-config)]
-              (stream/push! stream-handler event :streaming)))
+              (stream/push! stream-handler event :default)))
           (doseq [[tap-name expected] (:tap-results test-config)]
             (when-not (= expected (get @tap tap-name))
               (swap! result

@@ -93,7 +93,7 @@
                                           pred
                                           (index/channel (get query-params
                                                               "stream"
-                                                              :streaming)))
+                                                              :default)))
                     :ws/channel (ws-handler pubsub
                                             actions
                                             ch

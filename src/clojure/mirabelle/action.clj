@@ -1527,7 +1527,7 @@
 
   This example reinjects events into the stream named `:foo`."
   ([]
-   (reinject! :streaming))
+   (reinject! :default))
   ([destination-stream]
    (spec/valid? ::reinject [destination-stream])
    {:action :reinject!
@@ -1725,8 +1725,7 @@
 
 (defn reaper
   "Everytime this action receives an event, it will expires events from the
-  index and reinject them into a stream (default to the real time stream processing
-  engine).
+  index and reinject them into a stream (default to the default streams).
 
   ```clojure
   (reaper)
@@ -1735,7 +1734,7 @@
   ```clojure
   (reaper :custom-stream
   ```"
-  ([] (reaper :streaming))
+  ([] (reaper :default))
   ([destination-stream]
    (spec/valid? ::reaper [destination-stream])
    {:action :reaper

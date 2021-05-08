@@ -66,7 +66,7 @@
      :body {:streams (stream/list-dynamic-streams stream-handler)}})
   (current-time [_ _]
     {:status 200
-     :body {:current-time (-> (stream/context stream-handler :streaming)
+     :body {:current-time (-> (stream/context stream-handler :default)
                               :index
                               index/current-time)}})
   (not-found [_ _]

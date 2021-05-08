@@ -45,8 +45,8 @@
   [stream-handler registry ^ChannelGroup channel-group handler]
   (let [handler-fn (fn [event]
                      (stream/push! stream-handler event
-                                   (or (:stream event)
-                                       :streaming)))]
+                                   (or (keyword (:stream event))
+                                       :default)))]
     (proxy [ChannelInboundHandlerAdapter] []
       (channelActive [ctx]
         (.add channel-group (.channel ctx)))
