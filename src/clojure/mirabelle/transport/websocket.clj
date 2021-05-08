@@ -98,7 +98,7 @@
                                             actions
                                             ch
                                             pred
-                                            (-> request :route-params :channel))))))
+                                            (-> request :route-params :channel keyword))))))
 
             (catch Exception e
               (log/error {} e "Error in the websocket handler")

@@ -12,15 +12,17 @@ parser = argparse.ArgumentParser(description='Mirabelle python websocket')
 parser.add_argument('--host', default="localhost", help='Mirabelle host (default `localhost`)')
 parser.add_argument('--port', default=5556, type=int, help='Mirabelle port (default `5556`)')
 parser.add_argument('--query', default="WzphbHdheXMtdHJ1ZV0=", help='Query (default `[:always-true]`)')
+parser.add_argument('--channel', default="default-index", help='The channel to subscribe (default `default-index`)')
 parser.add_argument('--no-indent', dest='indent', action='store_true', help='indent json')
 args = parser.parse_args()
 
 host = args.host
 port = args.port
 query = quote(args.query, safe='')
+channel = quote(args.channel, safe='')
 indent = not args.indent
 
-address = "ws://{}:{}/index?query={}".format(host, port, query)
+address = "ws://{}:{}/channel/{}?query={}".format(host, port, channel, query)
 
 
 async def run():

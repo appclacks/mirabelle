@@ -1,7 +1,7 @@
 ---
 title: On Disk queue
 weight: 30
-chapter: true
+chapter: false
 ---
 
 *Warning*: I'm not totally satisfied with this feature and with the current implementation. It will change in the future. Please provide me feedbacks ;)

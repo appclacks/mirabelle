@@ -15,5 +15,5 @@
      :params [[:= :service "bar"]],
      :children
      ({:action :index, :params [[:host]]}
-      {:action :publish!, :params [:channel], :children []}
+      {:action :publish!, :params [:my-channel], :children []}
       {:action :tap, :params [:bar]})})}}}
