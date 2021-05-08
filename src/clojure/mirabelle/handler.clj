@@ -28,12 +28,13 @@
   (search-index [_ {:keys [params]}]
     (let [query (-> params :query b64/from-base64 edn/read-string)
           stream-name (:name params)
-          compiled-stream (-> (stream/get-dynamic-stream stream-handler stream-name))]
+          index (if (= :default stream-name)
+                  (:index (stream/context stream-handler :default))
+                  (-> (stream/get-dynamic-stream stream-handler stream-name)
+                      :context
+                      :index))]
       {:status 200
-       :body {:events (-> compiled-stream
-                          :context
-                          :index
-                          (index/search query))}}))
+       :body {:events (index/search index query)}}))
   (add-stream [_ {:keys [params]}]
     (let [stream-name (:name params)
           config (-> params :config b64/from-base64 edn/read-string)]
@@ -66,7 +67,7 @@
      :body {:streams (stream/list-dynamic-streams stream-handler)}})
   (current-time [_ _]
     {:status 200
-     :body {:current-time (-> (stream/context stream-handler :streaming)
+     :body {:current-time (-> (stream/context stream-handler :default)
                               :index
                               index/current-time)}})
   (not-found [_ _]

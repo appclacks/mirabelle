@@ -1,12 +1,14 @@
 {:foo
- {:actions {:action :custom
+ {:default true
+  :actions {:action :custom
             :params [[:and
                       [:> :metric 10]
                       [:< :metric 20]]]
             :children [{:action :tap
                         :params [:foo]}]}}
  :bar
- {:actions {:action :where
+ {:default true
+  :actions {:action :where
             :params [[:> :metric 100]]
             :children [{:action :tap
                         :params [:foo]}]}}}

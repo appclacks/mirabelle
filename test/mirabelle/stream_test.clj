@@ -285,6 +285,8 @@
                           (a/above-dt 10 20)
                           (a/between-dt 10 20 30)
                           (a/decrement)
+                          (a/project [[:= :host "foo"]
+                                      [:= :service "bar"]])
                           (a/to-base64 :host
                                        (a/from-base64 :host))
                           (a/to-base64 [:host :service]
@@ -316,10 +318,12 @@
                           (a/error)
                           (a/expired)
                           (a/fixed-event-window 3
+                                                (a/coll-sum)
                                                 (a/percentiles [0 0.5 1])
                                                 (a/coll-mean
                                                  (a/sflatten))
                                                 (a/coll-max)
+                                                (a/coll-quotient)
                                                 (a/coll-min)
                                                 (a/coll-count)
                                                 (a/coll-rate))
@@ -414,12 +418,16 @@
 
 (deftest compile-io!-test
   (testing "file io"
-    (let [io-compiled (stream/compile-io! {:type :file
+    (let [io-compiled (stream/compile-io! nil
+                                          :foo
+                                          {:type :file
                                            :config {:path "/tmp/foo"}}
                                           {})]
       (is (satisfies? IO (:component io-compiled)))))
   (testing "custom io"
-    (let [io-compiled (stream/compile-io! {:type :custom
+    (let [io-compiled (stream/compile-io! nil
+                                          :foo
+                                          {:type :custom
                                            :config {:path "/tmp/foo"}}
                                           {:custom 'mirabelle.io.file/map->FileIO})]
       (is (satisfies? IO (:component io-compiled))))))
@@ -459,7 +467,7 @@
 (deftest async-queue-test
   (testing "non-test mode"
     (let [recorder (atom [])
-          queue {:component (pool/dynamic-thread-pool-executor {})}
+          queue {:component (pool/dynamic-thread-pool-executor nil :foo {})}
           stream {:name "my-stream"
                   :description "foo"
                   :actions (a/async-queue! :foo
@@ -505,19 +513,19 @@
                                             :io-directories [io-path]
                                             :registry (metric/registry-component {})})]
     (spit (str streams-path "/" "streams.edn") (pr-str streams))
-    (let [{:keys [compiled-real-time-streams
+    (let [{:keys [compiled-streams
                   streams-configurations]} (stream/reload handler)]
       (is (= streams-configurations streams))
-      (is (= (set (keys compiled-real-time-streams)) #{:foo :bar})))
+      (is (= (set (keys compiled-streams)) #{:foo :bar})))
     (spit (str streams-path "/" "streams.edn") (pr-str new-streams))
-    (let [{:keys [compiled-real-time-streams
+    (let [{:keys [compiled-streams
                   streams-configurations]} (stream/reload handler)]
       (is (= streams-configurations new-streams))
-      (is (= (set (keys compiled-real-time-streams)) #{:bar :baz})))
-    (let [{:keys [compiled-real-time-streams
+      (is (= (set (keys compiled-streams)) #{:bar :baz})))
+    (let [{:keys [compiled-streams
                   streams-configurations]} (stream/reload handler)]
       (is (= streams-configurations new-streams))
-      (is (= (set (keys compiled-real-time-streams)) #{:bar :baz})))))
+      (is (= (set (keys compiled-streams)) #{:bar :baz})))))
 
 (deftest io-test
   (testing "Not in test mode"

@@ -25,14 +25,16 @@
 (defn build-system
   [{:keys [tcp stream http queue io websocket]}]
   (let [registry (metric/registry-component {})
-        queue-component (component/start (queue/map->ChroniqueQueue queue))
+        queue-component (if queue
+                          (component/start (queue/map->ChroniqueQueue queue))
+                          (queue/map->DummyQueue {}))
         index (component/start (index/map->Index {}))
         pubsub (component/start (pubsub/map->PubSub {}))]
     (component/system-map
      :registry registry
      :index index
      :pubsub pubsub
-     :queue queue
+     :queue queue-component
      :websocket (-> (websocket/map->WebsocketServer websocket)
                     (component/using [:pubsub :registry]))
      :http (-> (corbihttp/map->Server {:config http})

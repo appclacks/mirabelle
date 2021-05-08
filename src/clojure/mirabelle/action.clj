@@ -230,6 +230,40 @@
   {:action :coll-max
    :children children})
 
+(defn coll-quotient*
+  [_ & children]
+  (fn [events]
+    (call-rescue (math/quotient events) children)))
+
+(defn coll-quotient
+  "Divide the first event `:metrìc` field by all subsequent events `:metric`.
+  Return a new event containing the new `:metric`.
+
+  Should receive a list of events from the previous stream."
+  [& children]
+  {:action :coll-quotient
+   :children children})
+
+(defn coll-sum*
+  [_ & children]
+  (fn [events]
+    (call-rescue (math/sum-events events) children)))
+
+(defn coll-sum
+  "Sum all the events :metric fields
+  Should receive a list of events from the previous stream.
+
+  ```clojure
+  (fixed-event-window 10
+    (coll-sum
+      (debug)))
+  ```
+
+  Sum all :metric fields for windows of 10 events"
+  [& children]
+  {:action :coll-sum
+   :children children})
+
 (defn coll-min*
   [_ & children]
   (fn [events]
@@ -708,7 +742,8 @@
     :else
     (let [[k v & children] args]
       (when (or (not k) (not v))
-        (throw (ex/ex-info "Invalid parameters for with: %s %s" k v)))
+        (throw (ex/ex-info (format "Invalid parameters for with: %s %s" k v)
+                           {})))
       {:action :with
        :children children
        :params [{k v}]})))
@@ -954,12 +989,12 @@
   (split
     [:> :metric 10] (debug)
     [:> :metric 5] (info)
-    (critical)
+    (error)
   ```
 
   In this example, all events with :metric > 10 will go into the debug stream,
   all events with :metric > 5 in the info stream, and other events will to the
-  default stream which is \"critical\".
+  default stream which is \"error\".
 
   The default stream is optional, if not set all events not matching a condition
   will be discarded."
@@ -1290,6 +1325,30 @@
         (when (seq events)
           (call-rescue events children))))))
 
+(s/def ::project (s/cat :conditions (s/coll-of ::condition)))
+
+(defn project
+  "Takes a list of conditions.
+  Like coalesce, project will return the most recent events matching
+  the conditions.
+
+  ```clojure
+  (project [[:= :service \"enqueues\"]
+            [:= :service \"dequeues\"]]
+    (coll-quotient
+      (with :service \"enqueues per dequeue\"
+        (info))))
+  ```
+
+  We divide here the latest event for the \"enqueues\" :service by the
+  latest event from the \"dequeues\" one.
+  "
+  [conditions & children]
+  (spec/valid? ::project [conditions])
+  {:action :project
+   :params [conditions]
+   :children children})
+
 (defn index*
   [context labels]
   (let [i (:index context)
@@ -1312,8 +1371,7 @@
   (index [:host :service])
   ```
 
-  This example will index events by host and services.
-  "
+  This example will index events by host and services."
   [labels]
   (spec/valid? ::index [labels])
   {:action :index
@@ -1428,7 +1486,7 @@
    :params [fields]
    :children children})
 
-(defn restore!*
+(defn disk-queue!*
   [context]
   (if (:test-mode? context)
     (fn [_] nil)
@@ -1437,10 +1495,10 @@
         (when-let [events (keep-non-discarded-events events)]
           (queue/write! queue events))))))
 
-(defn restore!
+(defn disk-queue!
   "Write events into the on-disk queue."
   []
-  {:action :restore!
+  {:action :disk-queue!
    :params []})
 
 (defn reinject!*
@@ -1468,7 +1526,7 @@
 
   This example reinjects events into the stream named `:foo`."
   ([]
-   (reinject! :streaming))
+   (reinject! :default))
   ([destination-stream]
    (spec/valid? ::reinject [destination-stream])
    {:action :reinject!
@@ -1666,8 +1724,7 @@
 
 (defn reaper
   "Everytime this action receives an event, it will expires events from the
-  index and reinject them into a stream (default to the real time stream processing
-  engine).
+  index and reinject them into a stream (default to the default streams).
 
   ```clojure
   (reaper)
@@ -1676,7 +1733,7 @@
   ```clojure
   (reaper :custom-stream
   ```"
-  ([] (reaper :streaming))
+  ([] (reaper :default))
   ([destination-stream]
    (spec/valid? ::reaper [destination-stream])
    {:action :reaper
@@ -1774,7 +1831,8 @@
   (let [pubsub (:pubsub context)]
     (fn [event]
       (when-not (:test-mode? context)
-        (pubsub/publish! pubsub channel event)))))
+        (when-let [event (keep-non-discarded-events event)]
+          (pubsub/publish! pubsub channel event))))))
 
 (s/def ::publish! (s/cat :channel keyword?))
 
@@ -1795,14 +1853,17 @@
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
+   :below-dt cond-dt*
    :between-dt cond-dt*
    :changed changed*
    :coalesce coalesce*
+   :coll-count coll-count*
    :coll-max coll-max*
    :coll-mean coll-mean*
    :coll-min coll-min*
+   :coll-quotient coll-quotient*
    :coll-rate coll-rate*
-   :coll-count coll-count*
+   :coll-sum coll-sum*
    :critical critical*
    :critical-dt cond-dt*
    :debug debug*
@@ -1826,6 +1887,7 @@
    :outside-dt cond-dt*
    :over over*
    :percentiles percentiles*
+   :project project*
    :publish! publish!*
    :push-io! push-io!*
    :reaper reaper*
@@ -1847,4 +1909,4 @@
    :warning warning*
    :where where*
    :with with*
-   :restore! restore!*})
+   :disk-queue! disk-queue!*})

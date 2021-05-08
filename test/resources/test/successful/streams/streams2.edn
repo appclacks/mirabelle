@@ -1,5 +1,6 @@
 {:baz
- {:actions {:action :custom
+ {:default true
+  :actions {:action :custom
             :params [[:= :service "aa"]]
             :children [{:action :tap
                         :params [:baz]}]}}}

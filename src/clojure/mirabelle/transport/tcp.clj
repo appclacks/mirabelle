@@ -45,8 +45,8 @@
   [stream-handler registry ^ChannelGroup channel-group handler]
   (let [handler-fn (fn [event]
                      (stream/push! stream-handler event
-                                   (or (:stream event)
-                                       :streaming)))]
+                                   (or (keyword (:stream event))
+                                       :default)))]
     (proxy [ChannelInboundHandlerAdapter] []
       (channelActive [ctx]
         (.add channel-group (.channel ctx)))
@@ -162,6 +162,7 @@
           timer (metric/get-timer! registry
                                    :tcp-request-duration
                                    {})
+          so-backlog (int (or so-backlog 100))
           channel-grp (transport/channel-group
                        (str "tcp-server " host ":" port))
 
@@ -180,6 +181,12 @@
                                            shared-event-executor
                                            channel-grp
                                            nil))]
+      (metric/gauge! registry
+                     :netty.event.executor.queue.size
+                     {}
+                     (fn []
+                       (reduce + (map #(.pendingTasks %)
+                                      (iterator-seq (.iterator shared-event-executor))))))
       (locking transport/ioutil-lock
         (locking this
           (when-not @killer

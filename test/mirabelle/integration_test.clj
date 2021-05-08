@@ -15,7 +15,7 @@
 
 (deftest http-test
   (testing "healthz"
-    (let [resp (http/get "http://localhost:5666/healthz"
+    (let [resp (http/get "http://localhost:5558/healthz"
                          {:as :json})]
       (is (= 200 (:status resp)))
       (is (= {:message "ok"}
@@ -25,7 +25,7 @@
                                 pr-str
                                 b64/to-base64)}
                    json/generate-string)
-          resp (http/post "http://localhost:5666/api/v1/stream/foo"
+          resp (http/post "http://localhost:5558/api/v1/stream/test-foo"
                           {:content-type :json
                            :as :json
                            :body body})]
@@ -33,79 +33,79 @@
       (is (= {:message "stream added"}
              (:body resp)))))
   (testing "push-event"
-    (let [body (-> {:event {:host "foo" :time 3}}
+    (let [body (-> {:event {:host "test-foo" :time 3}}
                    json/generate-string)
-          resp (http/put "http://localhost:5666/api/v1/stream/foo"
+          resp (http/put "http://localhost:5558/api/v1/stream/test-foo"
                          {:content-type :json
                           :as :json
                           :body body})]
       (is (= 200 (:status resp)))
       (is (= {:message "ok"}
              (:body resp))))
-    (let [body (-> {:event {:host "foo"}}
+    (let [body (-> {:event {:host "test-foo"}}
                    json/generate-string)
-          resp (http/put "http://localhost:5666/api/v1/stream/bar"
+          resp (http/put "http://localhost:5558/api/v1/stream/test-bar"
                          {:content-type :json
                           :throw-exceptions false
                           :as :json
                           :body body})]
       (is (= 404 (:status resp)))
-      (is (= {:error "Stream :bar not found"}
+      (is (= {:error "Stream :test-bar not found"}
              (json/parse-string (:body resp) true)))))
   (testing "search-index"
     (let [body (-> {:query (-> [:always-true]
                                 pr-str
                                 b64/to-base64)}
                    json/generate-string)
-          resp (http/post "http://localhost:5666/api/v1/index/foo/search"
+          resp (http/post "http://localhost:5558/api/v1/index/test-foo/search"
                           {:content-type :json
                            :throw-exceptions false
                            :as :json
                            :body body})]
       (is (= 200 (:status resp)))
-      (is (= {:events [{:host "foo" :time 3}]}
+      (is (= {:events [{:host "test-foo" :time 3}]}
              (:body resp))))
     (let [body (-> {:query (-> [:always-true]
                                 pr-str
                                 b64/to-base64)}
                    json/generate-string)
-          resp (http/post "http://localhost:5666/api/v1/index/bar/search"
+          resp (http/post "http://localhost:5558/api/v1/index/test-bar/search"
                           {:content-type :json
                            :throw-exceptions false
                            :as :json
                            :body body})]
       (is (= 404 (:status resp)))
-      (is (= {:error "stream :bar not found"}
+      (is (= {:error "stream :test-bar not found"}
              (json/parse-string (:body resp) true)))))
   (testing "get-stream"
-    (let [resp (http/get "http://localhost:5666/api/v1/stream/foo"
+    (let [resp (http/get "http://localhost:5558/api/v1/stream/test-foo"
                          {:as :json})]
       (is (= 200 (:status resp)))
-      (is (= {:config (-> {:actions {:action :index :params [[:host]]}}
+      (is (= {:config (-> {:actions {:action :index :params [[:host]]} :default false}
                           pr-str
                           b64/to-base64)
               :current-time 3}
              (:body resp)))))
   (testing "list-streams"
-    (let [resp (http/get "http://localhost:5666/api/v1/stream"
-                         {:as :json})]
+    (let [resp (http/get "http://localhost:5558/api/v1/stream"
+                         {:as :json})
+          streams (-> resp :body :streams set)]
       (is (= 200 (:status resp)))
-      (is (= {:streams ["foo"]}
-             (:body resp)))))
+      (is (streams "test-foo"))))
   (testing "current-time"
-    (let [resp (http/get "http://localhost:5666/api/v1/current-time"
+    (let [resp (http/get "http://localhost:5558/api/v1/current-time"
                          {:as :json})]
       (is (= 200 (:status resp)))
       (is (= {:current-time 0}
              (:body resp)))))
   (testing "remove-stream"
-    (let [resp (http/delete "http://localhost:5666/api/v1/stream/foo"
+    (let [resp (http/delete "http://localhost:5558/api/v1/stream/test-foo"
                             {:as :json})]
       (is (= 200 (:status resp)))
       (is (= {:message "stream removed"}
              (:body resp))))
-    (let [resp (http/get "http://localhost:5666/api/v1/stream"
-                         {:as :json})]
+    (let [resp (http/get "http://localhost:5558/api/v1/stream"
+                         {:as :json})
+          streams (-> resp :body :streams set)]
       (is (= 200 (:status resp)))
-      (is (= {:streams []}
-             (:body resp))))))
+      (is (not (streams "test-foo"))))))

@@ -1,14 +1,13 @@
 (streams
  (stream
-  {:name :foo}
-  (where [:> :metric 10]
-         (index [:host])
-         (increment
-          (with {:influxdb/tags [:environment :state :host]
-                 :influxdb/fields [:metric]}
-                (info)
-                (where [:= :service "abc"]
-                       (publish! :bar))
-                ;(push-io! :influxdb)
-                )
-          ))))
+  {:name :foo :default true}
+  (where [:= :service "foo"]
+    (info)
+    (tap :foo)))
+ (stream
+  {:name :bar :default true}
+  (where [:= :service "bar"]
+    (index [:host])
+    (publish! :channel))))
+
+

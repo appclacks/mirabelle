@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>http://example.org/howto/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/howto/build/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/production/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/howto/configuration/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/howto/stream/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/howto/tests/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/api/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/howto/action-io-ref/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/extension/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/howto/index/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/integration/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/howto/pubsub/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/riemann-diff/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/howto/on-disk-queue/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/support/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://example.org/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/tags/</loc>
+  </url>
+  
+</urlset>

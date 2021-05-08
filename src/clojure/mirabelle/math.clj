@@ -1,16 +1,30 @@
 (ns mirabelle.math
   (:require [mirabelle.event :as event]))
 
+;; TODO: optimize fn to not iterate twice
+
 (defn mean
-  "Takes a list of event and returns the metrics mean.
+  "Takes a list of events and returns the metrics mean.
   The latest event is used as a base to build the event returned by
   this funcion."
   [events]
   (when (seq events)
     (assoc (event/most-recent events)
            :metric
-           (-> (reduce #(+ (:metric %2) %1) 0 events)
+           (-> (reduce #(+ (:metric %2 0) %1) 0 events)
                (/ (count events))))))
+
+(defn quotient
+  "Takes a list of events
+  Divide the first event `:metrìc` field by all subsequent events `:metric`
+
+  Throws if it divides by zero."
+  [events]
+  (when (seq events)
+    (assoc (event/most-recent events)
+           :metric
+           (->> (map :metric events)
+                (reduce #(/ %1 %2))))))
 
 (defn count-events
   "Count the number of events.
@@ -48,6 +62,15 @@
   the biggest metric"
   [events]
   (extremum >= events))
+
+(defn sum-events
+  "Sum all events :metric.
+  Use the most recent event as a base for the new event."
+  [events]
+  (when (seq events)
+    (assoc (event/most-recent events)
+           :metric
+           (reduce #(+ (:metric %2 0) %1) 0 events))))
 
 (defn min-event
   "Takes a list of event and returns the event with
@@ -102,19 +125,15 @@
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn sorted-sample
   "Sample a sequence of events at points. Returns events with the :quantile
-  key set to to \"pint\". For instance, (sorted-sample events [0 1])
+  key set to the computed quantile. For instance, (sorted-sample events [0 1])
   returns a 2-element seq of the smallest event and the biggest event, by
-  metric. The first has a quantile set to \"0\" and the second one set to
-  in \"1\". If the points is a map, eg (sorted-sample events {0 \".min\" 1
-  \".max\"}, the the values will be appened to the quantile directly.
+  metric. The first has a quantile set to 0 and the second one set to
+  in 1.
   Useful for extracting histograms and percentiles.
 
   When s is empty, returns an empty list."
   [s points]
-  (let [[points pnames] (if (vector? points)
-                         [points (map #(str %) points)]
-                         (apply map vector points))]
-    (map (fn [pname event]
-           (assoc event :quantile pname))
-         pnames
-         (sorted-sample-extract s points))))
+  (map (fn [pname event]
+         (assoc event :quantile pname))
+       points
+       (sorted-sample-extract s points)))

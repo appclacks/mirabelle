@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="description" content="">
+
+
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+
+    <title>I/O and actions reference :: Mirabelle</title>
+
+    
+    <link href="/css/nucleus.css?1620502812" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1620502812" rel="stylesheet">
+    <link href="/css/hybrid.css?1620502812" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1620502812" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1620502812" rel="stylesheet">
+    <link href="/css/auto-complete.css?1620502812" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1620502812" rel="stylesheet">
+    <link href="/css/theme.css?1620502812" rel="stylesheet">
+    <link href="/css/tabs.css?1620502812" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1620502812" rel="stylesheet">
+    
+    
+
+    <script src="/js/jquery-3.3.1.min.js?1620502812"></script>
+
+    <style>
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+        :not(pre) > code + span.copy-to-clipboard {
+            display: none;
+        }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/howto/action-io-ref/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a id="logo" href="http://example.org/">
+  <h2>Mirabelle</p>
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/js/lunr.min.js?1620502812"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1620502812"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/example.org\/";
+    
+</script>
+<script type="text/javascript" src="/js/search.js?1620502812"></script>
+
+    
+  </div>
+  
+    <section id="homelinks">
+      <ul>
+        <li>
+            <a class="padding" href='/'><i class='fas fa-home'></i> Home</a>
+        </li>
+      </ul>
+    </section>
+  
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/" title="How to" class="dd-item
+        parent
+        
+        
+        ">
+      <a href="/howto/">
+          How to
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+
+        
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/build/" title="Install or build Mirabelle" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/build/">
+          Install or build Mirabelle
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/configuration/" title="Configuration" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/stream/" title="Writing streams" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/stream/">
+          Writing streams
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/tests/" title="Writing tests" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/tests/">
+          Writing tests
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/action-io-ref/" title="I/O and actions reference" class="dd-item
+        parent
+        active
+        
+        ">
+      <a href="/howto/action-io-ref/">
+          I/O and actions reference
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/index/" title="The index" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/index/">
+          The index
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/pubsub/" title="Publish Subscribe" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/pubsub/">
+          Publish Subscribe
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/howto/on-disk-queue/" title="On Disk queue" class="dd-item
+        
+        
+        
+        ">
+      <a href="/howto/on-disk-queue/">
+          On Disk queue
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/production/" title="Mirabelle in production" class="dd-item
+        
+        
+        
+        ">
+      <a href="/production/">
+          Mirabelle in production
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/api/" title="HTTP API" class="dd-item
+        
+        
+        
+        ">
+      <a href="/api/">
+          HTTP API
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/extension/" title="Extend Mirabelle" class="dd-item
+        
+        
+        
+        ">
+      <a href="/extension/">
+          Extend Mirabelle
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/integration/" title="Clients and integrations" class="dd-item
+        
+        
+        
+        ">
+      <a href="/integration/">
+          Clients and integrations
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/riemann-diff/" title="Differences with Riemann" class="dd-item
+        
+        
+        
+        ">
+      <a href="/riemann-diff/">
+          Differences with Riemann
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+          
+
+
+
+
+ 
+  
+    
+    <li data-nav-id="/support/" title="Support and contributions" class="dd-item
+        
+        
+        
+        ">
+      <a href="/support/">
+          Support and contributions
+          
+      </a>
+      
+      
+    </li>
+  
+ 
+
+          
+        
+    </ul>
+
+    
+    
+
+    
+    <section id="footer">
+      <b><p>Powered by <a href="https://mcorbin.fr">mcorbin</a></p></b>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  
+                  <span id="toc-menu"><i class="fas fa-list-alt"></i></span>
+                  
+                  <span class="links">
+                 
+                 
+                    
+          
+          
+            
+            
+          
+          
+            
+            
+          
+          
+            <a href='/'></a> > <a href='/howto/'>How to</a> > I/O and actions reference
+          
+        
+          
+        
+          
+        
+                 
+                  </span>
+                </div>
+                
+                    <div class="progress">
+    <div class="wrapper">
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#io">I/O</a>
+      <ul>
+        <li><a href="#file">File</a></li>
+        <li><a href="#pagerduty">Pagerduty</a></li>
+        <li><a href="#influxdb">InfluxDB</a></li>
+      </ul>
+    </li>
+    <li><a href="#actions">Actions</a></li>
+  </ul>
+</nav>
+    </div>
+</div>
+
+                
+              </div>
+            </div>
+            
+        <div id="head-tags">
+        
+        </div>
+        
+        <div id="body-inner">
+          
+            <h1>
+              
+              I/O and actions reference
+            </h1>
+          
+
+        
+
+
+
+	<p>This section lists all built-in actions and I/O available in Mirabelle.</p>
+<h2 id="io">I/O</h2>
+<p>I/O can be <a href="http://localhost:1313/howto/stream/#io-and-async-queues">referenced in streams</a> in order to forward events to external systems.</p>
+<h3 id="file">File</h3>
+<p>This I/O write all events into a file, as edn.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{my-io-file {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:path</span> <span style="color:#e6db74">&#34;/tmp/events?edn&#34;</span>}
+             <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:file</span>}}
+</code></pre></div><h3 id="pagerduty">Pagerduty</h3>
+<p>This I/O forwards events to <a href="https://pagerduty.com">Pagerduty</a>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:pagerduty-client</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:service-key</span> <span style="color:#e6db74">&#34;pagerduty-service-key&#34;</span>
+                             <span style="color:#e6db74">:source-key</span> <span style="color:#e6db74">:service</span>
+                             <span style="color:#e6db74">:summary-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:state</span>]
+                             <span style="color:#e6db74">:dedup-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>]
+                             <span style="color:#e6db74">:http-options</span> {<span style="color:#e6db74">:socket-timeout</span> <span style="color:#ae81ff">5000</span>
+                                            <span style="color:#e6db74">:connection-timeout</span> <span style="color:#ae81ff">5000</span>}}
+                    <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:pagerduty</span>}}
+</code></pre></div><ul>
+<li>The <code>:service-key</code> parameter is your Pagerduty service (integration) key.</li>
+<li><code>:source-key</code> is the event key which will be used for the alert source in the Pagerduty payload.</li>
+<li><code>:summary-keys</code> is a list of keys which will be used to build the event summary. In this example, the summary would be <code>&lt;event-host&gt;-&lt;event-service&gt;-&lt;event-state&gt;</code>.</li>
+<li><code>:dedup-keys</code> is a list of keys used to build the Pagerduty dedup key in the alert payload.
+<code>:http-options</code> is an optional map for extra HTTP options (see <a href="https://github.com/dakrone/clj-http">clj-http</a> for more information).</li>
+</ul>
+<p>The raw event will also be sent to Pagerduty in the <code>custom_details</code> field. The alert timestamp will be the event time, or the current time if the event has no time.</p>
+<p>By default, the event <code>:state</code> is used to deduce the right Pagerduty action:</p>
+<ul>
+<li>&ldquo;critical&rdquo;: trigger</li>
+<li>&ldquo;ok&rdquo;: resolve</li>
+</ul>
+<p>You can also set a <code>:pagerduty/action</code> key to your event in order to set the action (with the <code>with</code> action for example: <code>(with :pagerduty/action :trigger ...)</code></p>
+<h3 id="influxdb">InfluxDB</h3>
+<p>Forward events to the <a href="https://www.influxdata.com/">InfluxDB</a> timserie database.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:influxdb</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:connection-string</span> <span style="color:#e6db74">&#34;http://127.0.0.1:8086&#34;</span>
+                     <span style="color:#e6db74">:bucket</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>
+                     <span style="color:#e6db74">:org</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>
+                     <span style="color:#e6db74">:measurement</span> <span style="color:#e6db74">:service</span>
+                     <span style="color:#75715e">;; either use username/password</span>
+                     <span style="color:#e6db74">:username</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>
+                     <span style="color:#e6db74">:password</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>
+                     <span style="color:#75715e">;; or token authenticate</span>
+                     <span style="color:#e6db74">:token</span> <span style="color:#e6db74">&#34;my-token&#34;</span>
+                     <span style="color:#e6db74">:default-tags</span> {<span style="color:#e6db74">&#34;project&#34;</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>}
+                     <span style="color:#e6db74">:tags</span> [<span style="color:#e6db74">:service</span>]
+                     <span style="color:#e6db74">:fields</span> [<span style="color:#e6db74">:environment</span>]}
+            <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:influxdb</span>}}
+</code></pre></div><p>The <code>:measurement</code>, <code>:username</code>, <code>:password</code>, <code>:token</code>, <code>:default-tags</code>, <code>:tags</code> and <code>fields</code> parameters are optional. The <code>:measurement</code> parameter is the event key which will be used for the influxdb measurement</p>
+<p>Default tags will be added to all events. The <code>:tags</code> option contains the list of keys to convert to influxdb tags, and the <code>:fields</code> option for fields.</p>
+<p>You can also add the <code>:influxdb/measurement</code>, <code>:influxdb/fields</code> and <code>:influxdb/tags</code> to your events (using the <code>with</code> action for example) in order to override per event the default configuration for these options.</p>
+<h2 id="actions">Actions</h2>
+<ul>
+<li>above-dt</li>
+<li>async-queue!</li>
+<li>below-dt</li>
+<li>between-dt</li>
+<li>changed</li>
+<li>coalesce</li>
+<li>coll-count</li>
+<li>coll-max</li>
+<li>coll-mean</li>
+<li>coll-min</li>
+<li>coll-quotient</li>
+<li>coll-rate</li>
+<li>coll-sum</li>
+<li>critical</li>
+<li>critical-dt</li>
+<li>debug</li>
+<li>decrement</li>
+<li>ddt</li>
+<li>ddt-pos</li>
+<li>info</li>
+<li>error</li>
+<li>ewma-timeless</li>
+<li>exception-stream</li>
+<li>expired</li>
+<li>fixed-event-window</li>
+<li>fixed-time-window</li>
+<li>from-base64</li>
+<li>increment</li>
+<li>index</li>
+<li>io</li>
+<li>json-fields</li>
+<li>moving-event-window</li>
+<li>not-expired</li>
+<li>outside-dt</li>
+<li>over</li>
+<li>percentiles</li>
+<li>project</li>
+<li>publish!</li>
+<li>push-io!</li>
+<li>reaper</li>
+<li>reinject!</li>
+<li>scale</li>
+<li>sflatten</li>
+<li>split</li>
+<li>sdissoc</li>
+<li>sdo</li>
+<li>sformat</li>
+<li>tag</li>
+<li>tagged-all</li>
+<li>tap</li>
+<li>test-action</li>
+<li>throttle</li>
+<li>to-base64</li>
+<li>under</li>
+<li>untag</li>
+<li>warning</li>
+<li>where</li>
+<li>with</li>
+<li>restore!</li>
+</ul>
+
+
+
+
+
+<footer class=" footline" >
+	
+</footer>
+
+        
+        </div>
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+
+        
+
+
+	 
+	 
+		
+			<a class="nav nav-prev" href="/howto/tests/" title="Writing tests"> <i class="fa fa-chevron-left"></i></a>
+		
+		
+			<a class="nav nav-next" href="/howto/index/" title="The index" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+		
+	
+    </div>
+
+    </section>
+
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/js/clipboard.min.js?1620502812"></script>
+    <script src="/js/perfect-scrollbar.min.js?1620502812"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1620502812"></script>
+    <script src="/js/jquery.sticky.js?1620502812"></script>
+    <script src="/js/featherlight.min.js?1620502812"></script>
+    <script src="/js/highlight.pack.js?1620502812"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/js/modernizr.custom-3.6.0.js?1620502812"></script>
+    <script src="/js/learn.js?1620502812"></script>
+    <script src="/js/hugo-learn.js?1620502812"></script>
+    
+        
+            <script src="/mermaid/mermaid.js?1620502812"></script>
+        
+        <script>
+            mermaid.initialize({ startOnLoad: true });
+        </script>
+    
+    
+
+  </body>
+</html>

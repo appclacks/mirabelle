@@ -68,36 +68,41 @@
     (fn handle [request]
       (http/with-channel request ch
         (when (http/websocket? ch)
-          (let [actions (atom [])
-                uri (:uri request)
-                request (bidi/match-route* routes uri request)
-                query-params (->(:query-string request)
-                                http-query-map)
-                pred (request->pred query-params)]
-            (if (= :ws/not-found (:handler request))
-              (do
-                (log/info {} "Unknown URI " (:uri request) ", closing")
-                (http/close ch))
-              (do
-                (swap! nb-conn inc)
-                (http/on-close ch
-                               (fn [_]
-                                 (swap! nb-conn dec)
-                                 (doseq [action @actions]
-                                   (action))))
-                (condp = (:handler request)
-                  :ws/index (ws-handler pubsub
-                                        actions
-                                        ch
-                                        pred
-                                        (index/channel (get query-params
-                                                            "stream"
-                                                            :streaming)))
-                  :ws/channel (ws-handler pubsub
+          (try
+            (let [actions (atom [])
+                  uri (:uri request)
+                  request (bidi/match-route* routes uri request)
+                  query-params (->(:query-string request)
+                                  http-query-map)
+                  pred (request->pred query-params)]
+              (if (= :ws/not-found (:handler request))
+                (do
+                  (log/info {} "Unknown URI " (:uri request) ", closing")
+                  (http/close ch))
+                (do
+                  (swap! nb-conn inc)
+                  (http/on-close ch
+                                 (fn [_]
+                                   (swap! nb-conn dec)
+                                   (doseq [action @actions]
+                                     (action))))
+                  (condp = (:handler request)
+                    :ws/index (ws-handler pubsub
                                           actions
                                           ch
                                           pred
-                                          (-> request :route-params :channel)))))))))))
+                                          (index/channel (get query-params
+                                                              "stream"
+                                                              :default)))
+                    :ws/channel (ws-handler pubsub
+                                            actions
+                                            ch
+                                            pred
+                                            (-> request :route-params :channel))))))
+
+            (catch Exception e
+              (log/error {} e "Error in the websocket handler")
+              (http/close ch))))))))
 
 (defrecord WebsocketServer [host port server pubsub registry]
   component/Lifecycle

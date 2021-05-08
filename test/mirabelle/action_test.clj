@@ -284,6 +284,26 @@
                    {:metric 5}]]
                  [{:metric 10}])))
 
+(deftest coll-quotient*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/coll-quotient* nil rec)
+                 state
+                 [[{:metric 1}
+                   {:metric 10}
+                   {:metric 5}]]
+                 [{:metric (/ 1 10 5)}])))
+
+(deftest coll-sum*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/coll-sum* nil rec)
+                 state
+                 [[{:metric 1}
+                   {:metric 10 :time 0 :tags ["a"]}
+                   {}
+                   {}
+                   {:metric 5}]]
+                 [{:metric 16  :time 0 :tags ["a"]}])))
+
 (deftest coll-min*-test
   (let [[rec state] (recorder)]
     (test-action (a/coll-min* nil rec)
@@ -723,9 +743,9 @@
                                  rec)
                  state
                  [[{:metric 3} {:metric 1} {:metric 2}]]
-                 [{:metric 1 :quantile "0"}
-                  {:metric 2 :quantile "0.5"}
-                  {:metric 3 :quantile "1"}])))
+                 [{:metric 1 :quantile 0}
+                  {:metric 2 :quantile 0.5}
+                  {:metric 3 :quantile 1}])))
 
 (deftest tagged-all*-test
   (let [[rec state] (recorder)]
