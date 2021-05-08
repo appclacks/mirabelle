@@ -26,11 +26,13 @@ In Mirabelle (and unlike in Riemann), **all** streams advance based on the time 
 
 In Mirabelle, events arrive by default in streams defined in the Mirabelle configuration file. As said previously, the Mirabelle clock for a stream will only advance if you send new events.
 
-You can also in Mirabelle instantiate steams on the fly (using the Mirabelle HTTP API) and push events into these new streams. All streams have their own clocks and can advance independently. You can choose on which stream clients should push events.
+You can also in Mirabelle instantiate steams on the fly (using the Mirabelle HTTP API) and push events into these new streams. All streams have their own clocks and can advance independently. You can choose on which stream clients should push events, and define which streams should be used by default.
 
 ![Mirabelle](img/mirabelle_streams.png)
 
 You can have real time streams receiving events directly from your servers and applications, and some streams working on old (and maybe ordered) data coming from various databases. Like that, you can have the best of both words: real time analytics, and run analytics on old data using continuous queries for example.
+
+You can even use Mirabelle to play and explore with historical data. You could have for example a Mirabelle instance used for real time stream processing, another one (or even the same one on dedicated streams) working on old data... It's up to you to decide !
 
 ## Stream example, with unit tests
 
