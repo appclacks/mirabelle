@@ -1352,7 +1352,7 @@
 (defn index*
   [context labels]
   (let [i (:index context)
-        channel (index/channel (:stream-name context))
+        channel (index/channel (:input context))
         pubsub (:pubsub context)]
     (fn [event]
       (when-let [t (:time event)]

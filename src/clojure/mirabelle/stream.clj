@@ -202,7 +202,7 @@
   IStreamHandler
   (context [this source-stream]
     {:io compiled-io
-     :stream-name source-stream
+     :input source-stream
      :index index
      :queue queue
      :tap tap
@@ -262,7 +262,7 @@
                              (assoc (context this stream-name)
                                     :index
                                     (component/start (index/map->Index {}))
-                                    :stream-name stream-name)
+                                    :input stream-name)
                              (update stream-configuration :default boolean))
             new-compiled-streams (assoc compiled-streams
                                         stream-name

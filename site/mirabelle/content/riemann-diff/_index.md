@@ -26,6 +26,14 @@ It means you can have some streams for "real time" computation, and some streams
 
 When you send an event to Mirabelle, you can specify the `stream` attribute in order to send the event to a specific stream.
 
+## Multiple dimensions
+
+Riemann mostly works on the `:host` and `:service` fields. it's common to encode "dimensions" in `:service`.
+
+For example, you could have in Riemann a service named `http_requests_duration_prod_p99`. In mirabelle, you would modelize this event like this: `{:service "http_requests_duration" :environment "prod" :quantile "0.99"}`
+
+A lot of Riemann streams (`index`, `coalesce`...) were rewritten. You can now provide for each action on which keys it should work instead to have to manipulate complex `:service` names.
+
 ## HTTP API
 
 Mirabelle provides an [HTTP API](/api) which allow you to manage streams dynamically (create, list, get, remove), and to gather information about your system:

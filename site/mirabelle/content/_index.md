@@ -1,6 +1,6 @@
 # Mirabelle, a powerful stream processing engine for monitoring
 
-Mirabelle is stream processing engine which can be used to aggregate events, metrics and logs.
+Mirabelle is a stream processing engine which can be used to aggregate events, metrics and logs.
 
 Its powerful and extensible DSL allows you to define computations on a stream of data. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabelling...) which can be easily combined according to your needs.
 
@@ -20,7 +20,7 @@ I would like to thank all Riemann maintainers and contributors for this amazing 
 
 Mirabelle use the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessy with Mirabelle (which also added a lot of new features).
 
-Like in Riemaann, Mirabelle provides an index which can be queried (and on which you can subscribe) in order to explore your system state.
+Like in Riemann, Mirabelle provides an index which can be queried (and on which you can subscribe) in order to explore your system state.
 
 ## Streams clocks, real time, continuous queries
 

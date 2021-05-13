@@ -622,7 +622,7 @@
         pubsub-result (atom [])
         {:keys [entrypoint]} (stream/compile-stream! {:index index
                                                       :pubsub pubsub
-                                                      :stream-name :streaming}
+                                                      :input :streaming}
                                                      stream)]
     (pubsub/add pubsub (index/channel :streaming) (fn [event]
                                                     (swap! pubsub-result conj event)))
@@ -655,7 +655,7 @@
         {:keys [entrypoint]} (stream/compile-stream!
                               {:index index
                                :pubsub pubsub
-                               :stream-name :streaming
+                               :input :streaming
                                :reinject (fn [event _]
                                            (swap! recorder conj event))}
                               stream)]
