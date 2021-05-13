@@ -1503,11 +1503,13 @@
 
 (defn reinject!*
   [context destination-stream]
-  (let [reinject-fn (:reinject context)]
+  (let [reinject-fn (:reinject context)
+        destination-stream (or destination-stream (:input context))]
     (fn [event]
       (reinject-fn event destination-stream))))
 
-(s/def ::reinject (s/cat :destination-stream keyword?))
+(s/def ::reinject (s/cat :destination-stream (s/or :keyword keyword?
+                                                   :nil nil?)))
 
 (defn reinject!
   "Reinject an event into the streaming system.
@@ -1526,7 +1528,7 @@
 
   This example reinjects events into the stream named `:foo`."
   ([]
-   (reinject! :default))
+   (reinject! nil))
   ([destination-stream]
    (spec/valid? ::reinject [destination-stream])
    {:action :reinject!
@@ -1715,12 +1717,14 @@
 (defn reaper*
   [context destination-stream]
   (let [index (:index context)
-        reinject-fn (:reinject context)]
+        reinject-fn (:reinject context)
+        destination-stream (or destination-stream (:input context))]
     (fn [_]
       (doseq [event (index/expire index)]
         (reinject-fn event destination-stream)))))
 
-(s/def ::reaper (s/cat :destination-stream keyword?))
+(s/def ::reaper (s/cat :destination-stream (s/or :keyword keyword?
+                                                 :nil nil?)))
 
 (defn reaper
   "Everytime this action receives an event, it will expires events from the
@@ -1733,7 +1737,7 @@
   ```clojure
   (reaper :custom-stream)
   ```"
-  ([] (reaper :default))
+  ([] (reaper :nil))
   ([destination-stream]
    (spec/valid? ::reaper [destination-stream])
    {:action :reaper
