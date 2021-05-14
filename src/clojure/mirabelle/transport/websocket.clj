@@ -23,11 +23,19 @@
               (mapcat (fn [kv] (string/split kv #"=" 2))
                       (string/split string #"&")))))
 
+(defn query-true?
+  "Helper to support the Riemann default `true` query."
+  [query]
+  (if (= "true" query)
+    (b64/to-base64 "[:always-true]")
+    query))
+
 (defn request->pred
   "Returns the predicate for the channel events based on the request query params"
   [query-params]
   (-> query-params
       (get "query")
+      query-true?
       b64/from-base64
       edn/read-string
       condition/compile-conditions))

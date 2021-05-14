@@ -42,6 +42,7 @@
      :stream-handler (stream/map->StreamHandler
                       {:streams-directories (:directories stream)
                        :io-directories (:directories io)
+                       :custom-io (:custom io)
                        :custom-actions (:actions stream)
                        :index index
                        :queue queue-component

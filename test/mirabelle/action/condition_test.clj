@@ -17,6 +17,7 @@
      [:not-nil? :metric]])
   (are [condition] (not (cd/valid-condition? condition))
     [[:> :metric 10]]
+    [= :service "bar"]
     [:?? :metric 10]
     [:= "host" "foo"]
     [:foo :metric]

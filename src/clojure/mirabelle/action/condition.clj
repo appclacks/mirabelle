@@ -1,4 +1,5 @@
-(ns mirabelle.action.condition)
+(ns mirabelle.action.condition
+  (:require [exoscale.ex :as ex]))
 
 (def condition->fn
   "Map containing the functions associated to the where options"
@@ -43,6 +44,8 @@
         args (if (and regex? (string? (first args)))
                [(-> (first args) re-pattern)]
                args)]
+    (when (nil? condition-fn)
+      (ex/ex-incorrect! "Invalid condition" {}))
     (fn [event] (apply condition-fn
                        (get event field)
                        args))))

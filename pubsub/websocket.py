@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import asyncio
+import base64
 import websockets
 import argparse
 from urllib.parse import quote
@@ -11,14 +12,15 @@ import time
 parser = argparse.ArgumentParser(description='Mirabelle python websocket')
 parser.add_argument('--host', default="localhost", help='Mirabelle host (default `localhost`)')
 parser.add_argument('--port', default=5556, type=int, help='Mirabelle port (default `5556`)')
-parser.add_argument('--query', default="WzphbHdheXMtdHJ1ZV0=", help='Query (default `[:always-true]`)')
+parser.add_argument('--query', default="[:always-true]", help='Query (default `[:always-true]`)')
 parser.add_argument('--channel', default="default-index", help='The channel to subscribe (default `default-index`)')
 parser.add_argument('--no-indent', dest='indent', action='store_true', help='indent json')
 args = parser.parse_args()
 
 host = args.host
 port = args.port
-query = quote(args.query, safe='')
+query = base64.b64encode(bytes(args.query, "utf-8")).decode("utf-8")
+print(query)
 channel = quote(args.channel, safe='')
 indent = not args.indent
 
