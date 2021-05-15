@@ -29,7 +29,7 @@ You can test that yourself by running the `websocket.py` script available [here]
 
 When you subscribe to a channel, you should provide a valid [where clause](/howto/stream/#filtering-events) in base64. For example, the query `[:always-true]` which matches everything would be `WzphbHdheXMtdHJ1ZV0=`.
 
-You can now run the script with `./websocket.py`. By default, it subscribes to the default index. You can specify a channel with `--channel` (like `--channel my-channel` here), or a query with `--query`.
+You can now run the script with `./websocket.py`. By default, it subscribes to the default index. You can specify a channel with `--channel` (like `--channel my-channel` here), or a query with `--query` (the query will be automatically converted to base64 by the script).
 
 You can also write your own scripts in various languages. You need to subscribe to `ws://<host>:<port>/channel/<channel-name>?query=<query>`.
 

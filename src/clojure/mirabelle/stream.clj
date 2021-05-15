@@ -70,7 +70,8 @@
       (get custom-io t)
       (assoc io-config
              :component
-             ((requiring-resolve (get custom-io t)) (:config io-config)))
+             ((requiring-resolve (get custom-io t)) (assoc (:config io-config)
+                                                           :registry registry)))
 
       (= :async-queue t)
       (assoc io-config :component (pool/dynamic-thread-pool-executor registry
