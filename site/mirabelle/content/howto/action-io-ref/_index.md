@@ -8,7 +8,7 @@ This section lists all built-in actions and I/O available in Mirabelle.
 
 ## I/O
 
-I/O can be [referenced in streams](http://localhost:1313/howto/stream/#io-and-async-queues) in order to forward events to external systems.
+I/O can be [referenced in streams](/howto/stream/#io-and-async-queues) in order to forward events to external systems.
 
 ### File
 
