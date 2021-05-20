@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1621172319" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1621172319" rel="stylesheet">
-    <link href="/css/hybrid.css?1621172319" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1621172319" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1621172319" rel="stylesheet">
-    <link href="/css/auto-complete.css?1621172319" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1621172319" rel="stylesheet">
-    <link href="/css/theme.css?1621172319" rel="stylesheet">
-    <link href="/css/tabs.css?1621172319" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1621172319" rel="stylesheet">
+    <link href="/css/nucleus.css?1621519549" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1621519549" rel="stylesheet">
+    <link href="/css/hybrid.css?1621519549" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1621519549" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1621519549" rel="stylesheet">
+    <link href="/css/auto-complete.css?1621519549" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1621519549" rel="stylesheet">
+    <link href="/css/theme.css?1621519549" rel="stylesheet">
+    <link href="/css/tabs.css?1621519549" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1621519549" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1621172319"></script>
+    <script src="/js/jquery-3.3.1.min.js?1621519549"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1621172319"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1621172319"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1621519549"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1621519549"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1621172319"></script>
+<script type="text/javascript" src="/js/search.js?1621519549"></script>
 
     
   </div>
@@ -778,18 +778,23 @@ It means you should be careful about which action you will use downstream. It sh
   (<span style="color:#a6e22e">coll-rate</span>
     (<span style="color:#a6e22e">info</span>))
   (<span style="color:#a6e22e">coll-count</span>
+    (<span style="color:#a6e22e">info</span>))
+  (<span style="color:#a6e22e">coll-top</span> <span style="color:#ae81ff">10</span>
+    (<span style="color:#a6e22e">info</span>))
+  (<span style="color:#a6e22e">coll-bottom</span> <span style="color:#ae81ff">10</span>
     (<span style="color:#a6e22e">info</span>)))
 </code></pre></div><p><code>coll-max</code> will forward downstream the event with the biggest <code>:metric</code> field, <code>coll-min</code> will forward the event with the smallest <code>:metric</code>.
 <code>coll-sum</code> will sum all events <code>:metric</code> together.
-<code>coll-quotient</code> will divide the first event <code>:metric</code> by the value of the next events.</p>
+<code>coll-quotient</code> will divide the first event <code>:metric</code> by the value of the next events.
+<code>coll-top</code> and <code>coll-bottom</code> returns the events with the top biggest (or top smallest) <code>:metric</code> field (for example, <code>coll-top</code> would return the 10 events with the biggest <code>:metric</code>).</p>
 <p><code>coll-mean</code> will compute the mean based on the event <code>:metric</code> fields. <code>coll-rate</code> compute the rate of events (the sum of all <code>:metrics</code> divided by the time range, based on the most ancient and most recent events), and <code>coll-count</code> will return a new event with <code>:metric</code> being the number of events in the window.<br>
 The three previous streams use the latest event from the list of events to build the new event.</p>
-<p>The <code>percentiles</code> action can also be used to compute percentiles on a list of events:</p>
+<p>The <code>coll-percentiles</code> action can also be used to compute percentiles on a list of events:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-time-window</span> <span style="color:#ae81ff">60</span>
-  (<span style="color:#a6e22e">percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.98</span> <span style="color:#ae81ff">0.99</span>]
+  (<span style="color:#a6e22e">coll-percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.98</span> <span style="color:#ae81ff">0.99</span>]
     (<span style="color:#a6e22e">info</span>)))
-</code></pre></div><p>In this example, we generate 60-seconds time windows and pass them to the <code>percentiles</code> action. The action takes que wanted quantiles as parameter.</p>
-<p>The <code>percentiles</code> action will produce for each quantile an event with the <code>:quantile</code> key set to the quantile value, and the <code>;metric</code> field set to the value computed from the list of events for this quantile. The quantiles <code>0</code> and <code>1</code> can also be used to get the smallest of biggest event.</p>
+</code></pre></div><p>In this example, we generate 60-seconds time windows and pass them to the <code>coll-percentiles</code> action. The action takes que wanted quantiles as parameter.</p>
+<p>The <code>coll-percentiles</code> action will produce for each quantile an event with the <code>:quantile</code> key set to the quantile value, and the <code>;metric</code> field set to the value computed from the list of events for this quantile. The quantiles <code>0</code> and <code>1</code> can also be used to get the smallest of biggest event.</p>
 <p>If needed, you can also flatten a list of events, to get back a single event using <code>flatten</code>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">moving-event-window</span> <span style="color:#ae81ff">10</span>
   (<span style="color:#a6e22e">sflatten</span>
@@ -811,7 +816,7 @@ The three previous streams use the latest event from the list of events to build
 <p>These two streams can help you doing computation on events from multiple sources.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_requests_duration_seconds&#34;</span>]
   (<span style="color:#a6e22e">coalesce</span> <span style="color:#ae81ff">10</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:environment</span>]
-    (<span style="color:#a6e22e">percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.98</span> <span style="color:#ae81ff">0.99</span>]
+    (<span style="color:#a6e22e">coll-percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.98</span> <span style="color:#ae81ff">0.99</span>]
       (<span style="color:#a6e22e">info</span>))))
 </code></pre></div><p><code>coalesce</code> will return periodically (here, every 10 seconds) the latest event for each, in this example, <code>:host</code> and <code>environment</code>. For example, if you have 20 unique host/environment combination push event regularly, coalesce will emit a list of 20 events (the latest for each combination).</p>
 <p>Expired events are not emitted, so if a host stops pushing, its event will not be emitted once the event is expired.</p>
@@ -1155,19 +1160,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1621172320"></script>
-    <script src="/js/perfect-scrollbar.min.js?1621172320"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1621172320"></script>
-    <script src="/js/jquery.sticky.js?1621172320"></script>
-    <script src="/js/featherlight.min.js?1621172320"></script>
-    <script src="/js/highlight.pack.js?1621172320"></script>
+    <script src="/js/clipboard.min.js?1621519549"></script>
+    <script src="/js/perfect-scrollbar.min.js?1621519549"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1621519549"></script>
+    <script src="/js/jquery.sticky.js?1621519549"></script>
+    <script src="/js/featherlight.min.js?1621519549"></script>
+    <script src="/js/highlight.pack.js?1621519549"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1621172320"></script>
-    <script src="/js/learn.js?1621172320"></script>
-    <script src="/js/hugo-learn.js?1621172320"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1621519549"></script>
+    <script src="/js/learn.js?1621519549"></script>
+    <script src="/js/hugo-learn.js?1621519549"></script>
     
         
-            <script src="/mermaid/mermaid.js?1621172320"></script>
+            <script src="/mermaid/mermaid.js?1621519549"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });
