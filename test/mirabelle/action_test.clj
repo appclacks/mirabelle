@@ -906,3 +906,16 @@
                  [[{:metric 100} {:metric 10}]
                   [{:metric 10}]
                   [{:metric 2} {:metric 1}]])))
+
+(deftest coll-bottom-test
+  (let [[rec state] (recorder)]
+    (test-action (a/coll-bottom* nil
+                                 2
+                                 rec)
+                 state
+                 [[{:metric 10} {:metric 4} {:metric 100} {:metric 2}]
+                  [{:metric 10}]
+                  [{:metric -10} {:metric 1} {:metric 2} {:metric 0}]]
+                 [[{:metric 2} {:metric 4}]
+                  [{:metric 10}]
+                  [{:metric -10} {:metric 0}]])))

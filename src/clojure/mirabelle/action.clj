@@ -1875,6 +1875,27 @@
    :params [nb-events]
    :children children})
 
+(defn coll-bottom*
+  [_ nb-events & children]
+  (fn [events]
+    (call-rescue (math/extremum-n nb-events < events) children)))
+
+(s/def ::coll-bottom (s/cat :nb-events pos-int?))
+
+(defn coll-bottom
+  "Receives a list of events, returns the top N events with the lowest metrics.
+
+  ```clojure
+  (fixed-time-window 60
+    (coll-bottom
+      (info)))
+  ```"
+  [nb-events & children]
+  (spec/valid? ::coll-bottom [nb-events])
+  {:action :coll-bottom
+   :params [nb-events]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1882,6 +1903,7 @@
    :between-dt cond-dt*
    :changed changed*
    :coalesce coalesce*
+   :coll-bottom coll-bottom*
    :coll-count coll-count*
    :coll-max coll-max*
    :coll-mean coll-mean*
