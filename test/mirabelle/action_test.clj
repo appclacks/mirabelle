@@ -736,11 +736,11 @@
                   {:metric 2}
                   {:metric 3}])))
 
-(deftest percentiles*-test
+(deftest coll-percentiles*-test
   (let [[rec state] (recorder)]
-    (test-action (a/percentiles* nil
-                                 [0 0.5 1]
-                                 rec)
+    (test-action (a/coll-percentiles* nil
+                                      [0 0.5 1]
+                                      rec)
                  state
                  [[{:metric 3} {:metric 1} {:metric 2}]]
                  [{:metric 1 :quantile 0}

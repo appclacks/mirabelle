@@ -319,7 +319,7 @@
                           (a/expired)
                           (a/fixed-event-window 3
                                                 (a/coll-sum)
-                                                (a/percentiles [0 0.5 1])
+                                                (a/coll-percentiles [0 0.5 1])
                                                 (a/coll-mean
                                                  (a/sflatten))
                                                 (a/coll-max)

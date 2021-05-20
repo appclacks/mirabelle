@@ -1423,17 +1423,17 @@
    :params [(if (keyword? fields) [fields] fields)]
    :children children})
 
-(defn percentiles*
+(defn coll-percentiles*
   [_ points & children]
   (fn [events]
     (doseq [event (math/sorted-sample events points)]
       (call-rescue event
                    children))))
 
-(s/def ::percentiles (s/cat :points (s/coll-of number?)))
+(s/def ::coll-percentiles (s/cat :points (s/coll-of number?)))
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
-(defn percentiles
+(defn coll-percentiles
   "Receives a list of events and selects one
   event from that period for each point. If point is 0, takes the lowest metric
   event.  If point is 1, takes the highest metric event. 0.5 is the median
@@ -1443,11 +1443,11 @@
 
   ```clojure
   (fixed-event-window 10
-    (percentiles [0.5 0.75 0.98 0.99]))
+    (coll-percentiles [0.5 0.75 0.98 0.99]))
   ```"
   [points & children]
-  (spec/valid? ::percentiles [points])
-  {:action :percentiles
+  (spec/valid? ::coll-percentiles [points])
+  {:action :coll-percentiles
    :params [points]
    :children children})
 
@@ -1934,7 +1934,7 @@
    :not-expired not-expired*
    :outside-dt cond-dt*
    :over over*
-   :percentiles percentiles*
+   :coll-percentiles coll-percentiles*
    :project project*
    :publish! publish!*
    :push-io! push-io!*
