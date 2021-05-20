@@ -88,6 +88,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - coll-max
 - coll-mean
 - coll-min
+- coll-percentiles
 - coll-quotient
 - coll-rate
 - coll-sum
@@ -113,7 +114,6 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - not-expired
 - outside-dt
 - over
-- percentiles
 - project
 - publish!
 - push-io!

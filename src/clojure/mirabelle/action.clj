@@ -1908,6 +1908,7 @@
    :coll-max coll-max*
    :coll-mean coll-mean*
    :coll-min coll-min*
+   :coll-percentiles coll-percentiles*
    :coll-quotient coll-quotient*
    :coll-rate coll-rate*
    :coll-sum coll-sum*
@@ -1934,7 +1935,6 @@
    :not-expired not-expired*
    :outside-dt cond-dt*
    :over over*
-   :coll-percentiles coll-percentiles*
    :project project*
    :publish! publish!*
    :push-io! push-io!*

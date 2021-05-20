@@ -355,27 +355,32 @@ Let's take this example which creates windows of 10 events and forwards them to 
   (coll-rate
     (info))
   (coll-count
+    (info))
+  (coll-top 10
+    (info))
+  (coll-bottom 10
     (info)))
 ```
 
 `coll-max` will forward downstream the event with the biggest `:metric` field, `coll-min` will forward the event with the smallest `:metric`.
 `coll-sum` will sum all events `:metric` together.
 `coll-quotient` will divide the first event `:metric` by the value of the next events.
+`coll-top` and `coll-bottom` returns the events with the top biggest (or top smallest) `:metric` field (for example, `coll-top` would return the 10 events with the biggest `:metric`).
 
 `coll-mean` will compute the mean based on the event `:metric` fields. `coll-rate` compute the rate of events (the sum of all `:metrics` divided by the time range, based on the most ancient and most recent events), and `coll-count` will return a new event with `:metric` being the number of events in the window.  
 The three previous streams use the latest event from the list of events to build the new event.
 
-The `percentiles` action can also be used to compute percentiles on a list of events:
+The `coll-percentiles` action can also be used to compute percentiles on a list of events:
 
 ```clojure
 (fixed-time-window 60
-  (percentiles [0.5 0.75 0.98 0.99]
+  (coll-percentiles [0.5 0.75 0.98 0.99]
     (info)))
 ```
 
-In this example, we generate 60-seconds time windows and pass them to the `percentiles` action. The action takes que wanted quantiles as parameter.
+In this example, we generate 60-seconds time windows and pass them to the `coll-percentiles` action. The action takes que wanted quantiles as parameter.
 
-The `percentiles` action will produce for each quantile an event with the `:quantile` key set to the quantile value, and the `;metric` field set to the value computed from the list of events for this quantile. The quantiles `0` and `1` can also be used to get the smallest of biggest event.
+The `coll-percentiles` action will produce for each quantile an event with the `:quantile` key set to the quantile value, and the `;metric` field set to the value computed from the list of events for this quantile. The quantiles `0` and `1` can also be used to get the smallest of biggest event.
 
 If needed, you can also flatten a list of events, to get back a single event using `flatten`:
 
@@ -417,7 +422,7 @@ These two streams can help you doing computation on events from multiple sources
 ```clojure
 (where [:= :service "http_requests_duration_seconds"]
   (coalesce 10 [:host :environment]
-    (percentiles [0.5 0.75 0.98 0.99]
+    (coll-percentiles [0.5 0.75 0.98 0.99]
       (info))))
 ```
 

@@ -56,7 +56,7 @@ You could write a Mirabelle stream which will compute on the fly the quantiles f
   (stream {:name :percentiles}
     (where [:= :service "http_request_duration_seconds"]
       (fixed-time-window 60
-        (percentiles [0.5 0.75 0.99]
+        (coll-percentiles [0.5 0.75 0.99]
           (where [:and [:= :quantile 0.99]
                        [:> :metric 1]]
             (with :state "critical"
