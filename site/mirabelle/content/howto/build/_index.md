@@ -1,5 +1,5 @@
 ---
-title: Install or build Mirabelle
+title: Install, build and launch Mirabelle
 weight: 1
 disableToc: false
 ---
@@ -44,7 +44,7 @@ Let's say your I/O are in `/etc/mirabelle/io`, your EDN (compiled) streams in `/
            :console {:encoder :json}}}
 ```
 
-You should now be able to launch Mirabelle using Docker:
+You should now be able to launch Mirabelle using Docker (you can check the [Docker hub](https://hub.docker.com/r/mcorbin/mirabelle/tags) to get the latest release):
 
 ```
 docker run -p 5555:5555 -p 5556:5556 -p 5558:5558 \
