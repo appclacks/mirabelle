@@ -1,4 +1,4 @@
-(defproject fr.mcorbin/mirabelle "0.0.2-alpha3"
+(defproject fr.mcorbin/mirabelle "0.0.2-alpha5"
   :description "A stream processing engine inspired by Riemann"
   :url "https://github.com/mcorbin/mirabelle"
   :license {:name "EPL-2.0"
