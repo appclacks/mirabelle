@@ -137,3 +137,15 @@
          (assoc event :quantile pname))
        points
        (sorted-sample-extract s points)))
+
+(defn extremum-n
+  "Takes a number of events, a comparator and a list of events.
+  Sort the events based on the :metric field and by using the comparator
+  and Return the first nb events."
+  [nb comparator events]
+  (when-not (= 0 (count events))
+    (take nb (sort-by :metric comparator events))))
+
+
+
+

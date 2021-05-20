@@ -69,3 +69,18 @@
 
     [{:metric 6} {:metric 1} {:metric 2} {:metric 1} {:metric 1}]
     [{:metric 1 :quantile 0} {:metric 1 :quantile 0.5} {:metric 6 :quantile 1}]))
+
+(deftest extremum-n-test
+  (are [events expected] (= (math/extremum-n 3 > events) expected)
+    [{:metric 1} {:metric 2} {:metric 4}]
+    [{:metric 4} {:metric 2} {:metric 1}]
+
+    [{:metric 10} {:metric 2} {:metric 4} {:metric 2}]
+    [{:metric 10} {:metric 4} {:metric 2}])
+
+  (are [events expected] (= (math/extremum-n 3 < events) expected)
+    [{:metric 1} {:metric 2} {:metric 4}]
+    [{:metric 1} {:metric 2} {:metric 4}]
+
+    [{:metric 10} {:metric 2} {:metric 4} {:metric 1}]
+    [{:metric 1} {:metric 2} {:metric 4}]))

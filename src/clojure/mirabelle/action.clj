@@ -1434,7 +1434,7 @@
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn percentiles
-  "Over each period of interval seconds, aggregates events and selects one
+  "Receives a list of events and selects one
   event from that period for each point. If point is 0, takes the lowest metric
   event.  If point is 1, takes the highest metric event. 0.5 is the median
   event, and so forth. Forwards each of these events to children. The event
@@ -1854,6 +1854,27 @@
    :params [channel]
    :children []})
 
+(defn coll-top*
+  [_ nb-events & children]
+  (fn [events]
+    (call-rescue (math/extremum-n nb-events > events) children)))
+
+(s/def ::coll-top (s/cat :nb-events pos-int?))
+
+(defn coll-top
+  "Receives a list of events, returns the top N events with the highest metrics.
+
+  ```clojure
+  (fixed-time-window 60
+    (coll-top
+      (info)))
+  ```"
+  [nb-events & children]
+  (spec/valid? ::coll-top [nb-events])
+  {:action :coll-top
+   :params [nb-events]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1868,6 +1889,7 @@
    :coll-quotient coll-quotient*
    :coll-rate coll-rate*
    :coll-sum coll-sum*
+   :coll-top coll-top*
    :critical critical*
    :critical-dt cond-dt*
    :debug debug*
