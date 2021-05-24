@@ -113,9 +113,9 @@
   (fn [event]
     (when-let [event (keep-non-discarded-events event)]
       (condp = level
-        :debug (log/debug {} (pr-str event))
-        :info (log/info {} (pr-str event))
-        :error (log/error {} (pr-str event))))))
+        :debug (log/debug {} (json/generate-string event))
+        :info (log/info {} (json/generate-string event))
+        :error (log/error {} (json/generate-string event))))))
 
 (defn debug*
   [_]
