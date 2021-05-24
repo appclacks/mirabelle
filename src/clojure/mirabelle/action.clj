@@ -1476,7 +1476,7 @@
 
   ```clojure
   (by [:host :service]
-    (moving-time-window 5))
+    (fixed-time-window 5))
   ```
 
   This example generates a moving window for each host/service combination."

@@ -19,8 +19,8 @@
                                 (:message r))
 
                   ( = (:type r) :exception)
-                  (str (:exception r) "\n" (map str (.getStackTrace ^Exception
-                                                                    (:exception r))))
+                  (str (:exception r) "\n" (mapv str (.getStackTrace ^Exception
+                                                                     (:exception r))))
 
                   ( = (:type r) :tap)
                   (str (format "expected: %s\nactual: %s"
@@ -45,7 +45,7 @@
                                 :registry registry
                                 :test-mode? true
                                 ;; dedicated index in test mode
-                                :index (index/map->Index {})}))
+                                :index (component/start (index/map->Index {}))}))
               ;; the context source stream is not important here
               ;; because we only want the tap
               tap (:tap (stream/context stream-handler :test))]
