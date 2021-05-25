@@ -1737,7 +1737,7 @@
   ```clojure
   (reaper :custom-stream)
   ```"
-  ([] (reaper :nil))
+  ([] (reaper nil))
   ([destination-stream]
    (spec/valid? ::reaper [destination-stream])
    {:action :reaper
