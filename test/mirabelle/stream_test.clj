@@ -649,6 +649,7 @@
 (deftest reaper-test
   (let [index (component/start (index/map->Index {}))
         recorder (atom [])
+        dest (atom [])
         pubsub (component/start (pubsub/map->PubSub {}))
         stream {:name "my-stream"
                 :description "foo"
@@ -657,8 +658,9 @@
         {:keys [entrypoint]} (stream/compile-stream!
                               {:index index
                                :pubsub pubsub
-                               :input :streaming
-                               :reinject (fn [event _]
+                               :input :default
+                               :reinject (fn [event destination-stream]
+                                           (swap! dest conj destination-stream)
                                            (swap! recorder conj event))}
                               stream)]
     (entrypoint {:host "f" :metric 12 :time 1 :ttl 15})
@@ -667,6 +669,7 @@
     (entrypoint {:host "b" :metric 12 :time 17})
     (is (= 17 (index/current-time index)))
     (is (= 1 (index/size-index index)))
+    (is (= [:default] @dest))
     (is (= [{:host "b" :metric 12 :time 17}]
            (index/search index [:always-true])))
     (is (= [{:host "f" :metric 12 :time 1 :ttl 15 :state "expired"}]
