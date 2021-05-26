@@ -32,7 +32,11 @@ Riemann mostly works on the `:host` and `:service` fields. it's common to encode
 
 For example, you could have in Riemann a service named `http_requests_duration_prod_p99`. In mirabelle, you would modelize this event like this: `{:service "http_requests_duration" :environment "prod" :quantile "0.99"}`
 
-A lot of Riemann streams (`index`, `coalesce`...) were rewritten. You can now provide for each action on which keys it should work instead to have to manipulate complex `:service` names.
+A lot of Riemann streams/actions (`index`, `coalesce`...) were rewritten. You can now provide for each action on which keys it should work instead to have to manipulate complex `:service` names.
+
+## New actions
+
+New actions which I think could be interesting were added to Mirabelle. Also, not all Riemann actions were backported, only the main ones (I could probably backport the other ones later if needed).
 
 ## HTTP API
 
@@ -53,3 +57,7 @@ Streams and I/O are configured separatly, and streams references I/O. These comp
 ## Hot reload
 
 In Riemann, all streams states (time windows for example) all lost during reloads. it's not the case in Mirabelle. Only streams which were modified in the configuration are recreated.
+
+## New features
+
+A lot of small new features were also added (like a new pubsub mechanism, the on-disk queue...).

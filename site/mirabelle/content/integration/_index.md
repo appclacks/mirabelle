@@ -10,6 +10,8 @@ I will test with Mirabelle the Riemann integrations one by one and update this p
 
 ## Emacs
 
+You can put that in your emacs configuration in order to have a good indentation for Mirabelle actions (as you can see, only a few actions are list, I will put the other ones later):
+
 ```
 (put-clojure-indent 'by 1)
 (put-clojure-indent 'coalesce 2)
@@ -20,5 +22,4 @@ I will test with Mirabelle the Riemann integrations one by one and update this p
 (put-clojure-indent 'sformat 3)
 (put-clojure-indent 'with 1)
 (put-clojure-indent 'where 1)
-
 ```
