@@ -20,7 +20,6 @@ args = parser.parse_args()
 host = args.host
 port = args.port
 query = base64.b64encode(bytes(args.query, "utf-8")).decode("utf-8")
-print(query)
 channel = quote(args.channel, safe='')
 indent = not args.indent
 
