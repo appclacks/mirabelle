@@ -278,89 +278,6 @@
                {:host "baz" :metric 7 :time 4}]]
              @recorder)))))
 
-(deftest full-test
-  (let [stream {:name "my-stream"
-                :description "foo"
-                :actions (a/sdo
-                          (a/above-dt 10 20)
-                          (a/between-dt 10 20 30)
-                          (a/decrement)
-                          (a/project [[:= :host "foo"]
-                                      [:= :service "bar"]])
-                          (a/to-base64 :host
-                                       (a/from-base64 :host))
-                          (a/to-base64 [:host :service]
-                                       (a/from-base64 [:host :service]))
-                          (a/sdissoc :foo)
-                          (a/sformat "%s" :host [:service])
-                          (a/exception-stream
-                           (a/by [:host])
-                           (a/decrement))
-                          (a/by [:host])
-                          (a/by [:host :service])
-                          (a/sdissoc [:host :service])
-                          (a/throttle 10)
-                          (a/warning)
-                          (a/ewma-timeless 1)
-                          (a/over 1)
-                          (a/under 1)
-                          (a/tap :foo)
-                          (a/io)
-                          (a/io
-                           (a/by [:host]))
-                          (a/fixed-time-window 3)
-                          (a/split
-                           [:> :metric 10] (a/critical))
-                          (a/critical)
-                          (a/critical-dt 10)
-                          (a/debug)
-                          (a/info)
-                          (a/error)
-                          (a/expired)
-                          (a/fixed-event-window 3
-                                                (a/coll-sum)
-                                                (a/coll-percentiles [0 0.5 1])
-                                                (a/coll-mean
-                                                 (a/sflatten))
-                                                (a/coll-max)
-                                                (a/coll-quotient)
-                                                (a/coll-min)
-                                                (a/coll-count)
-                                                (a/coll-rate)
-                                                (a/coll-top 2)
-                                                (a/coll-bottom 2))
-                          (a/increment)
-                          (a/changed :state "ok")
-                          (a/not-expired)
-                          (a/tag "foo")
-                          (a/ddt)
-                          (a/moving-event-window 3)
-                          (a/ddt-pos)
-                          (a/tagged-all ["foo" "bar"])
-                          (a/tagged-all "bar")
-                          (a/untag "foo")
-                          (a/tag ["foo" "bar"])
-                          (a/untag ["foo" "bar"])
-                          (a/json-fields [:foo :bar])
-                          (a/json-fields :foo)
-                          (a/outside-dt 2 10 20)
-                          (a/coalesce 2 [:host])
-                          (a/scale 100)
-                          (a/with :foo 1)
-                          (a/with {:foo 1})
-                          (a/where [:> :metric 10])
-                          (a/where [:always-true]
-                                   (a/critical))
-                          (a/where [:and
-                                    [:< :metric 10]
-                                    [:> :metric 1]]))}
-        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
-    (is (fn? entrypoint))
-    (entrypoint {:state "ok" :time 2 :metric 1 :host "foo" :service "a"})
-    (entrypoint {:state "ok" :time 4 :metric 1 :host "foo" :service "a"})
-    (entrypoint {:state "ok" :time 100 :metric 1 :host "foo" :service "b"})
-    (entrypoint {:state "ok" :time 200 :metric 1 :host "foo" :service "a"})))
-
 (deftest split-test
   (let [recorder (atom [])
         recorder2 (atom [])
@@ -674,3 +591,87 @@
            (index/search index [:always-true])))
     (is (= [{:host "f" :metric 12 :time 1 :ttl 15 :state "expired"}]
            @recorder))))
+
+(deftest full-test
+  (let [stream {:name "my-stream"
+                :description "foo"
+                :actions (a/sdo
+                          (a/above-dt 10 20)
+                          (a/between-dt 10 20 30)
+                          (a/decrement)
+                          (a/stable 5 :state)
+                          (a/project [[:= :host "foo"]
+                                      [:= :service "bar"]])
+                          (a/to-base64 :host
+                                       (a/from-base64 :host))
+                          (a/to-base64 [:host :service]
+                                       (a/from-base64 [:host :service]))
+                          (a/sdissoc :foo)
+                          (a/sformat "%s" :host [:service])
+                          (a/exception-stream
+                           (a/by [:host])
+                           (a/decrement))
+                          (a/by [:host])
+                          (a/by [:host :service])
+                          (a/sdissoc [:host :service])
+                          (a/throttle 10)
+                          (a/warning)
+                          (a/ewma-timeless 1)
+                          (a/over 1)
+                          (a/under 1)
+                          (a/tap :foo)
+                          (a/io)
+                          (a/io
+                           (a/by [:host]))
+                          (a/fixed-time-window 3)
+                          (a/split
+                           [:> :metric 10] (a/critical))
+                          (a/critical)
+                          (a/critical-dt 10)
+                          (a/debug)
+                          (a/info)
+                          (a/error)
+                          (a/expired)
+                          (a/fixed-event-window 3
+                                                (a/coll-sum)
+                                                (a/coll-percentiles [0 0.5 1])
+                                                (a/coll-mean
+                                                 (a/sflatten))
+                                                (a/coll-max)
+                                                (a/coll-quotient)
+                                                (a/coll-min)
+                                                (a/coll-count)
+                                                (a/coll-rate)
+                                                (a/coll-top 2)
+                                                (a/coll-bottom 2))
+                          (a/increment)
+                          (a/changed :state "ok")
+                          (a/not-expired)
+                          (a/tag "foo")
+                          (a/ddt)
+                          (a/moving-event-window 3)
+                          (a/ddt-pos)
+                          (a/tagged-all ["foo" "bar"])
+                          (a/tagged-all "bar")
+                          (a/untag "foo")
+                          (a/tag ["foo" "bar"])
+                          (a/untag ["foo" "bar"])
+                          (a/json-fields [:foo :bar])
+                          (a/json-fields :foo)
+                          (a/outside-dt 2 10 20)
+                          (a/coalesce 2 [:host])
+                          (a/scale 100)
+                          (a/with :foo 1)
+                          (a/with {:foo 1})
+                          (a/where [:> :metric 10])
+                          (a/where [:always-true]
+                                   (a/critical))
+                          (a/where [:and
+                                    [:< :metric 10]
+                                    [:> :metric 1]]))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (is (fn? entrypoint))
+    (entrypoint {:state "ok" :time 2 :metric 1 :host "foo" :service "a"})
+    (entrypoint {:state "ok" :time 4 :metric 1 :host "foo" :service "a"})
+    (entrypoint {:state "ok" :time 100 :metric 1 :host "foo" :service "b"})
+    (entrypoint {:state "ok" :time 200 :metric 1 :host "foo" :service "a"})))

@@ -376,34 +376,29 @@
         last-changed-state (atom {:ok false
                                   :time nil})]
     (fn [event]
-      (let [{ok :ok changed-state-time :time} @last-changed-state
-            event-time (:time event)
+      (let [event-time (:time event)
             valid-event (condition-fn event)]
         (when event-time ;; filter events with no time
-          (swap! last-changed-state (fn [state]
-                        (cond
-                          (and valid-event (and (not ok)
-                                                (or (not changed-state-time)
-                                                    (> event-time changed-state-time))))
-                          ;; event is validating the condition
-                          ;; last event is not ok, has no time or is too old
-                          ;; => last-changed-state is now ok with a new time
-                          {:ok true :time event-time}
-                          (and (not valid-event) (and ok
-                                                      (or (not changed-state-time)
-                                                          (> event-time changed-state-time))))
-                          ;; event is not validating the condition
-                          ;; last event is ok, has no time or is too old
-                          ;; => last-changed-state is now ko with a new time
-                          {:ok false :time event-time}
-                          ;; default value, return the state
-                          :else state)))
-          (when (and valid-event
-                      ;; we already had an ok event
-                     ok
-                     ;; check is current time > first ok event + dt
-                     (> event-time (+ changed-state-time dt)))
-            (call-rescue event children)))))))
+          (let [{ok :ok time :time}
+                (swap! last-changed-state
+                       (fn [{ok :ok time :time :as state}]
+                         (cond
+                           ;; event is validating the condition
+                           ;; last event is not ok, has no time or is too old
+                           ;; => last-changed-state is now ok with a new time
+                           (and valid-event (and (not ok)
+                                                 (or (not time)
+                                                     (> event-time time))))
+                           {:ok true :time event-time}
+                           ;; event is not validating the condition
+                           ;; => last-changed-state is now ko with no time
+                           (not valid-event)
+                           {:ok false :time nil}
+                           ;; default value, return the state
+                           :else state)))]
+            (when (and ok
+                       (> event-time (+ time dt)))
+              (call-rescue event children))))))))
 
 (s/def ::above-dt (s/cat :threshold pos-int? :dt pos-int?))
 
@@ -1896,6 +1891,79 @@
    :params [nb-events]
    :children children})
 
+(defn stable*
+  [_ dt field & children]
+  (let [state (atom {:last-state nil
+                     :buffer []
+                     :out nil
+                     ;; last flip time
+                     :time nil
+                     ;; clock
+                     :max-time 0})]
+    (fn [event]
+      (let [event-time (:time event)
+            event-state (get event field)]
+        (when event-time
+          (let [{:keys [out]}
+                (swap! state
+                       (fn [{:keys [time buffer last-state max-time] :as state}]
+                         (if (< event-time max-time)
+                           (assoc state :out nil)
+                           (cond
+                             ;; no time = first event, or else the state
+                             ;; was changed
+                             (or (not time)
+                                 (not= last-state
+                                       event-state))
+                             {:time event-time
+                              :last-state event-state
+                              :buffer [event]
+                              :out nil
+                              :max-time event-time}
+
+                             ;; state is equal, but the dt period is not completed
+                             (<= event-time (+ time dt))
+                             (-> (update state :buffer conj event)
+                                 (assoc :out nil :max-time event-time))
+
+                             ;; state is equal, dt seconds passed
+                             ;; the current buffer + the event should be sent
+                             (> event-time (+ time dt))
+                             {:time time
+                              :last-state event-state
+                              :buffer []
+                              :max-time event-time
+                              :out (conj buffer event)}))))]
+            (doseq [event out]
+              (call-rescue event children))))))))
+
+
+(s/def ::stable (s/cat :dt pos-int? :field keyword?))
+
+(defn stable
+  "Takes a duration (dt) in second and a field name as parameter.
+  Returns events where the value of the field specified as second argument
+  is equal to the value of the field for the last event, for at least dt seconds.
+  Events can be buffered for dt seconds before being forwarded in order to see
+  if they are stable or not.
+
+  Events should arrive in order (old events will be dropped).
+
+  You can use this stream to remove flapping states for example.
+
+  ```clojure
+  (stable 10 :state
+    (info))
+  ```
+
+  In this example, events will be forwarded of the value of the `:state` key
+  is the same for at least 10 seconds"
+  [dt field & children]
+  (spec/valid? ::stable [dt field])
+  {:action :stable
+   :params [dt field]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1946,6 +2014,7 @@
    :sdissoc sdissoc*
    :sdo sdo*
    :sformat sformat*
+   :stable stable*
    :tag tag*
    :tagged-all tagged-all*
    :tap tap*

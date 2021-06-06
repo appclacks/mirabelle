@@ -177,9 +177,11 @@
                  state
                  [{:time 1 :metric 12}
                   {:time 4 :metric 12}
+                  {:metric 12}
                   {:time 12 :metric 12}
                   {:time 22 :metric 13}
                   {:time 23 :metric 1}
+                  {:metric 1}
                   {:time 25 :metric 11}
                   {:time 36 :metric 12}]
                  [{:time 12 :metric 12}
@@ -919,3 +921,41 @@
                  [[{:metric 2} {:metric 4}]
                   [{:metric 10}]
                   [{:metric -10} {:metric 0}]])))
+
+(deftest stable*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/stable* nil
+                            10
+                            :state
+                            rec)
+                 state
+                 [{:state "critical" :time 1}
+                  {:state "critical" :time 9}
+                  {:state "critical" :time 12}
+                  {:state "critical" :time 13}
+                  {:state "ok" :time 1}
+                  {:state "ok" :time 14}
+                  {:state "ok" :time 1}
+                  {:state "ok" :time 15}
+                  {:state "ok" :time 25}
+                  {:state "critical" :time 28}
+                  {:state "ok" :time 29}
+                  {:state "ok" :time 38}
+                  {:state "ok" :time 40}
+                  {:state "critical" :time 40}
+                  {:state "ok" :time 41}
+                  {:state "ok" :time 52}]
+                 [{:state "critical" :time 1}
+                  {:state "critical" :time 9}
+                  {:state "critical" :time 12}
+                  {:state "critical" :time 13}
+                  ;;
+                  {:state "ok" :time 14}
+                  {:state "ok" :time 15}
+                  {:state "ok" :time 25}
+                  ;;
+                  {:state "ok" :time 29}
+                  {:state "ok" :time 38}
+                  {:state "ok" :time 40}
+                  {:state "ok" :time 41}
+                  {:state "ok" :time 52}])))
