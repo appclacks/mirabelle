@@ -15,7 +15,7 @@
                  [io.netty/netty-common "4.1.58.Final"]
                  [io.netty/netty-transport "4.1.58.Final"]
                  [io.netty/netty-resolver "4.1.58.Final"]
-                 [mcorbin/corbihttp "0.13.0"]
+                 [mcorbin/corbihttp "0.15.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/spec.alpha "0.2.194"]
                  [com.influxdb/influxdb-client-java "2.0.0"]

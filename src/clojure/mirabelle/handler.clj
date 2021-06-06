@@ -1,7 +1,6 @@
 (ns mirabelle.handler
   (:require [clojure.edn :as edn]
             [corbihttp.metric :as metric]
-            [exoscale.coax :as c]
             [exoscale.ex :as ex]
             [mirabelle.b64 :as b64]
             [mirabelle.index :as index]
@@ -25,9 +24,9 @@
   (healthz [_ _]
     {:status 200
      :body {:message "ok"}})
-  (search-index [_ {:keys [params]}]
-    (let [query (-> params :query b64/from-base64 edn/read-string)
-          stream-name (:name params)
+  (search-index [_ {:keys [all-params]}]
+    (let [query (-> all-params :query b64/from-base64 edn/read-string)
+          stream-name (:name all-params)
           index (if (= :default stream-name)
                   (:index (stream/context stream-handler :default))
                   (-> (stream/get-dynamic-stream stream-handler stream-name)
@@ -35,24 +34,24 @@
                       :index))]
       {:status 200
        :body {:events (index/search index query)}}))
-  (add-stream [_ {:keys [params]}]
-    (let [stream-name (:name params)
-          config (-> params :config b64/from-base64 edn/read-string)]
+  (add-stream [_ {:keys [all-params]}]
+    (let [stream-name (:name all-params)
+          config (-> all-params :config b64/from-base64 edn/read-string)]
       (stream/add-dynamic-stream stream-handler stream-name config)
       {:status 200
        :body {:message "stream added"}}))
-  (push-event [_ {:keys [params]}]
-    (let [stream-name (:name params)]
-      (stream/push! stream-handler (:event params) stream-name)
+  (push-event [_ {:keys [all-params]}]
+    (let [stream-name (:name all-params)]
+      (stream/push! stream-handler (:event all-params) stream-name)
       {:status 200
        :body {:message "ok"}}))
-  (remove-stream [_ {:keys [params]}]
-    (let [stream-name (:name params)]
+  (remove-stream [_ {:keys [all-params]}]
+    (let [stream-name (:name all-params)]
       (stream/remove-dynamic-stream stream-handler stream-name)
       {:status 200
        :body {:message "stream removed"}}))
-  (get-stream [_ {:keys [params]}]
-    (let [stream-name (:name params)
+  (get-stream [_ {:keys [all-params]}]
+    (let [stream-name (:name all-params)
           stream (stream/get-dynamic-stream stream-handler stream-name)
           config (-> stream
                      (dissoc :context :entrypoint)
@@ -78,41 +77,44 @@
      :headers {"Content-Type" "text/plain"}
      :body (.getBytes ^String (metric/scrape registry))}))
 
+(def path-vars-regex #"[a-zA-Z0-9~._+~-]+")
+
 (def dispatch-map
-  {:index/search {:handler-fn search-index
+  {:index/search {:path [#"api/v1/index/" [path-vars-regex :name] #"/search/?"]
+                  :method :post
+                  :handler-fn search-index
                   :spec :mirabelle.http.index/search}
-   :stream/list {:handler-fn list-streams}
-   :stream/event {:handler-fn push-event
+   :stream/list {:path [#"api/v1/stream/?"]
+                 :method :get
+                 :handler-fn list-streams}
+   :stream/event {:path [#"api/v1/stream/" [path-vars-regex :name] #"/?"]
+                  :method :put
+                  :handler-fn push-event
                   :spec :mirabelle.http.stream/event}
-   :stream/add {:handler-fn add-stream
+   :stream/add {:path [#"api/v1/stream/" [path-vars-regex :name] #"/?"]
+                :method :post
+                :handler-fn add-stream
                 :spec :mirabelle.http.stream/add}
-   :stream/remove {:handler-fn remove-stream
+   :stream/remove {:path [#"api/v1/stream/" [path-vars-regex :name] #"/?"]
+                   :method :delete
+                   :handler-fn remove-stream
                    :spec :mirabelle.http.stream/remove}
-   :stream/current-time {:handler-fn current-time}
-   :stream/get {:handler-fn get-stream
+   :stream/current-time {:path [#"api/v1/current-time/?"]
+                         :method :get
+                         :handler-fn current-time}
+   :stream/get {:path [#"api/v1/stream/" [path-vars-regex :name] #"/?"]
+                :method :get
+                :handler-fn get-stream
                 :spec :mirabelle.http.stream/get}
-   :system/metrics {:handler-fn metrics}
-   :system/healthz {:handler-fn healthz}
-   :system/not-found {:handler-fn not-found}})
+   :system/metrics {:path "metrics"
+                    :method :get
+                    :handler-fn metrics}
+   :system/healthz {:path "healthz"
+                    :method :get
+                    :handler-fn healthz}})
 
 (defn assert-spec-valid
   [spec params]
   (if spec
     (ex/assert-spec-valid spec params)
     params))
-
-(defn handle
-  [request handler registry]
-  (let [req-handler (:handler request)]
-    (if-let [{:keys [handler-fn spec]} (get dispatch-map req-handler)]
-      (metric/with-time
-        registry
-        :http.request.duration
-        {"uri" (str (:uri request))
-         "method"  (-> request :request-method name)}
-        (->> (c/coerce spec (:all-params request {}))
-             (assert-spec-valid spec)
-             (hash-map :params)
-             (handler-fn handler)))
-      (throw (ex/ex-fault (format "unknown handler %s" req-handler)
-                          {:handler req-handler})))))

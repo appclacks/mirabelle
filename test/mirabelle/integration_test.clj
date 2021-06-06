@@ -108,4 +108,22 @@
                          {:as :json})
           streams (-> resp :body :streams set)]
       (is (= 200 (:status resp)))
-      (is (not (streams "test-foo"))))))
+      (is (not (streams "test-foo")))))
+  (testing "not-found"
+    (let [resp (http/delete "http://localhost:5558/api/v1/notfound"
+                            {:as :json
+                             :throw-exceptions false})]
+      (is (= 404 (:status resp)))
+      (is (= {:error "not found"}
+             (json/parse-string (:body resp) true)))))
+  (testing "search-index: wring parameter"
+    (let [body (-> {:query nil}
+                   json/generate-string)
+          resp (http/post "http://localhost:5558/api/v1/index/test-foo/search"
+                          {:content-type :json
+                           :throw-exceptions false
+                           :as :json
+                           :body body})]
+      (is (= 400 (:status resp)))
+      (is (= {:error "field query is incorrect"}
+             (json/parse-string (:body resp) true))))))

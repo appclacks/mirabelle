@@ -1,14 +1,14 @@
 (ns mirabelle.http
   (:require [com.stuartsierra.component :as component]
             [corbihttp.interceptor.error :as itc-error]
+            [corbihttp.interceptor.handler :as itc-handler]
             [corbihttp.interceptor.id :as itc-id]
             [corbihttp.interceptor.json :as itc-json]
             [corbihttp.interceptor.metric :as itc-metric]
-            [corbihttp.interceptor.params :as itc-params]
             [corbihttp.interceptor.ring :as itc-ring]
             [corbihttp.interceptor.response :as itc-response]
             [exoscale.interceptor :as interceptor]
-            [mirabelle.interceptor.route :as itc-route]))
+            [mirabelle.handler :as mh]))
 
 (defn interceptor-chain
   [api-handler registry]
@@ -18,13 +18,14 @@
    itc-json/json ;; leave
    itc-error/error ;; error
    itc-id/request-id ;;enter
-   itc-route/match-route ;; enter
    itc-ring/cookies ;; enter + leave
    itc-ring/params ;; enter
    itc-ring/keyword-params ;; enter
    itc-json/request-params ;; enter
-   itc-params/merge-params ;; enter
-   (itc-route/route api-handler registry) ;; enter
+   (itc-handler/main-handler registry
+                             mh/dispatch-map
+                             api-handler
+                             mh/not-found) ;; enter
    ])
 
 (defn execute!
