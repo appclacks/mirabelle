@@ -662,6 +662,7 @@
                           (a/coalesce 2 [:host])
                           (a/scale 100)
                           (a/with :foo 1)
+                          (a/rename-keys {:host :service})
                           (a/with {:foo 1})
                           (a/where [:> :metric 10])
                           (a/where [:always-true]

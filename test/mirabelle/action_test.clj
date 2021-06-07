@@ -959,3 +959,20 @@
                   {:state "ok" :time 40}
                   {:state "ok" :time 41}
                   {:state "ok" :time 52}])))
+
+(deftest rename-keys*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/rename-keys* nil
+                                 {:host :service
+                                  :environment :env}
+                                 rec)
+                 state
+                 [{:host "foo" :service "bar" :environment "prod"}
+                  {:host "foo" :service "bar"}
+                  {:service "bar"}
+                  {}]
+                 [{:service "foo" :env "prod"}
+                  {:service "foo"}
+                  {:service "bar"}
+                  {}])))
+

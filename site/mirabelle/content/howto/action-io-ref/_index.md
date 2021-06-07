@@ -84,6 +84,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - between-dt
 - changed
 - coalesce
+- coll-bottom
 - coll-count
 - coll-max
 - coll-mean
@@ -92,13 +93,14 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - coll-quotient
 - coll-rate
 - coll-sum
+- coll-top
 - critical
 - critical-dt
-- debug
-- decrement
 - ddt
 - ddt-pos
-- info
+- debug
+- decrement
+- disk-queue!
 - error
 - ewma-timeless
 - exception-stream
@@ -108,6 +110,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - from-base64
 - increment
 - index
+- info
 - io
 - json-fields
 - moving-event-window
@@ -119,12 +122,14 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - push-io!
 - reaper
 - reinject!
+- rename-keys
 - scale
-- sflatten
-- split
 - sdissoc
 - sdo
+- sflatten
 - sformat
+- split
+- stable
 - tag
 - tagged-all
 - tap
@@ -136,4 +141,3 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - warning
 - where
 - with
-- restore!

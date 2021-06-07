@@ -1,5 +1,6 @@
 (ns mirabelle.action
   (:require [cheshire.core :as json]
+            [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [corbihttp.log :as log]
@@ -1964,6 +1965,30 @@
    :params [dt field]
    :children children})
 
+(defn rename-keys*
+  [_ replacement & children]
+  (fn [event]
+    (call-rescue (set/rename-keys event replacement) children)))
+
+(s/def ::rename-keys (s/cat :replacement (s/map-of keyword? keyword?)))
+
+(defn rename-keys
+  "Rename events keys.
+
+  ```clojure
+  (rename-keys {:host :service
+                :environment :env}
+  ```
+
+  In this example, the `:host` key will be renamed `:service` and the
+  `:environment` key is renamed `:env`.
+  Existing values will be overrided."
+  [replacement & children]
+  (spec/valid? ::rename-keys [replacement])
+  {:action :rename-keys
+   :params [replacement]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -1987,6 +2012,7 @@
    :decrement decrement*
    :ddt ddt*
    :ddt-pos ddt*
+   :disk-queue! disk-queue!*
    :info info*
    :error error*
    :ewma-timeless ewma-timeless*
@@ -2008,12 +2034,13 @@
    :push-io! push-io!*
    :reaper reaper*
    :reinject! reinject!*
+   :rename-keys rename-keys*
    :scale scale*
-   :sflatten sflatten*
-   :split split*
    :sdissoc sdissoc*
    :sdo sdo*
+   :sflatten sflatten*
    :sformat sformat*
+   :split split*
    :stable stable*
    :tag tag*
    :tagged-all tagged-all*
@@ -2025,5 +2052,6 @@
    :untag untag*
    :warning warning*
    :where where*
-   :with with*
-   :disk-queue! disk-queue!*})
+   :with with*})
+
+(comment (->> action->fn keys (map name) sort (reduce (fn [s v] (str s "\n- " v)) "")))
