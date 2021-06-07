@@ -1,8 +1,8 @@
 (defproject fr.mcorbin/mirabelle "0.1.0"
   :description "A stream processing engine inspired by Riemann"
   :url "https://github.com/mcorbin/mirabelle"
-  :license {:name "EPL-2.0"
-            :url "https://www.eclipse.org/legal/epl-2.0/"}
+  :license {:name "EPL-1.0"
+            :url "https://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[cc.qbits/tape "0.3.4"]
                  [clj-http "3.12.0"]
                  [com.boundary/high-scale-lib "1.0.6"]
