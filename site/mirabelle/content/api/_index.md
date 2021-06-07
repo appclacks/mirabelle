@@ -6,7 +6,7 @@ disableToc: false
 
 ## Health
 
-- **GET** /healthz or /health
+- **GET** `/healthz` or `/health`
 
 ---
 
@@ -18,7 +18,7 @@ curl localhost:5558/healthz
 
 ## Metrics
 
-- **GET** /metrics
+- **GET** `/metrics`
 
 Mirabelle metrics are returned as Prometheus format.
 
@@ -26,7 +26,7 @@ Mirabelle metrics are returned as Prometheus format.
 
 ### Add a stream
 
-- **POST** api/v1/stream/<stream-name>
+- **POST** `/api/v1/stream/<stream-name>`
 
 The body is a json string like `{"config": "<stream-config>"}`.
 
@@ -44,7 +44,7 @@ curl -H "Content-Type: application/json" -X POST --data  '{"config": "ezphY3Rpb2
 
 ### List streams
 
-- **GET** api/v1/stream/
+- **GET** `/api/v1/stream/`
 
 List all streams configured in Mirabelle.
 
@@ -57,7 +57,7 @@ List all streams configured in Mirabelle.
 
 ### Get a stream
 
-- **GET** api/v1/stream/<stream-name>
+- **GET** `/api/v1/stream/<stream-name>`
 
 Get a stream configuration and the time of its index.
 
@@ -69,7 +69,7 @@ curl localhost:5558/api/v1/stream/trololo
 
 ### Remove a stream
 
-- **DELETE** api/v1/stream/<stream-name>
+- **DELETE** `/api/v1/stream/<stream-name>`
 
 Delete a stream by name.
 
@@ -83,7 +83,7 @@ curl -X DELETE localhost:5558/api/v1/stream/trololo
 
 ### Push an event
 
-- **PUT** api/v1/stream/<stream-name>
+- **PUT** `/api/v1/stream/<stream-name>`
 
 Push an event to the specified stream.
 
@@ -97,7 +97,7 @@ curl -H "Content-Type: application/json" -X PUT --data '{"event": {"service": "f
 
 ### Query the index
 
-- **GET** api/v1/index/<steam-name>/search
+- **GET** `/api/v1/index/<steam-name>/search`
 
 Returns events matching the query for the index of the stream `<stream-name>`. The query passed in the body should be a [where query](/howto/stream/#filtering-events).
 
@@ -111,7 +111,9 @@ curl -H "Content-Type: application/json" -X POST --data '{"query": "Wzo9IDpzZXJ2
 
 ### Get the default index current time
 
-get the current time for the default index
+- **GET** `/api/v1/current-time`
+
+Get the current time for the default index.
 
 ---
 
