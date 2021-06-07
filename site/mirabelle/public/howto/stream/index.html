@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1623062704" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1623062704" rel="stylesheet">
-    <link href="/css/hybrid.css?1623062704" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1623062704" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1623062704" rel="stylesheet">
-    <link href="/css/auto-complete.css?1623062704" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1623062704" rel="stylesheet">
-    <link href="/css/theme.css?1623062704" rel="stylesheet">
-    <link href="/css/tabs.css?1623062704" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1623062704" rel="stylesheet">
+    <link href="/css/nucleus.css?1623063409" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1623063409" rel="stylesheet">
+    <link href="/css/hybrid.css?1623063409" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1623063409" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1623063409" rel="stylesheet">
+    <link href="/css/auto-complete.css?1623063409" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1623063409" rel="stylesheet">
+    <link href="/css/theme.css?1623063409" rel="stylesheet">
+    <link href="/css/tabs.css?1623063409" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1623063409" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1623062704"></script>
+    <script src="/js/jquery-3.3.1.min.js?1623063409"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1623062704"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1623062704"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1623063409"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1623063409"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1623062704"></script>
+<script type="text/javascript" src="/js/search.js?1623063409"></script>
 
     
   </div>
@@ -744,6 +744,11 @@ For example, the <code>above-dt</code> stream will only let events pass if all e
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">default</span> <span style="color:#e6db74">:ttl</span> <span style="color:#ae81ff">60</span>
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>The <code>sdissoc</code> action takes a field or a list of fields and will remove them from the vent. For example, <code>(sdissoc :host)</code> or <code>(sdissoc [:host :service])</code>.</p>
+<p>You can use <code>rename-keys</code> to rename some events keys:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(rename-keys {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>
+              <span style="color:#e6db74">:environment</span> <span style="color:#e6db74">:env</span>}
+</code></pre></div><p>In this example, the <code>:host</code> key will be renamed <code>:service</code> and the
+<code>:environment</code> key is renamed <code>:env</code>. Existing values will be overrided.</p>
 <p>Some actions can modify the <code>:metric</code> field. <code>increment</code> and <code>decrement</code> will add +1 or -1 to it, and you can use <code>scale</code> to multiply it with a value: <code>(scale 1000)</code> for example.</p>
 <h4 id="detect-state-transitions">Detect state transitions</h4>
 <p>The <code>changed</code> action can be used to detect state transitions.</p>
@@ -755,7 +760,11 @@ For example, the <code>above-dt</code> stream will only let events pass if all e
 {<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>} <span style="color:#75715e">;; filtered</span>
 {<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>} <span style="color:#75715e">;; filtered</span>
 {<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;ok&#34;</span>} <span style="color:#75715e">;; passed downstream</span>
-</code></pre></div><h4 id="events-windows">Events Windows</h4>
+</code></pre></div><p>You can also use the <code>stable</code> action to filter flapping states for example:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">stable</span> <span style="color:#ae81ff">60</span> <span style="color:#e6db74">:state</span>
+  (<span style="color:#a6e22e">info</span>))
+</code></pre></div><p>In this example, events wll be forwarded to the child action (<code>info</code>) only if the <code>:state</code> key is stable (has the same value) for all events during 60 seconds.</p>
+<h4 id="events-windows">Events Windows</h4>
 <p>You have three windows types availables in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
 It means you should be careful about which action you will use downstream. It should be actions working on list of events.</p>
 <p>The first one, <code>fixed-time-window</code>, will buffer all events during a defined duration and then flush them downstream. For example, <code>(fixed-time-window 60)</code> will create windows of 60 seconds.</p>
@@ -1160,19 +1169,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1623062704"></script>
-    <script src="/js/perfect-scrollbar.min.js?1623062704"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1623062704"></script>
-    <script src="/js/jquery.sticky.js?1623062704"></script>
-    <script src="/js/featherlight.min.js?1623062704"></script>
-    <script src="/js/highlight.pack.js?1623062704"></script>
+    <script src="/js/clipboard.min.js?1623063410"></script>
+    <script src="/js/perfect-scrollbar.min.js?1623063410"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1623063410"></script>
+    <script src="/js/jquery.sticky.js?1623063410"></script>
+    <script src="/js/featherlight.min.js?1623063410"></script>
+    <script src="/js/highlight.pack.js?1623063410"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1623062704"></script>
-    <script src="/js/learn.js?1623062704"></script>
-    <script src="/js/hugo-learn.js?1623062704"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1623063410"></script>
+    <script src="/js/learn.js?1623063410"></script>
+    <script src="/js/hugo-learn.js?1623063410"></script>
     
         
-            <script src="/mermaid/mermaid.js?1623062704"></script>
+            <script src="/mermaid/mermaid.js?1623063410"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

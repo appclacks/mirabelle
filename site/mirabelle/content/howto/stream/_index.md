@@ -302,6 +302,16 @@ The `default` action is similar to `with` but it only accepts one value, and wil
 
 The `sdissoc` action takes a field or a list of fields and will remove them from the vent. For example, `(sdissoc :host)` or `(sdissoc [:host :service])`.
 
+You can use `rename-keys` to rename some events keys:
+
+```clojure
+(rename-keys {:host :service
+              :environment :env}
+```
+
+In this example, the `:host` key will be renamed `:service` and the
+  `:environment` key is renamed `:env`. Existing values will be overrided.
+
 Some actions can modify the `:metric` field. `increment` and `decrement` will add +1 or -1 to it, and you can use `scale` to multiply it with a value: `(scale 1000)` for example.
 
 #### Detect state transitions
@@ -322,6 +332,15 @@ In this example, events will only be passed downstream to the `error` action if 
 {:state "critical"} ;; filtered
 {:state "ok"} ;; passed downstream
 ```
+
+You can also use the `stable` action to filter flapping states for example:
+
+```clojure
+(stable 60 :state
+  (info))
+```
+
+In this example, events wll be forwarded to the child action (`info`) only if the `:state` key is stable (has the same value) for all events during 60 seconds.
 
 #### Events Windows
 
