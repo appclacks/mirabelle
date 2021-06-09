@@ -12,7 +12,7 @@ It also implements a publish-subscribe system, which allows you to see in real t
 
 Mirabelle is in alpha, but I'm eager to receive feedbacks
 
-## Fully compatible with Riemann
+## Compatible with Riemann
 
 Mirabelle is heavily inspired by [Riemann](http://riemann.io/). Actually, part of the Mirabelle codebase (some streams and the TCP server implementation for example) was imported from Riemann (these parts are mentionned in the codebase).
 
