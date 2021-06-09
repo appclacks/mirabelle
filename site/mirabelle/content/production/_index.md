@@ -4,7 +4,7 @@ weight: 2
 chapter: false
 ---
 
-*Warning*: Mirabelle is for now not ready for production, it's still an alpha software.
+*Warning*: Mirabelle is for now not ready for production, it's still alpha software.
 
 Is section is about the Mirabelle streams guarantees, Mirabelle use cases, fault tolerance and the metrics exposed by Mirabelle.
 
@@ -47,11 +47,11 @@ It means you can have streams for various use cases. For example, you could have
 
 You can also perform continuous queries using Mirabelle. Indeed, if you compute things on the fly using events coming from multiple hosts (like, time windows on events coming from various hosts or services), Mirabelle may only be able to do approximation on the computations.
 
-As I said before, Mirabelle streams use the events time for their clocks, so "old" events could be removed from computations. But it's OK, because there are ways of mitigating that (accept events un actions until they are not expired, so if your events have a TTL of 60 seconds, it's OK if they arrive a few seconds late). I also like the Riemann philosophy which is `mostly correct information right now is more useful, than totally correct information only available once the failure is over`.
+As previously mentioned, Mirabelle streams use the events time for their clocks, so "old" events could be removed from computations. But it's OK, because there are ways of mitigating that (accept events and actions until they are not expired, so if your events have a TTL of 60 seconds, it's OK if they arrive a few seconds late). I also like the Riemann philosophy which is `mostly correct information right now is more useful, than totally correct information only available once the failure is over`.
 
 But what if you want totally correct information ? In that case, you can just:
 
-- Forward all raw events to an external system (timeserie database for example)
+- Forward all raw events to an external system (timeseries database for example)
 - Reinject them a bit later, sorted, into Mirabelle. It could be a dedicated Mirabelle instance, or a dedicated stream on your first instance. In this mode, you should have totally correct computations.
 
 You can even use Mirabelle to play with old data, like "let's reinject all data from 2 weeks ago into Mirabelle in order to compute some statistics, or detect weird things over time" !
@@ -66,7 +66,7 @@ You can always use continuous queries (and replay events if needed) in order to 
 
 You can also put a thing like [Kafka](https://kafka.apache.org/) in front of Riemann (or even push Riemann metrics to Kafka).
 
-I will soon add the possibility to forward events between Mirabelle instances, and I will also build a proxy which will be able to forward events to various Mirabelle instances based on some criterias/algorithms (duplicates to everyone, consistent hashing...).
+I will soon add the possibility to forward events between Mirabelle instances, and I will also build a proxy which will be able to forward events to various Mirabelle instances based on some criteria/algorithms (duplicates to everyone, consistent hashing...).
 
 ## Metrics
 
@@ -93,7 +93,7 @@ Mirabelle exposes a `/metrics` endpoint. For example, a lot of JVM internal metr
 
 ### Async queues
 
-For each async queues, you have these metrics (the `executor` label is the async quee name):
+For each async queues, you have these metrics (the `executor` label is the async queue name):
 
 - `executor_queue_remaining_capacity`: The remaining capacity of the executor queue, example `executor_queue_remaining_capacity{executor="thread-pool",} 10000.0`.
 - `executor_queue_tasks`: the accepted and completed tasks in the executor, for example `executor_queue_tasks{executor="thread-pool",state="accepted",}` or `executor_queue_tasks{executor="thread-pool",state="completed",}`

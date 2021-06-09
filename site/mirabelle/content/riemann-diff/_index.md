@@ -30,7 +30,7 @@ When you send an event to Mirabelle, you can specify the `stream` attribute in o
 
 Riemann mostly works on the `:host` and `:service` fields. it's common to encode "dimensions" in `:service`.
 
-For example, you could have in Riemann a service named `http_requests_duration_prod_p99`. In mirabelle, you would modelize this event like this: `{:service "http_requests_duration" :environment "prod" :quantile "0.99"}`
+For example, you could have in Riemann a service named `http_requests_duration_prod_p99`. In Mirabelle, you would model this event like this: `{:service "http_requests_duration" :environment "prod" :quantile "0.99"}`
 
 A lot of Riemann streams/actions (`index`, `coalesce`...) were rewritten. You can now provide for each action on which keys it should work instead to have to manipulate complex `:service` names.
 
@@ -52,7 +52,7 @@ Mirabelle does not use the Riemann query language to query the index. Instead, i
 
 ## Clear distinctions streams and I/O
 
-Streams and I/O are configured separatly, and streams references I/O. These components do not have the same lifecycle, and handling I/O is less error prone in Mirabelle, especially during reloads.
+Streams and I/O are configured separately, and streams references I/O. These components do not have the same lifecycle, and handling I/O is less error prone in Mirabelle, especially during reloads.
 
 ## Hot reload
 

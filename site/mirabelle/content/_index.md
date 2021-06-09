@@ -2,23 +2,23 @@
 
 Mirabelle is a stream processing engine which can be used to aggregate events, metrics and logs.
 
-Its powerful and extensible DSL allows you to define computations on a stream of data. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabelling...) which can be easily combined according to your needs.
+Its powerful and extensible DSL allows you to define computations on a stream of data. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabeling, etc.) which can be easily combined according to your needs.
 
 ![Mirabelle](img/mirabelle_presentation.png)
 
-Mirabelle can also route events to external systems (timeserie databases, logging systems, cloud monitoring services...), fire alerts (Pagerduty), write data into files...
+Mirabelle can also route events to external systems (timeseries databases, logging systems, cloud monitoring services, etc.), fire alerts (e.g. to Pagerduty), write data into files and more.
 
 It also implements a publish-subscribe system, which allows you to see in real time (through Websockets) events flowing into streams.
 
-Mirabelle is in alpha, but I'm eager to receive feedbacks
+Mirabelle is currently in alpha, but I'm eager to receive feedback.
 
 ## Compatible with Riemann
 
-Mirabelle is heavily inspired by [Riemann](http://riemann.io/). Actually, part of the Mirabelle codebase (some streams and the TCP server implementation for example) was imported from Riemann (these parts are mentionned in the codebase).
+Mirabelle is heavily inspired by [Riemann](https://riemann.io/). Actually, part of the Mirabelle codebase (some streams and the TCP server implementation for example) was imported from Riemann (these parts are mentioned in the codebase).
 
 I would like to thank all Riemann maintainers and contributors for this amazing tool.
 
-Mirabelle use the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessy with Mirabelle (which also added a lot of new features).
+Mirabelle use the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also added a lot of new features).
 
 Like in Riemann, Mirabelle provides an index which can be queried (and on which you can subscribe) in order to explore your system state.
 
@@ -38,9 +38,9 @@ You can even use Mirabelle to play and explore with historical data. You could h
 
 ## Stream example, with unit tests
 
-Let's say a web application is pushing the duration (in seconds) of the http requests it receives. This metric could be modelised using this Mirabelle event
+Let's say a web application is pushing the duration (in seconds) of the HTTP requests it receives. This metric could be modeled using this Mirabelle event
 
-```
+```clojure
 {:host "my-server"
  :service "http_request_duration_seconds"
  :application "my-web-app"
@@ -49,7 +49,7 @@ Let's say a web application is pushing the duration (in seconds) of the http req
  :metric 0.5}
 ```
 
-You could write a Mirabelle stream which will compute on the fly the quantiles for this metric. In this example, Mirabelle will split the received events into 60 seconds windows, then compute the percentiles, set the event `:state` to "critical" and send an alert to Pagerduty if the `0.99` quantiles is greater than 1 seocnd.
+You could write a Mirabelle stream which will compute on the fly the quantiles for this metric. In this example, Mirabelle will split the received events into 60 seconds windows, then compute the percentiles, set the event `:state` to "critical" and send an alert to Pagerduty if the `0.99` quantiles is greater than 1 second.
 
 ```clojure
 (streams
@@ -87,7 +87,7 @@ A test for this stream would be:
 
 In this test, we inject into the `:percentiles` stream three events, and we verify that the tap named `:alert` contains the expected alert (the `0.99` quantile is greater than 1) generated for these events.
 
-Thanks to Clojure datastructures, these is *no side effects between streams and actions*. It's OK to modify events in parallel (in multiple threads) and to have multiple branches per stream. You can even pass events between streams (like described [here](todo)). You are free to organize streams and how they communicate between each other exactly how you want to, the tool and its DSL will not limit you on than.
+Thanks to Clojure datastructures, there is *no side effects between streams and actions*. It's OK to modify events in parallel (in multiple threads) and to have multiple branches per stream. You can even pass events between streams (like described [here](todo)). You are free to organize streams and how they communicate between each other exactly how you want to; the tool and its DSL will not limit you.
 
 Here is a more complete and commented example, with multiple actions performed in one stream:
 
