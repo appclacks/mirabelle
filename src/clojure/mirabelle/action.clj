@@ -1349,6 +1349,7 @@
   [context labels]
   (let [i (:index context)
         channel (index/channel (:source-stream context))
+        default-channel (index/channel :default)
         pubsub (:pubsub context)]
     (fn [event]
       (when-let [t (:time event)]
@@ -1356,7 +1357,7 @@
       (when-not (:test-mode? context)
         (pubsub/publish! pubsub channel event)
         (when (:default context)
-          (pubsub/publish! pubsub :default event)))
+          (pubsub/publish! pubsub default-channel event)))
       (index/insert i event labels))))
 
 (s/def ::index (s/cat :labels (s/coll-of keyword?)))
@@ -1735,14 +1736,15 @@
 
 (defn reaper
   "Everytime this action receives an event, it will expires events from the
-  index and reinject them into a stream (default to the default streams).
+  index (every dt seconds) and reinject them into a stream
+  (default to the current stream if not specified).
 
   ```clojure
-  (reaper)
+  (reaper 5)
   ```
 
   ```clojure
-  (reaper interval :custom-stream)
+  (reaper 5 :custom-stream)
   ```"
   ([interval] (reaper interval nil))
   ([interval destination-stream]

@@ -19,9 +19,8 @@ The Mirabelle Websocket server allows user to subscribe to the streams [index](/
 
 In this stream, we filter all events with `:service` "bar". Then, we index them, and we also call `publish!` to publish the event to a channel named `:my-channel`.
 
-A channel is created by default for each index. For the default index shared by all streams defined in the configuration, the name is `default-index`.
-
-If you create a stream using the API, the channel will be `<stream-name>-index`.
+A channel is created by default for each index (the channel name being `<stream-name>-index`).
+You can also subscribe for events indexed into indexes belonging to streams tagged `:default` by subscribing to the `default-index` channel.
 
 Users can also subscribe to other channels, not related to indexes. It's what `publish!` does. In this example, all users subscribing to the `:my-channel` channel will receive the events.
 

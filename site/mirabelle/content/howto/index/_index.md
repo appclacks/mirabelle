@@ -6,9 +6,7 @@ disableToc: false
 
 The Mirabelle Index is an in memory map which can be used to store events.
 
-One index is instantiated and shared by all streams managed by the Mirabelle configuration file.
-
-Streams instantiated by the API have their own index, per stream.
+Each Mirabelle stream (generated from the configuration file or from the API) has its own, dedicated index instance.
 
 ## How to push events into the index
 
@@ -53,10 +51,12 @@ In order to trigger event expiration from events stored into the index, we shoul
 
 ```clojure
 (reaper)
-(reaper :custom-stream)
+(reaper 5 :custom-stream)
 ```
 
-By default, events are reinjected into the `:default` stream. You can also pass a stream name to the reaper action in order to reinject events into another stream.
+The `reaper` action takes as first parameter the interval (in seconds) on which the reaper stream will expire events. Don't forget you should feed the reaper action with events in order to move its clock.
+
+The `custom-stream` parameter is optional. By default, events are reinjected into the current stream. You can also pass a stream name to the reaper action in order to reinject events into another stream.
 
 I recommand you to not call forward all events to the reaper (it will impact performances). Instead, identify a couple of events arriving regularly, and forward them to the reaper in order to update the index clock.
 

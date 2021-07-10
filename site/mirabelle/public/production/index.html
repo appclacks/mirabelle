@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.82.1" />
+    <meta name="generator" content="Hugo 0.80.0" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Mirabelle in production :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1623236613" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1623236613" rel="stylesheet">
-    <link href="/css/hybrid.css?1623236613" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1623236613" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1623236613" rel="stylesheet">
-    <link href="/css/auto-complete.css?1623236613" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1623236613" rel="stylesheet">
-    <link href="/css/theme.css?1623236613" rel="stylesheet">
-    <link href="/css/tabs.css?1623236613" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1623236613" rel="stylesheet">
+    <link href="/css/nucleus.css?1625949780" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1625949780" rel="stylesheet">
+    <link href="/css/hybrid.css?1625949780" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1625949780" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1625949780" rel="stylesheet">
+    <link href="/css/auto-complete.css?1625949780" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1625949780" rel="stylesheet">
+    <link href="/css/theme.css?1625949780" rel="stylesheet">
+    <link href="/css/tabs.css?1625949780" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1625949780" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1623236613"></script>
+    <script src="/js/jquery-3.3.1.min.js?1625949780"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1623236613"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1623236613"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1625949780"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1625949780"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1623236613"></script>
+<script type="text/javascript" src="/js/search.js?1625949780"></script>
 
     
   </div>
@@ -566,7 +566,7 @@
 
 
 
-	<p><em>Warning</em>: Mirabelle is for now not ready for production, it&rsquo;s still an alpha software.</p>
+	<p><em>Warning</em>: Mirabelle is for now not ready for production, it&rsquo;s still alpha software.</p>
 <p>Is section is about the Mirabelle streams guarantees, Mirabelle use cases, fault tolerance and the metrics exposed by Mirabelle.</p>
 <h2 id="streams-guarantees-and-performances">Streams guarantees and performances</h2>
 <p>Like in Riemann, Mirabelle acknowledges events. Behaviors describe in <a href="http://riemann.io/howto.html#client-backpressure-latency-and-queues">this section</a> of the Riemann documentation are also true for Mirabelle (note that a couple of stuff, like some metrics, are renamed/a bit different in Mirabelle).</p>
@@ -591,10 +591,10 @@
 <li>Create streams using the API on demand. Streams with <code>:default true</code> created through the API will also receive all events flowing through the Mirabelle TCP server. You could like that enable a stream, and then remove it once you&rsquo;re done.</li>
 </ul>
 <p>You can also perform continuous queries using Mirabelle. Indeed, if you compute things on the fly using events coming from multiple hosts (like, time windows on events coming from various hosts or services), Mirabelle may only be able to do approximation on the computations.</p>
-<p>As I said before, Mirabelle streams use the events time for their clocks, so &ldquo;old&rdquo; events could be removed from computations. But it&rsquo;s OK, because there are ways of mitigating that (accept events un actions until they are not expired, so if your events have a TTL of 60 seconds, it&rsquo;s OK if they arrive a few seconds late). I also like the Riemann philosophy which is <code>mostly correct information right now is more useful, than totally correct information only available once the failure is over</code>.</p>
+<p>As previously mentioned, Mirabelle streams use the events time for their clocks, so &ldquo;old&rdquo; events could be removed from computations. But it&rsquo;s OK, because there are ways of mitigating that (accept events and actions until they are not expired, so if your events have a TTL of 60 seconds, it&rsquo;s OK if they arrive a few seconds late). I also like the Riemann philosophy which is <code>mostly correct information right now is more useful, than totally correct information only available once the failure is over</code>.</p>
 <p>But what if you want totally correct information ? In that case, you can just:</p>
 <ul>
-<li>Forward all raw events to an external system (timeserie database for example)</li>
+<li>Forward all raw events to an external system (timeseries database for example)</li>
 <li>Reinject them a bit later, sorted, into Mirabelle. It could be a dedicated Mirabelle instance, or a dedicated stream on your first instance. In this mode, you should have totally correct computations.</li>
 </ul>
 <p>You can even use Mirabelle to play with old data, like &ldquo;let&rsquo;s reinject all data from 2 weeks ago into Mirabelle in order to compute some statistics, or detect weird things over time&rdquo; !</p>
@@ -603,7 +603,7 @@
 <p>Mirabelle is not a distributed system. Like in Riemann, streams states (like time windows) and the index are lost after a crash. You could use the <a href="/howto/on-disk-queue/">On Disk queue</a> in Mirabelle in order to rebuild the states but it has a lot of limitations (check the link for more information).</p>
 <p>You can always use continuous queries (and replay events if needed) in order to achieve fault tolerance. A computation failed because the machine crashes ? Just relaunch it with the same data.</p>
 <p>You can also put a thing like <a href="https://kafka.apache.org/">Kafka</a> in front of Riemann (or even push Riemann metrics to Kafka).</p>
-<p>I will soon add the possibility to forward events between Mirabelle instances, and I will also build a proxy which will be able to forward events to various Mirabelle instances based on some criterias/algorithms (duplicates to everyone, consistent hashing&hellip;).</p>
+<p>I will soon add the possibility to forward events between Mirabelle instances, and I will also build a proxy which will be able to forward events to various Mirabelle instances based on some criteria/algorithms (duplicates to everyone, consistent hashing&hellip;).</p>
 <h2 id="metrics">Metrics</h2>
 <p>Mirabelle exposes a <code>/metrics</code> endpoint. For example, a lot of JVM internal metrics are exposed. Here are describe some interesting metrics.</p>
 <h3 id="tcp-server">TCP server</h3>
@@ -629,7 +629,7 @@
 <li><code>stream_duration_seconds</code>: The time events pass into the streaming engine (quantiles) for example <code>stream_duration_seconds{quantile=&quot;0.5&quot;,} 3.4816E-5</code>.</li>
 </ul>
 <h3 id="async-queues">Async queues</h3>
-<p>For each async queues, you have these metrics (the <code>executor</code> label is the async quee name):</p>
+<p>For each async queues, you have these metrics (the <code>executor</code> label is the async queue name):</p>
 <ul>
 <li><code>executor_queue_remaining_capacity</code>: The remaining capacity of the executor queue, example <code>executor_queue_remaining_capacity{executor=&quot;thread-pool&quot;,} 10000.0</code>.</li>
 <li><code>executor_queue_tasks</code>: the accepted and completed tasks in the executor, for example <code>executor_queue_tasks{executor=&quot;thread-pool&quot;,state=&quot;accepted&quot;,}</code> or <code>executor_queue_tasks{executor=&quot;thread-pool&quot;,state=&quot;completed&quot;,}</code></li>
@@ -940,19 +940,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1623236613"></script>
-    <script src="/js/jquery.sticky.js?1623236613"></script>
-    <script src="/js/featherlight.min.js?1623236613"></script>
-    <script src="/js/highlight.pack.js?1623236613"></script>
+    <script src="/js/clipboard.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1625949780"></script>
+    <script src="/js/jquery.sticky.js?1625949780"></script>
+    <script src="/js/featherlight.min.js?1625949780"></script>
+    <script src="/js/highlight.pack.js?1625949780"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1623236613"></script>
-    <script src="/js/learn.js?1623236613"></script>
-    <script src="/js/hugo-learn.js?1623236613"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1625949780"></script>
+    <script src="/js/learn.js?1625949780"></script>
+    <script src="/js/hugo-learn.js?1625949780"></script>
     
         
-            <script src="/mermaid/mermaid.js?1623236613"></script>
+            <script src="/mermaid/mermaid.js?1625949780"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

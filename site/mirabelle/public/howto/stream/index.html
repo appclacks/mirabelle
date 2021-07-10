@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.82.1" />
+    <meta name="generator" content="Hugo 0.80.0" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1623236613" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1623236613" rel="stylesheet">
-    <link href="/css/hybrid.css?1623236613" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1623236613" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1623236613" rel="stylesheet">
-    <link href="/css/auto-complete.css?1623236613" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1623236613" rel="stylesheet">
-    <link href="/css/theme.css?1623236613" rel="stylesheet">
-    <link href="/css/tabs.css?1623236613" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1623236613" rel="stylesheet">
+    <link href="/css/nucleus.css?1625949780" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1625949780" rel="stylesheet">
+    <link href="/css/hybrid.css?1625949780" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1625949780" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1625949780" rel="stylesheet">
+    <link href="/css/auto-complete.css?1625949780" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1625949780" rel="stylesheet">
+    <link href="/css/theme.css?1625949780" rel="stylesheet">
+    <link href="/css/tabs.css?1625949780" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1625949780" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1623236613"></script>
+    <script src="/js/jquery-3.3.1.min.js?1625949780"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1623236613"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1623236613"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1625949780"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1625949780"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1623236613"></script>
+<script type="text/javascript" src="/js/search.js?1625949780"></script>
 
     
   </div>
@@ -857,11 +857,13 @@ The three previous streams use the latest event from the list of events to build
 <p>The event will have as tag &ldquo;exception&rdquo; and the exception class name. The <code>:exception</code> key will contain the JVM <code>Exception</code> instance, <code>:base-event</code> the full event which triggered the exception, and finally <code>:description</code> will contain a string representation of the exception (including the stacktrace).</p>
 <h4 id="move-events-between-streams">Move events between streams</h4>
 <p>You can reinject events from a stream to itself, or to another stream (a dynamic stream for example).</p>
-<p>By default, events are reinjected into all streams defined in the configuration. You can specific the name of the targeted stream if needed:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">reinject!</span>)
+<p>By default, events are reinjected into the current stream. You can specify the name of the targeted stream if needed:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; send events into the current stream</span>
+(<span style="color:#a6e22e">reinject!</span>)
 
+<span style="color:#75715e">;; send events to another stream</span>
 (<span style="color:#a6e22e">reinject!</span> <span style="color:#e6db74">:custom-dynamic-stream</span>)
-</code></pre></div><p>Be careful about infinite loops !</p>
+</code></pre></div><p>Be careful about infinite loops while using <code>reinject!</code>.</p>
 
 
 
@@ -1169,19 +1171,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1623236613"></script>
-    <script src="/js/jquery.sticky.js?1623236613"></script>
-    <script src="/js/featherlight.min.js?1623236613"></script>
-    <script src="/js/highlight.pack.js?1623236613"></script>
+    <script src="/js/clipboard.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1625949780"></script>
+    <script src="/js/jquery.sticky.js?1625949780"></script>
+    <script src="/js/featherlight.min.js?1625949780"></script>
+    <script src="/js/highlight.pack.js?1625949780"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1623236613"></script>
-    <script src="/js/learn.js?1623236613"></script>
-    <script src="/js/hugo-learn.js?1623236613"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1625949780"></script>
+    <script src="/js/learn.js?1625949780"></script>
+    <script src="/js/hugo-learn.js?1625949780"></script>
     
         
-            <script src="/mermaid/mermaid.js?1623236613"></script>
+            <script src="/mermaid/mermaid.js?1625949780"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

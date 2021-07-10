@@ -109,15 +109,15 @@ curl -H "Content-Type: application/json" -X POST --data '{"query": "Wzo9IDpzZXJ2
 {"events":[]}
 ```
 
-### Get the default index current time
+### Get an index current time
 
-- **GET** `/api/v1/current-time`
+- **GET** `/api/v1/index/<stream-name>/current-time`
 
-Get the current time for the default index.
+Get the current time for an index
 
 ---
 
 ```
-curl localhost:5558/api/v1/current-time
+curl localhost:5558/api/v1/index/my-stream/current-time
 {"current-time":0}
 ```

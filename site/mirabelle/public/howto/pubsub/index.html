@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.82.1" />
+    <meta name="generator" content="Hugo 0.80.0" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Publish Subscribe :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1623236613" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1623236613" rel="stylesheet">
-    <link href="/css/hybrid.css?1623236613" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1623236613" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1623236613" rel="stylesheet">
-    <link href="/css/auto-complete.css?1623236613" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1623236613" rel="stylesheet">
-    <link href="/css/theme.css?1623236613" rel="stylesheet">
-    <link href="/css/tabs.css?1623236613" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1623236613" rel="stylesheet">
+    <link href="/css/nucleus.css?1625949780" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1625949780" rel="stylesheet">
+    <link href="/css/hybrid.css?1625949780" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1625949780" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1625949780" rel="stylesheet">
+    <link href="/css/auto-complete.css?1625949780" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1625949780" rel="stylesheet">
+    <link href="/css/theme.css?1625949780" rel="stylesheet">
+    <link href="/css/tabs.css?1625949780" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1625949780" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1623236613"></script>
+    <script src="/js/jquery-3.3.1.min.js?1625949780"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1623236613"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1623236613"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1625949780"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1625949780"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1623236613"></script>
+<script type="text/javascript" src="/js/search.js?1625949780"></script>
 
     
   </div>
@@ -574,8 +574,8 @@
     (index [<span style="color:#e6db74">:host</span>])
     (<span style="color:#a6e22e">publish!</span> <span style="color:#e6db74">:my-channel</span>))))
 </code></pre></div><p>In this stream, we filter all events with <code>:service</code> &ldquo;bar&rdquo;. Then, we index them, and we also call <code>publish!</code> to publish the event to a channel named <code>:my-channel</code>.</p>
-<p>A channel is created by default for each index. For the default index shared by all streams defined in the configuration, the name is <code>default-index</code>.</p>
-<p>If you create a stream using the API, the channel will be <code>&lt;stream-name&gt;-index</code>.</p>
+<p>A channel is created by default for each index (the channel name being <code>&lt;stream-name&gt;-index</code>).
+You can also subscribe for events indexed into indexes belonging to streams tagged <code>:default</code> by subscribing to the <code>default-index</code> channel.</p>
 <p>Users can also subscribe to other channels, not related to indexes. It&rsquo;s what <code>publish!</code> does. In this example, all users subscribing to the <code>:my-channel</code> channel will receive the events.</p>
 <p>You can test that yourself by running the <code>websocket.py</code> script available <a href="https://github.com/mcorbin/mirabelle/tree/master/pubsub">here</a>. You will need Python 3, and to install the dependencies listed in <code>requirements.txt</code> using <code>pip install -r requirements.txt</code>.</p>
 <p>When you subscribe to a channel, you should provide a valid <a href="/howto/stream/#filtering-events">where clause</a> in base64. For example, the query <code>[:always-true]</code> which matches everything would be <code>WzphbHdheXMtdHJ1ZV0=</code>.</p>
@@ -890,19 +890,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1623236613"></script>
-    <script src="/js/jquery.sticky.js?1623236613"></script>
-    <script src="/js/featherlight.min.js?1623236613"></script>
-    <script src="/js/highlight.pack.js?1623236613"></script>
+    <script src="/js/clipboard.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1625949780"></script>
+    <script src="/js/jquery.sticky.js?1625949780"></script>
+    <script src="/js/featherlight.min.js?1625949780"></script>
+    <script src="/js/highlight.pack.js?1625949780"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1623236613"></script>
-    <script src="/js/learn.js?1623236613"></script>
-    <script src="/js/hugo-learn.js?1623236613"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1625949780"></script>
+    <script src="/js/learn.js?1625949780"></script>
+    <script src="/js/hugo-learn.js?1625949780"></script>
     
         
-            <script src="/mermaid/mermaid.js?1623236613"></script>
+            <script src="/mermaid/mermaid.js?1625949780"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

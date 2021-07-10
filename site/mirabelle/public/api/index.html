@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.82.1" />
+    <meta name="generator" content="Hugo 0.80.0" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>HTTP API :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1623236613" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1623236613" rel="stylesheet">
-    <link href="/css/hybrid.css?1623236613" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1623236613" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1623236613" rel="stylesheet">
-    <link href="/css/auto-complete.css?1623236613" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1623236613" rel="stylesheet">
-    <link href="/css/theme.css?1623236613" rel="stylesheet">
-    <link href="/css/tabs.css?1623236613" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1623236613" rel="stylesheet">
+    <link href="/css/nucleus.css?1625949780" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1625949780" rel="stylesheet">
+    <link href="/css/hybrid.css?1625949780" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1625949780" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1625949780" rel="stylesheet">
+    <link href="/css/auto-complete.css?1625949780" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1625949780" rel="stylesheet">
+    <link href="/css/theme.css?1625949780" rel="stylesheet">
+    <link href="/css/tabs.css?1625949780" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1625949780" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1623236613"></script>
+    <script src="/js/jquery-3.3.1.min.js?1625949780"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1623236613"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1623236613"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1625949780"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1625949780"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1623236613"></script>
+<script type="text/javascript" src="/js/search.js?1625949780"></script>
 
     
   </div>
@@ -539,7 +539,7 @@
         <li><a href="#remove-a-stream">Remove a stream</a></li>
         <li><a href="#push-an-event">Push an event</a></li>
         <li><a href="#query-the-index">Query the index</a></li>
-        <li><a href="#get-the-default-index-current-time">Get the default index current time</a></li>
+        <li><a href="#get-an-index-current-time">Get an index current time</a></li>
       </ul>
     </li>
   </ul>
@@ -569,7 +569,7 @@
 
 	<h2 id="health">Health</h2>
 <ul>
-<li><strong>GET</strong> /healthz or /health</li>
+<li><strong>GET</strong> <code>/healthz</code> or <code>/health</code></li>
 </ul>
 <hr>
 <pre><code>curl localhost:5558/healthz
@@ -577,13 +577,13 @@
 {&quot;message&quot;:&quot;ok&quot;}
 </code></pre><h2 id="metrics">Metrics</h2>
 <ul>
-<li><strong>GET</strong> /metrics</li>
+<li><strong>GET</strong> <code>/metrics</code></li>
 </ul>
 <p>Mirabelle metrics are returned as Prometheus format.</p>
 <h2 id="stream">Stream</h2>
 <h3 id="add-a-stream">Add a stream</h3>
 <ul>
-<li><strong>POST</strong> api/v1/stream/<!-- raw HTML omitted --></li>
+<li><strong>POST</strong> <code>/api/v1/stream/&lt;stream-name&gt;</code></li>
 </ul>
 <p>The body is a json string like <code>{&quot;config&quot;: &quot;&lt;stream-config&gt;&quot;}</code>.</p>
 <p><!-- raw HTML omitted --> should be the stream EDN configuration as base64. For example <code>{:actions {:action :info}}</code> as base64 would be <code>ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfX0=</code>.</p>
@@ -594,7 +594,7 @@
 {&quot;message&quot;:&quot;stream added&quot;}
 </code></pre><h3 id="list-streams">List streams</h3>
 <ul>
-<li><strong>GET</strong> api/v1/stream/</li>
+<li><strong>GET</strong> <code>/api/v1/stream/</code></li>
 </ul>
 <p>List all streams configured in Mirabelle.</p>
 <hr>
@@ -602,7 +602,7 @@
 {&quot;streams&quot;:[&quot;bar&quot;,&quot;foo&quot;,&quot;trololo&quot;]}
 </code></pre><h3 id="get-a-stream">Get a stream</h3>
 <ul>
-<li><strong>GET</strong> api/v1/stream/<!-- raw HTML omitted --></li>
+<li><strong>GET</strong> <code>/api/v1/stream/&lt;stream-name&gt;</code></li>
 </ul>
 <p>Get a stream configuration and the time of its index.</p>
 <pre><code>curl localhost:5558/api/v1/stream/trololo
@@ -610,7 +610,7 @@
 {&quot;config&quot;:&quot;ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfSwgOmRlZmF1bHQgZmFsc2V9&quot;,&quot;current-time&quot;:0}
 </code></pre><h3 id="remove-a-stream">Remove a stream</h3>
 <ul>
-<li><strong>DELETE</strong> api/v1/stream/<!-- raw HTML omitted --></li>
+<li><strong>DELETE</strong> <code>/api/v1/stream/&lt;stream-name&gt;</code></li>
 </ul>
 <p>Delete a stream by name.</p>
 <hr>
@@ -619,7 +619,7 @@
 {&quot;message&quot;:&quot;stream removed&quot;}
 </code></pre><h3 id="push-an-event">Push an event</h3>
 <ul>
-<li><strong>PUT</strong> api/v1/stream/<!-- raw HTML omitted --></li>
+<li><strong>PUT</strong> <code>/api/v1/stream/&lt;stream-name&gt;</code></li>
 </ul>
 <p>Push an event to the specified stream.</p>
 <hr>
@@ -628,17 +628,20 @@
 {&quot;message&quot;:&quot;ok&quot;}
 </code></pre><h3 id="query-the-index">Query the index</h3>
 <ul>
-<li><strong>GET</strong> api/v1/index/<!-- raw HTML omitted -->/search</li>
+<li><strong>GET</strong> <code>/api/v1/index/&lt;steam-name&gt;/search</code></li>
 </ul>
 <p>Returns events matching the query for the index of the stream <code>&lt;stream-name&gt;</code>. The query passed in the body should be a <a href="/howto/stream/#filtering-events">where query</a>.</p>
 <hr>
 <pre><code>curl -H &quot;Content-Type: application/json&quot; -X POST --data '{&quot;query&quot;: &quot;Wzo9IDpzZXJ2aWNlICJmb28iXQ==&quot;}' 127.0.0.1:5558/api/v1/index/default/search
 
 {&quot;events&quot;:[]}
-</code></pre><h3 id="get-the-default-index-current-time">Get the default index current time</h3>
-<p>get the current time for the default index</p>
+</code></pre><h3 id="get-an-index-current-time">Get an index current time</h3>
+<ul>
+<li><strong>GET</strong> <code>/api/v1/index/&lt;stream-name&gt;/current-time</code></li>
+</ul>
+<p>Get the current time for an index</p>
 <hr>
-<pre><code>curl localhost:5558/api/v1/current-time
+<pre><code>curl localhost:5558/api/v1/index/my-stream/current-time
 {&quot;current-time&quot;:0}
 </code></pre>
 
@@ -946,19 +949,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1623236613"></script>
-    <script src="/js/jquery.sticky.js?1623236613"></script>
-    <script src="/js/featherlight.min.js?1623236613"></script>
-    <script src="/js/highlight.pack.js?1623236613"></script>
+    <script src="/js/clipboard.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1625949780"></script>
+    <script src="/js/jquery.sticky.js?1625949780"></script>
+    <script src="/js/featherlight.min.js?1625949780"></script>
+    <script src="/js/highlight.pack.js?1625949780"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1623236613"></script>
-    <script src="/js/learn.js?1623236613"></script>
-    <script src="/js/hugo-learn.js?1623236613"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1625949780"></script>
+    <script src="/js/learn.js?1625949780"></script>
+    <script src="/js/hugo-learn.js?1625949780"></script>
     
         
-            <script src="/mermaid/mermaid.js?1623236613"></script>
+            <script src="/mermaid/mermaid.js?1625949780"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

@@ -1,42 +1,78 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
   <url>
     <loc>https://www.mirabelle.mcorbin.fr/howto/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/howto/build/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/production/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/howto/configuration/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/howto/stream/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/howto/tests/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/api/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/howto/action-io-ref/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/extension/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/howto/index/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/integration/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/howto/pubsub/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/riemann-diff/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/howto/on-disk-queue/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/support/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/</loc>
     <priority>0</priority>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/categories/</loc>
-  </url><url>
+  </url>
+  
+  <url>
     <loc>https://www.mirabelle.mcorbin.fr/tags/</loc>
   </url>
+  
 </urlset>

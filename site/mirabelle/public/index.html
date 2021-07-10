@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.82.1" />
+    <meta name="generator" content="Hugo 0.80.0" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title> :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1623236613" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1623236613" rel="stylesheet">
-    <link href="/css/hybrid.css?1623236613" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1623236613" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1623236613" rel="stylesheet">
-    <link href="/css/auto-complete.css?1623236613" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1623236613" rel="stylesheet">
-    <link href="/css/theme.css?1623236613" rel="stylesheet">
-    <link href="/css/tabs.css?1623236613" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1623236613" rel="stylesheet">
+    <link href="/css/nucleus.css?1625949780" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1625949780" rel="stylesheet">
+    <link href="/css/hybrid.css?1625949780" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1625949780" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1625949780" rel="stylesheet">
+    <link href="/css/auto-complete.css?1625949780" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1625949780" rel="stylesheet">
+    <link href="/css/theme.css?1625949780" rel="stylesheet">
+    <link href="/css/tabs.css?1625949780" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1625949780" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1623236613"></script>
+    <script src="/js/jquery-3.3.1.min.js?1625949780"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1623236613"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1623236613"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1625949780"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1625949780"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1623236613"></script>
+<script type="text/javascript" src="/js/search.js?1625949780"></script>
 
     
   </div>
@@ -509,15 +509,15 @@
  
 <h1 id="mirabelle-a-powerful-stream-processing-engine-for-monitoring">Mirabelle, a powerful stream processing engine for monitoring</h1>
 <p>Mirabelle is a stream processing engine which can be used to aggregate events, metrics and logs.</p>
-<p>Its powerful and extensible DSL allows you to define computations on a stream of data. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabelling&hellip;) which can be easily combined according to your needs.</p>
+<p>Its powerful and extensible DSL allows you to define computations on a stream of data. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabeling, etc.) which can be easily combined according to your needs.</p>
 <p><img src="img/mirabelle_presentation.png" alt="Mirabelle"></p>
-<p>Mirabelle can also route events to external systems (timeserie databases, logging systems, cloud monitoring services&hellip;), fire alerts (Pagerduty), write data into files&hellip;</p>
+<p>Mirabelle can also route events to external systems (timeseries databases, logging systems, cloud monitoring services, etc.), fire alerts (e.g. to Pagerduty), write data into files and more.</p>
 <p>It also implements a publish-subscribe system, which allows you to see in real time (through Websockets) events flowing into streams.</p>
-<p>Mirabelle is in alpha, but I&rsquo;m eager to receive feedbacks</p>
+<p>Mirabelle is currently in alpha, but I&rsquo;m eager to receive feedback.</p>
 <h2 id="compatible-with-riemann">Compatible with Riemann</h2>
-<p>Mirabelle is heavily inspired by <a href="http://riemann.io/">Riemann</a>. Actually, part of the Mirabelle codebase (some streams and the TCP server implementation for example) was imported from Riemann (these parts are mentionned in the codebase).</p>
+<p>Mirabelle is heavily inspired by <a href="https://riemann.io/">Riemann</a>. Actually, part of the Mirabelle codebase (some streams and the TCP server implementation for example) was imported from Riemann (these parts are mentioned in the codebase).</p>
 <p>I would like to thank all Riemann maintainers and contributors for this amazing tool.</p>
-<p>Mirabelle use the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessy with Mirabelle (which also added a lot of new features).</p>
+<p>Mirabelle use the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also added a lot of new features).</p>
 <p>Like in Riemann, Mirabelle provides an index which can be queried (and on which you can subscribe) in order to explore your system state.</p>
 <h2 id="streams-clocks-real-time-continuous-queries">Streams clocks, real time, continuous queries</h2>
 <p>In Mirabelle (and unlike in Riemann), <strong>all</strong> streams advance based on the time of the events they receive. Because of that, it&rsquo;s super easy to reason about your streams, and to unit test them (the same inputs always produce the same outputs).</p>
@@ -527,14 +527,14 @@
 <p>You can have real time streams receiving events directly from your servers and applications, and some streams working on old (and maybe ordered) data coming from various databases. Like that, you can have the best of both words: real time analytics, and run analytics on old data using continuous queries for example.</p>
 <p>You can even use Mirabelle to play and explore with historical data. You could have for example a Mirabelle instance used for real time stream processing, another one (or even the same one on dedicated streams) working on old data&hellip; It&rsquo;s up to you to decide !</p>
 <h2 id="stream-example-with-unit-tests">Stream example, with unit tests</h2>
-<p>Let&rsquo;s say a web application is pushing the duration (in seconds) of the http requests it receives. This metric could be modelised using this Mirabelle event</p>
-<pre><code>{:host &quot;my-server&quot;
- :service &quot;http_request_duration_seconds&quot;
- :application &quot;my-web-app&quot;
- :time 1619731016,145
- :tags [&quot;web&quot;]
- :metric 0.5}
-</code></pre><p>You could write a Mirabelle stream which will compute on the fly the quantiles for this metric. In this example, Mirabelle will split the received events into 60 seconds windows, then compute the percentiles, set the event <code>:state</code> to &ldquo;critical&rdquo; and send an alert to Pagerduty if the <code>0.99</code> quantiles is greater than 1 seocnd.</p>
+<p>Let&rsquo;s say a web application is pushing the duration (in seconds) of the HTTP requests it receives. This metric could be modeled using this Mirabelle event</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;my-server&#34;</span>
+ <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
+ <span style="color:#e6db74">:application</span> <span style="color:#e6db74">&#34;my-web-app&#34;</span>
+ <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1619731016</span>,<span style="color:#ae81ff">145</span>
+ <span style="color:#e6db74">:tags</span> [<span style="color:#e6db74">&#34;web&#34;</span>]
+ <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">0.5</span>}
+</code></pre></div><p>You could write a Mirabelle stream which will compute on the fly the quantiles for this metric. In this example, Mirabelle will split the received events into 60 seconds windows, then compute the percentiles, set the event <code>:state</code> to &ldquo;critical&rdquo; and send an alert to Pagerduty if the <code>0.99</code> quantiles is greater than 1 second.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:percentiles</span>}
     (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>]
@@ -562,7 +562,7 @@
                                       <span style="color:#e6db74">:quantile</span> <span style="color:#ae81ff">0.99</span>
                                       <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>}]}}}
 </code></pre></div><p>In this test, we inject into the <code>:percentiles</code> stream three events, and we verify that the tap named <code>:alert</code> contains the expected alert (the <code>0.99</code> quantile is greater than 1) generated for these events.</p>
-<p>Thanks to Clojure datastructures, these is <em>no side effects between streams and actions</em>. It&rsquo;s OK to modify events in parallel (in multiple threads) and to have multiple branches per stream. You can even pass events between streams (like described <a href="todo">here</a>). You are free to organize streams and how they communicate between each other exactly how you want to, the tool and its DSL will not limit you on than.</p>
+<p>Thanks to Clojure datastructures, there is <em>no side effects between streams and actions</em>. It&rsquo;s OK to modify events in parallel (in multiple threads) and to have multiple branches per stream. You can even pass events between streams (like described <a href="todo">here</a>). You are free to organize streams and how they communicate between each other exactly how you want to; the tool and its DSL will not limit you.</p>
 <p>Here is a more complete and commented example, with multiple actions performed in one stream:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:multiple-branches</span>}
@@ -877,19 +877,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.min.js?1623236613"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1623236613"></script>
-    <script src="/js/jquery.sticky.js?1623236613"></script>
-    <script src="/js/featherlight.min.js?1623236613"></script>
-    <script src="/js/highlight.pack.js?1623236613"></script>
+    <script src="/js/clipboard.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.min.js?1625949780"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1625949780"></script>
+    <script src="/js/jquery.sticky.js?1625949780"></script>
+    <script src="/js/featherlight.min.js?1625949780"></script>
+    <script src="/js/highlight.pack.js?1625949780"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1623236613"></script>
-    <script src="/js/learn.js?1623236613"></script>
-    <script src="/js/hugo-learn.js?1623236613"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1625949780"></script>
+    <script src="/js/learn.js?1625949780"></script>
+    <script src="/js/hugo-learn.js?1625949780"></script>
     
         
-            <script src="/mermaid/mermaid.js?1623236613"></script>
+            <script src="/mermaid/mermaid.js?1625949780"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

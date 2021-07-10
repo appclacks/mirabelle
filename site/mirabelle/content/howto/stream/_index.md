@@ -497,12 +497,14 @@ The event will have as tag "exception" and the exception class name. The `:excep
 
 You can reinject events from a stream to itself, or to another stream (a dynamic stream for example).
 
-By default, events are reinjected into all streams defined in the configuration. You can specific the name of the targeted stream if needed:
+By default, events are reinjected into the current stream. You can specify the name of the targeted stream if needed:
 
 ```clojure
+;; send events into the current stream
 (reinject!)
 
+;; send events to another stream
 (reinject! :custom-dynamic-stream)
 ```
 
-Be careful about infinite loops !
+Be careful about infinite loops while using `reinject!`.
