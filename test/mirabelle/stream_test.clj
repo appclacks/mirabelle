@@ -571,7 +571,7 @@
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/sdo (a/index [:host])
-                                (a/reaper))}
+                                (a/reaper 20))}
         {:keys [entrypoint]} (stream/compile-stream!
                               {:index index
                                :pubsub pubsub
@@ -585,9 +585,11 @@
     (is (= 1 (index/size-index index)))
     (entrypoint {:host "b" :metric 12 :time 17})
     (is (= 17 (index/current-time index)))
-    (is (= 1 (index/size-index index)))
+    ;; not expired yet because of the reaper interval
+    (is (= 2 (index/size-index index)))
+    (entrypoint {:host "b" :metric 12 :time 20})
     (is (= ["my-stream"] @dest))
-    (is (= [{:host "b" :metric 12 :time 17}]
+    (is (= [{:host "b" :metric 12 :time 20}]
            (index/search index [:always-true])))
     (is (= [{:host "f" :metric 12 :time 1 :ttl 15 :state "expired"}]
            @recorder))))

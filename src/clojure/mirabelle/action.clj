@@ -1713,16 +1713,25 @@
    :children children})
 
 (defn reaper*
-  [context destination-stream]
+  [context interval destination-stream]
   (let [index (:index context)
+        clock (atom [0 false])
         reinject-fn (:reinject context)
         destination-stream (or destination-stream (:source-stream context))]
-    (fn [_]
-      (doseq [event (index/expire index)]
-        (reinject-fn event destination-stream)))))
+    (fn [event]
+      (when (:time event)
+        (let [[_ expire?] (swap! clock (fn [[previous-tick _ :as s]]
+                                         (if (>= (:time event)
+                                                 (+ interval previous-tick))
+                                           [(:time event) true]
+                                           s)))]
+          (when expire?
+            (doseq [event (index/expire index)]
+              (reinject-fn event destination-stream))))))))
 
-(s/def ::reaper (s/cat :destination-stream (s/or :keyword keyword?
-                                                 :nil nil?)))
+(s/def ::reaper (s/cat :interval pos-int?
+                       :destination-stream (s/or :keyword keyword?
+                                                :nil nil?)))
 
 (defn reaper
   "Everytime this action receives an event, it will expires events from the
@@ -1733,13 +1742,13 @@
   ```
 
   ```clojure
-  (reaper :custom-stream)
+  (reaper interval :custom-stream)
   ```"
-  ([] (reaper nil))
-  ([destination-stream]
-   (spec/valid? ::reaper [destination-stream])
+  ([interval] (reaper interval nil))
+  ([interval destination-stream]
+   (spec/valid? ::reaper [interval destination-stream])
    {:action :reaper
-    :params [destination-stream]
+    :params [interval destination-stream]
     :children []}))
 
 (s/def ::to-base64 (s/cat :fields (s/coll-of keyword?)))
