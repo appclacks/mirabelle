@@ -204,7 +204,6 @@
   IStreamHandler
   (context [this source-stream]
     {:io compiled-io
-     :index index
      :queue queue
      :tap tap
      :test-mode? test-mode?
@@ -226,7 +225,9 @@
             new-compiled-streams (->> streams-configs-to-compile
                                       (mapv (fn [[k v]]
                                               [k (compile-stream!
-                                                  (context this k)
+                                                  (assoc (context this k)
+                                                         :index
+                                                         (component/start (index/map->Index {})))
                                                   (update v :default boolean))]))
                                       (into {})
                                       (merge (apply dissoc
@@ -262,8 +263,7 @@
                              ;; dedicated index for dyn streams
                              (assoc (context this stream-name)
                                     :index
-                                    (component/start (index/map->Index {}))
-                                    :input stream-name)
+                                    (component/start (index/map->Index {})))
                              (update stream-configuration :default boolean))
             new-compiled-streams (assoc compiled-streams
                                         stream-name

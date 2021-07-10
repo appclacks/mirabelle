@@ -64,9 +64,11 @@
   (list-streams [_ _]
     {:status 200
      :body {:streams (stream/list-dynamic-streams stream-handler)}})
-  (current-time [_ _]
+  (current-time [_ {:keys [all-params]}]
     {:status 200
-     :body {:current-time (-> (stream/context stream-handler :default)
+     :body {:current-time (-> (stream/get-dynamic-stream stream-handler
+                                                         (:name all-params))
+                              :context
                               :index
                               index/current-time)}})
   (not-found [_ _]
@@ -84,6 +86,10 @@
                   :method :post
                   :handler-fn search-index
                   :spec :mirabelle.http.index/search}
+   :index/current-time {:path [#"api/v1/index/" [path-vars-regex :name] #"/current-time/?"]
+                        :method :get
+                        :spec :mirabelle.http.index/current-time
+                        :handler-fn current-time}
    :stream/list {:path [#"api/v1/stream/?"]
                  :method :get
                  :handler-fn list-streams}
@@ -99,9 +105,6 @@
                    :method :delete
                    :handler-fn remove-stream
                    :spec :mirabelle.http.stream/remove}
-   :stream/current-time {:path [#"api/v1/current-time/?"]
-                         :method :get
-                         :handler-fn current-time}
    :stream/get {:path [#"api/v1/stream/" [path-vars-regex :name] #"/?"]
                 :method :get
                 :handler-fn get-stream

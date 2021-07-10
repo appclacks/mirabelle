@@ -19,6 +19,9 @@
 
 (s/def :mirabelle.http.index/search (s/keys :req-un [:mirabelle.index/query
                                                      :mirabelle.stream/name]))
+
+(s/def :mirabelle.http.index/current-time (s/keys :req-un [:mirabelle.stream/name]))
+
 (s/def :mirabelle.http.stream/add (s/keys :req-un [:mirabelle.stream/name
                                                    :mirabelle.stream/config]))
 (s/def :mirabelle.http.stream/get (s/keys :req-un [:mirabelle.stream/name]))

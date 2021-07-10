@@ -93,10 +93,10 @@
       (is (= 200 (:status resp)))
       (is (streams "test-foo"))))
   (testing "current-time"
-    (let [resp (http/get "http://localhost:5558/api/v1/current-time"
+    (let [resp (http/get "http://localhost:5558/api/v1/index/test-foo/current-time"
                          {:as :json})]
       (is (= 200 (:status resp)))
-      (is (= {:current-time 0}
+      (is (= {:current-time 3}
              (:body resp)))))
   (testing "remove-stream"
     (let [resp (http/delete "http://localhost:5558/api/v1/stream/test-foo"
