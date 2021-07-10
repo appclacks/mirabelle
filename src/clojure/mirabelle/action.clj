@@ -1354,7 +1354,9 @@
       (when-let [t (:time event)]
         (index/new-time? i t))
       (when-not (:test-mode? context)
-        (pubsub/publish! pubsub channel event))
+        (pubsub/publish! pubsub channel event)
+        (when (:default context)
+          (pubsub/publish! pubsub :default event)))
       (index/insert i event labels))))
 
 (s/def ::index (s/cat :labels (s/coll-of keyword?)))

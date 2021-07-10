@@ -227,6 +227,7 @@
                                               [k (compile-stream!
                                                   (assoc (context this k)
                                                          :index
+                                                         :default (boolean (:default v))
                                                          (component/start (index/map->Index {})))
                                                   (update v :default boolean))]))
                                       (into {})
