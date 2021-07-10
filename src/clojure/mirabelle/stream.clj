@@ -152,6 +152,7 @@
 (deftype StreamHandler [streams-directories ;; config
                         io-directories;; config
                         lock
+                        ;; streams from the config file
                         ^:volatile-mutable streams-configurations
                         ^:volatile-mutable io-configurations
                         custom-actions
@@ -203,7 +204,6 @@
   IStreamHandler
   (context [this source-stream]
     {:io compiled-io
-     :input source-stream
      :index index
      :queue queue
      :tap tap
@@ -226,7 +226,7 @@
             new-compiled-streams (->> streams-configs-to-compile
                                       (mapv (fn [[k v]]
                                               [k (compile-stream!
-                                                  (context this :default)
+                                                  (context this k)
                                                   (update v :default boolean))]))
                                       (into {})
                                       (merge (apply dissoc

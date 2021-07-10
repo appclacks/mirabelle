@@ -1348,7 +1348,7 @@
 (defn index*
   [context labels]
   (let [i (:index context)
-        channel (index/channel (:input context))
+        channel (index/channel (:source-stream context))
         pubsub (:pubsub context)]
     (fn [event]
       (when-let [t (:time event)]
@@ -1500,7 +1500,7 @@
 (defn reinject!*
   [context destination-stream]
   (let [reinject-fn (:reinject context)
-        destination-stream (or destination-stream (:input context))]
+        destination-stream (or destination-stream (:source-stream context))]
     (fn [event]
       (reinject-fn event destination-stream))))
 
@@ -1714,7 +1714,7 @@
   [context destination-stream]
   (let [index (:index context)
         reinject-fn (:reinject context)
-        destination-stream (or destination-stream (:input context))]
+        destination-stream (or destination-stream (:source-stream context))]
     (fn [_]
       (doseq [event (index/expire index)]
         (reinject-fn event destination-stream)))))

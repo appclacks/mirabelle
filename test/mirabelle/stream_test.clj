@@ -541,10 +541,10 @@
         pubsub-result (atom [])
         {:keys [entrypoint]} (stream/compile-stream! {:index index
                                                       :pubsub pubsub
-                                                      :input :streaming}
+                                                      :source-stream "my-stream"}
                                                      stream)]
-    (pubsub/add pubsub (index/channel :streaming) (fn [event]
-                                                    (swap! pubsub-result conj event)))
+    (pubsub/add pubsub (index/channel "my-stream") (fn [event]
+                                                     (swap! pubsub-result conj event)))
     (entrypoint {:host "f" :metric 12 :time 1})
     (is (= [{:host "f" :metric 12 :time 1}]
            @pubsub-result))
@@ -575,7 +575,7 @@
         {:keys [entrypoint]} (stream/compile-stream!
                               {:index index
                                :pubsub pubsub
-                               :input :default
+                               :source-stream "my-stream"
                                :reinject (fn [event destination-stream]
                                            (swap! dest conj destination-stream)
                                            (swap! recorder conj event))}
@@ -586,7 +586,7 @@
     (entrypoint {:host "b" :metric 12 :time 17})
     (is (= 17 (index/current-time index)))
     (is (= 1 (index/size-index index)))
-    (is (= [:default] @dest))
+    (is (= ["my-stream"] @dest))
     (is (= [{:host "b" :metric 12 :time 17}]
            (index/search index [:always-true])))
     (is (= [{:host "f" :metric 12 :time 1 :ttl 15 :state "expired"}]
