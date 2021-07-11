@@ -53,7 +53,7 @@ You could write a Mirabelle stream which will compute on the fly the quantiles f
 
 ```clojure
 (streams
-  (stream {:name :percentiles}
+  (stream {:name :percentiles :default true}
     (where [:= :service "http_request_duration_seconds"]
       (fixed-time-window 60
         (coll-percentiles [0.5 0.75 0.99]
