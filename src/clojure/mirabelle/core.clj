@@ -89,30 +89,43 @@
       (log/error {} e "fail to start the system")
       (throw e))))
 
+(defn compile!
+  [args]
+  (log/info {} "compiling streams")
+  (when-not (= 3 (count args))
+    (log/error {} "Invalid parameters")
+    (System/exit 1))
+  (let [src-dir (second args)
+        dst-dir (nth args 2)]
+    (when-not (s/valid? ::config/directory-spec src-dir)
+      (log/error {} (format "%s is not a directory" src-dir))
+      (System/exit 1))
+    (when-not (s/valid? ::config/directory-spec dst-dir)
+      (log/error {} (format "%s is not a directory" src-dir))
+      (System/exit 1))
+    (config/compile-config! src-dir dst-dir))
+  (log/info {} "Streams successfully compiled"))
+
+(defn test!
+  []
+  (log/info {} "launching tests")
+  (let [config (config/load-config)
+        _ (start-logging! (:logging config))
+        test-result (test/launch-tests
+                     config)]
+    (println test-result)))
+
 (defn -main
   "Starts the application"
   [& args]
   (when (seq args)
     (condp = (first args)
-      "compile" (do (log/info {} "compiling streams")
-                    (when-not (= 3 (count args))
-                      (log/error {} "Invalid parameters")
-                      (System/exit 1))
-                    (let [src-dir (second args)
-                          dst-dir (nth args 2)]
-                      (when-not (s/valid? ::config/directory-spec src-dir)
-                        (log/error {} (format "%s is not a directory" src-dir))
-                        (System/exit 1))
-                      (when-not (s/valid? ::config/directory-spec dst-dir)
-                        (log/error {} (format "%s is not a directory" src-dir))
-                        (System/exit 1))
-                      (config/compile-config! src-dir dst-dir)))
-      "test" (do (log/info {} "launching tests")
-                 (let [config (config/load-config)
-                       _ (start-logging! (:logging config))
-                       test-result (test/launch-tests
-                                    config)]
-                   (println test-result))))
+      "compile" (compile! args)
+      "test" (test!)
+      "compile-test" (do (compile! args)
+                         (test!))
+      "compile_test" (do (compile! args)
+                         (test!)))
 
     (System/exit 0))
   (with-handler :term
