@@ -226,9 +226,8 @@
                                       (mapv (fn [[k v]]
                                               [k (compile-stream!
                                                   (assoc (context this k)
-                                                         :index
-                                                         :default (boolean (:default v))
-                                                         (component/start (index/map->Index {})))
+                                                         :index (component/start (index/map->Index {}))
+                                                         :default (boolean (:default v)))
                                                   (update v :default boolean))]))
                                       (into {})
                                       (merge (apply dissoc

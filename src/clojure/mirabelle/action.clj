@@ -1211,7 +1211,7 @@
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn under
-  "Passes on events only when their metric is greater than x.
+  "Passes on events only when their metric is under than x.
 
   ```clojure
   (under 10
