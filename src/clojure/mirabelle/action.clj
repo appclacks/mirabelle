@@ -1318,7 +1318,7 @@
             events (->> (:buffer result)
                         vals
                         (remove nil?))]
-        (when (seq events)
+        (when-not (zero? (count events))
           (call-rescue events children))))))
 
 (s/def ::project (s/cat :conditions (s/coll-of ::condition)))
