@@ -1,14 +1,12 @@
 (ns mirabelle.math
   (:require [mirabelle.event :as event]))
 
-;; TODO: optimize fn to not iterate twice
-
 (defn mean
   "Takes a list of events and returns the metrics mean.
   The latest event is used as a base to build the event returned by
   this funcion."
   [events]
-  (when (seq events)
+  (when-not (zero? (count events))
     (assoc (event/most-recent events)
            :metric
            (-> (reduce #(+ (:metric %2 0) %1) 0 events)
@@ -20,7 +18,7 @@
 
   Throws if it divides by zero."
   [events]
-  (when (seq events)
+  (when-not (zero? (count events))
     (assoc (event/most-recent events)
            :metric
            (->> (map :metric events)
@@ -31,7 +29,7 @@
   The latest event is used as a base to build the event returned by
   this funcion."
   [events]
-  (when (seq events)
+  (when-not (zero? (count events))
     (assoc (event/most-recent events)
            :metric
            (count events))))
@@ -39,7 +37,7 @@
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn extremum
   [operation events]
-  (when (seq events)
+  (when-not (zero? (count events))
     (reduce
      (fn [state event]
        (cond
@@ -67,7 +65,7 @@
   "Sum all events :metric.
   Use the most recent event as a base for the new event."
   [events]
-  (when (seq events)
+  (when-not (zero? (count events))
     (assoc (event/most-recent events)
            :metric
            (reduce #(+ (:metric %2 0) %1) 0 events))))
@@ -82,7 +80,7 @@
   "Takes a list of events and compute the rate for them.
   Use the most recent event as a base for the new event."
   [events]
-  (when (seq events)
+  (when-not (zero? (count events))
     (let [{:keys [base sum min-time]}
           (reduce
            (fn [{:keys [base sum min-time]} event]
