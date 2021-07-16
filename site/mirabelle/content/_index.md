@@ -20,11 +20,11 @@ I would like to thank all Riemann maintainers and contributors for this amazing 
 
 Mirabelle use the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also added a lot of new features).
 
-Like in Riemann, Mirabelle provides an index which can be queried (and on which you can subscribe) in order to explore your system state.
+Like Riemann, Mirabelle provides an index which can be queried (and on which you can subscribe) in order to explore your system state.
 
 ## Streams clocks, real time, continuous queries
 
-In Mirabelle (and unlike in Riemann), **all** streams advance based on the time of the events they receive. Because of that, it's super easy to reason about your streams, and to unit test them (the same inputs always produce the same outputs).
+In Mirabelle (and unlike Riemann), **all** streams advance based on the time of the events they receive. Because of that, it's super easy to reason about your streams, and to unit test them (the same inputs always produce the same outputs).
 
 In Mirabelle, events arrive by default in streams defined in the Mirabelle configuration file. As said previously, the Mirabelle clock for a stream will only advance if you send new events.
 
@@ -34,7 +34,7 @@ You can also in Mirabelle instantiate steams on the fly (using the Mirabelle HTT
 
 You can have real time streams receiving events directly from your servers and applications, and some streams working on old (and maybe ordered) data coming from various databases. Like that, you can have the best of both words: real time analytics, and run analytics on old data using continuous queries for example.
 
-You can even use Mirabelle to play and explore with historical data. You could have for example a Mirabelle instance used for real time stream processing, another one (or even the same one on dedicated streams) working on old data... It's up to you to decide !
+Being able to use the same tool for stream processing and to work on historical data is interesting. You could for example have a Mirabelle instance used for real time stream processing, and another one (or even the same one on dedicated streams) working on old data... It's up to you to decide !
 
 ## Stream example, with unit tests
 

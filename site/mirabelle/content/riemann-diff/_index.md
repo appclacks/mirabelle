@@ -58,6 +58,10 @@ Streams and I/O are configured separately, and streams references I/O. These com
 
 In Riemann, all streams states (time windows for example) all lost during reloads. it's not the case in Mirabelle. Only streams which were modified in the configuration are recreated.
 
+## Index
+
+In Mirabelle, each stream has its own dedicated index.
+
 ## New features
 
 A lot of small new features were also added (like a new pubsub mechanism, the on-disk queue...).
