@@ -40,7 +40,7 @@
 (defn parse-timestamp
   [event]
   (str (java.time.Instant/ofEpochMilli
-        (or (:time event) (long (time/now))))))
+        (or (:time event) (time/now)))))
 
 (defn format-event
   "Formats an event for PagerDuty v2 API"
