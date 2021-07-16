@@ -39,7 +39,7 @@
 
 (defn parse-timestamp
   [event]
-  (str (java.time.Instant/ofEpochMilli
+  (str (java.time.Instant/ofEpochSecond
         (or (:time event) (time/now)))))
 
 (defn format-event

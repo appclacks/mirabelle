@@ -16,7 +16,7 @@
   (is (= {:summary "foo - bar"
           :source "foo"
           :severity "critical"
-          :timestamp "1970-01-01T00:00:00.001Z"
+          :timestamp "1970-01-01T00:00:01Z"
           :custom_details
           {:host "foo" :service "bar" :state "critical" :time 1}}
          (pd/format-event {:source-key :host
@@ -25,7 +25,7 @@
   (is (= {:summary "foo - bar"
           :source "bar"
           :severity "critical"
-          :timestamp "1970-01-01T00:00:00.001Z"
+          :timestamp "1970-01-01T00:00:01Z"
           :custom_details
           {:host "foo" :service "bar" :time 1}}
          (pd/format-event {:source-key :service
@@ -34,7 +34,7 @@
   (is (= {:summary "foo - bar"
           :source "bar"
           :severity "info"
-          :timestamp "1970-01-01T00:00:00.001Z"
+          :timestamp "1970-01-01T00:00:01Z"
           :custom_details
           {:host "foo" :service "bar" :time 1 :state "ok"}}
          (pd/format-event {:source-key :service
@@ -47,7 +47,7 @@
           :payload {:summary "foo - bar"
                     :source "foo"
                     :severity "critical"
-                    :timestamp "1970-01-01T00:00:00.001Z"
+                    :timestamp "1970-01-01T00:00:01Z"
                     :custom_details
                     {:host "foo" :service "bar" :state "critical" :time 1}}
           :dedup_key "foo-bar"}
@@ -62,7 +62,7 @@
           :payload {:summary "foo - bar"
                     :source "foo"
                     :severity "critical"
-                    :timestamp "1970-01-01T00:00:00.001Z"
+                    :timestamp "1970-01-01T00:00:01Z"
                     :custom_details
                     {:host "foo" :service "bar" :state "critical" :time 1}}}
          (pd/request-body {:service-key "mcorbin"
