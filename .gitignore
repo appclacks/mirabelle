@@ -15,5 +15,5 @@ file-example-io
 java.iml
 .idea
 *.iml
-/dev/queue
+/dev/queue/metadata*
 venv

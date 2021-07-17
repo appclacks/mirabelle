@@ -5,10 +5,10 @@
  :websocket {:host "0.0.0.0"
              :port 5556}
  :queue {:directory "dev/queue"}
- :stream {:directories ["/etc/mirabelle/streams"]
+ :stream {:directories ["dev/resources/io"]
           :actions {:custom mirabelle.action/where*}}
- :io {:directories ["/etc/mirabelle/io"]
+ :io {:directories ["dev/resources/streams"]
       :custom {}}
  :logging {:level "info"
            :console {:encoder :json}}
- :test {:directories ["dev/resources/examples/streams/tests/"]}}
+ :test {:directories ["dev/resources/tests"]}}
