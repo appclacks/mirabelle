@@ -658,6 +658,7 @@
                           (a/untag "foo")
                           (a/tag ["foo" "bar"])
                           (a/untag ["foo" "bar"])
+                          (a/keep-keys [:host :service])
                           (a/json-fields [:foo :bar])
                           (a/json-fields :foo)
                           (a/outside-dt 2 10 20)
