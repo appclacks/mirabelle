@@ -306,11 +306,16 @@ You can use `rename-keys` to rename some events keys:
 
 ```clojure
 (rename-keys {:host :service
-              :environment :env}
+              :environment :env})
 ```
 
-In this example, the `:host` key will be renamed `:service` and the
-  `:environment` key is renamed `:env`. Existing values will be overrided.
+In this example, the `:host` key will be renamed `:service` and the `:environment` key is renamed `:env`. Existing values will be overrided.
+
+If you want to keep only some keys from an event (and so remove all the others), you can use `keep-keys`:
+
+```clojure
+(keep-keys [:host :service :time :metric :description :environment])
+```
 
 Some actions can modify the `:metric` field. `increment` and `decrement` will add +1 or -1 to it, and you can use `scale` to multiply it with a value: `(scale 1000)` for example.
 
