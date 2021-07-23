@@ -976,3 +976,17 @@
                   {:service "bar"}
                   {}])))
 
+(deftest keep-keys*-test
+  (let [[rec state] (recorder)]
+    (test-action (a/keep-keys* nil
+                               [:host :service :metric]
+                               rec)
+                 state
+                 [{:host "foo" :service "bar" :environment "prod" :metric 10}
+                  {:host "foo" :service "baz" :time 4}
+                  {:service "bar"}
+                  {}]
+                 [{:host "foo" :service "bar" :metric 10}
+                  {:host "foo" :service "baz"}
+                  {:service "bar"}
+                  {}])))

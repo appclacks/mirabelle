@@ -2002,6 +2002,26 @@
    :params [replacement]
    :children children})
 
+(defn keep-keys*
+  [_ keys-to-keep & children]
+  (fn [event]
+    (call-rescue (select-keys event keys-to-keep) children)))
+
+(s/def ::keep-keys (s/cat :keys-to-keep (s/coll-of keyword?)))
+
+(defn keep-keys
+  "Keep only the specified keys for events.
+
+  ```clojure
+  (keep-keys [:host :metric :time :environment :description]
+    (info))
+  ```"
+  [keys-to-keep & children]
+  (spec/valid? ::keep-keys [keys-to-keep])
+  {:action :keep-keys
+   :params [keys-to-keep]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :async-queue! async-queue!*
@@ -2038,6 +2058,7 @@
    :index index*
    :io io*
    :json-fields json-fields*
+   :keep-keys keep-keys*
    :moving-event-window moving-event-window*
    :not-expired not-expired*
    :outside-dt cond-dt*
