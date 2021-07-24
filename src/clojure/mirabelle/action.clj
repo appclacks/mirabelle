@@ -67,7 +67,7 @@
 
   Here, we keep only events with :host = foo and with :metric > 10"
   [conditions & children]
-  (spec/valid? ::where [conditions])
+  (spec/valid-action? ::where [conditions])
   {:action :where
    :params [conditions]
    :children children})
@@ -185,7 +185,7 @@
 
   This example will return a vector events partitioned 5 by 5."
   [size & children]
-  (spec/valid? ::fixed-event-window [size])
+  (spec/valid-action? ::fixed-event-window [size])
   {:action :fixed-event-window
    :params [size]
    :children children})
@@ -404,7 +404,7 @@
 (s/def ::above-dt (s/cat :threshold pos-int? :dt pos-int?))
 
 (defn above-dt
-   "Takes a number `threshold` and a time period in seconds `dt`.
+  "Takes a number `threshold` and a time period in seconds `dt`.
   If the condition \"the event metric is > to the threshold\" is valid for all events
   received during at least the period `dt`, valid events received after the `dt`
   period will be passed on until an invalid event arrives.
@@ -418,7 +418,7 @@
   In this example, if the events `:metric` field are greater than 100 for more than 10 seconds, events are passed downstream.
   "
   [threshold dt & children]
-  (spec/valid? ::above-dt [threshold dt])
+  (spec/valid-action? ::above-dt [threshold dt])
   {:action :above-dt
    :params [[:> :metric threshold] dt]
    :children children})
@@ -426,7 +426,7 @@
 (s/def ::below-dt (s/cat :threshold pos-int? :dt pos-int?))
 
 (defn below-dt
-    "Takes a number `threshold` and a time period in seconds `dt`.
+  "Takes a number `threshold` and a time period in seconds `dt`.
   If the condition `the event metric is < to the threshold` is valid for all
   events received during at least the period `dt`, valid events received after
   the `dt` period will be passed on until an invalid event arrives.
@@ -440,7 +440,7 @@
   In this example, if the events `:metric` field are lower than 100 for more than 10 seconds, events are passed downstream.
   "
   [threshold dt & children]
-  (spec/valid? ::below-dt [threshold dt])
+  (spec/valid-action? ::below-dt [threshold dt])
   {:action :below-dt
    :params [[:< :metric threshold] dt]
    :children children})
@@ -448,7 +448,7 @@
 (s/def ::between-dt (s/cat :low pos-int? :high pos-int? :dt pos-int?))
 
 (defn between-dt
-    "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
+  "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
   If the condition `the event metric is > low and < high` is valid for all events
   received during at least the period `dt`, valid events received after the `dt`
   period will be passed on until an invalid event arrives.
@@ -462,7 +462,7 @@
   In this example, if the events `:metric` field are between 50 ans 100 for more than 10 seconds, events are passed downstream.
   "
   [low high dt & children]
-  (spec/valid? ::between-dt [low high dt])
+  (spec/valid-action? ::between-dt [low high dt])
   {:action :between-dt
    :params [[:and
              [:> :metric low]
@@ -473,7 +473,7 @@
 (s/def ::outside-dt (s/cat :low pos-int? :high pos-int? :dt pos-int?))
 
 (defn outside-dt
-    "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
+  "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
   If the condition `the event metric is < low or > high` is valid for all events
   received during at least the period `dt`, valid events received after the `dt`
   period will be passed on until an invalid event arrives.
@@ -488,7 +488,7 @@
   In this example, if the events `:metric` field are outside the 50-100 range for more than 10 seconds, events are passed downstream.
   "
   [low high dt & children]
-  (spec/valid? ::outside-dt [low high dt])
+  (spec/valid-action? ::outside-dt [low high dt])
   {:action :outside-dt
    :params [[:or
              [:< :metric low]
@@ -512,7 +512,7 @@
   In this example, if the events `:state` are \"critical\" for more than 10 seconds, events are passed downstream.
   "
   [dt & children]
-  (spec/valid? ::critical-dt [dt])
+  (spec/valid-action? ::critical-dt [dt])
   {:action :critical-dt
    :params [[:= :state "critical"]
             dt]
@@ -578,7 +578,7 @@
   In this example, all events where `:state` is not set will be updated with
   `:state` to \"ok\"."
   [field value & children]
-  (spec/valid? ::default [field value])
+  (spec/valid-action? ::default [field value])
   {:action :default
    :params [field value]
    :children children})
@@ -609,7 +609,7 @@
 
   I/O are automatically discarded in test mode."
   [io-name]
-  (spec/valid? ::push-io! [io-name])
+  (spec/valid-action? ::push-io! [io-name])
   {:action :push-io!
    :params [io-name]})
 
@@ -699,7 +699,7 @@
   Expired events will be removed from the list.
   "
   [dt fields & children]
-  (spec/valid? ::coalesce [dt fields])
+  (spec/valid-action? ::coalesce [dt fields])
   {:action :coalesce
    :children children
    :params [dt fields]})
@@ -823,7 +823,7 @@
 
   This example adds the tag \"foo\" and \"bar\" to events."
   [tags & children]
-  (spec/valid? ::tag [tags])
+  (spec/valid-action? ::tag [tags])
   {:action :tag
    :params [tags]
    :children children})
@@ -855,7 +855,7 @@
 
   This example removes the tags \"foo\" and \"bar\" from events"
   [tags & children]
-  (spec/valid? ::untag [tags])
+  (spec/valid-action? ::untag [tags])
   {:action :untag
    :params [tags]
    :children children})
@@ -890,7 +890,7 @@
   This example keeps only events tagged \"foo\" and \"bar\".
   "
   [tags & children]
-  (spec/valid? ::tagged-all [tags])
+  (spec/valid-action? ::tagged-all [tags])
   {:action :tagged-all
    :params [tags]
    :children children})
@@ -956,7 +956,7 @@
   This example will multiply the :metric field for all events by 1000.
   "
   [factor & children]
-  (spec/valid? ::scale [factor])
+  (spec/valid-action? ::scale [factor])
   {:action :scale
    :params [factor]
    :children children})
@@ -1008,7 +1008,7 @@
                                   (do
                                     (swap! children conj (first clause))
                                     [:always-true])))))]
-    (spec/valid? (s/coll-of ::condition) clauses-fn)
+    (spec/valid-action? (s/coll-of ::condition) clauses-fn)
     {:action :split
      :params [clauses-fn]
      :children @children}))
@@ -1044,7 +1044,7 @@
   In this example, throttle will let one event pass at most every 10 seconds.
   Other events, or events with no time, are filtered."
   [dt & children]
-  (spec/valid? ::scale [dt])
+  (spec/valid-action? ::scale [dt])
   {:action :throttle
    :params [dt]
    :children children})
@@ -1067,8 +1067,8 @@
                          ; No start time
                          (nil? start-time)
                          (assoc state :start-time (:time event)
-                                      :buffer [event]
-                                      :windows nil)
+                                :buffer [event]
+                                :windows nil)
 
                          ; Too old
                          (< (:time event) start-time)
@@ -1114,7 +1114,7 @@
   ```
   "
   [n & children]
-  (spec/valid? ::scale [n])
+  (spec/valid-action? ::scale [n])
   {:action :fixed-time-window
    :params [n]
    :children children})
@@ -1141,7 +1141,7 @@
     (coll-mean (info))
   ```"
   [n & children]
-  (spec/valid? ::moving-event-window [n])
+  (spec/valid-action? ::moving-event-window [n])
   {:action :moving-event-window
    :params [n]
    :children children})
@@ -1170,7 +1170,7 @@
   r=1/2 means the current event counts for half, the previous event for 1/4,
   the previous event for 1/8, and so on."
   [r & children]
-  (spec/valid? ::ewma-timeless [r])
+  (spec/valid-action? ::ewma-timeless [r])
   {:action :ewma-timeless
    :params [r]
    :children children})
@@ -1194,7 +1194,7 @@
     (info))
   ```"
   [n & children]
-  (spec/valid? ::over [n])
+  (spec/valid-action? ::over [n])
   {:action :over
    :params [n]
    :children children})
@@ -1219,7 +1219,7 @@
   ```
   "
   [n & children]
-  (spec/valid? ::under [n])
+  (spec/valid-action? ::under [n])
   {:action :under
    :params [n]
    :children children})
@@ -1254,7 +1254,7 @@
 
   This stream is useful to get only events making a transition."
   [field init & children]
-  (spec/valid? ::changed [field init])
+  (spec/valid-action? ::changed [field init])
   {:action :changed
    :params [field init]
    :children children})
@@ -1340,7 +1340,7 @@
   latest event from the \"dequeues\" one.
   "
   [conditions & children]
-  (spec/valid? ::project [conditions])
+  (spec/valid-action? ::project [conditions])
   {:action :project
    :params [conditions]
    :children children})
@@ -1372,7 +1372,7 @@
 
   This example will index events by host and services."
   [labels]
-  (spec/valid? ::index [labels])
+  (spec/valid-action? ::index [labels])
   {:action :index
    :params [labels]})
 
@@ -1417,7 +1417,7 @@
   (sdissoc [:environment :host] (info))
   ```"
   [fields & children]
-  (spec/valid? ::sdissoc [fields])
+  (spec/valid-action? ::sdissoc [fields])
   {:action :sdissoc
    :params [(if (keyword? fields) [fields] fields)]
    :children children})
@@ -1445,7 +1445,7 @@
     (coll-percentiles [0.5 0.75 0.98 0.99]))
   ```"
   [points & children]
-  (spec/valid? ::coll-percentiles [points])
+  (spec/valid-action? ::coll-percentiles [points])
   {:action :coll-percentiles
    :params [points]
    :children children})
@@ -1480,7 +1480,7 @@
 
   This example generates a moving window for each host/service combination."
   [fields & children]
-  (spec/valid? ::by [fields])
+  (spec/valid-action? ::by [fields])
   {:action :by
    :params [fields]
    :children children})
@@ -1529,7 +1529,7 @@
   ([]
    (reinject! nil))
   ([destination-stream]
-   (spec/valid? ::reinject [destination-stream])
+   (spec/valid-action? ::reinject [destination-stream])
    {:action :reinject!
     :params [destination-stream]}))
 
@@ -1556,7 +1556,7 @@
     (info))
   ```"
   [queue-name & children]
-  (spec/valid? ::async-queue! [queue-name])
+  (spec/valid-action? ::async-queue! [queue-name])
   {:action :async-queue!
    :params [queue-name]
    :children children})
@@ -1598,7 +1598,7 @@
   In test mode, all events with `:service` \"foo\" will be saved in a tap
   named `:foo`"
   [tap-name]
-  (spec/valid? ::tap [tap-name])
+  (spec/valid-action? ::tap [tap-name])
   {:action :tap
    :params [tap-name]})
 
@@ -1615,8 +1615,8 @@
      children)))
 
 (s/def ::json-fields (s/cat :fields
-                             (s/or :single keyword?
-                                   :multiple (s/coll-of keyword?))))
+                            (s/or :single keyword?
+                                  :multiple (s/coll-of keyword?))))
 
 (defn json-fields
   "Takes a field or a list of fields, and converts the values associated to these
@@ -1632,7 +1632,7 @@
   data, with keywords as keys.
   "
   [fields & children]
-  (spec/valid? ::json-fields [fields])
+  (spec/valid-action? ::json-fields [fields])
   {:action :tap
    :params [(if (keyword? fields) [fields] fields)]
    :children children})
@@ -1732,7 +1732,7 @@
 
 (s/def ::reaper (s/cat :interval pos-int?
                        :destination-stream (s/or :keyword keyword?
-                                                :nil nil?)))
+                                                 :nil nil?)))
 
 (defn reaper
   "Everytime this action receives an event, it will expires events from the
@@ -1748,7 +1748,7 @@
   ```"
   ([interval] (reaper interval nil))
   ([interval destination-stream]
-   (spec/valid? ::reaper [interval destination-stream])
+   (spec/valid-action? ::reaper [interval destination-stream])
    {:action :reaper
     :params [interval destination-stream]
     :children []}))
@@ -1774,7 +1774,7 @@
   "
   [field & children]
   (let [fields (if (keyword? field) [field] field)]
-    (spec/valid? ::to-base64 [fields])
+    (spec/valid-action? ::to-base64 [fields])
     {:action :to-base64
      :params [fields]
      :children children}))
@@ -1800,7 +1800,7 @@
   "
   [field & children]
   (let [fields (if (keyword? field) [field] field)]
-    (spec/valid? ::from-base64 [fields])
+    (spec/valid-action? ::from-base64 [fields])
     {:action :from-base64
      :params [fields]
      :children children}))
@@ -1834,7 +1834,7 @@
   More information about availables formatters in the Clojure documentation:
   https://clojuredocs.org/clojure.core/format"
   [template target-field fields & children]
-  (spec/valid? ::sformat [template target-field fields])
+  (spec/valid-action? ::sformat [template target-field fields])
   {:action :sformat
    :params [template target-field fields]
    :children children})
@@ -1858,7 +1858,7 @@
 
   Users can then subscribe to channels using the websocket engine."
   [channel]
-  (spec/valid? ::publish! [channel])
+  (spec/valid-action? ::publish! [channel])
   {:action :publish!
    :params [channel]
    :children []})
@@ -1879,7 +1879,7 @@
       (info)))
   ```"
   [nb-events & children]
-  (spec/valid? ::coll-top [nb-events])
+  (spec/valid-action? ::coll-top [nb-events])
   {:action :coll-top
    :params [nb-events]
    :children children})
@@ -1900,7 +1900,7 @@
       (info)))
   ```"
   [nb-events & children]
-  (spec/valid? ::coll-bottom [nb-events])
+  (spec/valid-action? ::coll-bottom [nb-events])
   {:action :coll-bottom
    :params [nb-events]
    :children children})
@@ -1951,7 +1951,6 @@
             (doseq [event out]
               (call-rescue event children))))))))
 
-
 (s/def ::stable (s/cat :dt pos-int? :field keyword?))
 
 (defn stable
@@ -1973,7 +1972,7 @@
   In this example, events will be forwarded of the value of the `:state` key
   is the same for at least 10 seconds"
   [dt field & children]
-  (spec/valid? ::stable [dt field])
+  (spec/valid-action? ::stable [dt field])
   {:action :stable
    :params [dt field]
    :children children})
@@ -1997,7 +1996,7 @@
   `:environment` key is renamed `:env`.
   Existing values will be overrided."
   [replacement & children]
-  (spec/valid? ::rename-keys [replacement])
+  (spec/valid-action? ::rename-keys [replacement])
   {:action :rename-keys
    :params [replacement]
    :children children})
@@ -2017,7 +2016,7 @@
     (info))
   ```"
   [keys-to-keep & children]
-  (spec/valid? ::keep-keys [keys-to-keep])
+  (spec/valid-action? ::keep-keys [keys-to-keep])
   {:action :keep-keys
    :params [keys-to-keep]
    :children children})

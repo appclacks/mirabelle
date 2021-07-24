@@ -1,5 +1,7 @@
 (ns mirabelle.spec
   (:require [clojure.spec.alpha :as s]
+            [clojure.string :as string]
+            [corbihttp.log :as log]
             [exoscale.ex :as ex]))
 
 (s/def ::ne-string (s/and string? (complement empty?)))
@@ -11,6 +13,16 @@
 (defn valid?
   [spec value]
   (ex/assert-spec-valid spec value))
+
+(defn valid-action?
+  [spec value]
+  (try
+    (valid? spec value)
+    (catch Exception e
+      (log/error {} (format "Invalid call to action '%s' with parameters '%s'"
+                            (name spec)
+                            (pr-str value)))
+      (throw e))))
 
 (s/def :mirabelle.index/query ::ne-string)
 (s/def :mirabelle.stream/name keyword?)

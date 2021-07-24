@@ -42,10 +42,18 @@
              (action/by-fn (first params)
                            #(compile! context (:children s)))
              (let [children (compile! context (:children s))]
-               (if (seq params)
-                 (apply func context (concat params children))
-                 (apply func context children))))
-           (ex/ex-incorrect! (format "Action %s not found" action))))))))
+               (try
+                 (if (seq params)
+                   (apply func context (concat params children))
+                   (apply func context children))
+                 (catch Exception e
+                   (log/error {} (format "Your EDN configuration is incorrect. Error in action '%s' with parameters '%s'"
+                                         (name action)
+                                         (pr-str params)))
+                   (throw e)))))
+           (let [error (format "Your EDN configuration is incorrect. Action %s not found." action)]
+             (log/error {} error)
+             (ex/ex-incorrect! error))))))))
 
 (defn compile-stream!
   "Compile a stream to functions and associate to it its entrypoint."

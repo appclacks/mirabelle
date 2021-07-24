@@ -106,7 +106,6 @@
            dorun))
     (catch Exception e
       (if (ex/type? e ::ex/invalid-spec)
-        (do (log/error {} e)
-            (throw (ex/ex-incorrect (error/spec-ex->message e)
-                                    {})))
+        (throw (ex/ex-incorrect (str (error/spec-ex->message e) "\nMore details about the error:\n")
+                                {:original-error e}))
         (throw e)))))
