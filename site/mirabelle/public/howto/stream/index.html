@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1626461459" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1626461459" rel="stylesheet">
-    <link href="/css/hybrid.css?1626461459" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1626461459" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1626461459" rel="stylesheet">
-    <link href="/css/auto-complete.css?1626461459" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1626461459" rel="stylesheet">
-    <link href="/css/theme.css?1626461459" rel="stylesheet">
-    <link href="/css/tabs.css?1626461459" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1626461459" rel="stylesheet">
+    <link href="/css/nucleus.css?1627139321" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1627139321" rel="stylesheet">
+    <link href="/css/hybrid.css?1627139321" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1627139321" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1627139321" rel="stylesheet">
+    <link href="/css/auto-complete.css?1627139321" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1627139321" rel="stylesheet">
+    <link href="/css/theme.css?1627139321" rel="stylesheet">
+    <link href="/css/tabs.css?1627139321" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1627139321" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1626461459"></script>
+    <script src="/js/jquery-3.3.1.min.js?1627139321"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1626461459"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1626461459"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1627139321"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1627139321"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1626461459"></script>
+<script type="text/javascript" src="/js/search.js?1627139321"></script>
 
     
   </div>
@@ -770,10 +770,11 @@ For example, the <code>above-dt</code> stream will only let events pass if all e
 </code></pre></div><p>The <code>sdissoc</code> action takes a field or a list of fields and will remove them from the vent. For example, <code>(sdissoc :host)</code> or <code>(sdissoc [:host :service])</code>.</p>
 <p>You can use <code>rename-keys</code> to rename some events keys:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(rename-keys {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>
-              <span style="color:#e6db74">:environment</span> <span style="color:#e6db74">:env</span>}
-</code></pre></div><p>In this example, the <code>:host</code> key will be renamed <code>:service</code> and the
-<code>:environment</code> key is renamed <code>:env</code>. Existing values will be overrided.</p>
-<p>Some actions can modify the <code>:metric</code> field. <code>increment</code> and <code>decrement</code> will add +1 or -1 to it, and you can use <code>scale</code> to multiply it with a value: <code>(scale 1000)</code> for example.</p>
+              <span style="color:#e6db74">:environment</span> <span style="color:#e6db74">:env</span>})
+</code></pre></div><p>In this example, the <code>:host</code> key will be renamed <code>:service</code> and the <code>:environment</code> key is renamed <code>:env</code>. Existing values will be overrided.</p>
+<p>If you want to keep only some keys from an event (and so remove all the others), you can use <code>keep-keys</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">keep-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:time</span> <span style="color:#e6db74">:metric</span> <span style="color:#e6db74">:description</span> <span style="color:#e6db74">:environment</span>])
+</code></pre></div><p>Some actions can modify the <code>:metric</code> field. <code>increment</code> and <code>decrement</code> will add +1 or -1 to it, and you can use <code>scale</code> to multiply it with a value: <code>(scale 1000)</code> for example.</p>
 <h4 id="detect-state-transitions">Detect state transitions</h4>
 <p>The <code>changed</code> action can be used to detect state transitions.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">changed</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;ok&#34;</span>
@@ -1211,19 +1212,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1626461459"></script>
-    <script src="/js/perfect-scrollbar.min.js?1626461459"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1626461459"></script>
-    <script src="/js/jquery.sticky.js?1626461459"></script>
-    <script src="/js/featherlight.min.js?1626461459"></script>
-    <script src="/js/highlight.pack.js?1626461459"></script>
+    <script src="/js/clipboard.min.js?1627139321"></script>
+    <script src="/js/perfect-scrollbar.min.js?1627139321"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1627139321"></script>
+    <script src="/js/jquery.sticky.js?1627139321"></script>
+    <script src="/js/featherlight.min.js?1627139321"></script>
+    <script src="/js/highlight.pack.js?1627139321"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1626461459"></script>
-    <script src="/js/learn.js?1626461459"></script>
-    <script src="/js/hugo-learn.js?1626461459"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1627139321"></script>
+    <script src="/js/learn.js?1627139321"></script>
+    <script src="/js/hugo-learn.js?1627139321"></script>
     
         
-            <script src="/mermaid/mermaid.js?1626461459"></script>
+            <script src="/mermaid/mermaid.js?1627139321"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });
