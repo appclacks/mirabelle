@@ -4,7 +4,7 @@
             [corbihttp.log :as log]
             [exoscale.ex :as ex]))
 
-(s/def ::ne-string (s/and string? (complement empty?)))
+(s/def ::ne-string (s/and string? (complement string/blank?)))
 (s/def ::keyword-or-str (s/or :keyword keyword?
                               :string ::ne-string))
 
