@@ -103,12 +103,14 @@
   component/Lifecycle
   (start [this]
     (spec/valid? ::influxdb config)
-    (let [config (merge default-config config)
-          ^InfluxDBClient c (influxdb-client config)]
-      (assoc this
-             :config config
-             :client c
-             :write-api (.getWriteApi c))))
+    (if client
+      this
+      (let [config (merge default-config config)
+            ^InfluxDBClient c (influxdb-client config)]
+        (assoc this
+               :config config
+               :client c
+               :write-api (.getWriteApi c)))))
   (stop [this]
     (.close client)
     (assoc this :client nil :write-api nil))

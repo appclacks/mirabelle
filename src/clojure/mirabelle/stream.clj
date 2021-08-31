@@ -11,6 +11,7 @@
             [mirabelle.action :as action]
             [mirabelle.db.queue :as q]
             [mirabelle.index :as index]
+            [mirabelle.io.elasticsearch :as elasticsearch]
             [mirabelle.io.file :as io-file]
             [mirabelle.io.influxdb :as influxdb]
             [mirabelle.io.pagerduty :as pagerduty]
@@ -94,7 +95,13 @@
       (= :pagerduty t)
       (assoc io-config
              :component
-             (pagerduty/map->Pagerduty (:config io-config)))
+             (component/start (pagerduty/map->Pagerduty (:config io-config))))
+
+      (= :elasticsearch t)
+      (assoc io-config
+             :component
+             (component/start (elasticsearch/map->Elasticsearch
+                               {:config (:config io-config)})))
 
       (= :influxdb t)
       (assoc io-config

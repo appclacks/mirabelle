@@ -9,13 +9,9 @@
             [exoscale.ex :as ex]
             [mirabelle.io :as io]
             [mirabelle.spec :as spec]
-            [mirabelle.time :as time])
-  (:import java.text.SimpleDateFormat
-           java.util.Date))
+            [mirabelle.time :as time]))
 
 (def event-url "https://events.pagerduty.com/v2/enqueue")
-
-(def formatter (SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"))
 
 (defn event+keys->str
   [event event-keys separator]
