@@ -219,6 +219,7 @@
   IStreamHandler
   (context [this source-stream]
     {:io compiled-io
+     :registry registry
      :queue queue
      :tap tap
      :test-mode? test-mode?
