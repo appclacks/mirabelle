@@ -114,7 +114,7 @@
                             {:as :json
                              :throw-exceptions false})]
       (is (= 404 (:status resp)))
-      (is (= {:error "not found"}
+      (is (= {:error "uri /api/v1/notfound not found for method delete"}
              (json/parse-string (:body resp) true)))))
   (testing "search-index: wring parameter"
     (let [body (-> {:query nil}

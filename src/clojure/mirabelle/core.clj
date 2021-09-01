@@ -37,8 +37,10 @@
      :queue queue-component
      :websocket (-> (websocket/map->WebsocketServer websocket)
                     (component/using [:pubsub :registry]))
-     :http (-> (corbihttp/map->Server {:config http})
-               (component/using [:handler]))
+     :http (-> (corbihttp/map->Server {:config http
+                                       :registry registry
+                                       :chain-builder http/interceptor-chain})
+               (component/using [:api-handler]))
      :stream-handler (stream/map->StreamHandler
                       {:streams-directories (:directories stream)
                        :io-directories (:directories io)
@@ -48,8 +50,6 @@
                        :queue queue-component
                        :registry registry
                        :pubsub pubsub})
-     :handler (-> (http/map->ChainHandler {})
-                  (component/using [:api-handler :registry]))
      :index index
      :api-handler (-> (handler/map->Handler {})
                       (component/using [:stream-handler :registry]))
