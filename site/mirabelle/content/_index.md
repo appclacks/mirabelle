@@ -1,8 +1,10 @@
-# Mirabelle, a powerful stream processing engine for monitoring
+# Mirabelle, a powerful stream processing engine
 
 Mirabelle is a stream processing engine which can be used to aggregate events, metrics and logs.
 
 Its powerful and extensible DSL allows you to define computations on a stream of data. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabeling, etc.) which can be easily combined according to your needs.
+
+It can be used for a lot of use cases like monitoring, fraud detection, alerting, to route events and metrics between different systems...
 
 ![Mirabelle](img/mirabelle_presentation.png)
 
