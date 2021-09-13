@@ -42,7 +42,7 @@
 (defn where*
   [_ conditions & children]
   (let [condition-fn (cd/compile-conditions conditions)]
-    (fn [event]
+    (fn stream [event]
       (when (condition-fn event)
         (call-rescue event children)))))
 
@@ -75,7 +75,7 @@
 
 (defn increment*
   [_ & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue (update event :metric inc)
                  children)))
 
@@ -93,7 +93,7 @@
 
 (defn decrement*
   [_ & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue (update event :metric dec)
                  children)))
 
@@ -112,7 +112,7 @@
 (defn log-action
   "Generic logger"
   [level]
-  (fn [event]
+  (fn stream [event]
     (when-let [event (keep-non-discarded-events event)]
       (condp = level
         :debug (log/debug {} (json/generate-string event))
@@ -165,7 +165,7 @@
 (defn fixed-event-window*
   [_ size & children]
   (let [window (atom [])]
-    (fn [event]
+    (fn stream [event]
       (let [events (swap! window (fn [events]
                                    (let [events (conj events event)]
                                      (if (< size (count events))
@@ -193,7 +193,7 @@
 
 (defn coll-mean*
   [_ & children]
-  (fn [events]
+  (fn stream [events]
     (call-rescue (math/mean events) children)))
 
 (defn coll-mean
@@ -214,7 +214,7 @@
 
 (defn coll-max*
   [_ & children]
-  (fn [events]
+  (fn stream [events]
     (call-rescue (math/max-event events) children)))
 
 (defn coll-max
@@ -234,7 +234,7 @@
 
 (defn coll-quotient*
   [_ & children]
-  (fn [events]
+  (fn stream [events]
     (call-rescue (math/quotient events) children)))
 
 (defn coll-quotient
@@ -248,7 +248,7 @@
 
 (defn coll-sum*
   [_ & children]
-  (fn [events]
+  (fn stream [events]
     (call-rescue (math/sum-events events) children)))
 
 (defn coll-sum
@@ -268,7 +268,7 @@
 
 (defn coll-min*
   [_ & children]
-  (fn [events]
+  (fn stream [events]
     (call-rescue (math/min-event events) children)))
 
 (defn coll-min
@@ -288,7 +288,7 @@
 
 (defn test-action*
   [_ state]
-  (fn [event]
+  (fn stream [event]
     (swap! state conj event)))
 
 (defn test-action
@@ -301,7 +301,7 @@
 
 (defn sdo*
   [_ & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue event children)))
 
 (defn sdo
@@ -325,7 +325,7 @@
   "Keep expired events."
   [_ & children]
   (let [time-state (atom 0)]
-    (fn [event]
+    (fn stream [event]
       (let [current-time (swap! time-state (fn [old-time]
                                              (max old-time (:time event 0))))]
         (when (e/expired? current-time event)
@@ -349,7 +349,7 @@
   "Keep non-expired events."
   [_ & children]
   (let [time-state (atom 0)]
-    (fn [event]
+    (fn stream [event]
       (let [current-time (swap! time-state (fn [old-time]
                                              (max old-time (:time event 0))))]
         (when (not (e/expired? current-time event))
@@ -377,7 +377,7 @@
   (let [condition-fn (cd/compile-conditions conditions)
         last-changed-state (atom {:ok false
                                   :time nil})]
-    (fn [event]
+    (fn stream [event]
       (let [event-time (:time event)
             valid-event (condition-fn event)]
         (when event-time ;; filter events with no time
@@ -521,7 +521,7 @@
 
 (defn critical*
   [_ & children]
-  (fn [event]
+  (fn stream [event]
     (when (e/critical? event)
       (call-rescue event children))))
 
@@ -541,7 +541,7 @@
 
 (defn warning*
   [_ & children]
-  (fn [event]
+  (fn stream [event]
     (when (e/warning? event)
       (call-rescue event children))))
 
@@ -561,7 +561,7 @@
 
 (defn default*
   [_ field value & children]
-  (fn [event]
+  (fn stream [event]
     (if-not (get event field)
       (call-rescue (assoc event field value) children)
       (call-rescue event children))))
@@ -588,9 +588,9 @@
   [context io-name]
   ;; discard io in test mode
   (if (:test-mode? context)
-    (fn [_] nil)
+    (fn stream [_] nil)
     (if-let [io-component (get-in context [:io io-name :component])]
-      (fn [event]
+      (fn stream [event]
         (when-let [events (keep-non-discarded-events event)]
           (io/inject! io-component (e/sequential-events events))))
       (throw (ex/ex-incorrect (format "IO %s not found"
@@ -622,7 +622,7 @@
                      :window nil})
         key-fn #(vals (select-keys % fields))]
     ;; the implementation can probably be optimized ?
-    (fn [event]
+    (fn stream [event]
       (let [buffer-update-fn (fn [current-event]
                                (cond
                                  ;; current-event is nil
@@ -707,7 +707,7 @@
 
 (defn with*
   [_ fields & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue (merge event fields) children)))
 
 (defn with
@@ -747,7 +747,7 @@
 
 (defn coll-rate*
   [_  & children]
-  (fn [events]
+  (fn stream [events]
     (call-rescue (math/rate events) children)))
 
 (defn coll-rate
@@ -776,7 +776,7 @@
 
 (defn sflatten*
   [_ & children]
-  (fn [events]
+  (fn stream [events]
     (doseq [e events]
       (call-rescue e children))))
 
@@ -800,7 +800,7 @@
 (defn tag*
   [_ tags & children]
   (let [tags (flatten [tags])]
-    (fn [event]
+    (fn stream [event]
       (call-rescue
        (assoc event :tags (distinct (concat tags (:tags event))))
        children))))
@@ -833,7 +833,7 @@
   [_ tags & children]
   (let [tags (set (flatten [tags]))
         blacklist #(not (tags %))]
-    (fn [event]
+    (fn stream [event]
       (call-rescue (update event :tags #(filter blacklist %))
                    children))))
 
@@ -941,7 +941,7 @@
 
 (defn scale*
   [_ factor & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue (update event :metric * factor) children)))
 
 (s/def ::scale (s/cat :factor number?))
@@ -970,7 +970,7 @@
                           (map (fn [clause]
                                  [(cd/compile-conditions (first clause))
                                   (second clause)])))]
-    (fn [event]
+    (fn stream [event]
       (when-let [stream (reduce (fn [state clause]
                                   (if ((first clause) event)
                                     (reduced (second clause))
@@ -1017,7 +1017,7 @@
 (defn throttle*
   [_ dt & children]
   (let [last-sent (atom [nil nil])]
-    (fn [event]
+    (fn stream [event]
       (when (:time event)
         (let [[_ event-to-send] (swap! last-sent
                                        (fn [[last-time-sent _]]
@@ -1060,27 +1060,27 @@
       (let [s (swap! state
                      (fn [{:keys [start-time buffer] :as state}]
                        (cond
-                         ; No time
+                                        ; No time
                          (nil? (:time event))
                          (-> (update state :buffer conj event)
                              (assoc :windows nil))
 
-                         ; No start time
+                                        ; No start time
                          (nil? start-time)
                          (assoc state :start-time (:time event)
                                 :buffer [event]
                                 :windows nil)
 
-                         ; Too old
+                                        ; Too old
                          (< (:time event) start-time)
                          (assoc state :windows nil)
 
-                         ; Within window
+                                        ; Within window
                          (< (:time event) (+ start-time n))
                          (-> (update state :buffer conj event)
                              (assoc :windows nil))
 
-                         ; Above window
+                                        ; Above window
                          :else
                          (let [delta (- (:time event) start-time)
                                dstart (- delta (mod delta n))
@@ -1154,7 +1154,7 @@
         c-existing (- 1 r)
         c-new r]
     (fn stream [event]
-      ; Compute new ewma
+                                        ; Compute new ewma
       (let [m (when-let [metric-new (:metric event)]
                 (swap! m (comp (partial + (* c-new metric-new))
                                (partial * c-existing))))]
@@ -1228,7 +1228,7 @@
 (defn changed*
   [_ field init & children]
   (let [state (atom [init nil])]
-    (fn [event]
+    (fn stream [event]
       (let [[_ event] (swap! state
                              (fn [s]
                                (let [current-val (get event field)]
@@ -1267,7 +1267,7 @@
                                      {}
                                      (range 0 (count conditions)))
                      :current-time 0})]
-    (fn [event]
+    (fn stream [event]
       (let [result (swap! state
                           (fn [{:keys [current-time buffer]}]
                             ;; ffirst compute the current time
@@ -1352,7 +1352,7 @@
         channel (index/channel (:source-stream context))
         default-channel (index/channel :default)
         pubsub (:pubsub context)]
-    (fn [event]
+    (fn stream [event]
       (when-let [t (:time event)]
         (index/new-time? i t))
       (when-not (:test-mode? context)
@@ -1379,7 +1379,7 @@
 
 (defn coll-count*
   [_ & children]
-  (fn [events]
+  (fn stream [events]
     ;; send empty event if the list is empty
     (call-rescue (or (math/count-events events)
                      {:metric 0})
@@ -1405,7 +1405,7 @@
 
 (defn sdissoc*
   [_ fields & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue (apply dissoc event fields)
                  children)))
 
@@ -1425,7 +1425,7 @@
 
 (defn coll-percentiles*
   [_ points & children]
-  (fn [events]
+  (fn stream [events]
     (doseq [event (math/sorted-sample events points)]
       (call-rescue event
                    children))))
@@ -1489,9 +1489,9 @@
 (defn disk-queue!*
   [context]
   (if (:test-mode? context)
-    (fn [_] nil)
+    (fn stream [_] nil)
     (let [queue (:queue context)]
-      (fn [events]
+      (fn stream [events]
         (when-let [events (keep-non-discarded-events events)]
           (queue/write! queue events))))))
 
@@ -1505,7 +1505,7 @@
   [context destination-stream]
   (let [reinject-fn (:reinject context)
         destination-stream (or destination-stream (:source-stream context))]
-    (fn [event]
+    (fn stream [event]
       (reinject-fn event destination-stream))))
 
 (s/def ::reinject (s/cat :destination-stream (s/or :keyword keyword?
@@ -1541,7 +1541,7 @@
   (if (:test-mode? context)
     (apply sdo* context children)
     (if-let [^Executor executor (get-in context [:io queue-name :component])]
-      (fn [event]
+      (fn stream [event]
         (.execute executor
                   (fn []
                     (call-rescue event children))))
@@ -1565,7 +1565,7 @@
 (defn io*
   [context & children]
   (if (:test-mode? context)
-    (fn [_] nil)
+    (fn stream [_] nil)
     (apply sdo* context children)))
 
 (defn io
@@ -1579,12 +1579,12 @@
   [context tape-name]
   (if (:test-mode? context)
     (let [tap (:tap context)]
-      (fn [event]
+      (fn stream [event]
         (swap! tap
                (fn [tap]
                  (update tap tape-name (fn [v] (if v (conj v event) [event])))))))
     ;; discard in non-tests
-    (fn [_] nil)))
+    (fn stream [_] nil)))
 
 (s/def ::tap (s/cat :tap-name keyword?))
 
@@ -1605,7 +1605,7 @@
 
 (defn json-fields*
   [_ fields & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue
      (reduce (fn [event field]
                (if (get event field)
@@ -1652,7 +1652,7 @@
 
 (defn exception-stream*
   [_ success-child failure-child]
-  (fn [event]
+  (fn stream [event]
     (try
       (success-child event)
       (catch Exception e
@@ -1720,7 +1720,7 @@
         clock (atom [0 false])
         reinject-fn (:reinject context)
         destination-stream (or destination-stream (:source-stream context))]
-    (fn [event]
+    (fn stream [event]
       (when (:time event)
         (let [[_ expire?] (swap! clock (fn [[previous-tick _ :as s]]
                                          (if (>= (:time event)
@@ -1758,7 +1758,7 @@
 
 (defn to-base64*
   [_ fields & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue (reduce #(update %1 %2 b64/to-base64) event fields) children)))
 
 (defn to-base64
@@ -1782,7 +1782,7 @@
 
 (defn from-base64*
   [_ fields & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue (reduce #(update %1 %2 b64/from-base64) event fields) children)))
 
 (s/def ::from-base64 (s/cat :fields (s/coll-of keyword?)))
@@ -1809,7 +1809,7 @@
 (defn sformat*
   [_ template target-field fields & children]
   (let [value-fn (fn [event] (reduce #(conj %1 (get event %2)) [] fields))]
-    (fn [event]
+    (fn stream [event]
       (call-rescue
        (assoc event
               target-field
@@ -1843,7 +1843,7 @@
 (defn publish!*
   [context channel]
   (let [pubsub (:pubsub context)]
-    (fn [event]
+    (fn stream [event]
       (when-not (:test-mode? context)
         (when-let [event (keep-non-discarded-events event)]
           (pubsub/publish! pubsub channel event))))))
@@ -1866,7 +1866,7 @@
 
 (defn coll-top*
   [_ nb-events & children]
-  (fn [events]
+  (fn stream [events]
     (call-rescue (math/extremum-n nb-events > events) children)))
 
 (s/def ::coll-top (s/cat :nb-events pos-int?))
@@ -1887,7 +1887,7 @@
 
 (defn coll-bottom*
   [_ nb-events & children]
-  (fn [events]
+  (fn stream [events]
     (call-rescue (math/extremum-n nb-events < events) children)))
 
 (s/def ::coll-bottom (s/cat :nb-events pos-int?))
@@ -1915,7 +1915,7 @@
                      :time nil
                      ;; clock
                      :max-time 0})]
-    (fn [event]
+    (fn stream [event]
       (let [event-time (:time event)
             event-state (get event field)]
         (when event-time
@@ -1980,7 +1980,7 @@
 
 (defn rename-keys*
   [_ replacement & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue (set/rename-keys event replacement) children)))
 
 (s/def ::rename-keys (s/cat :replacement (s/map-of keyword? keyword?)))
@@ -2004,7 +2004,7 @@
 
 (defn keep-keys*
   [_ keys-to-keep & children]
-  (fn [event]
+  (fn stream [event]
     (call-rescue (select-keys event keys-to-keep) children)))
 
 (s/def ::keep-keys (s/cat :keys-to-keep (s/coll-of keyword?)))
