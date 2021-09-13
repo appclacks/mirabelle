@@ -1,5 +1,6 @@
 (ns mirabelle.graphviz
-  (:require [mirabelle.stream :as stream]))
+  (:require [mirabelle.stream :as stream]
+            [clojure.string :as string]))
 
 
 (defn action->graphviz
@@ -27,7 +28,7 @@
 (defn stream->graphviz
   [config]
   (format "digraph {\n %s \n }"
-          (clojure.string/join
+          (string/join
            "\n"
            (for [[stream-name config] config]
              (let [action (:actions config)]
@@ -35,14 +36,11 @@
                     (first (action->graphviz "entrypoint"
                                              ""
                                              [action]))
-                    "\n}"
-                    )))))
-   
-  )
+                    "\n}"))))))
 
 (defn graphviz
   [streams-directories destination]
   (let [config (stream/read-edn-dirs streams-directories)]
-    
+
     )
   )

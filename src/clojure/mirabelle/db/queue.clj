@@ -77,9 +77,9 @@
       (queue/close! queue))
     (assoc this :queue nil :appender nil))
   IQueue
-  (write! [this events]
+  (write! [_ events]
     (appender/write! appender (event/sequential-events events)))
-  (read-all! [this action]
+  (read-all! [_ action]
     (let [start-time (System/currentTimeMillis)
           tailer (tailer/make queue)
           events-count (volatile! 0)
@@ -98,7 +98,7 @@
 
 (defrecord DummyQueue []
   IQueue
-  (write! [this events]
+  (write! [_ _]
     nil)
-  (read-all! [this action]
+  (read-all! [_ _]
     nil))

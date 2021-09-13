@@ -16,15 +16,15 @@
   (stop [this]
     (assoc this :subscriptions nil))
   IPubSub
-  (add [this channel handler]
+  (add [_ channel handler]
     (let [id (UUID/randomUUID)]
       (swap! subscriptions assoc-in
              [(keyword channel)
               id]
              handler)
       id))
-  (rm [this channel id]
+  (rm [_ channel id]
     (swap! subscriptions update (keyword channel) dissoc id))
-  (publish! [this channel event]
+  (publish! [_ channel event]
     (doseq [[_ handler] (get @subscriptions channel)]
       (handler event))))

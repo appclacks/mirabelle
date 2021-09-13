@@ -115,7 +115,7 @@
     (.close client)
     (assoc this :client nil :write-api nil))
   io/IO
-  (inject! [this events]
+  (inject! [_ events]
     (doseq [event events]
       (.writePoint write-api (event->point config event)))))
 

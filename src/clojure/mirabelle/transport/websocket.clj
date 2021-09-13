@@ -118,7 +118,7 @@
     (assoc this :server (http/run-server
                          (handler pubsub registry)
                          {:ip host :port port})))
-  (stop [this]
+  (stop [_]
     (when server
       (try
         (server)

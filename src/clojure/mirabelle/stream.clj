@@ -209,7 +209,7 @@
                                    (update %1 :tags concat ["discard"])
                                    :default))))
     this)
-  (stop [this]
+  (stop [_]
     ;; stop executors first to let them finish ongoing tasks
     (doseq [[_ queue] (filter #(= :async-queue (:type %)) compiled-io)]
       (let [^Executor executor (:component queue)]
@@ -260,7 +260,7 @@
         (set! streams-configurations new-streams-configurations)
         {:compiled-streams compiled-streams
          :streams-configurations new-streams-configurations})))
-  (push! [this event stream]
+  (push! [_ event stream]
     (if (= :default stream)
       (doseq [[_ s] compiled-streams]
         (when (:default s)
@@ -285,15 +285,15 @@
                                         stream-name
                                         compiled-stream)]
         (set! compiled-streams new-compiled-streams))))
-  (remove-dynamic-stream [this stream-name]
+  (remove-dynamic-stream [_ stream-name]
     (log/infof {} "Removing dynamic stream %s" stream-name)
     (locking lock
       (let [new-compiled-streams (dissoc compiled-streams
                                          stream-name)]
         (set! compiled-streams new-compiled-streams))))
-  (list-dynamic-streams [this]
+  (list-dynamic-streams [_]
     (or (keys compiled-streams) []))
-  (get-dynamic-stream [this stream-name]
+  (get-dynamic-stream [_ stream-name]
     (if-let [stream (get compiled-streams stream-name)]
       stream
       (throw (ex/ex-info

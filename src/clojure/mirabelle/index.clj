@@ -46,15 +46,15 @@
            :index nil
            :current-time nil))
   IIndex
-  (size-index [this]
+  (size-index [_]
     (.size index))
-  (clear-index [this]
+  (clear-index [_]
     (.clear index))
-  (current-time [this]
+  (current-time [_]
     @current-time)
-  (new-time? [this t]
+  (new-time? [_ t]
     (swap! current-time (fn [current] (max t current))))
-  (delete [this k]
+  (delete [_ k]
     (.remove index k))
   (expire [this]
     (reduce
@@ -79,7 +79,7 @@
      []
      index))
 
-  (search [this condition]
+  (search [_ condition]
     (let [condition-fn (cd/compile-conditions condition)]
       (filter condition-fn (.values index))))
 
@@ -89,5 +89,5 @@
         (delete this labels)
         (.put index (select-keys event labels) event))))
 
-  (lookup [this k]
+  (lookup [_ k]
     (.get index k)))

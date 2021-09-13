@@ -3,6 +3,6 @@
 
 (defrecord FileIO [path]
   io/IO
-  (inject! [this events]
+  (inject! [_ events]
     (doseq [event events]
       (spit path (str (pr-str event) "\n") :append true))))

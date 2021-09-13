@@ -102,23 +102,23 @@
 
 (defn create-client
   [{:keys [service-token api-key] :as config}]
-  (let [hosts ^"[Lorg.apache.http.HttpHost;" (into-array (config->http-hosts config))]
-    (let [^RestClientBuilder builder (RestClient/builder hosts)]
-      (.setRequestConfigCallback builder (request-config-callback config))
-      (.setHttpClientConfigCallback builder (http-config-callback config))
-      (when service-token
-       (.setDefaultHeaders builder
-                           (into-array [(BasicHeader. "Authorization"
-                                                      (str "Bearer " service-token))])))
-     (when api-key
-       (let [secret (.getBytes ^String (b64/to-base64 (str (:id api-key)
-                                                           ":"
-                                                           (:secret api-key)))
-                               java.nio.charset.StandardCharsets/UTF_8)]
-         (.setDefaultHeaders builder
-                             (into-array [(BasicHeader. "Authorization"
-                                                        (str "ApiKey " secret))]))))
-      (.build builder))))
+  (let [hosts ^"[Lorg.apache.http.HttpHost;" (into-array (config->http-hosts config))
+        ^RestClientBuilder builder (RestClient/builder hosts)]
+    (.setRequestConfigCallback builder (request-config-callback config))
+    (.setHttpClientConfigCallback builder (http-config-callback config))
+    (when service-token
+      (.setDefaultHeaders builder
+                          (into-array [(BasicHeader. "Authorization"
+                                                     (str "Bearer " service-token))])))
+    (when api-key
+      (let [secret (.getBytes ^String (b64/to-base64 (str (:id api-key)
+                                                          ":"
+                                                          (:secret api-key)))
+                              java.nio.charset.StandardCharsets/UTF_8)]
+        (.setDefaultHeaders builder
+                            (into-array [(BasicHeader. "Authorization"
+                                                       (str "ApiKey " secret))]))))
+    (.build builder)))
 
 (defn format-event
   [{:keys [default-index default-index-formatter]} event]
@@ -163,7 +163,7 @@
       (.close ^RestClient client))
     (assoc this :client nil :response-listener nil))
   io/IO
-  (inject! [this events]
+  (inject! [_ events]
     (let [^Request request (Request. "POST" "/_bulk")]
       (.setEntity request
                   (NStringEntity. ^String (format-events config events)
