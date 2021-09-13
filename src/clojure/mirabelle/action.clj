@@ -2036,12 +2036,19 @@
 (s/def ::include (s/cat :path ::spec/ne-string
                         :config :include/config))
 
+(defn get-env-profile
+  []
+  (some-> (System/getenv "PROFILE")
+          keyword))
+
 (defn include
   "Include an configuration file by path into the configuration. The file will be read
   using the aero (https://github.com/juxt/aero/) library.
   The `config` variable supports these optional options:
 
-  - `:profile`: the aero profile to use
+  - `:profile`: the aero profile to use. By default, Mirabelle will read (and convert
+  to a Clojure keyword) the PROFILE environment variable during compilation.
+  You can override this value by setting `:profile`.
   - `:variables`: variables to pass to the configuration file.
   You can use the `#mirabelle/var` reader in order to define variables in your
   EDN file.
@@ -2056,11 +2063,13 @@
   [path config]
   (spec/valid-action? ::include [path config])
   (binding [*ns* (find-ns 'mirabelle.action)]
-    (eval (aero/read-config
-           path
-           (cond-> {}
-             (:profile config) (assoc :profile (:profile config))
-             (:variables config) (assoc :variables (:variables config)))))))
+    (let [profile (or (:profile config)
+                      (get-env-profile))]
+      (eval (aero/read-config
+             path
+             (cond-> {}
+               profile (assoc :profile profile)
+               (:variables config) (assoc :variables (:variables config))))))))
 
 (def action->fn
   {:above-dt cond-dt*

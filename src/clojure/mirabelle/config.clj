@@ -85,8 +85,11 @@
   second value the compiled version of it."
   [^File f]
   (log/info {} (format "Compiling %s" (.getName f)))
-  [(.getName f)
-   (eval (aero/read-config (.getPath f) {}))])
+  (let [profile (get-env-profile)]
+    [(.getName f)
+     (eval (aero/read-config (.getPath f)
+                             (cond-> {}
+                               profile (assoc :profile profile))))]))
 
 (defn compile-config!
   [src-dir dest-dir]
