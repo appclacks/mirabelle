@@ -595,12 +595,15 @@
            @recorder))))
 
 (deftest full-test
-  (let [stream {:name "my-stream"
+  (let [include-path (.getPath (io/resource "include/action"))
+        stream {:name "my-stream"
                 :description "foo"
                 :actions (a/sdo
                           (a/above-dt 10 20)
                           (a/between-dt 10 20 30)
                           (a/decrement)
+                          (a/include include-path {:variables {:service "toto"}
+                                                   :profile :prod})
                           (a/stable 5 :state)
                           (a/project [[:= :host "foo"]
                                       [:= :service "bar"]])

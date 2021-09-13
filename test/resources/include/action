@@ -1,0 +1,3 @@
+(where [:= :service #mirabelle/var :service]
+  (with :state #profile {:default "critical"
+                         :prod "info"}))

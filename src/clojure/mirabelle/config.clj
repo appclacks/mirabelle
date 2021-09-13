@@ -1,6 +1,5 @@
 (ns mirabelle.config
   (:require [aero.core :as aero]
-            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
             [clojure.spec.alpha :as s]
@@ -9,6 +8,7 @@
             [environ.core :as env]
             [exoscale.cloak :as cloak]
             [exoscale.ex :as ex]
+            ;; needed to eval the config
             [mirabelle.action :refer :all]
             [mirabelle.path :as path])
   (:import java.io.File))
@@ -86,10 +86,7 @@
   [^File f]
   (log/info {} (format "Compiling %s" (.getName f)))
   [(.getName f)
-   (->> (.getPath f)
-        slurp
-        edn/read-string
-        eval)])
+   (eval (aero/read-config (.getPath f) {}))])
 
 (defn compile-config!
   [src-dir dest-dir]

@@ -1,5 +1,6 @@
 (ns mirabelle.action
-  (:require [cheshire.core :as json]
+  (:require [aero.core :as aero]
+            [cheshire.core :as json]
             [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [clojure.string :as string]
@@ -2020,6 +2021,46 @@
   {:action :keep-keys
    :params [keys-to-keep]
    :children children})
+
+(defmethod aero/reader 'mirabelle/var
+  [opts _ value]
+  (when-not (keyword? value)
+    (throw (ex-info "The argument of #mirabelle/var should be a keyword"
+                    {:variable value})))
+  (let [variables (:variables opts)]
+    (get variables value)))
+
+(s/def :include/variables (s/map-of keyword? any?))
+(s/def :include/profile keyword?)
+(s/def :include/config (s/keys :opt-un [:include/variables :include/profile]))
+(s/def ::include (s/cat :path ::spec/ne-string
+                        :config :include/config))
+
+(defn include
+  "Include an configuration file by path into the configuration. The file will be read
+  using the aero (https://github.com/juxt/aero/) library.
+  The `config` variable supports these optional options:
+
+  - `:profile`: the aero profile to use
+  - `:variables`: variables to pass to the configuration file.
+  You can use the `#mirabelle/var` reader in order to define variables in your
+  EDN file.
+
+  This allows you to use the same configuration snippet (eventually templated) from
+  multiple streams (or multiple parts of the same stream)
+
+  ```clojure
+  (includes\"/etc/mirabelle/includes/my-actions.clj {:profile :dev
+                                                     :variables {:foo \"bar\"})
+  ```"
+  [path config]
+  (spec/valid-action? ::include [path config])
+  (binding [*ns* (find-ns 'mirabelle.action)]
+    (eval (aero/read-config
+           path
+           (cond-> {}
+             (:profile config) (assoc :profile (:profile config))
+             (:variables config) (assoc :variables (:variables config)))))))
 
 (def action->fn
   {:above-dt cond-dt*
