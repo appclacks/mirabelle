@@ -1015,39 +1015,56 @@
      :children @children}))
 
 (defn throttle*
-  [_ dt & children]
+  [_ n dt & children]
   (let [last-sent (atom [nil nil])]
     (fn stream [event]
       (when (:time event)
-        (let [[_ event-to-send] (swap! last-sent
-                                       (fn [[last-time-sent _]]
-                                         (if (or (nil? last-time-sent)
-                                                 (>= (:time event)
-                                                     (+ last-time-sent dt)))
-                                           [(:time event) event]
+        (let [[_ _ event-to-send] (swap! last-sent
+                                       (fn [[last-time-sent counter _]]
+                                         (cond
+                                           ;; window is closed
+                                           ;; we send the event and
+                                           ;; reset the counter
+                                           (or (nil? last-time-sent)
+                                               (>= (:time event)
+                                                   (+ last-time-sent dt)))
+                                           [(:time event)
+                                            1
+                                            event]
 
-                                           [last-time-sent nil])))]
+                                           ;; we reached the threshold
+                                           ;; we stop sending
+                                           (= counter n)
+                                           [last-time-sent
+                                            counter
+                                            nil]
+
+                                           ;; counter is smaller, we let the event
+                                           ;; pass
+                                           :else [last-time-sent
+                                                  (inc counter)
+                                                  event])))]
           (when event-to-send
             (call-rescue event-to-send children)))))))
 
-(s/def ::throttle (s/cat :dt number?))
+(s/def ::throttle (s/cat :n pos-int? :dt pos-int?))
 
 (defn throttle
-  "Let one event pass at most every dt seconds.
+  "Let N event pass at most every dt seconds.
   Can be used for example to avoid sending to limit the number of alerts
   sent to an external system.
 
   ```clojure
-  (throttle 10
-    (alert))
+  (throttle 3 10
+    (error))
   ```
 
-  In this example, throttle will let one event pass at most every 10 seconds.
+  In this example, throttle will let 3 events pass at most every 10 seconds.
   Other events, or events with no time, are filtered."
-  [dt & children]
-  (spec/valid-action? ::scale [dt])
+  [n dt & children]
+  (spec/valid-action? ::throttle [n dt])
   {:action :throttle
-   :params [dt]
+   :params [n dt]
    :children children})
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!

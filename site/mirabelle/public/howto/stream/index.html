@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1630605190" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1630605190" rel="stylesheet">
-    <link href="/css/hybrid.css?1630605190" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1630605190" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1630605190" rel="stylesheet">
-    <link href="/css/auto-complete.css?1630605190" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1630605190" rel="stylesheet">
-    <link href="/css/theme.css?1630605190" rel="stylesheet">
-    <link href="/css/tabs.css?1630605190" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1630605190" rel="stylesheet">
+    <link href="/css/nucleus.css?1631823283" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1631823283" rel="stylesheet">
+    <link href="/css/hybrid.css?1631823283" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1631823283" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1631823283" rel="stylesheet">
+    <link href="/css/auto-complete.css?1631823283" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1631823283" rel="stylesheet">
+    <link href="/css/theme.css?1631823283" rel="stylesheet">
+    <link href="/css/tabs.css?1631823283" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1631823283" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1630605190"></script>
+    <script src="/js/jquery-3.3.1.min.js?1631823283"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1630605190"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1630605190"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1631823283"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1631823283"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1630605190"></script>
+<script type="text/javascript" src="/js/search.js?1631823283"></script>
 
     
   </div>
@@ -565,6 +565,7 @@
         <li><a href="#streams">Streams</a></li>
         <li><a href="#edn-representation-and-compilation">EDN representation and compilation</a></li>
         <li><a href="#io-and-async-queues">I/O and async queues</a></li>
+        <li><a href="#events-time">Events time</a></li>
         <li><a href="#more-examples">More examples</a></li>
       </ul>
     </li>
@@ -593,7 +594,28 @@
 
 
 
-	<p>In this section, you will learn about how streams work, how to define them and how to use them.</p>
+	<p>In this section, you will learn about how streams work, how to define them and how to use them.
+Not all availables actions and I/O are listed here. You can see the full list in <a href="/howto/action-io-ref/">this section of the documentation</a>.</p>
+<p><strong>Concepts</strong></p>
+<ul>
+<li><a href="/howto/stream/#events">What is a Mirabelle event</a></li>
+<li><a href="/howto/stream/#streams">What is a Mirabelle stream</a></li>
+<li><a href="/howto/stream/#edn-representation-and-compilation">Compilation and EDN representation of streams and compilation</a></li>
+<li><a href="/howto/stream/#io-and-async-queues">IO and Async Queue: how to make Mirabelle communicate with external systems</a></li>
+<li><a href="/howto/stream/#events-time">How Mirabelle handles time</a></li>
+</ul>
+<p><strong>Writing streams</strong></p>
+<ul>
+<li><a href="/howto/stream/#filtering-events">Filtering events based on various fields and conditions</a></li>
+<li><a href="/howto/stream/#modifying-events">Modifying events: update fields, values, set default values, select fields&hellip;</a></li>
+<li><a href="/howto/stream/#detect-state-transitions">Detect state transitions</a></li>
+<li><a href="/howto/stream/#events-windows">Work with windows (time windows, events windows&hellip;)</a></li>
+<li><a href="/howto/stream/#actions-on-list-of-events">Action on lists of events: max, min, count, percentiles, rate&hellip;</a></li>
+<li><a href="/howto/stream/#coalesce-and-project">Combine events from multiple hosts, correlate events between each others</a></li>
+<li><a href="/howto/stream/#throttle">The throttle action</a></li>
+<li><a href="/howto/stream/#handle-exceptions-errors">Handle errors in streams</a></li>
+<li><a href="/howto/stream/#move-events-between-streams">Move events between streams</a></li>
+</ul>
 <h2 id="stream-dsl">Stream DSL</h2>
 <p>Mirabelle ships with a complete, extensible DSL to define streams. The DSL is heavily inspired by <a href="http://riemann.io/">Riemann</a>.</p>
 <h3 id="events">Events</h3>
@@ -718,10 +740,17 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 (async-queue! :thread-pool
   (some-blocking-action))
 </code></pre><p>You can use async queues to avoid blocking the main Mirabelle threads and achieve better performances. Of course</p>
+<h3 id="events-time">Events time</h3>
+<p>In Mirabelle, <strong>all</strong> streams use the events time as a wall clock. All side effects (without exception), like flushing windows, will be triggered based on events time.</p>
+<p>It means the same events, in the same order, will <strong>always</strong> produce the same result. It&rsquo;s easy for users to <a href="/howto/tests/">write unit tests on streams</a> and to reason about streams thanks to this feature.</p>
+<p>It also allows you to use Mirabelle for a lot of use cases:</p>
+<ul>
+<li>Real time stream processing</li>
+<li>Work with old data by replaying them (in order) on dedicated streams.</li>
+</ul>
+<p>Some use cases are explained in <a href="/production/#use-cases">this section</a> of the documentation.</p>
 <h3 id="more-examples">More examples</h3>
 <p>This section shows more advanced use cases for streams. Not all actions are described here, the list of all actions is available <a href="/action-io-ref/">here</a>.</p>
-<h4 id="events-time">Events time</h4>
-<p>In Mirabelle, <strong>all</strong> streams use the events time as a wall clock. TODO: describe more</p>
 <h4 id="filtering-events">Filtering events</h4>
 <p>The first way of filtering events is to use the <code>where</code> action. For example, <code>(where [:= :service &quot;foo&quot;]</code> will keep all events with service &ldquo;foo&rdquo;.</p>
 <p>A lot of predicates can be used in <code>where</code>:</p>
@@ -750,8 +779,8 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
   (error))
 </code></pre><p>In this example, <code>debug</code> will be called if the metric is greater than 10, if not <code>info</code> is called if the metric is greater than 5, and by default <code>error</code> is called if nothing matches (the default stream is optional, the event is discarded if not set).</p>
 <p>the <code>over</code> and <code>under</code> streams can also be used to filter events with <code>:metric</code> over or under a threshold: <code>(over 3)</code>, <code>(under 4)</code>.</p>
-<p>You can also filter all events with <code>:state</code> &ldquo;critical&rdquo; using <code>(critical)</code>, filter events with <code>:state</code> &ldquo;warning&rdquo; using <code>(warning)</code>, and expired events using <code>(expired)</code>.</p>
-<p>Some streams can also be used to only let pass events if a condition is true for a given period of time.<br>
+<p>You can also filter all events with <code>:state</code> &ldquo;critical&rdquo; using <code>(critical)</code>, filter events with <code>:state</code> &ldquo;warning&rdquo; using <code>(warning)</code>, and expired events using <code>(expired)</code> (<code>not-expired</code> also exists to do the opposite).</p>
+<p>Some streams can also be used to only let pass events if a condition is true for a given period of time.
 For example, the <code>above-dt</code> stream will only let events pass if all events received have their <code>:metric</code> fields above a threshold for a certain duration:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">above-dt</span> <span style="color:#ae81ff">1</span> <span style="color:#ae81ff">60</span>
   (<span style="color:#a6e22e">error</span>)))
@@ -775,7 +804,13 @@ For example, the <code>above-dt</code> stream will only let events pass if all e
 <p>If you want to keep only some keys from an event (and so remove all the others), you can use <code>keep-keys</code>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">keep-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:time</span> <span style="color:#e6db74">:metric</span> <span style="color:#e6db74">:description</span> <span style="color:#e6db74">:environment</span>])
 </code></pre></div><p>Some actions can modify the <code>:metric</code> field. <code>increment</code> and <code>decrement</code> will add +1 or -1 to it, and you can use <code>scale</code> to multiply it with a value: <code>(scale 1000)</code> for example.</p>
-<h4 id="detect-state-transitions">Detect state transitions</h4>
+<p>You can also tags to events, for example:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; add the &#34;foo&#34; tag to events</span>
+(<span style="color:#a6e22e">tag</span> <span style="color:#e6db74">&#34;foo&#34;</span>)
+
+<span style="color:#75715e">;; add the &#34;foo&#34; and &#34;bar&#34; tags to events</span>
+(<span style="color:#a6e22e">tag</span> [<span style="color:#e6db74">&#34;foo&#34;</span> <span style="color:#e6db74">&#34;bar&#34;</span>])
+</code></pre></div><h4 id="detect-state-transitions">Detect state transitions</h4>
 <p>The <code>changed</code> action can be used to detect state transitions.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">changed</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;ok&#34;</span>
   (<span style="color:#a6e22e">error</span>))
@@ -861,6 +896,11 @@ The three previous streams use the latest event from the list of events to build
     (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;enqueues per dequeue&#34;</span>
       (<span style="color:#a6e22e">info</span>))))
 </code></pre></div><p>In this example, we pass to project two <code>where</code> clauses, for example to divide the <code>:metric</code> from the first event with the other one.</p>
+<h4 id="throttle">Throttle</h4>
+<p>You can use the <code>throttle</code> action to let only some events pass at most every dt seconds. You can for example use it to avoid sending too many alerts to an external system:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">throttle</span> <span style="color:#ae81ff">3</span> <span style="color:#ae81ff">60</span>
+  (<span style="color:#a6e22e">error</span>))
+</code></pre></div><p>In this example, throttle will only forward 3 events to the <code>error</code> action every 60 seconds.</p>
 <h4 id="handle-exceptions-errors">Handle exceptions (errors)</h4>
 <p>Sometimes, streams can generate errors. For example, a downstream service can be down, or you could try to do an invalid action on an event. Let&rsquo;s take an example:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">exception-stream</span>
@@ -1212,19 +1252,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1630605190"></script>
-    <script src="/js/perfect-scrollbar.min.js?1630605190"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1630605190"></script>
-    <script src="/js/jquery.sticky.js?1630605190"></script>
-    <script src="/js/featherlight.min.js?1630605190"></script>
-    <script src="/js/highlight.pack.js?1630605190"></script>
+    <script src="/js/clipboard.min.js?1631823283"></script>
+    <script src="/js/perfect-scrollbar.min.js?1631823283"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1631823283"></script>
+    <script src="/js/jquery.sticky.js?1631823283"></script>
+    <script src="/js/featherlight.min.js?1631823283"></script>
+    <script src="/js/highlight.pack.js?1631823283"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1630605190"></script>
-    <script src="/js/learn.js?1630605190"></script>
-    <script src="/js/hugo-learn.js?1630605190"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1631823283"></script>
+    <script src="/js/learn.js?1631823283"></script>
+    <script src="/js/hugo-learn.js?1631823283"></script>
     
         
-            <script src="/mermaid/mermaid.js?1630605190"></script>
+            <script src="/mermaid/mermaid.js?1631823283"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

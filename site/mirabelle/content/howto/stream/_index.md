@@ -5,6 +5,27 @@ disableToc: false
 ---
 
 In this section, you will learn about how streams work, how to define them and how to use them.
+Not all availables actions and I/O are listed here. You can see the full list in [this section of the documentation](/howto/action-io-ref/).
+
+**Concepts**
+
+- [What is a Mirabelle event](/howto/stream/#events)
+- [What is a Mirabelle stream](/howto/stream/#streams)
+- [Compilation and EDN representation of streams and compilation](/howto/stream/#edn-representation-and-compilation)
+- [IO and Async Queue: how to make Mirabelle communicate with external systems](/howto/stream/#io-and-async-queues)
+- [How Mirabelle handles time](/howto/stream/#events-time)
+
+**Writing streams**
+
+- [Filtering events based on various fields and conditions](/howto/stream/#filtering-events)
+- [Modifying events: update fields, values, set default values, select fields...](/howto/stream/#modifying-events)
+- [Detect state transitions](/howto/stream/#detect-state-transitions)
+- [Work with windows (time windows, events windows...)](/howto/stream/#events-windows)
+- [Action on lists of events: max, min, count, percentiles, rate...](/howto/stream/#actions-on-list-of-events)
+- [Combine events from multiple hosts, correlate events between each others](/howto/stream/#coalesce-and-project)
+- [The throttle action](/howto/stream/#throttle)
+- [Handle errors in streams](/howto/stream/#handle-exceptions-errors)
+- [Move events between streams](/howto/stream/#move-events-between-streams)
 
 ## Stream DSL
 
@@ -221,13 +242,22 @@ This will create a new async queue named `:thread-pool`. When you use an async q
 
 You can use async queues to avoid blocking the main Mirabelle threads and achieve better performances. Of course
 
+### Events time
+
+In Mirabelle, **all** streams use the events time as a wall clock. All side effects (without exception), like flushing windows, will be triggered based on events time.
+
+It means the same events, in the same order, will **always** produce the same result. It's easy for users to [write unit tests on streams](/howto/tests/) and to reason about streams thanks to this feature.
+
+It also allows you to use Mirabelle for a lot of use cases:
+
+- Real time stream processing
+- Work with old data by replaying them (in order) on dedicated streams.
+
+Some use cases are explained in [this section](/production/#use-cases) of the documentation.
+
 ### More examples
 
 This section shows more advanced use cases for streams. Not all actions are described here, the list of all actions is available [here](/action-io-ref/).
-
-#### Events time
-
-In Mirabelle, **all** streams use the events time as a wall clock. TODO: describe more
 
 #### Filtering events
 
@@ -266,9 +296,9 @@ In this example, `debug` will be called if the metric is greater than 10, if not
 
 the `over` and `under` streams can also be used to filter events with `:metric` over or under a threshold: `(over 3)`, `(under 4)`.
 
-You can also filter all events with `:state` "critical" using `(critical)`, filter events with `:state` "warning" using `(warning)`, and expired events using `(expired)`.
+You can also filter all events with `:state` "critical" using `(critical)`, filter events with `:state` "warning" using `(warning)`, and expired events using `(expired)` (`not-expired` also exists to do the opposite).
 
-Some streams can also be used to only let pass events if a condition is true for a given period of time.  
+Some streams can also be used to only let pass events if a condition is true for a given period of time.
 For example, the `above-dt` stream will only let events pass if all events received have their `:metric` fields above a threshold for a certain duration:
 
 ```clojure
@@ -318,6 +348,16 @@ If you want to keep only some keys from an event (and so remove all the others),
 ```
 
 Some actions can modify the `:metric` field. `increment` and `decrement` will add +1 or -1 to it, and you can use `scale` to multiply it with a value: `(scale 1000)` for example.
+
+You can also tags to events, for example:
+
+```clojure
+;; add the "foo" tag to events
+(tag "foo")
+
+;; add the "foo" and "bar" tags to events
+(tag ["foo" "bar"])
+```
 
 #### Detect state transitions
 
@@ -465,6 +505,18 @@ Expired events are not emitted, so if a host stops pushing, its event will not b
 ```
 
 In this example, we pass to project two `where` clauses, for example to divide the `:metric` from the first event with the other one.
+
+#### Throttle
+
+You can use the `throttle` action to let only some events pass at most every dt seconds. You can for example use it to avoid sending too many alerts to an external system:
+
+```clojure
+(throttle 3 60
+  (error))
+```
+
+In this example, throttle will only forward 3 events to the `error` action every 60 seconds.
+
 
 #### Handle exceptions (errors)
 

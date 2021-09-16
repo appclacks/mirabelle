@@ -619,7 +619,7 @@
                           (a/by [:host])
                           (a/by [:host :service])
                           (a/sdissoc [:host :service])
-                          (a/throttle 10)
+                          (a/throttle 1 10)
                           (a/warning)
                           (a/ewma-timeless 1)
                           (a/over 1)

@@ -475,6 +475,7 @@
 (deftest throttle*-test
   (let [[rec state] (recorder)]
     (test-actions (a/throttle* nil
+                               1
                                5
                                rec)
                   state
@@ -486,11 +487,32 @@
                    {:metric 1 :time 12 :state "ok"}
                    {:metric 1 :time 14 :state "ok"}
                    {:metric 1 :time 16 :state "ok"}
-                   {:metric 1 :time 18 :state "ok"}
-                   ]
+                   {:metric 1 :time 18 :state "ok"}]
                   [{:metric 1 :time 0 :state "ok"}
                    {:metric 1 :time 5 :state "ok"}
                    {:metric 1 :time 12 :state "ok"}
+                   {:metric 1 :time 18 :state "ok"}]))
+  (let [[rec state] (recorder)]
+    (test-actions (a/throttle* nil
+                               2
+                               5
+                               rec)
+                  state
+                  [{:metric 1 :time 0 :state "ok"}
+                   {:metric 1 :time 1 :state "ok"}
+                   {:metric 1 :time 5 :state "ok"}
+                   {:metric 1 :time 7 :state "ok"}
+                   {:metric 1 :time 3 :state "ok"}
+                   {:metric 1 :time 12 :state "ok"}
+                   {:metric 1 :time 14 :state "ok"}
+                   {:metric 1 :time 16 :state "ok"}
+                   {:metric 1 :time 18 :state "ok"}]
+                  [{:metric 1 :time 0 :state "ok"}
+                   {:metric 1 :time 1 :state "ok"}
+                   {:metric 1 :time 5 :state "ok"}
+                   {:metric 1 :time 7 :state "ok"}
+                   {:metric 1 :time 12 :state "ok"}
+                   {:metric 1 :time 14 :state "ok"}
                    {:metric 1 :time 18 :state "ok"}])))
 
 (deftest fixed-time-window*-test
