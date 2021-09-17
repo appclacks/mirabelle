@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1631823283" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1631823283" rel="stylesheet">
-    <link href="/css/hybrid.css?1631823283" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1631823283" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1631823283" rel="stylesheet">
-    <link href="/css/auto-complete.css?1631823283" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1631823283" rel="stylesheet">
-    <link href="/css/theme.css?1631823283" rel="stylesheet">
-    <link href="/css/tabs.css?1631823283" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1631823283" rel="stylesheet">
+    <link href="/css/nucleus.css?1631893797" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1631893797" rel="stylesheet">
+    <link href="/css/hybrid.css?1631893797" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1631893797" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1631893797" rel="stylesheet">
+    <link href="/css/auto-complete.css?1631893797" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1631893797" rel="stylesheet">
+    <link href="/css/theme.css?1631893797" rel="stylesheet">
+    <link href="/css/tabs.css?1631893797" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1631893797" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1631823283"></script>
+    <script src="/js/jquery-3.3.1.min.js?1631893797"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1631823283"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1631823283"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1631893797"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1631893797"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1631823283"></script>
+<script type="text/javascript" src="/js/search.js?1631893797"></script>
 
     
   </div>
@@ -564,6 +564,7 @@
         <li><a href="#events">Events</a></li>
         <li><a href="#streams">Streams</a></li>
         <li><a href="#edn-representation-and-compilation">EDN representation and compilation</a></li>
+        <li><a href="#include-streams-snippets-in-the-main-configurationn-profiles-and-variables">Include streams snippets in the main configurationn, profiles and variables</a></li>
         <li><a href="#io-and-async-queues">I/O and async queues</a></li>
         <li><a href="#events-time">Events time</a></li>
         <li><a href="#more-examples">More examples</a></li>
@@ -601,6 +602,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 <li><a href="/howto/stream/#events">What is a Mirabelle event</a></li>
 <li><a href="/howto/stream/#streams">What is a Mirabelle stream</a></li>
 <li><a href="/howto/stream/#edn-representation-and-compilation">Compilation and EDN representation of streams and compilation</a></li>
+<li><a href="/howto/stream/#include-streams-snippets-in-the-main-configurationn-profiles-and-variables">Include streams snippets in the main configuration, use profiles and variables</a></li>
 <li><a href="/howto/stream/#io-and-async-queues">IO and Async Queue: how to make Mirabelle communicate with external systems</a></li>
 <li><a href="/howto/stream/#events-time">How Mirabelle handles time</a></li>
 </ul>
@@ -613,6 +615,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 <li><a href="/howto/stream/#actions-on-list-of-events">Action on lists of events: max, min, count, percentiles, rate&hellip;</a></li>
 <li><a href="/howto/stream/#coalesce-and-project">Combine events from multiple hosts, correlate events between each others</a></li>
 <li><a href="/howto/stream/#throttle">The throttle action</a></li>
+<li><a href="/howto/stream/#convert-a-counter-to-a-rate">Convert a counter to a rate</a></li>
 <li><a href="/howto/stream/#handle-exceptions-errors">Handle errors in streams</a></li>
 <li><a href="/howto/stream/#move-events-between-streams">Move events between streams</a></li>
 </ul>
@@ -706,6 +709,35 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 <p>More examples are available at the bottom on this page, and availables actions are listed in the <a href="/action-io-ref/">Actions and I/O reference</a> section of the documentation.</p>
 <p>Streams can also be created dynamically using <a href="/howto/dynamic-streams/">the API</a>.</p>
 <p>Mirabelle supports hot reload on a SIGKILL. On a reload, only streams which had their configurations modified will be reloaded. Streams created using the API will be unchanged.</p>
+<h3 id="include-streams-snippets-in-the-main-configurationn-profiles-and-variables">Include streams snippets in the main configurationn, profiles and variables</h3>
+<p><strong>Profiles and readers</strong></p>
+<p>Mirabelle generates its configuration using the <a href="https://github.com/juxt/aero">Aero</a> Clojure library.</p>
+<p>You can set the <code>PROFILE</code> environment variable in order to use Aero <a href="https://github.com/juxt/aero#profile">profiles</a>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+  (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:foo</span> <span style="color:#e6db74">:default</span> true}
+    (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:and</span>
+             [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;disk-used&#34;</span>]
+             [<span style="color:#e6db74">:&gt;</span> <span style="color:#e6db74">:metric</span> <span style="color:#f92672">#</span>profile {<span style="color:#e6db74">:preprod</span> <span style="color:#ae81ff">70</span>
+                                   <span style="color:#e6db74">:prod</span> <span style="color:#ae81ff">60</span>
+                                   <span style="color:#e6db74">:default</span> <span style="color:#ae81ff">90</span>}]]
+      (<span style="color:#a6e22e">error</span>))))
+</code></pre></div><p>In this example, we log events as error if they have <code>:service</code> equal to &ldquo;disk-used&rdquo; and if the <code>:metric</code> field is greater than a threshold.</p>
+<p>This threshold will not be the same depending of the <code>PROFILE</code> value. By defaut (if <code>PROFILE</code> is not set) the value will be <code>90</code>. If <code>PROFILE</code> is set to <code>preprod</code>, the threshold will be <code>70</code>, and <code>60</code> for <code>prod</code>.</p>
+<p>You can also use other Aero build-in readers described in the Aero <a href="https://github.com/juxt/aero">readme</a>, like <code>#env</code> to read an environment variable, <code>#join</code> and <code>#envf</code> to build strings based on multiple nevironments variables&hellip;</p>
+<p><strong>Include</strong></p>
+<p>It&rsquo;s possible to include a configuration file in another one. Let&rsquo;s take this file named for example <code>log-service.clj</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#f92672">#</span>mirabelle/var <span style="color:#e6db74">:my-service</span>]
+  (<span style="color:#a6e22e">info</span>))
+</code></pre></div><p>You can then use this file using <code>include</code> in a Mirabelle stream:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+  (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:foo</span> <span style="color:#e6db74">:default</span> true}
+    (<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;disk-used&#34;</span>}})
+    (<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;ram-used&#34;</span>}})))
+</code></pre></div><p>The <code>#mirabelle/var</code> reader allows you to read a variable passed to the <code>include</code> action (here, the variable is named <code>:my-service</code>).</p>
+<p>You can also override the default Mirabelle profile (passed as an environment variable) by passing the <code>;profile</code> key to the <code>include</code> options:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;disk-used&#34;</span>}
+                            <span style="color:#e6db74">:profile</span> <span style="color:#e6db74">:dev</span>})
+</code></pre></div><p>The <code>include</code> action allows you to create parameterizable configuration snippets.</p>
 <h3 id="io-and-async-queues">I/O and async queues</h3>
 <p>In the previous example, we are only logging events, which is not very useful. What if we want to interact with other systems, like sending alerts to a service like Pagerduty, or forward all events a timeserie database like InfluxDB ?</p>
 <p>I/O should be defined in the <code>:io</code> section fo the <a href="/howto/configuration/">configuration file</a>, in files in directories referenced in the <code>:directories</code> key. All I/O available natively are described in the <a href="/action-io-ref/">Actions and I/O reference</a> section of the documentation.</p>
@@ -901,6 +933,12 @@ The three previous streams use the latest event from the list of events to build
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">throttle</span> <span style="color:#ae81ff">3</span> <span style="color:#ae81ff">60</span>
   (<span style="color:#a6e22e">error</span>))
 </code></pre></div><p>In this example, throttle will only forward 3 events to the <code>error</code> action every 60 seconds.</p>
+<h4 id="convert-a-counter-to-a-rate">Convert a counter to a rate</h4>
+<p>The <code>dtt</code> action can be used to convert a counter (which could always increase) to a rate:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">ddt</span>
+  (<span style="color:#a6e22e">info</span>))
+</code></pre></div><p>If this stream is fed with <code>{:metric 1 :time 1}</code> and then <code>{:metric 10 :time 4}</code> (these events could represent the count of requests to a HTTP server for example), the event <code>{:metric (/ 9 3) :time 4}</code> will be produced. This event is computed by doing <code>(10-1)/3</code> for the <code>;metric</code> field, and the <code>:time</code> field is the time of the latest event.</p>
+<p>The result is the rate of requests during this time period.</p>
 <h4 id="handle-exceptions-errors">Handle exceptions (errors)</h4>
 <p>Sometimes, streams can generate errors. For example, a downstream service can be down, or you could try to do an invalid action on an event. Let&rsquo;s take an example:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">exception-stream</span>
@@ -1252,19 +1290,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1631823283"></script>
-    <script src="/js/perfect-scrollbar.min.js?1631823283"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1631823283"></script>
-    <script src="/js/jquery.sticky.js?1631823283"></script>
-    <script src="/js/featherlight.min.js?1631823283"></script>
-    <script src="/js/highlight.pack.js?1631823283"></script>
+    <script src="/js/clipboard.min.js?1631893797"></script>
+    <script src="/js/perfect-scrollbar.min.js?1631893797"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1631893797"></script>
+    <script src="/js/jquery.sticky.js?1631893797"></script>
+    <script src="/js/featherlight.min.js?1631893797"></script>
+    <script src="/js/highlight.pack.js?1631893797"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1631823283"></script>
-    <script src="/js/learn.js?1631823283"></script>
-    <script src="/js/hugo-learn.js?1631823283"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1631893797"></script>
+    <script src="/js/learn.js?1631893797"></script>
+    <script src="/js/hugo-learn.js?1631893797"></script>
     
         
-            <script src="/mermaid/mermaid.js?1631823283"></script>
+            <script src="/mermaid/mermaid.js?1631893797"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

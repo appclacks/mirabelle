@@ -416,8 +416,7 @@
                   [{:metric 1 :time 1}
                    {:metric 10 :time 4}
                    {:metric 11 :time 7}
-                   {:metric 8 :time 10}
-                   ]
+                   {:metric 8 :time 10}]
                   [{:metric (/ 9 3) :time 4}
                    {:metric (/ 1 3) :time 7}
                    {:metric -1 :time 10}])

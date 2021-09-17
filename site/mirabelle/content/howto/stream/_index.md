@@ -12,6 +12,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 - [What is a Mirabelle event](/howto/stream/#events)
 - [What is a Mirabelle stream](/howto/stream/#streams)
 - [Compilation and EDN representation of streams and compilation](/howto/stream/#edn-representation-and-compilation)
+- [Include streams snippets in the main configuration, use profiles and variables](/howto/stream/#include-streams-snippets-in-the-main-configurationn-profiles-and-variables)
 - [IO and Async Queue: how to make Mirabelle communicate with external systems](/howto/stream/#io-and-async-queues)
 - [How Mirabelle handles time](/howto/stream/#events-time)
 
@@ -24,6 +25,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 - [Action on lists of events: max, min, count, percentiles, rate...](/howto/stream/#actions-on-list-of-events)
 - [Combine events from multiple hosts, correlate events between each others](/howto/stream/#coalesce-and-project)
 - [The throttle action](/howto/stream/#throttle)
+- [Convert a counter to a rate](/howto/stream/#convert-a-counter-to-a-rate)
 - [Handle errors in streams](/howto/stream/#handle-exceptions-errors)
 - [Move events between streams](/howto/stream/#move-events-between-streams)
 
@@ -178,6 +180,60 @@ More examples are available at the bottom on this page, and availables actions a
 Streams can also be created dynamically using [the API](/howto/dynamic-streams/).
 
 Mirabelle supports hot reload on a SIGKILL. On a reload, only streams which had their configurations modified will be reloaded. Streams created using the API will be unchanged.
+
+### Include streams snippets in the main configurationn, profiles and variables
+
+**Profiles and readers**
+
+Mirabelle generates its configuration using the [Aero](https://github.com/juxt/aero) Clojure library.
+
+You can set the `PROFILE` environment variable in order to use Aero [profiles](https://github.com/juxt/aero#profile):
+
+```clojure
+(streams
+  (stream {:name :foo :default true}
+    (where [:and
+             [:= :service "disk-used"]
+             [:> :metric #profile {:preprod 70
+                                   :prod 60
+                                   :default 90}]]
+      (error))))
+```
+
+In this example, we log events as error if they have `:service` equal to "disk-used" and if the `:metric` field is greater than a threshold.
+
+This threshold will not be the same depending of the `PROFILE` value. By defaut (if `PROFILE` is not set) the value will be `90`. If `PROFILE` is set to `preprod`, the threshold will be `70`, and `60` for `prod`.
+
+You can also use other Aero build-in readers described in the Aero [readme](https://github.com/juxt/aero), like `#env` to read an environment variable, `#join` and `#envf` to build strings based on multiple nevironments variables...
+
+**Include**
+
+It's possible to include a configuration file in another one. Let's take this file named for example `log-service.clj`:
+
+```clojure
+(where [:= :service #mirabelle/var :my-service]
+  (info))
+```
+
+You can then use this file using `include` in a Mirabelle stream:
+
+```clojure
+(streams
+  (stream {:name :foo :default true}
+    (include "log-service.clj" {:variables {:my-service "disk-used"}})
+    (include "log-service.clj" {:variables {:my-service "ram-used"}})))
+```
+
+The `#mirabelle/var` reader allows you to read a variable passed to the `include` action (here, the variable is named `:my-service`).
+
+You can also override the default Mirabelle profile (passed as an environment variable) by passing the `;profile` key to the `include` options:
+
+```clojure
+(include "log-service.clj" {:variables {:my-service "disk-used"}
+                            :profile :dev})
+```
+
+The `include` action allows you to create parameterizable configuration snippets.
 
 ### I/O and async queues
 
@@ -517,6 +573,18 @@ You can use the `throttle` action to let only some events pass at most every dt 
 
 In this example, throttle will only forward 3 events to the `error` action every 60 seconds.
 
+#### Convert a counter to a rate
+
+The `dtt` action can be used to convert a counter (which could always increase) to a rate:
+
+```clojure
+(ddt
+  (info))
+```
+
+If this stream is fed with `{:metric 1 :time 1}` and then `{:metric 10 :time 4}` (these events could represent the count of requests to a HTTP server for example), the event `{:metric (/ 9 3) :time 4}` will be produced. This event is computed by doing `(10-1)/3` for the `;metric` field, and the `:time` field is the time of the latest event.
+
+The result is the rate of requests during this time period.
 
 #### Handle exceptions (errors)
 
