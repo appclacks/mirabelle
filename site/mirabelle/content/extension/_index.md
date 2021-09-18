@@ -36,7 +36,7 @@ Now, open the `project.clj` file in the `my-module` directory.
 
 First, remove the `:main ^:skip-aot my-module-name.core` line. Then, adds to the `:dependencies` list the Mirabelle project by adding `[fr.mcorbin/mirabelle "<replace-with-your-mirabelle-version>"]`. Be sure to use the same version than your Mirabelle version (it may in theory work with different versions but we never know).
 
-You can now open the file in `src/my_mudule_name/core.clj`
+You can now open the file in `src/my_module_name/core.clj`
 
 ## Write a custom action
 
@@ -49,7 +49,7 @@ Here would be the code of the `core.clj` file:
   (:require [mirabelle.action :as a]
             [mirabelle.io :as io]))
 
-(defn keep-if-greater-than
+(defn keep-if-greater-than*
   [context threshold & children]
   (fn [event]
     (when (> (:metric event) threshold)
@@ -59,7 +59,7 @@ Here would be the code of the `core.clj` file:
 
 First, we `:require` the `mirabelle.action` and the `mirabelle.io` namespaces (the `io` one will be used later in this tutorial).
 
-Then, we create a Clojure function named `keep-if-greater-than`. This function takes 3 parameters:
+Then, we create a Clojure function named `keep-if-greater-than*`. This function takes 3 parameters:
 
 - A `context` map, which is a Mirabelle internal component which contains some internal state. It will not be used here.
 - `threshold`, which is the threshold parameter passed to the stream.
@@ -110,12 +110,12 @@ The first thing to do to use your module is to reference your new action and I/O
 
 ```clojure
 {:stream {:directories ["/etc/mirabelle/streams"]
-          :actions {:keep-if-greater-than my-module-name.core/keep-if-greater-than}}
+          :actions {:keep-if-greater-than my-module-name.core/keep-if-greater-than*}}
  :io {:directories ["/etc/mirabelle/io"]
       :custom {:custom-file my-module-name.core/map->CustomFileIO}}}
 ```
 
-You can see that the `:keep-if-greater-than` key references the function you wrote in your module, and that the `:custom-file` I/O references `my-module-name.core/map->CustomFileIO` (the map->CustomFileIO is automatically available, it's how Clojure records work).
+You can see that the `:keep-if-greater-than*` key references the function you wrote in your module, and that the `:custom-file` I/O references `my-module-name.core/map->CustomFileIO` (the map->CustomFileIO is automatically available, it's how Clojure records work).
 
 You can now use the `:custom-file` I/O type in your Mirabelle I/O configuration file. The `:config` key should contain your I/O configuration (here, the `path` parameter):
 
