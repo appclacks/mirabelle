@@ -3,6 +3,7 @@
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
             [clojure.spec.alpha :as s]
+            [exoscale.cloak :as cloak]
             [less.awful.ssl :as less-ssl]
             [mirabelle.b64 :as b64]
             [mirabelle.config :as config]
@@ -37,14 +38,16 @@
 (s/def ::default-index ::spec/ne-string)
 (s/def ::default-index-pattern ::spec/ne-string)
 (s/def ::id ::spec/ne-string)
-(s/def ::secret ::spec/ne-string)
-(s/def ::api (s/keys :req-un [::id ::secret]))
+(s/def ::secret ::spec/secret)
+(s/def ::api-key (s/keys :req-un [::id ::secret]))
 (s/def ::username ::spec/ne-string)
-(s/def ::password ::spec/ne-string)
+(s/def ::password ::spec/secret)
+(s/def ::service-token ::spec/secret)
 (s/def ::basic-auth (s/keys :req-un [::username ::password]))
 (s/def ::elasticsearch (s/keys :req-un [::hosts
                                         ::default-index-pattern
-                                        ::default-index]
+                                        ::default-index
+                                        ::scheme]
                                :opt-un [::config/cacert
                                         ::config/cert
                                         ::config/key
@@ -53,9 +56,7 @@
                                         ::thread-count
                                         ::basic-auth
                                         ::service-token
-                                        ::api-key
-                                        ::scheme
-                                        ::api-secret]))
+                                        ::api-key]))
 
 
 (defn config->http-hosts
@@ -91,7 +92,7 @@
        (let [provider (BasicCredentialsProvider.)]
          (.setCredentials provider AuthScope/ANY (UsernamePasswordCredentials.
                                                   (:username basic-auth)
-                                                  (:password basic-auth)))
+                                                  (cloak/unmask (:password basic-auth))))
          (.setDefaultCredentialsProvider builder provider)))
      (when cacert
        (let [ssl-context (less-ssl/ssl-context (:key config)
@@ -109,11 +110,11 @@
     (when service-token
       (.setDefaultHeaders builder
                           (into-array [(BasicHeader. "Authorization"
-                                                     (str "Bearer " service-token))])))
+                                                     (str "Bearer " (cloak/unmask service-token)))])))
     (when api-key
       (let [secret (.getBytes ^String (b64/to-base64 (str (:id api-key)
                                                           ":"
-                                                          (:secret api-key)))
+                                                          (cloak/unmask (:secret api-key))))
                               java.nio.charset.StandardCharsets/UTF_8)]
         (.setDefaultHeaders builder
                             (into-array [(BasicHeader. "Authorization"

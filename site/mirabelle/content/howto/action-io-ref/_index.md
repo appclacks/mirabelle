@@ -24,7 +24,7 @@ This I/O write all events into a file, as edn.
 This I/O forwards events to [Pagerduty](https://pagerduty.com).
 
 ```clojure
-{:pagerduty-client {:config {:service-key "pagerduty-service-key"
+{:pagerduty-client {:config {:service-key #secret "pagerduty-service-key"
                              :source-key :service
                              :summary-keys [:host :service :state]
                              :dedup-keys [:host :service]
@@ -50,7 +50,7 @@ You can also set a `:pagerduty/action` key to your event in order to set the act
 
 ### InfluxDB
 
-Forward events to the [InfluxDB](https://www.influxdata.com/) timserie database.
+Forward events to the [InfluxDB](https://www.influxdata.com/) timserie database. This I/O forwards events to InfluxDB asynchronously.
 
 ```clojure
 {:influxdb {:config {:connection-string "http://127.0.0.1:8086"
@@ -59,9 +59,9 @@ Forward events to the [InfluxDB](https://www.influxdata.com/) timserie database.
                      :measurement :service
                      ;; either use username/password
                      :username "mirabelle"
-                     :password "mirabelle"
+                     :password #secret "mirabelle"
                      ;; or token authenticate
-                     :token "my-token"
+                     :token #secret "my-token"
                      :default-tags {"project" "mirabelle"}
                      :tags [:service]
                      :fields [:environment]}
@@ -73,6 +73,41 @@ The `:measurement`, `:username`, `:password`, `:token`, `:default-tags`, `:tags`
 Default tags will be added to all events. The `:tags` option contains the list of keys to convert to influxdb tags, and the `:fields` option for fields.
 
 You can also add the `:influxdb/measurement`, `:influxdb/fields` and `:influxdb/tags` to your events (using the `with` action for example) in order to override per event the default configuration for these options.
+
+### Elasticsearch
+
+Forward events to [ElasticSearch](https://www.elastic.co/fr/). This I/O forwards events to Elasticsearch asynchronously.
+
+```clojure
+{:elastic {:type :elasticsearch
+           :config {;; the list of elasticsearch osts
+                    :hosts [{:address "localhost"
+                             :port 9200}]
+                    ;; the path to tls certificates (optional)
+                    :key "/tmp/client-key.key"
+                    :cert "/tmp/client-cert.crt"
+                    :cacert "/tmp/cacert.crt"
+                    ;; The http scheme (http or https)
+                    :scheme "http"
+                    ;; The default Elasticsearch index name
+                    :default-index "abc"
+                    ;; The default index pattern which will be added to the index
+                    ;; name
+                    :default-index-pattern "yyyy-MM-dd"
+                    ;; Timeouts options (optional)
+                    :connect-timeout 1000000
+                    :socket-timeout 1000000
+                    ;; The number of threads for the client (optional)
+                    :thread-count 3
+                    ;; Basic auth configuration (optional)
+                    :basic-auth {:username "name"
+                                 :password #secret "pass"}
+                    ;; Service token (optional)
+                    :service-token #secret "my-service-token"
+                    ;; API key configuration (optional)
+                    :api-key {:id "id"
+                              :secret #secret "secret"}}}}
+```
 
 ## Actions
 
@@ -108,6 +143,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - fixed-event-window
 - fixed-time-window
 - from-base64
+- include
 - increment
 - index
 - info

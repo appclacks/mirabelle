@@ -6,6 +6,7 @@
             [clj-http.client :as client]
             [clojure.spec.alpha :as s]
             [clojure.string :as string]
+            [exoscale.cloak :as cloak]
             [exoscale.ex :as ex]
             [mirabelle.io :as io]
             [mirabelle.spec :as spec]
@@ -54,7 +55,7 @@
   :resolve"
   [{:keys [service-key dedup-keys] :as this} event-action event]
   (merge
-   {:routing_key service-key
+   {:routing_key (cloak/unmask service-key)
     :event_action event-action
     :payload (format-event this event)}
    (if dedup-keys
@@ -75,7 +76,7 @@
         event-url
         http-options))
 
-(s/def ::service-key string?)
+(s/def ::service-key ::spec/secret)
 (s/def ::http-options (s/or :map map? :nil nil?))
 (s/def ::source-key keyword?)
 (s/def ::summary-keys (s/coll-of keyword? :kind (complement empty?)))

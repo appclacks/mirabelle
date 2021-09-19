@@ -2,9 +2,11 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [corbihttp.log :as log]
+            [exoscale.cloak :as cloak]
             [exoscale.ex :as ex]))
 
 (s/def ::ne-string (s/and string? (complement string/blank?)))
+(s/def ::secret cloak/secret?)
 (s/def ::keyword-or-str (s/or :keyword keyword?
                               :string ::ne-string))
 

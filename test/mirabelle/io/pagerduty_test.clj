@@ -1,6 +1,7 @@
 (ns mirabelle.io.pagerduty-test
   (:require [clojure.test :refer :all]
             [com.stuartsierra.component :as component]
+            [exoscale.cloak :as cloak]
             [mirabelle.io.pagerduty :as pd]))
 
 (deftest event+keys->str-test
@@ -74,14 +75,14 @@
 (deftest start-stop-test
   (testing "valid specs"
     (let [client (component/start
-                  (pd/map->Pagerduty {:service-key "foo"
+                  (pd/map->Pagerduty {:service-key (cloak/mask "foo")
                                       :http-options {}
                                       :source-key :service
                                       :summary-keys [:host :service :state :metric]
                                       :dedup-keys [:host :service]}))]
       (component/stop client))
     (let [client (component/start
-                  (pd/map->Pagerduty {:service-key "foo"
+                  (pd/map->Pagerduty {:service-key (cloak/mask "foo")
                                       :source-key :service
                                       :summary-keys [:host :service :state :metric]
                                       :dedup-keys [:host :service]}))]

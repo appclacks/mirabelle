@@ -2,6 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
+            [exoscale.cloak :as cloak]
             [mirabelle.io :as io]
             [mirabelle.spec :as spec])
   (:import com.influxdb.client.InfluxDBClient
@@ -22,10 +23,10 @@
       (log/info "Using username/password authentication for influxdb")
       (.authenticate options
                      (:username config)
-                     (.toCharArray ^String (:password config))))
+                     (.toCharArray ^String (cloak/unmask (:password config)))))
     (when-let [token (:token config)]
       (log/info "Using token authentication for influxdb")
-      (.authenticateToken options (.toCharArray ^String token)))
+      (.authenticateToken options (.toCharArray ^String (cloak/unmask token))))
     (when-let [tags (:default-tags config)]
       (doseq [[tag value] tags]
         (.addDefaultTag options (name tag) (name value))))
@@ -72,8 +73,8 @@
 (s/def ::bucket ::spec/ne-string)
 (s/def ::org ::spec/ne-string)
 (s/def ::username ::spec/ne-string)
-(s/def ::password ::spec/ne-string)
-(s/def ::token ::spec/ne-string)
+(s/def ::password ::spec/secret)
+(s/def ::token ::spec/secret)
 (s/def ::tags (s/coll-of keyword?))
 (s/def ::fields (s/coll-of keyword?))
 (s/def ::measurement keyword?)

@@ -2154,4 +2154,4 @@
    :where where*
    :with with*})
 
-(comment (->> action->fn keys (map name) sort (reduce (fn [s v] (str s "\n- " v)) "")))
+(comment (->> (assoc action->fn :include nil) keys (map name) sort (reduce (fn [s v] (str s "\n- " v)) "")))

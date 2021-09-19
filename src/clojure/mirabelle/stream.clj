@@ -1,6 +1,7 @@
 ;; the code from this namespace is BAD
 (ns mirabelle.stream
-  (:require [clojure.edn :as edn]
+  (:require [aero.core :as aero]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.string :as string]
@@ -10,6 +11,7 @@
             [exoscale.ex :as ex]
             [mirabelle.action :as action]
             [mirabelle.db.queue :as q]
+            mirabelle.config
             [mirabelle.index :as index]
             [mirabelle.io.elasticsearch :as elasticsearch]
             [mirabelle.io.file :as io-file]
@@ -159,8 +161,7 @@
               (for [f files]
                 (.getPath ^File f))))
        (reduce #(concat %2 %1) [])
-       (map slurp)
-       (map edn/read-string)
+       (map #(aero/read-config % {}))
        (apply merge)))
 
 ;; I should simplify this crappy code
