@@ -74,7 +74,7 @@ Default tags will be added to all events. The `:tags` option contains the list o
 
 You can also add the `:influxdb/measurement`, `:influxdb/fields` and `:influxdb/tags` to your events (using the `with` action for example) in order to override per event the default configuration for these options.
 
-### Elasticsearch
+### Elasticsearch (beta)
 
 Forward events to [ElasticSearch](https://www.elastic.co/fr/). This I/O forwards events to Elasticsearch asynchronously.
 
