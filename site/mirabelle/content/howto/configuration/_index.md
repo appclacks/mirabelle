@@ -11,15 +11,18 @@ The Mirabelle configuration is defined in [EDN](https://github.com/edn-format/ed
 ```clojure
 {;; The Mirabelle TCP server. It's the server responsible for receiving events
  ;; using the Riemann format (protobuf).
- ;; the key, cert, and cacert optional parameters can be set to enable TLS (the
+ ;; the :key, :cert, and :cacert optional parameters can be set to enable TLS (the
  ;; parameters are path to the cert files)
- ;; The event-executor-size optional parameter can be used to control the number
+ ;; The :event-executor-size optional parameter can be used to control the number
  ;; of threads for the TCP server (default to number of cores).
+ ;; the :native? option can be used to enable epoll (on Linux) or kqueue (on mac or
+ ;; freebsd), which should increase performances.
  :tcp {:host "0.0.0.0"
-       :port 5555}
+       :port 5555
+       :native? true}
 
  ;; The Mirabelle HTTP Server.
- ;; The key, cert, and cacert optional parameters can be set to enable TLS (the
+ ;; The :key, :cert, and :cacert optional parameters can be set to enable TLS (the
  ;; parameters are path to the cert files)
  :http {:host "0.0.0.0"
         :port 5558}

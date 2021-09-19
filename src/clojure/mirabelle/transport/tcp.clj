@@ -78,14 +78,19 @@
    {:event-loop-group-fn #(NioEventLoopGroup.)
     :channel NioServerSocketChannel})
 
-(def netty-implementation
-  (let [mac-or-freebsd? (re-find #"(mac|freebsd)" (System/getProperty "os.name"))
-       linux? (re-find  #"linux" (System/getProperty "os.name"))
-       sfbit? (re-find #"(x86_64|amd64)" (System/getProperty "os.arch"))
-       native?  (= (System/getProperty "netty.native.implementation") "true")]
-    (cond (and native? sfbit? linux?) (epoll-netty-implementation)
-          (and native? sfbit? mac-or-freebsd?) (kqueue-netty-implementation)
-          :else (nio-netty-implementation))))
+(defn get-netty-implementation
+  [native?]
+  (let [mac-or-freebsd? (re-find #"(mac|freebsd|Mac|Freebsd)" (System/getProperty "os.name"))
+        linux? (re-find  #"(linux|Linux)" (System/getProperty "os.name"))
+        sfbit? (re-find #"(x86_64|amd64)" (System/getProperty "os.arch"))]
+    (cond (and native? sfbit? linux?)
+          (do (log/info {} "Netty: using epoll implementation")
+              (epoll-netty-implementation))
+          (and native? sfbit? mac-or-freebsd?)
+          (do (log/info {} "Netty: using kqueue implementation")
+              (kqueue-netty-implementation))
+          :else (do (log/info {} "Netty: using nio implementation")
+                    (nio-netty-implementation)))))
 
 (defn tcp-handler
   "Given a core, a channel, and a message, applies the message to core and
@@ -146,6 +151,7 @@
                       key ;; config
                       cert ;; config
                       cacert ;;config
+                      native? ;; config
                       so-backlog ;; config
                       channel-group ;; runtime
                       initializer ;; runtime
@@ -165,7 +171,8 @@
           so-backlog (int (or so-backlog 100))
           channel-grp (transport/channel-group
                        (str "tcp-server " host ":" port))
-
+          _ (log/info {} "NATIVE IS " native?)
+          netty-implementation (get-netty-implementation native?)
           initializer (if (and key cert cacert)
                         (let [ssl-context (ssl/ssl-context
                                            key cert cacert)]
@@ -205,7 +212,7 @@
                 (.childOption ChannelOption/SO_KEEPALIVE true)
                 (.childHandler initializer))
               ;; Start bootstrap
-              (->> (InetSocketAddress. host (int port))
+              (->> (InetSocketAddress. ^String host (int port))
                    (.bind bootstrap)
                    (.sync)
                    (.channel)
