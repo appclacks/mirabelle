@@ -31,7 +31,8 @@ Let's say your I/O are in `/etc/mirabelle/io`, your EDN (compiled) streams in `/
 
 ```clojure
 {:tcp {:host "0.0.0.0"
-       :port 5555}
+       :port 5555
+       :native? true}
  :http {:host "0.0.0.0"
         :port 5558}
  :websocket {:host "0.0.0.0"
@@ -52,7 +53,7 @@ docker run -p 5555:5555 -p 5556:5556 -p 5558:5558 \
 -v /etc/mirabelle/streams:/streams \
 -v /etc/mirabelle/config.edn:/config/config.edn \
 -e MIRABELLE_CONFIGURATION=/config/config.edn \
-mcorbin/mirabelle:v0.4.0
+mcorbin/mirabelle:v0.5.0
 ```
 
 ## Using Leiningen
