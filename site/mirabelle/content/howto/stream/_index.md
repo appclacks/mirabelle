@@ -358,7 +358,7 @@ Some streams can also be used to only let pass events if a condition is true for
 For example, the `above-dt` stream will only let events pass if all events received have their `:metric` fields above a threshold for a certain duration:
 
 ```clojure
-(above-dt 1 60
+(above-dt {:metric 1 :duration 60}
   (error)))
 ```
 
@@ -420,7 +420,7 @@ You can also tags to events, for example:
 The `changed` action can be used to detect state transitions.
 
 ```clojure
-(changed :state "ok"
+(changed {:field :state :init "ok"}
   (error))
 ```
 
@@ -448,11 +448,11 @@ In this example, events wll be forwarded to the child action (`info`) only if th
 You have three windows types availables in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
 It means you should be careful about which action you will use downstream. It should be actions working on list of events.
 
-The first one, `fixed-time-window`, will buffer all events during a defined duration and then flush them downstream. For example, `(fixed-time-window 60)` will create windows of 60 seconds.
+The first one, `fixed-time-window`, will buffer all events during a defined duration and then flush them downstream. For example, `(fixed-time-window {:duration 60})` will create windows of 60 seconds.
 
-The `fixed-event-window` action will created windows not based on time, but based on the number of events the action receives. For example, `(fixed-event-window 10)` will buffer events until 10 are buffered, and then pass the window downstream.
+The `fixed-event-window` action will created windows not based on time, but based on the number of events the action receives. For example, `(fixed-event-window {:duration 60})` will buffer events until 10 are buffered, and then pass the window downstream.
 
-The `moving-event-window` action works like `fixed-event-window` but will pass events downstream for every event received. For example, `(moving-event-window 10)` will in that case always send downstream the last 10 events.
+The `moving-event-window` action works like `fixed-event-window` but will pass events downstream for every event received. For example, `(moving-event-window {duration 10})` will in that case always send downstream the last 10 events.
 
 #### Actions on list of events
 
@@ -541,7 +541,7 @@ These two streams can help you doing computation on events from multiple sources
 
 ```clojure
 (where [:= :service "http_requests_duration_seconds"]
-  (coalesce 10 [:host :environment]
+  (coalesce {:duration 10 :fields [:host :environment]}
     (coll-percentiles [0.5 0.75 0.98 0.99]
       (info))))
 ```
@@ -567,7 +567,7 @@ In this example, we pass to project two `where` clauses, for example to divide t
 You can use the `throttle` action to let only some events pass at most every dt seconds. You can for example use it to avoid sending too many alerts to an external system:
 
 ```clojure
-(throttle 3 60
+(throttle {:count 3 :duration 60}
   (error))
 ```
 
