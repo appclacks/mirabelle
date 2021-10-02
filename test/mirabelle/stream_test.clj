@@ -70,7 +70,7 @@
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
-                :actions (a/above-dt 5 10
+                :actions (a/above-dt {:threshold 5 :duration 10}
                                      (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:metric 12 :time 1})
@@ -91,7 +91,7 @@
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
-                :actions (a/between-dt 20 30 10
+                :actions (a/between-dt {:low 20 :high 30 :duration 10}
                                        (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:metric 21 :time 1})
@@ -112,7 +112,7 @@
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
-                :actions (a/outside-dt 20 30 10
+                :actions (a/outside-dt {:low 20 :high 30 :duration 10}
                                        (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:metric 1 :time 1})
@@ -133,7 +133,7 @@
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
-                :actions (a/critical-dt 10
+                :actions (a/critical-dt {:duration 10}
                                         (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:state "critical" :time 1})
@@ -252,7 +252,7 @@
           stream {:name "my-stream"
                   :description "foo"
                   :actions (a/by [:host]
-                                 (a/fixed-event-window 2
+                                 (a/fixed-event-window {:size 2}
                                                        (a/test-action recorder)))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:host "foo" :metric 1 :time 1})
@@ -417,7 +417,7 @@
   (let [streams-path (.getPath (io/resource "streams"))
         io-path (.getPath (io/resource "ios"))
         streams {:foo {:actions {:action :fixed-event-window
-                                 :params [100]
+                                 :params [{:size 100}]
                                  :children []}}
                  :bar {:actions {:action :above-dt
                                  :params [[:> :metric 100] 200]
@@ -426,7 +426,7 @@
                                      :params [[:> :metric 200] 200]
                                      :children []}}
                      :baz {:actions {:action :fixed-event-window
-                                     :params [200]
+                                     :params [{:size 200}]
                                      :children []}}}
         handler (stream/map->StreamHandler {:streams-directories [streams-path]
                                             :io-directories [io-path]
@@ -599,9 +599,10 @@
         stream {:name "my-stream"
                 :description "foo"
                 :actions (a/sdo
-                          (a/above-dt 10 20)
+                          (a/above-dt {:threshold 5 :duration 10})
                           (a/default :service "foobar")
-                          (a/between-dt 10 20 30)
+                          (a/between-dt {:low 10 :high 20 :duration 10})
+                          (a/below-dt {:threshold 20 :duration 10})
                           (a/decrement)
                           (a/include include-path {:variables {:service "toto"}
                                                    :profile :prod})
@@ -620,7 +621,7 @@
                           (a/by [:host])
                           (a/by [:host :service])
                           (a/sdissoc [:host :service])
-                          (a/throttle 1 10)
+                          (a/throttle {:count 1 :duration 10})
                           (a/warning)
                           (a/ewma-timeless 1)
                           (a/over 1)
@@ -629,16 +630,16 @@
                           (a/io)
                           (a/io
                            (a/by [:host]))
-                          (a/fixed-time-window 3)
+                          (a/fixed-time-window {:duration 5})
                           (a/split
                            [:> :metric 10] (a/critical))
                           (a/critical)
-                          (a/critical-dt 10)
+                          (a/critical-dt {:duration 10})
                           (a/debug)
                           (a/info)
                           (a/error)
                           (a/expired)
-                          (a/fixed-event-window 3
+                          (a/fixed-event-window {:size 3}
                                                 (a/coll-sum)
                                                 (a/coll-percentiles [0 0.5 1])
                                                 (a/coll-mean
@@ -651,11 +652,11 @@
                                                 (a/coll-top 2)
                                                 (a/coll-bottom 2))
                           (a/increment)
-                          (a/changed :state "ok")
+                          (a/changed {:field :state :init "ok"})
                           (a/not-expired)
                           (a/tag "foo")
                           (a/ddt)
-                          (a/moving-event-window 3)
+                          (a/moving-event-window {:size 3})
                           (a/ddt-pos)
                           (a/tagged-all ["foo" "bar"])
                           (a/tagged-all "bar")
@@ -665,8 +666,8 @@
                           (a/keep-keys [:host :service])
                           (a/json-fields [:foo :bar])
                           (a/json-fields :foo)
-                          (a/outside-dt 2 10 20)
-                          (a/coalesce 2 [:host])
+                          (a/outside-dt {:low 2 :high 10 :duration 5})
+                          (a/coalesce {:duration 2 :fields [:host]})
                           (a/scale 100)
                           (a/with :foo 1)
                           (a/rename-keys {:host :service})

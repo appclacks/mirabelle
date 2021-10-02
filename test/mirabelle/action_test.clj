@@ -104,11 +104,11 @@
 
 (deftest fixed-event-window*-test
   (let [[rec state] (recorder)]
-    (test-actions (a/fixed-event-window* nil 3 rec)
+    (test-actions (a/fixed-event-window* nil {:size 3} rec)
                   state
                   [{:metric 10} {:metric 11}]
                   [])
-    (test-actions (a/fixed-event-window* nil 3 rec)
+    (test-actions (a/fixed-event-window* nil {:size 3} rec)
                   state
                   [{:metric 10} {:metric 11} {:metric 12}
                    {:metric 13} {:metric 14} {:metric 15}
@@ -222,7 +222,7 @@
 (deftest coalesce*-test
   (let [state (atom [])
         rec (fn [event] (swap! state conj event))
-        action (a/coalesce* nil 5 [:host :service] rec)]
+        action (a/coalesce* nil {:duration 5 :fields [:host :service]} rec)]
     (doseq [event [{:host "1" :service "foo" :metric 1 :time 0 :ttl 10}
                    {:host "1" :service "bar" :metric 1 :time 5 :ttl 10}
                    {:host "2" :service "foo" :metric 1 :time 5 :ttl 10}
@@ -240,7 +240,7 @@
            (map set @state))))
   (let [state (atom [])
         rec (fn [event] (swap! state conj event))
-        action (a/coalesce* nil 5 [:host :service] rec)]
+        action (a/coalesce* nil {:duration 5 :fields [:host :service]} rec)]
     (doseq [event [{:host "1" :service "foo" :metric 1 :time 0 :ttl 10}
                    {:host "1" :service "bar" :metric 1 :time 5 :ttl 10}]]
       (action event))
@@ -249,7 +249,7 @@
            (map set @state))))
   (let [state (atom [])
         rec (fn [event] (swap! state conj event))
-        action (a/coalesce* nil 5 [:host :service] rec)]
+        action (a/coalesce* nil {:duration 5 :fields [:host :service]} rec)]
     (doseq [event [{:host "1" :service "foo" :metric 1 :time 0 :ttl 20}
                    {:host "1" :service "baz" :metric 1 :time 1 :ttl 20}
                    {:host "1" :service "bar" :metric 1 :time 12 :ttl 20}]]
@@ -474,8 +474,7 @@
 (deftest throttle*-test
   (let [[rec state] (recorder)]
     (test-actions (a/throttle* nil
-                               1
-                               5
+                               {:count 1 :duration 5}
                                rec)
                   state
                   [{:metric 1 :time 0 :state "ok"}
@@ -493,8 +492,7 @@
                    {:metric 1 :time 18 :state "ok"}]))
   (let [[rec state] (recorder)]
     (test-actions (a/throttle* nil
-                               2
-                               5
+                               {:count 2 :duration 5}
                                rec)
                   state
                   [{:metric 1 :time 0 :state "ok"}
@@ -517,7 +515,7 @@
 (deftest fixed-time-window*-test
   (let [[rec state] (recorder)]
     (test-actions (a/fixed-time-window* nil
-                                        5
+                                        {:duration 5}
                                         rec)
                   state
                   [{:metric 1 :time 0 :state "ok"}
@@ -543,7 +541,7 @@
 (deftest moving-event-window*-test
   (let [[rec state] (recorder)]
     (test-actions (a/moving-event-window* nil
-                                          5
+                                          {:size 5}
                                           rec)
                   state
                   [{:metric 1 :time 0 :state "ok"}
@@ -656,7 +654,7 @@
 
 (deftest changed*-test
   (let [[rec state] (recorder)]
-    (test-actions (a/changed* nil :state "ok" rec)
+    (test-actions (a/changed* nil {:field :state :init "ok"} rec)
                   state
                   [{:metric 1 :state "ok"}
                    {:metric 2 :state "ok"}

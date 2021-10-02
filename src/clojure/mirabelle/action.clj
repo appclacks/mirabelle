@@ -17,6 +17,16 @@
             [mirabelle.spec :as spec])
   (:import java.util.concurrent.Executor))
 
+(s/def ::size pos-int?)
+(s/def ::duration pos-int?)
+(s/def ::threshold number?)
+(s/def ::high number?)
+(s/def ::low number?)
+(s/def ::field keyword?)
+(s/def ::init any?)
+(s/def ::fields (s/coll-of keyword?))
+(s/def ::count pos-int?)
+
 (defn call-rescue
   [event children]
   (doseq [child children]
@@ -163,7 +173,7 @@
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn fixed-event-window*
-  [_ size & children]
+  [_ {:keys [size]} & children]
   (let [window (atom [])]
     (fn stream [event]
       (let [events (swap! window (fn [events]
@@ -174,21 +184,21 @@
         (when (= size (count events))
           (call-rescue events children))))))
 
-(s/def ::fixed-event-window (s/cat :size pos-int?))
+(s/def ::fixed-event-window (s/cat :config (s/keys :req-un [::size])))
 
 (defn fixed-event-window
   "Returns a fixed-sized window of events.
 
   ```clojure
-  (fixed-event-window 5
+  (fixed-event-window {:size 5}
     (debug))
   ```
 
   This example will return a vector events partitioned 5 by 5."
-  [size & children]
-  (spec/valid-action? ::fixed-event-window [size])
+  [config & children]
+  (spec/valid-action? ::fixed-event-window [config])
   {:action :fixed-event-window
-   :params [size]
+   :params [config]
    :children children})
 
 (defn coll-mean*
@@ -202,7 +212,7 @@
   The most recent event is used as a base to create the new event
 
   ```clojure
-  (fixed-event-window 10
+  (fixed-event-window {:size 10}
     (coll-mean
       (debug)))
   ```
@@ -222,7 +232,7 @@
   Should receive a list of events from the previous stream.
 
   ```clojure
-  (fixed-event-window 10
+  (fixed-event-window {:size 10}
     (coll-max
       (debug)))
   ```
@@ -256,7 +266,7 @@
   Should receive a list of events from the previous stream.
 
   ```clojure
-  (fixed-event-window 10
+  (fixed-event-window {:size 10}
     (coll-sum
       (debug)))
   ```
@@ -276,7 +286,7 @@
   Should receive a list of events from the previous stream.
 
   ```clojure
-  (fixed-event-window 10
+  (fixed-event-window {:size 10}
     (coll-min
       (debug)))
   ```
@@ -402,121 +412,121 @@
                        (> event-time (+ time dt)))
               (call-rescue event children))))))))
 
-(s/def ::above-dt (s/cat :threshold pos-int? :dt pos-int?))
+(s/def ::above-dt (s/cat :config (s/keys :req-un [::threshold ::duration])))
 
 (defn above-dt
-  "Takes a number `threshold` and a time period in seconds `dt`.
+  "Takes a number `threshold` and a time period in seconds `duration`.
   If the condition \"the event metric is > to the threshold\" is valid for all events
-  received during at least the period `dt`, valid events received after the `dt`
+  received during at least the period `duration`, valid events received after the `duration`
   period will be passed on until an invalid event arrives.
   `:metric` should not be nil (it will produce exceptions).
 
   ```clojure
-  (above-dt 100 10
+  (above-dt {:threshold 100 :duration 10}
     (debug))
   ```
 
   In this example, if the events `:metric` field are greater than 100 for more than 10 seconds, events are passed downstream.
   "
-  [threshold dt & children]
-  (spec/valid-action? ::above-dt [threshold dt])
+  [config & children]
+  (spec/valid-action? ::above-dt [config])
   {:action :above-dt
-   :params [[:> :metric threshold] dt]
+   :params [[:> :metric (:threshold config)] (:duration config)]
    :children children})
 
-(s/def ::below-dt (s/cat :threshold pos-int? :dt pos-int?))
+(s/def ::below-dt (s/cat :config (s/keys :req-un [::threshold ::duration])))
 
 (defn below-dt
-  "Takes a number `threshold` and a time period in seconds `dt`.
+  "Takes a number `threshold` and a time period in seconds `duration`.
   If the condition `the event metric is < to the threshold` is valid for all
-  events received during at least the period `dt`, valid events received after
-  the `dt` period will be passed on until an invalid event arrives.
+  events received during at least the period `duration`, valid events received after
+  the `duration` period will be passed on until an invalid event arrives.
   `:metric` should not be nil (it will produce exceptions).
 
     ```clojure
-  (below-dt 100 10
+  (below-dt {:threshold 100 :duration 10}
     (debug))
   ```
 
   In this example, if the events `:metric` field are lower than 100 for more than 10 seconds, events are passed downstream.
   "
-  [threshold dt & children]
-  (spec/valid-action? ::below-dt [threshold dt])
+  [config & children]
+  (spec/valid-action? ::below-dt [config])
   {:action :below-dt
-   :params [[:< :metric threshold] dt]
+   :params [[:< :metric (:threshold config)] (:duration config)]
    :children children})
 
-(s/def ::between-dt (s/cat :low pos-int? :high pos-int? :dt pos-int?))
+(s/def ::between-dt (s/cat :config (s/keys :req-un [::high ::low ::duration])))
 
 (defn between-dt
-  "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
+  "Takes two numbers, `low` and `high`, and a time period in seconds, `duration`.
   If the condition `the event metric is > low and < high` is valid for all events
-  received during at least the period `dt`, valid events received after the `dt`
+  received during at least the period `duration`, valid events received after the `duration`
   period will be passed on until an invalid event arrives.
   `:metric` should not be nil (it will produce exceptions).
 
   ```clojure
-  (between-dt 50 100 10
+  (between-dt {:low 50 :high 100 :duration 10}
     (debug))
   ```
 
   In this example, if the events `:metric` field are between 50 ans 100 for more than 10 seconds, events are passed downstream.
   "
-  [low high dt & children]
-  (spec/valid-action? ::between-dt [low high dt])
+  [config & children]
+  (spec/valid-action? ::between-dt [config])
   {:action :between-dt
    :params [[:and
-             [:> :metric low]
-             [:< :metric high]]
-            dt]
+             [:> :metric (:low config)]
+             [:< :metric (:high config)]]
+            (:duration config)]
    :children children})
 
-(s/def ::outside-dt (s/cat :low pos-int? :high pos-int? :dt pos-int?))
+(s/def ::outside-dt (s/cat :config (s/keys :req-un [::low ::high ::duration])))
 
 (defn outside-dt
-  "Takes two numbers, `low` and `high`, and a time period in seconds, `dt`.
+  "Takes two numbers, `low` and `high`, and a time period in seconds, `duration`.
   If the condition `the event metric is < low or > high` is valid for all events
-  received during at least the period `dt`, valid events received after the `dt`
+  received during at least the period `duration`, valid events received after the `duration`
   period will be passed on until an invalid event arrives.
   `:metric` should not be nil (it will produce exceptions).
 
 
   ```clojure
-  (outside-dt 50 100 10
+  (outside-dt {:low 50 :high 100 :duration 10}
     (debug))
   ```
 
   In this example, if the events `:metric` field are outside the 50-100 range for more than 10 seconds, events are passed downstream.
   "
-  [low high dt & children]
-  (spec/valid-action? ::outside-dt [low high dt])
+  [config & children]
+  (spec/valid-action? ::outside-dt [config])
   {:action :outside-dt
    :params [[:or
-             [:< :metric low]
-             [:> :metric high]]
-            dt]
+             [:< :metric (:low config)]
+             [:> :metric (:high config)]]
+            (:duration config)]
    :children children})
 
-(s/def ::critical-dt (s/cat :dt pos-int?))
+(s/def ::critical-dt (s/cat :config (s/keys :req-un [::duration])))
 
 (defn critical-dt
-  "Takes a time period in seconds `dt`.
-  If all events received during at least the period `dt` have `:state` critical,
-  new critical events received after the `dt` period will be passed on until
+  "Takes a time period in seconds `duration`.
+  If all events received during at least the period `duration` have `:state` critical,
+  new critical events received after the `duration` period will be passed on until
   an invalid event arrives.
 
   ```clojure
-  (critical-dt 10
+  (critical-dt {:duration 10}
     (debug))
   ```
 
   In this example, if the events `:state` are \"critical\" for more than 10 seconds, events are passed downstream.
   "
-  [dt & children]
-  (spec/valid-action? ::critical-dt [dt])
+  [config & children]
+  (spec/valid-action? ::critical-dt [config])
   {:action :critical-dt
    :params [[:= :state "critical"]
-            dt]
+            (:duration config)]
    :children children})
 
 (defn critical*
@@ -615,7 +625,7 @@
    :params [io-name]})
 
 (defn coalesce*
-  [_ dt fields & children]
+  [_ {:keys [duration fields]} & children]
   (let [state (atom {:buffer {}
                      :current-time 0
                      :last-tick nil
@@ -661,7 +671,7 @@
 
                            ;; we are still in the same window, add the event
                            ;; to the buffer
-                           (< current-time (+ last-tick dt))
+                           (< current-time (+ last-tick duration))
                            (-> (update-in state
                                           [:buffer (key-fn event)]
                                           buffer-update-fn)
@@ -683,14 +693,14 @@
         (when-let [window (:window current-state)]
           (call-rescue window children))))))
 
-(s/def ::coalesce (s/cat :dt pos-int? :fields (s/coll-of keyword?)))
+(s/def ::coalesce (s/cat :config (s/keys :req-un [::duration ::fields])))
 
 (defn coalesce
   "Returns a list of the latest non-expired events (by `fields`) every dt seconds
   (at best).
 
   ```clojure
-  (coalesce 10 [:host :service]
+  (coalesce {:duration 10 :fields [:host :service]}
     (debug)
   ```
 
@@ -699,11 +709,11 @@
   of events.
   Expired events will be removed from the list.
   "
-  [dt fields & children]
-  (spec/valid-action? ::coalesce [dt fields])
+  [config & children]
+  (spec/valid-action? ::coalesce [config])
   {:action :coalesce
    :children children
-   :params [dt fields]})
+   :params [config]})
 
 (defn with*
   [_ fields & children]
@@ -756,7 +766,7 @@
   The latest event is used as a base to build the new event.
 
   ```clojure
-  (fixed-event-window 3
+  (fixed-event-window {:size 3}
     (coll-rate
       (debug)))
   ```
@@ -788,7 +798,7 @@
   by a time window stream for example).
 
   ```clojure
-  (fixed-event-window 5
+  (fixed-event-window {:size 5}
     (sflatten
       (info)))
   ```"
@@ -1015,7 +1025,7 @@
      :children @children}))
 
 (defn throttle*
-  [_ n dt & children]
+  [_ config & children]
   (let [last-sent (atom [nil nil])]
     (fn stream [event]
       (when (:time event)
@@ -1027,14 +1037,14 @@
                                            ;; reset the counter
                                            (or (nil? last-time-sent)
                                                (>= (:time event)
-                                                   (+ last-time-sent dt)))
+                                                   (+ last-time-sent (:duration config))))
                                            [(:time event)
                                             1
                                             event]
 
                                            ;; we reached the threshold
                                            ;; we stop sending
-                                           (= counter n)
+                                           (= counter (:count config))
                                            [last-time-sent
                                             counter
                                             nil]
@@ -1047,29 +1057,29 @@
           (when event-to-send
             (call-rescue event-to-send children)))))))
 
-(s/def ::throttle (s/cat :n pos-int? :dt pos-int?))
+(s/def ::throttle (s/cat :config (s/keys :req-un [::count ::duration])))
 
 (defn throttle
-  "Let N event pass at most every dt seconds.
+  "Let N event pass at most every duration seconds.
   Can be used for example to avoid sending to limit the number of alerts
   sent to an external system.
 
   ```clojure
-  (throttle 3 10
+  (throttle {:count 3 :duration 10}
     (error))
   ```
 
   In this example, throttle will let 3 events pass at most every 10 seconds.
   Other events, or events with no time, are filtered."
-  [n dt & children]
-  (spec/valid-action? ::throttle [n dt])
+  [config & children]
+  (spec/valid-action? ::throttle [config])
   {:action :throttle
-   :params [n dt]
+   :params [config]
    :children children})
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn fixed-time-window*
-  [_ n & children]
+  [_ {:keys [duration]} & children]
   (let [state (atom {:start-time nil
                      :buffer []
                      :windows nil})]
@@ -1093,15 +1103,15 @@
                          (assoc state :windows nil)
 
                                         ; Within window
-                         (< (:time event) (+ start-time n))
+                         (< (:time event) (+ start-time duration))
                          (-> (update state :buffer conj event)
                              (assoc :windows nil))
 
                                         ; Above window
                          :else
                          (let [delta (- (:time event) start-time)
-                               dstart (- delta (mod delta n))
-                               empties (dec (/ dstart n))
+                               dstart (- delta (mod delta duration))
+                               empties (dec (/ dstart duration))
                                ;; do we really need empty windows in
                                ;; mirabelle ? Should we keep this Riemann
                                ;; behavior ?
@@ -1113,7 +1123,7 @@
           (doseq [w windows]
             (call-rescue w children)))))))
 
-(s/def ::fixed-time-window (s/cat :n pos-int?))
+(s/def ::fixed-time-window (s/cat :config (s/keys :req-un [::duration])))
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn fixed-time-window
@@ -1126,27 +1136,27 @@
   Events without times accrue in the current window.
 
   ```clojure
-  (fixed-time-window 60
+  (fixed-time-window {:duration 60}
     (coll-max
       (info)))
   ```
   "
-  [n & children]
-  (spec/valid-action? ::scale [n])
+  [config & children]
+  (spec/valid-action? ::fixed-time-window [config])
   {:action :fixed-time-window
-   :params [n]
+   :params [config]
    :children children})
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn moving-event-window*
-  [_ n & children]
+  [_ config & children]
   (let [window (atom (vec []))]
     (fn stream [event]
       (let [w (swap! window (fn swap [w]
-                              (vec (take-last n (conj w event)))))]
+                              (vec (take-last (:size config) (conj w event)))))]
         (call-rescue w children)))))
 
-(s/def ::moving-event-window (s/cat :n pos-int?))
+(s/def ::moving-event-window (s/cat :config (s/keys :req-un [::size])))
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn moving-event-window
@@ -1155,13 +1165,13 @@
   event times. Example:
 
   ```clojure
-  (moving-event-window 5
+  (moving-event-window {:size 5}
     (coll-mean (info))
   ```"
-  [n & children]
-  (spec/valid-action? ::moving-event-window [n])
+  [config & children]
+  (spec/valid-action? ::moving-event-window [config])
   {:action :moving-event-window
-   :params [n]
+   :params [config]
    :children children})
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
@@ -1243,7 +1253,7 @@
    :children children})
 
 (defn changed*
-  [_ field init & children]
+  [_ {:keys [field init]} & children]
   (let [state (atom [init nil])]
     (fn stream [event]
       (let [[_ event] (swap! state
@@ -1256,7 +1266,7 @@
         (when event
           (call-rescue event children))))))
 
-(s/def ::changed (s/cat :field keyword? :init any?))
+(s/def ::changed (s/cat :config (s/keys :req-un [::init ::field])))
 
 (defn changed
   "Passes on events only if the `field` passed as parameter differs
@@ -1264,17 +1274,17 @@
   The `init` parameter is the default value for the stream.
 
   ```clojure
-  (changed :state \"ok\")
+  (changed {:field :state :init \"ok\"})
   ```
 
   For example, this action will let event pass if the :state field vary,
   the initial value being `ok`.
 
   This stream is useful to get only events making a transition."
-  [field init & children]
-  (spec/valid-action? ::changed [field init])
+  [config & children]
+  (spec/valid-action? ::changed [config])
   {:action :changed
-   :params [field init]
+   :params [config]
    :children children})
 
 (defn project*
@@ -1409,7 +1419,7 @@
   its :metric field is set to the number of events received as input.
 
   ```clojure
-  (fixed-time-window 60
+  (fixed-time-window {:duration 60}
     (coll-count
       (debug)))
   ```"
@@ -1459,7 +1469,7 @@
   Useful for extracting histograms and percentiles.
 
   ```clojure
-  (fixed-event-window 10
+  (fixed-event-window {:size 10}
     (coll-percentiles [0.5 0.75 0.98 0.99]))
   ```"
   [points & children]
@@ -1493,7 +1503,7 @@
 
   ```clojure
   (by [:host :service]
-    (fixed-time-window 5))
+    (fixed-time-window {:duration 60}))
   ```
 
   This example generates a moving window for each host/service combination."
@@ -1892,7 +1902,7 @@
   "Receives a list of events, returns the top N events with the highest metrics.
 
   ```clojure
-  (fixed-time-window 60
+  (fixed-time-window {:duration 60}
     (coll-top
       (info)))
   ```"
@@ -1913,7 +1923,7 @@
   "Receives a list of events, returns the top N events with the lowest metrics.
 
   ```clojure
-  (fixed-time-window 60
+  (fixed-time-window {:duration 60}
     (coll-bottom
       (info)))
   ```"
