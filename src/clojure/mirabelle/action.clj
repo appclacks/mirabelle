@@ -2108,6 +2108,7 @@
    :critical critical*
    :critical-dt cond-dt*
    :debug debug*
+   :default default*
    :decrement decrement*
    :ddt ddt*
    :ddt-pos ddt*

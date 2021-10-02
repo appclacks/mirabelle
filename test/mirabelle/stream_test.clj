@@ -600,6 +600,7 @@
                 :description "foo"
                 :actions (a/sdo
                           (a/above-dt 10 20)
+                          (a/default :service "foobar")
                           (a/between-dt 10 20 30)
                           (a/decrement)
                           (a/include include-path {:variables {:service "toto"}

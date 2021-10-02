@@ -17,3 +17,5 @@ java.iml
 *.iml
 /dev/queue/metadata*
 venv
+.clj-kondo
+.lsp
