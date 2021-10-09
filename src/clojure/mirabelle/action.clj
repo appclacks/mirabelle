@@ -1087,27 +1087,27 @@
       (let [s (swap! state
                      (fn [{:keys [start-time buffer] :as state}]
                        (cond
-                                        ; No time
+                         ;; No time
                          (nil? (:time event))
                          (-> (update state :buffer conj event)
                              (assoc :windows nil))
 
-                                        ; No start time
+                         ;; No start time
                          (nil? start-time)
                          (assoc state :start-time (:time event)
                                 :buffer [event]
                                 :windows nil)
 
-                                        ; Too old
+                         ;; Too old
                          (< (:time event) start-time)
                          (assoc state :windows nil)
 
-                                        ; Within window
+                         ;; Within window
                          (< (:time event) (+ start-time duration))
                          (-> (update state :buffer conj event)
                              (assoc :windows nil))
 
-                                        ; Above window
+                         ;; Above window
                          :else
                          (let [delta (- (:time event) start-time)
                                dstart (- delta (mod delta duration))
@@ -2098,8 +2098,68 @@
                profile (assoc :profile profile)
                (:variables config) (assoc :variables (:variables config))))))))
 
+(def keyword->aggr-f
+  {:+ +})
+
+(defn aggregation*
+  [_ {:keys [duration aggr-fn init]} & children]
+  (let [aggr-fn (get keyword->aggr-f, aggr-fn)
+        state (atom {:start-time nil
+                     :result init
+                     :windows nil})]
+    (when-not aggr-fn
+      (ex/ex-fault! (format "Invalid aggregation function %s" aggr-fn)
+                    {:aggr-fn aggr-fn}))
+    (fn stream [event]
+      (let [s (swap! state
+                     (fn [{:keys [start-time result] :as state}]
+                       (cond
+                         ;; No start time
+                         (nil? start-time)
+                         (assoc state :start-time (:time event)
+                                :result event
+                                :windows nil)
+
+                         ;; Too old
+                         (< (:time event) start-time)
+                         (assoc state :windows nil)
+
+                         ;; Within window
+                         (< (:time event) (+ start-time duration))
+                         (-> (update-in state [:result :metric] aggr-fn (:metric event))
+                             (assoc :windows nil))
+
+                         ;; Above window
+                         :else
+                         (let [result (assoc result :time (+ start-time duration))
+                               delta (- (:time event) start-time)
+                               dstart (- delta (mod delta duration))
+                               empties (dec (/ dstart duration))
+                               windows (concat [result]
+                                               (mapv #(update (assoc result
+                                                                     :metric 0)
+                                                              :time
+                                                              + (* duration (inc %)))
+                                                     (range empties)))]
+                           (-> (update state :start-time + dstart)
+                               (assoc :result event
+                                      :windows windows))))))]
+        (when-let [windows (:windows s)]
+          (doseq [w windows]
+            (call-rescue w children)))))))
+
+(s/def ::aggr-sum (s/cat :config (s/keys :req-un [::duration])))
+
+(defn aggr-sum
+  [config & children]
+  (spec/valid-action? ::aggr-sum [config])
+  {:action :aggr-sum
+   :params [(assoc config :init {} :aggr-fn :+)]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
+   :aggr-sum aggregation*
    :async-queue! async-queue!*
    :below-dt cond-dt*
    :between-dt cond-dt*

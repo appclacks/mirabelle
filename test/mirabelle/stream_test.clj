@@ -684,3 +684,26 @@
     (entrypoint {:state "ok" :time 4 :metric 1 :host "foo" :service "a"})
     (entrypoint {:state "ok" :time 100 :metric 1 :host "foo" :service "b"})
     (entrypoint {:state "ok" :time 200 :metric 1 :host "foo" :service "a"})))
+
+(deftest aggr-sum-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/aggr-sum {:duration 10}
+                                     (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:time 0 :metric 10})
+    (entrypoint {:time 7 :metric 1})
+    (entrypoint {:time 11 :metric 3})
+    (entrypoint {:time 14 :metric 8})
+    (entrypoint {:time 19 :metric 1})
+    (entrypoint {:time 20 :metric 2})
+    (entrypoint {:time 23 :metric 4})
+    (entrypoint {:time 60 :metric 1})
+    (is (= [{:time 10 :metric 11}
+            {:time 20 :metric 12}
+            {:time 30, :metric 6}
+            {:time 40, :metric 0}
+            {:time 50, :metric 0}
+            {:time 60 :metric 0}]
+           @recorder))))

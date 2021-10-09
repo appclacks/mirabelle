@@ -1024,3 +1024,26 @@
             [{:action :with, :children nil, :params [{:state "info"}]}]}
            (a/include include-path {:variables {:service "toto"}
                                     :profile :prod})))))
+
+(deftest aggregation*-test
+  (let [[rec state] (recorder)]
+    (test-actions (a/aggregation* nil
+                                  {:duration 10
+                                   :aggr-fn :+
+                                   :init {}}
+                                  rec)
+                  state
+                  [{:time 0 :metric 10}
+                   {:time 7 :metric 1}
+                   {:time 11 :metric 3}
+                   {:time 14 :metric 8}
+                   {:time 19 :metric 1}
+                   {:time 20 :metric 2}
+                   {:time 23 :metric 4}
+                   {:time 60 :metric 1}]
+                  [{:time 10 :metric 11}
+                   {:time 20 :metric 12}
+                   {:time 30, :metric 6}
+                   {:time 40, :metric 0}
+                   {:time 50, :metric 0}
+                   {:time 60 :metric 0}])))
