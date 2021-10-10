@@ -290,7 +290,7 @@ You can check the [javadoc](https://docs.oracle.com/en/java/javase/11/docs/api/j
 
 This will create a new async queue named `:thread-pool`. When you use an async queue in a stream, events will be pushed into the queue and downstream actions will be executed into a dedicated threadpool:
 
-```
+```clojure
 ;; we reference the async queue from the config as name
 (async-queue! :thread-pool
   (some-blocking-action))
