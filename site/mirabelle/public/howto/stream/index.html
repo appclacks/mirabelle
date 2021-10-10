@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1633183022" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1633183022" rel="stylesheet">
-    <link href="/css/hybrid.css?1633183022" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1633183022" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1633183022" rel="stylesheet">
-    <link href="/css/auto-complete.css?1633183022" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1633183022" rel="stylesheet">
-    <link href="/css/theme.css?1633183022" rel="stylesheet">
-    <link href="/css/tabs.css?1633183022" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1633183022" rel="stylesheet">
+    <link href="/css/nucleus.css?1633870641" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1633870641" rel="stylesheet">
+    <link href="/css/hybrid.css?1633870641" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1633870641" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1633870641" rel="stylesheet">
+    <link href="/css/auto-complete.css?1633870641" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1633870641" rel="stylesheet">
+    <link href="/css/theme.css?1633870641" rel="stylesheet">
+    <link href="/css/tabs.css?1633870641" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1633870641" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1633183022"></script>
+    <script src="/js/jquery-3.3.1.min.js?1633870641"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1633183022"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1633183022"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1633870641"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1633870641"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1633183022"></script>
+<script type="text/javascript" src="/js/search.js?1633870641"></script>
 
     
   </div>
@@ -768,10 +768,10 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 </ul>
 <p>You can check the <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html">javadoc</a> of the <code>ThreadPoolExecutor</code> class to know more about these parameters.</p>
 <p>This will create a new async queue named <code>:thread-pool</code>. When you use an async queue in a stream, events will be pushed into the queue and downstream actions will be executed into a dedicated threadpool:</p>
-<pre><code>;; we reference the async queue from the config as name
-(async-queue! :thread-pool
-  (some-blocking-action))
-</code></pre><p>You can use async queues to avoid blocking the main Mirabelle threads and achieve better performances. Of course</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; we reference the async queue from the config as name</span>
+(<span style="color:#a6e22e">async-queue!</span> <span style="color:#e6db74">:thread-pool</span>
+  (<span style="color:#a6e22e">some-blocking-action</span>))
+</code></pre></div><p>You can use async queues to avoid blocking the main Mirabelle threads and achieve better performances. Of course</p>
 <h3 id="events-time">Events time</h3>
 <p>In Mirabelle, <strong>all</strong> streams use the events time as a wall clock. All side effects (without exception), like flushing windows, will be triggered based on events time.</p>
 <p>It means the same events, in the same order, will <strong>always</strong> produce the same result. It&rsquo;s easy for users to <a href="/howto/tests/">write unit tests on streams</a> and to reason about streams thanks to this feature.</p>
@@ -1290,19 +1290,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1633183023"></script>
-    <script src="/js/perfect-scrollbar.min.js?1633183023"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1633183023"></script>
-    <script src="/js/jquery.sticky.js?1633183023"></script>
-    <script src="/js/featherlight.min.js?1633183023"></script>
-    <script src="/js/highlight.pack.js?1633183023"></script>
+    <script src="/js/clipboard.min.js?1633870641"></script>
+    <script src="/js/perfect-scrollbar.min.js?1633870641"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1633870641"></script>
+    <script src="/js/jquery.sticky.js?1633870641"></script>
+    <script src="/js/featherlight.min.js?1633870641"></script>
+    <script src="/js/highlight.pack.js?1633870641"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1633183023"></script>
-    <script src="/js/learn.js?1633183023"></script>
-    <script src="/js/hugo-learn.js?1633183023"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1633870641"></script>
+    <script src="/js/learn.js?1633870641"></script>
+    <script src="/js/hugo-learn.js?1633870641"></script>
     
         
-            <script src="/mermaid/mermaid.js?1633183023"></script>
+            <script src="/mermaid/mermaid.js?1633870641"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });
