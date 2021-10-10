@@ -493,7 +493,7 @@ The three previous streams use the latest event from the list of events to build
 The `coll-percentiles` action can also be used to compute percentiles on a list of events:
 
 ```clojure
-(fixed-time-window 60
+(fixed-time-window {:duration 60}
   (coll-percentiles [0.5 0.75 0.98 0.99]
     (info)))
 ```
@@ -505,7 +505,7 @@ The `coll-percentiles` action will produce for each quantile an event with the `
 If needed, you can also flatten a list of events, to get back a single event using `flatten`:
 
 ```clojure
-(moving-event-window 10
+(moving-event-window {:size 10}
   (sflatten
     (info)))
 ```
@@ -517,7 +517,7 @@ here, the events produced by `moving-event-window` will be sent one by one to `i
 You will often need to split streams for a given field. For example, imagine you want to count the number of events emitted every 60 seconds **by host**. If you write this stream:
 
 ```clojure
-(fixed-time-window 60
+(fixed-time-window {:duration 60}
   (coll-count
     (info)))
 ```
@@ -528,7 +528,7 @@ But if you write:
 
 ```clojure
 (by [:host]
-  (fixed-time-window 60
+  (fixed-time-window {:duration 60}
     (coll-count
       (info))))
 ```
