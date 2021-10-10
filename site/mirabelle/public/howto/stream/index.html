@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1633872138" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1633872138" rel="stylesheet">
-    <link href="/css/hybrid.css?1633872138" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1633872138" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1633872138" rel="stylesheet">
-    <link href="/css/auto-complete.css?1633872138" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1633872138" rel="stylesheet">
-    <link href="/css/theme.css?1633872138" rel="stylesheet">
-    <link href="/css/tabs.css?1633872138" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1633872138" rel="stylesheet">
+    <link href="/css/nucleus.css?1633872343" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1633872343" rel="stylesheet">
+    <link href="/css/hybrid.css?1633872343" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1633872343" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1633872343" rel="stylesheet">
+    <link href="/css/auto-complete.css?1633872343" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1633872343" rel="stylesheet">
+    <link href="/css/theme.css?1633872343" rel="stylesheet">
+    <link href="/css/tabs.css?1633872343" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1633872343" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1633872138"></script>
+    <script src="/js/jquery-3.3.1.min.js?1633872343"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1633872138"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1633872138"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1633872343"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1633872343"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1633872138"></script>
+<script type="text/javascript" src="/js/search.js?1633872343"></script>
 
     
   </div>
@@ -860,12 +860,12 @@ For example, the <code>above-dt</code> stream will only let events pass if all e
 <p>You have three windows types availables in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
 It means you should be careful about which action you will use downstream. It should be actions working on list of events.</p>
 <p>The first one, <code>fixed-time-window</code>, will buffer all events during a defined duration and then flush them downstream. For example, <code>(fixed-time-window {:duration 60})</code> will create windows of 60 seconds.</p>
-<p>The <code>fixed-event-window</code> action will created windows not based on time, but based on the number of events the action receives. For example, <code>(fixed-event-window {:duration 60})</code> will buffer events until 10 are buffered, and then pass the window downstream.</p>
-<p>The <code>moving-event-window</code> action works like <code>fixed-event-window</code> but will pass events downstream for every event received. For example, <code>(moving-event-window {duration 10})</code> will in that case always send downstream the last 10 events.</p>
+<p>The <code>fixed-event-window</code> action will created windows not based on time, but based on the number of events the action receives. For example, <code>(fixed-event-window {:size 60})</code> will buffer events until 10 are buffered, and then pass the window downstream.</p>
+<p>The <code>moving-event-window</code> action works like <code>fixed-event-window</code> but will pass events downstream for every event received. For example, <code>(moving-event-window {size 10})</code> will in that case always send downstream the last 10 events.</p>
 <h4 id="actions-on-list-of-events">Actions on list of events</h4>
 <p>Several actions can be executed on list of events (produced by windows for example).</p>
 <p>Let&rsquo;s take this example which creates windows of 10 events and forwards them to multiple streams:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-event-window</span> <span style="color:#ae81ff">10</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-event-window</span> {<span style="color:#e6db74">:size</span> <span style="color:#ae81ff">10</span>}
   (<span style="color:#a6e22e">coll-max</span>
     (<span style="color:#a6e22e">info</span>))
   (<span style="color:#a6e22e">coll-min</span>
@@ -1290,19 +1290,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1633872138"></script>
-    <script src="/js/perfect-scrollbar.min.js?1633872138"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1633872138"></script>
-    <script src="/js/jquery.sticky.js?1633872138"></script>
-    <script src="/js/featherlight.min.js?1633872138"></script>
-    <script src="/js/highlight.pack.js?1633872138"></script>
+    <script src="/js/clipboard.min.js?1633872343"></script>
+    <script src="/js/perfect-scrollbar.min.js?1633872343"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1633872343"></script>
+    <script src="/js/jquery.sticky.js?1633872343"></script>
+    <script src="/js/featherlight.min.js?1633872343"></script>
+    <script src="/js/highlight.pack.js?1633872343"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1633872138"></script>
-    <script src="/js/learn.js?1633872138"></script>
-    <script src="/js/hugo-learn.js?1633872138"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1633872343"></script>
+    <script src="/js/learn.js?1633872343"></script>
+    <script src="/js/hugo-learn.js?1633872343"></script>
     
         
-            <script src="/mermaid/mermaid.js?1633872138"></script>
+            <script src="/mermaid/mermaid.js?1633872343"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

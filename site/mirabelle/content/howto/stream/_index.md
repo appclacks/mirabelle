@@ -450,9 +450,9 @@ It means you should be careful about which action you will use downstream. It sh
 
 The first one, `fixed-time-window`, will buffer all events during a defined duration and then flush them downstream. For example, `(fixed-time-window {:duration 60})` will create windows of 60 seconds.
 
-The `fixed-event-window` action will created windows not based on time, but based on the number of events the action receives. For example, `(fixed-event-window {:duration 60})` will buffer events until 10 are buffered, and then pass the window downstream.
+The `fixed-event-window` action will created windows not based on time, but based on the number of events the action receives. For example, `(fixed-event-window {:size 60})` will buffer events until 10 are buffered, and then pass the window downstream.
 
-The `moving-event-window` action works like `fixed-event-window` but will pass events downstream for every event received. For example, `(moving-event-window {duration 10})` will in that case always send downstream the last 10 events.
+The `moving-event-window` action works like `fixed-event-window` but will pass events downstream for every event received. For example, `(moving-event-window {size 10})` will in that case always send downstream the last 10 events.
 
 #### Actions on list of events
 
@@ -461,7 +461,7 @@ Several actions can be executed on list of events (produced by windows for examp
 Let's take this example which creates windows of 10 events and forwards them to multiple streams:
 
 ```clojure
-(fixed-event-window 10
+(fixed-event-window {:size 10}
   (coll-max
     (info))
   (coll-min
