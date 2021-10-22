@@ -9,6 +9,7 @@
             [clj-http.util :as clj-http]
             [clojure.edn :as edn]
             [clojure.string :as string]
+            [exoscale.ex :as ex]
             [mirabelle.action.condition :as condition]
             [mirabelle.index :as index]
             [mirabelle.pubsub :as pubsub]
@@ -33,12 +34,17 @@
 (defn request->pred
   "Returns the predicate for the channel events based on the request query params"
   [query-params]
-  (-> query-params
-      (get "query")
-      query-true?
-      b64/from-base64
-      edn/read-string
-      condition/compile-conditions))
+  (let [query (get query-params "query")]
+    (try
+      (-> query
+          query-true?
+          b64/from-base64
+          edn/read-string
+          condition/compile-conditions)
+      (catch Exception e
+        (ex/ex-incorrect! (format "Invalid websocket query %s" query)
+                          (ex-data e)
+                          e)))))
 
 (defn ws-handler
   [pubsub actions ch pred channel]
