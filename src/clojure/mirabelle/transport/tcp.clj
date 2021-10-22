@@ -171,7 +171,6 @@
           so-backlog (int (or so-backlog 100))
           channel-grp (transport/channel-group
                        (str "tcp-server " host ":" port))
-          _ (log/info {} "NATIVE IS " native?)
           netty-implementation (get-netty-implementation native?)
           initializer (if (and key cert cacert)
                         (let [ssl-context (ssl/ssl-context
