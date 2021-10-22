@@ -114,7 +114,10 @@
                     :handler-fn metrics}
    :system/healthz {:path "healthz"
                     :method :get
-                    :handler-fn healthz}})
+                    :handler-fn healthz}
+   :system/health {:path "health"
+                   :method :get
+                   :handler-fn healthz}})
 
 (defn assert-spec-valid
   [spec params]
