@@ -277,7 +277,6 @@
     (locking lock
       (log/infof {} "Adding dynamic stream %s" stream-name)
       (let [compiled-stream (compile-stream!
-                             ;; dedicated index for dyn streams
                              (assoc (context this stream-name)
                                     :index
                                     (component/start (index/map->Index {})))

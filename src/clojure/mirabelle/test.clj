@@ -1,10 +1,22 @@
 (ns mirabelle.test
-  (:require [clojure.string :as string]
+  (:require [clojure.data :as data]
+            [clojure.string :as string]
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
             [corbihttp.metric :as metric]
             [mirabelle.index :as index]
             [mirabelle.stream :as stream]))
+
+(defn tap-error-message
+  [base-msg r]
+  (let [[expected-missing not-expected]
+        (data/diff (:expected r) (:actual r))]
+    (cond-> (format "%s\nExpected:\n\n%s\n\nActual:\n\n%s"
+                    base-msg
+                    (pr-str (:expected r))
+                    (pr-str (:actual r)))
+      expected-missing (str (format "\n\nExpected in the tap but missing:\n\n%s" (pr-str expected-missing)))
+      not-expected (str (format "\n\nNot expected in the tap:\n\n%s" (pr-str not-expected))))))
 
 (defn test-result->message
   "Takes results from tests, build an human readable message"
@@ -23,10 +35,8 @@
                                                                      (:exception r))))
 
                   ( = (:type r) :tap)
-                  (str (format "expected: %s\nactual: %s"
-                               (pr-str (:expected r))
-                               (pr-str (:actual r)))))))
-         (string/join "\n----\n")
+                  (tap-error-message r))))
+         (string/join "\n\n----\n\n")
          (str header))))
 
 (defn launch-tests
