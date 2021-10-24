@@ -640,6 +640,7 @@
                           (a/error)
                           (a/expired)
                           (a/fixed-event-window {:size 3}
+                                                (a/coll-where [:= :service "foo"])
                                                 (a/coll-sum)
                                                 (a/coll-percentiles [0 0.5 1])
                                                 (a/coll-mean

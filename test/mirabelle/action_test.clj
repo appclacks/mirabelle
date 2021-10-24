@@ -1047,3 +1047,26 @@
                    {:time 40, :metric 0}
                    {:time 50, :metric 0}
                    {:time 60 :metric 0}])))
+
+(deftest coll-where*-test
+  (let [[rec state] (recorder)]
+    (test-actions (a/coll-where* nil [:pos? :metric] rec)
+                  state
+                  [[{:metric 10} {:metric 10}]]
+                  [[{:metric 10} {:metric 10}]])
+    (test-actions (a/coll-where* nil [:pos? :metric] rec)
+                  state
+                  [[{:metric -1} {:metric 30} {:metric 0}]]
+                  [[{:metric 30}]])
+    (test-actions (a/coll-where* nil [:> :metric 20] rec)
+                  state
+                  [[{:metric -1} {:metric 30} {:metric 0}]]
+                  [[{:metric 30}]])
+    (test-actions (a/coll-where* nil
+                                 [:and
+                                  [:> :metric 20]
+                                  [:< :metric 40]]
+                                 rec)
+                  state
+                  [[{:metric -1} {:metric 30} {:metric 31} {:metric 50}]]
+                  [[{:metric 30} {:metric 31}]])))

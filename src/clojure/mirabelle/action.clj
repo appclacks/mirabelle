@@ -83,6 +83,28 @@
    :params [conditions]
    :children children})
 
+(defn coll-where*
+  [_ conditions & children]
+  (let [condition-fn (cd/compile-conditions conditions)]
+    (fn stream [events]
+      (call-rescue (filter condition-fn events) children))))
+
+(s/def ::coll-where (s/cat :conditions ::condition))
+
+(defn coll-where
+  "Like `where` but should receive a list of events.
+
+  ```clojure
+  (fixed-time-window {:duration 60}
+    (coll-where [:and [:= :host \"foo\"]
+                      [:> :metric 10]))
+  ```"
+  [conditions & children]
+  (spec/valid-action? ::coll-where [conditions])
+  {:action :coll-where
+   :params [conditions]
+   :children children})
+
 (defn increment*
   [_ & children]
   (fn stream [event]
@@ -2175,6 +2197,7 @@
    :coll-rate coll-rate*
    :coll-sum coll-sum*
    :coll-top coll-top*
+   :coll-where coll-where*
    :critical critical*
    :critical-dt cond-dt*
    :debug debug*
