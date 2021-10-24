@@ -38,6 +38,7 @@
 
 (s/def :mirabelle.http.stream/add (s/keys :req-un [:mirabelle.stream/name
                                                    :mirabelle.stream/config]))
+
 (s/def :mirabelle.http.stream/get (s/keys :req-un [:mirabelle.stream/name]))
 (s/def :mirabelle.http.stream/event (s/keys :req-un [:mirabelle.stream/name
                                                      :mirabelle.stream/event]))

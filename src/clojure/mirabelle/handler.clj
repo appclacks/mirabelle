@@ -12,7 +12,7 @@
   (get-stream [this params] "Get a stream")
   (remove-stream [this params] "remove a stream")
   (search-index [this params] "query the index")
-  (list-streams [this params] "list dynamic streams")
+  (list-streams [this params] "list streams")
   (push-event [this params] "Push an event to a stream")
   (current-time [this params] "get the current time of the real time engine.")
   (not-found [this params] "Not found handler")
@@ -29,7 +29,7 @@
           stream-name (:name all-params)
           index (if (= :default stream-name)
                   (:index (stream/context stream-handler :default))
-                  (-> (stream/get-dynamic-stream stream-handler stream-name)
+                  (-> (stream/get-stream stream-handler stream-name)
                       :context
                       :index))]
       {:status 200
@@ -37,7 +37,7 @@
   (add-stream [_ {:keys [all-params]}]
     (let [stream-name (:name all-params)
           config (-> all-params :config b64/from-base64 edn/read-string)]
-      (stream/add-dynamic-stream stream-handler stream-name config)
+      (stream/add-stream stream-handler stream-name config)
       {:status 200
        :body {:message "stream added"}}))
   (push-event [_ {:keys [all-params]}]
@@ -47,12 +47,12 @@
        :body {:message "ok"}}))
   (remove-stream [_ {:keys [all-params]}]
     (let [stream-name (:name all-params)]
-      (stream/remove-dynamic-stream stream-handler stream-name)
+      (stream/remove-stream stream-handler stream-name)
       {:status 200
        :body {:message "stream removed"}}))
   (get-stream [_ {:keys [all-params]}]
     (let [stream-name (:name all-params)
-          stream (stream/get-dynamic-stream stream-handler stream-name)
+          stream (stream/get-stream stream-handler stream-name)
           config (-> stream
                      (dissoc :context :entrypoint)
                      pr-str
@@ -63,11 +63,11 @@
               :current-time (index/current-time index)}}))
   (list-streams [_ _]
     {:status 200
-     :body {:streams (stream/list-dynamic-streams stream-handler)}})
+     :body {:streams (stream/list-streams stream-handler)}})
   (current-time [_ {:keys [all-params]}]
     {:status 200
-     :body {:current-time (-> (stream/get-dynamic-stream stream-handler
-                                                         (:name all-params))
+     :body {:current-time (-> (stream/get-stream stream-handler
+                                                 (:name all-params))
                               :context
                               :index
                               index/current-time)}})

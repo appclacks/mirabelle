@@ -60,9 +60,9 @@
               ;; because we only want the tap
               tap (:tap (stream/context stream-handler :test))]
           (if-let [target (:target test-config)]
-            (do (stream/add-dynamic-stream stream-handler
-                                           target
-                                           (get streams target))
+            (do (stream/add-stream stream-handler
+                                   target
+                                   (get streams target))
                 (doseq [event (:input test-config)]
                   (stream/push! stream-handler event target)))
             (doseq [event (:input test-config)]

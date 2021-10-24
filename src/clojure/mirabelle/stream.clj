@@ -146,10 +146,10 @@
 (defprotocol IStreamHandler
   (context [this source-stream] "Return the streams context")
   (reload [this] "Add the new configuration")
-  (add-dynamic-stream [this stream-name stream-configuration] "Add a new stream")
-  (remove-dynamic-stream [this stream-name] "Remove a stream by name")
-  (list-dynamic-streams [this] "List dynamic streams")
-  (get-dynamic-stream [this stream-name] "Get a dynamic stream")
+  (add-stream [this stream-name stream-configuration] "Add a new stream")
+  (remove-stream [this stream-name] "Remove a stream by name")
+  (list-streams [this] "List streams")
+  (get-stream [this stream-name] "Get a  stream")
   (push! [this event streams] "Inject an event into a list of streams"))
 
 (defn read-edn-dirs
@@ -163,6 +163,11 @@
        (reduce #(concat %2 %1) [])
        (map #(aero/read-config % {}))
        (apply merge)))
+
+(defn persisted-stream-file-name
+  "Returns the name of the file which will contain the stream"
+  [stream-name]
+  (str (name stream-name) "-api.edn"))
 
 ;; I should simplify this crappy code
 (deftype StreamHandler [streams-directories ;; config
@@ -273,27 +278,44 @@
         (throw (ex/ex-info
                 (format "Stream %s not found" stream)
                 [::not-found [:corbi/user ::ex/not-found]])))))
-  (add-dynamic-stream [this stream-name stream-configuration]
-    (locking lock
-      (log/infof {} "Adding dynamic stream %s" stream-name)
-      (let [compiled-stream (compile-stream!
-                             (assoc (context this stream-name)
-                                    :index
-                                    (component/start (index/map->Index {})))
-                             (update stream-configuration :default boolean))
-            new-compiled-streams (assoc compiled-streams
-                                        stream-name
-                                        compiled-stream)]
-        (set! compiled-streams new-compiled-streams))))
-  (remove-dynamic-stream [_ stream-name]
-    (log/infof {} "Removing dynamic stream %s" stream-name)
-    (locking lock
-      (let [new-compiled-streams (dissoc compiled-streams
-                                         stream-name)]
-        (set! compiled-streams new-compiled-streams))))
-  (list-dynamic-streams [_]
+  (add-stream [this stream-name {:keys [persist] :as stream-configuration}]
+    (log/infof {} "Adding stream %s" stream-name)
+    (if persist
+      (if-let [stream-directory (first streams-directories)]
+        (do (log/infof {} "The stream %s will be persisted" stream-name)
+            (spit (str stream-directory "/" (persisted-stream-file-name stream-name))
+                  (pr-str {stream-name stream-configuration}))
+            (reload this))
+        (throw (ex/ex-info
+                "The stream cannot be saved. No directory configured for streams"
+                [::incorrect [:corbi/user ::ex/incorrect]])))
+      (locking lock
+        (let [compiled-stream (compile-stream!
+                               (assoc (context this stream-name)
+                                      :index
+                                      (component/start (index/map->Index {})))
+                               (update stream-configuration :default boolean))
+              new-compiled-streams (assoc compiled-streams
+                                          stream-name
+                                          compiled-stream)]
+          (set! compiled-streams new-compiled-streams)))))
+  (remove-stream [this stream-name]
+    (log/infof {} "Removing stream %s" stream-name)
+    (let [stream-directory (first streams-directories)
+          stream-file (str stream-directory "/" (persisted-stream-file-name stream-name))]
+      (if (.exists ^java.io.File (io/file stream-file))
+        ;; the file was created using the API so we will delete the file then reload
+        (do
+          (log/infof {} "The stream %s will be removed from the filesystem" stream-name)
+          (io/delete-file stream-file true)
+          (reload this))
+        (locking lock
+          (let [new-compiled-streams (dissoc compiled-streams
+                                             stream-name)]
+            (set! compiled-streams new-compiled-streams))))))
+  (list-streams [_]
     (or (keys compiled-streams) []))
-  (get-dynamic-stream [_ stream-name]
+  (get-stream [_ stream-name]
     (if-let [stream (get compiled-streams stream-name)]
       stream
       (throw (ex/ex-info
