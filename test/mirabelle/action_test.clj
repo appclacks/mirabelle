@@ -513,30 +513,189 @@
                    {:metric 1 :time 18 :state "ok"}])))
 
 (deftest fixed-time-window*-test
-  (let [[rec state] (recorder)]
-    (test-actions (a/fixed-time-window* nil
-                                        {:duration 5}
-                                        rec)
-                  state
-                  [{:metric 1 :time 0 :state "ok"}
-                   {:metric 1 :time 1 :state "ok"}
-                   {:metric 1 :time 3 :state "ok"}
-                   {:metric 1 :time 5 :state "ok"}
-                   {:metric 1 :time 7 :state "ok"}
-                   {:metric 1 :time 9 :state "ok"}
-                   {:metric 1 :time 10 :state "ok"}
-                   {:metric 1 :time 29 :state "ok"}
-                   {:metric 1 :time 31 :state "ok"}]
-                  [[{:metric 1 :time 0 :state "ok"}
-                    {:metric 1 :time 1 :state "ok"}
-                    {:metric 1 :time 3 :state "ok"}]
-                   [{:metric 1 :time 5 :state "ok"}
-                    {:metric 1 :time 7 :state "ok"}
-                    {:metric 1 :time 9 :state "ok"}]
-                   [{:metric 1 :time 10 :state "ok"}]
-                   []
-                   []
-                   [{:metric 1 :time 29 :state "ok"}]])))
+  (testing "No toleration 1"
+    (let [[rec state] (recorder)]
+      (test-actions (a/fixed-time-window* nil
+                                          {:duration 5}
+                                          rec)
+                    state
+                    [{:metric 1 :time 0 :state "ok"}
+                     {:metric 1 :time 1 :state "ok"}
+                     {:metric 1 :time 3 :state "ok"}
+                     {:metric 1 :time 5 :state "ok"}
+                     {:metric 1 :time 7 :state "ok"}
+                     {:metric 1 :time 9 :state "ok"}
+                     {:metric 1 :time 10 :state "ok"}
+                     {:metric 1 :time 29 :state "ok"}
+                     {:metric 1 :time 31 :state "ok"}]
+                    [[{:metric 1 :time 0 :state "ok"}
+                      {:metric 1 :time 1 :state "ok"}
+                      {:metric 1 :time 3 :state "ok"}]
+                     [{:metric 1 :time 5 :state "ok"}
+                      {:metric 1 :time 7 :state "ok"}
+                      {:metric 1 :time 9 :state "ok"}]
+                     [{:metric 1 :time 10 :state "ok"}]
+                     []
+                     []
+                     [{:metric 1 :time 29 :state "ok"}]])))
+
+  (testing "No toleration 2"
+    (let [[rec state] (recorder)]
+      (test-actions (a/fixed-time-window* nil
+                                          {:duration 10}
+                                          rec)
+                    state
+                    [{:metric 1 :time 0 :state "ok"}
+                     {:metric 1 :time 7 :state "ok"}
+                     {:metric 1 :time 5 :state "ok"}
+                     {:metric 1 :time 9 :state "ok"}
+                     {:metric 1 :time 10 :state "ok"}
+                     {:metric 1 :time 8 :state "ok"}
+                     {:metric 1 :time 9 :state "ok"}
+                     {:metric 1 :time 1 :state "ok"}
+                     {:metric 1 :time 12 :state "ok"}
+                     {:metric 1 :time 3 :state "ok"}
+                     {:metric 1 :time 19 :state "ok"}
+                     {:metric 1 :time 17 :state "ok"}
+                     {:metric 1 :time 41 :state "ok"}
+                     {:metric 1 :time 39 :state "ok"}]
+                    [[{:metric 1 :time 0 :state "ok"}
+                      {:metric 1 :time 7 :state "ok"}
+                      {:metric 1 :time 5 :state "ok"}
+                      {:metric 1 :time 9 :state "ok"}]
+                     [{:metric 1 :time 10 :state "ok"}
+                      {:metric 1 :time 12 :state "ok"}
+                      {:metric 1 :time 19 :state "ok"}
+                      {:metric 1 :time 17 :state "ok"}]
+                     []
+                     []])))
+  (testing "Toleration 1"
+    (let [[rec state] (recorder)]
+      (println "aa")
+      (test-actions (a/fixed-time-window* nil
+                                          {:duration 10
+                                           :toleration 3}
+                                          rec)
+                    state
+                    [{:metric 1 :time 0 :state "ok"}
+                     {:metric 1 :time 1 :state "ok"}
+                     {:metric 1 :time 9 :state "ok"}
+                     {:metric 1 :time 12 :state "ok"}
+                     ;; tolerated
+                     {:metric 1 :time 8 :state "ok"}
+                     ;; outside toleration
+                     {:metric 1 :time 13 :state "ok"}
+                     {:metric 1 :time 29 :state "ok"}
+                     {:metric 1 :time 31 :state "ok"}
+                     ;; tolerated
+                     {:metric 1 :time 22 :state "ok"}
+                     ;; outside of the previous window
+                     {:metric 1 :time 19 :state "ok"}
+                     ;; tolerated
+                     {:metric 1 :time 23 :state "ok"}
+                     ;; flush the previous window
+                     {:metric 1 :time 38 :state "ok"}]
+                    [[{:metric 1 :time 0 :state "ok"}
+                      {:metric 1 :time 1 :state "ok"}
+                      {:metric 1 :time 9 :state "ok"}
+                      {:metric 1 :time 8 :state "ok"}]
+                     [{:metric 1 :time 12 :state "ok"}
+                      {:metric 1 :time 13 :state "ok"}]
+                     [{:metric 1 :time 29 :state "ok"}
+                      {:metric 1 :time 22 :state "ok"}
+                      {:metric 1 :time 23 :state "ok"}]])))
+  (testing "Toleration 2"
+    (let [[rec state] (recorder)]
+      (test-actions (a/fixed-time-window* nil
+                                          {:duration 10
+                                           :toleration 9}
+                                          rec)
+                    state
+                    [{:metric 1 :time 0 :state "ok"}
+                     {:metric 1 :time 1 :state "ok"}
+                     {:metric 1 :time 9 :state "ok"}
+                     {:metric 1 :time 12 :state "ok"}
+                     ;; tolerated
+                     {:metric 1 :time 8 :state "ok"}
+                     {:metric 1 :time 18 :state "ok"}
+                     {:metric 1 :time 13 :state "ok"}
+                     {:metric 1 :time 1 :state "ok"}
+                     ;; outside toleration
+                     {:metric 1 :time 19 :state "ok"}
+                     {:metric 1 :time 2 :state "ok"}
+                     {:metric 1 :time 29 :state "ok"}
+                     {:metric 1 :time 31 :state "ok"}
+                     ;; tolerated
+                     {:metric 1 :time 22 :state "ok"}
+                     ;; outside of the previous window
+                     {:metric 1 :time 19 :state "ko"}
+                     ;; tolerated
+                     {:metric 1 :time 23 :state "ok"}
+                     ;; flush the previous window
+                     {:metric 1 :time 39 :state "ok"}
+                     {:metric 1 :time 60 :state "ok"}]
+                    [[{:metric 1 :time 0 :state "ok"}
+                      {:metric 1 :time 1 :state "ok"}
+                      {:metric 1 :time 9 :state "ok"}
+                      {:metric 1 :time 8 :state "ok"}
+                      {:metric 1 :time 1 :state "ok"}]
+                     [{:metric 1 :time 12 :state "ok"}
+                      {:metric 1 :time 18 :state "ok"}
+                      {:metric 1 :time 13 :state "ok"}
+                      {:metric 1 :time 19 :state "ok"}]
+                     [{:metric 1 :time 29 :state "ok"}
+                      {:metric 1 :time 22 :state "ok"}
+                      {:metric 1 :time 23 :state "ok"}]
+                     [{:metric 1 :time 31 :state "ok"}
+                      {:metric 1 :time 39 :state "ok"}]
+                     []]))))
+
+(deftest fixed-time-window2*-test
+  (testing "Toleration 2"
+    (let [[rec state] (recorder)]
+      (test-actions (a/fixed-time-window* nil
+                                          {:duration 10
+                                           :toleration 9}
+                                          rec)
+                    state
+                    [{:metric 1 :time 0 :state "ok"}
+                     {:metric 1 :time 1 :state "ok"}
+                     {:metric 1 :time 9 :state "ok"}
+                     {:metric 1 :time 12 :state "ok"}
+                     ;; tolerated
+                     {:metric 1 :time 8 :state "ok"}
+                     {:metric 1 :time 18 :state "ok"}
+                     {:metric 1 :time 13 :state "ok"}
+                     {:metric 1 :time 1 :state "ok"}
+                     ;; outside toleration
+                     {:metric 1 :time 19 :state "ok"}
+                     {:metric 1 :time 2 :state "ok"}
+                     {:metric 1 :time 29 :state "ok"}
+                     {:metric 1 :time 31 :state "ok"}
+                     ;; tolerated
+                     {:metric 1 :time 22 :state "ok"}
+                     ;; outside of the previous window
+                     {:metric 1 :time 19 :state "ko"}
+                     ;; tolerated
+                     {:metric 1 :time 23 :state "ok"}
+                     ;; flush the previous window
+                     {:metric 1 :time 39 :state "ok"}
+                     {:metric 1 :time 60 :state "ok"}]
+                    [[{:metric 1 :time 0 :state "ok"}
+                      {:metric 1 :time 1 :state "ok"}
+                      {:metric 1 :time 9 :state "ok"}
+                      {:metric 1 :time 8 :state "ok"}
+                      {:metric 1 :time 1 :state "ok"}]
+                     [{:metric 1 :time 12 :state "ok"}
+                      {:metric 1 :time 18 :state "ok"}
+                      {:metric 1 :time 13 :state "ok"}
+                      {:metric 1 :time 19 :state "ok"}]
+                     [{:metric 1 :time 29 :state "ok"}
+                      {:metric 1 :time 22 :state "ok"}
+                      {:metric 1 :time 23 :state "ok"}]
+                     [{:metric 1 :time 31 :state "ok"}
+                      {:metric 1 :time 39 :state "ok"}]
+                     []]))))
 
 (deftest moving-event-window*-test
   (let [[rec state] (recorder)]

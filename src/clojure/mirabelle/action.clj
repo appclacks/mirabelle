@@ -19,6 +19,7 @@
 
 (s/def ::size pos-int?)
 (s/def ::duration pos-int?)
+(s/def ::toleration pos-int?)
 (s/def ::threshold number?)
 (s/def ::high number?)
 (s/def ::low number?)
@@ -1101,51 +1102,123 @@
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn fixed-time-window*
-  [_ {:keys [duration]} & children]
+  [_ {:keys [duration toleration]} & children]
   (let [state (atom {:start-time nil
-                     :buffer []
+                     :previous-window-closed nil
+                     :current-window []
+                     :first-window true
+                     :previous-window []
                      :windows nil})]
     (fn stream [event]
       (let [s (swap! state
-                     (fn [{:keys [start-time buffer] :as state}]
+                     (fn [{:keys [start-time
+                                  current-window
+                                  previous-window
+                                  previous-window-closed
+                                  first-window] :as state}]
                        (cond
-                         ;; No time
+                         ;; No time, add the event to the current window
+                         ;; and reset the windows to be send
                          (nil? (:time event))
-                         (-> (update state :buffer conj event)
+                         (-> (update state :current-window conj event)
                              (assoc :windows nil))
 
-                         ;; No start time
+                         ;; No start time, it's the first event received
+                         ;; wih a start time. The current window starts
                          (nil? start-time)
                          (assoc state :start-time (:time event)
-                                :buffer [event]
+                                :current-window [event]
                                 :windows nil)
 
-                         ;; Too old
+                         ;; The event time belongs to the previous window
+                         ;; and the previous window is still open
+                         (and toleration
+                              ;; do not update the previous window if we just started
+                              (not first-window)
+                              (not previous-window-closed)
+                              (< (- start-time duration)
+                                 (:time event)
+                                 start-time))
+                         (-> (assoc state :windows nil)
+                             (update :previous-window conj event))
+
+                         ;; too old for all windows (we already checked that
+                         ;; the event belongs to the previous window)
                          (< (:time event) start-time)
                          (assoc state :windows nil)
 
-                         ;; Within window
-                         (< (:time event) (+ start-time duration))
-                         (-> (update state :buffer conj event)
+                         ;; Within window, but didn't exceed the toleration
+                         ;; event should be added to the current window
+                         (and toleration
+                              (< (:time event) (+ start-time toleration)))
+                         (-> (update state :current-window conj event)
                              (assoc :windows nil))
 
-                         ;; Above window
+                         ;; Within window, event should be added to the current
+                         ;; window. The previous window should be flushed if needed
+                         ;; window should be flushed
+                         (< (:time event) (+ start-time duration))
+                         (cond-> (update state :current-window conj event)
+                           (not toleration)
+                           (assoc :windows [])
+
+                           ;; only flush previous if current is not the first window
+                           ;; ever
+                           (and toleration (not first-window))
+                           (assoc :windows [previous-window]
+                                  :previous-window []
+                                  :previous-window-closed true))
+
+                         ;; Above current window but part of the next window.
+                         (< (:time event) (+ start-time (* 2 duration)))
+                         (cond-> (-> (update state :start-time + duration)
+                                     (assoc :first-window false))
+
+                           ;; toleration is enabled
+                           toleration
+                           ;; flush the previous window if not already closed
+                           ;; and if the current window is not the firsto ne
+                           (assoc :windows (if (and (not previous-window-closed)
+                                                    (not first-window))
+                                             [previous-window]
+                                             [])
+                                  :first-window false
+                                  :previous-window current-window
+                                  :previous-window-closed false
+                                  :current-window [event])
+
+                           ;; no toleration, just flush the current window
+                           (not toleration)
+                           (assoc :windows [current-window]
+                                  :first-window false
+                                  :current-window [event]))
+
+                         ;; Above current window AND not part of the next window
+                         ;; flush everything (previous and current windows) if needed
+                         ;; and start from a fresh state
                          :else
                          (let [delta (- (:time event) start-time)
                                dstart (- delta (mod delta duration))
-                               empties (dec (/ dstart duration))
-                               ;; do we really need empty windows in
-                               ;; mirabelle ? Should we keep this Riemann
-                               ;; behavior ?
-                               windows (conj (repeat empties []) buffer)]
+                               empties (if toleration
+                                         (dec (dec (/ dstart duration)))
+                                         (dec (/ dstart duration)))
+                               windows (apply conj
+                                              (if (and toleration (not first-window))
+                                                [previous-window current-window]
+                                                [current-window])
+                                              (repeat empties []))]
                            (-> (update state :start-time + dstart)
-                               (assoc :buffer [event]
+                               (assoc :current-window [event]
+                                      :previous-window-closed false
+                                      :first-window false
+                                      :previous-window []
                                       :windows windows))))))]
         (when-let [windows (:windows s)]
           (doseq [w windows]
             (call-rescue w children)))))))
 
-(s/def ::fixed-time-window (s/cat :config (s/keys :req-un [::duration])))
+(s/def ::fixed-time-window (s/cat :config (s/keys :req-un [::duration]
+                                                  :opt-un [::toleration])))
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn fixed-time-window
@@ -1165,6 +1238,9 @@
   "
   [config & children]
   (spec/valid-action? ::fixed-time-window [config])
+  (when-let [toleration (:toleration config)]
+    (when (>= toleration (:duration config))
+      (ex/ex-incorrect! "fixed-time-window: the :toleration should be lower than the window duration" {})))
   {:action :fixed-time-window
    :params [config]
    :children children})

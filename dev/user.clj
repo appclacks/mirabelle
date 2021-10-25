@@ -1,5 +1,6 @@
 (ns user
   (:require [clojure.tools.namespace.repl :refer [refresh]]
+            [clj-memory-meter.core :as meter]
             [mirabelle.core :as core]))
 
 (defn start!
