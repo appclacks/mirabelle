@@ -2229,12 +2229,102 @@
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn moving-time-window
-    "A sliding window of all events with times within the last n seconds. Uses
+  "A sliding window of all events with times within the last n seconds. Uses
   the maximum event time as the present-time horizon. Every time a new event
   arrives within the window, emits a vector of events in the window to
   children.
 
   Events without times accrue in the current window."
+  [config & children]
+  (spec/valid-action? ::moving-time-window [config])
+  {:action :moving-time-window
+   :params [config]
+   :children children})
+
+(defn ssort*
+  [_ {:keys [duration field]} & children]
+  (let [state (atom {:start-time nil
+                     :current-buffer []
+                     :previous-buffer []
+                     :send nil})]
+    (fn stream [event]
+      (when-let [{:keys [send]}
+                 (swap! state
+                        (fn [{:keys [start-time] :as state}]
+                          (cond
+                            ;; no start-time
+                            (nil? start-time)
+                            (assoc state
+                                   :start-time (:time event)
+                                   :current-buffer [event])
+                            ;; in the current buffer
+                            (or (nil? (:time event))
+                                (and (<= start-time
+                                         (:time event))
+                                     (< (:time event)
+                                        (+ start-time duration))))
+                            (-> (update state :current-buffer conj event)
+                                (assoc :send nil))
+
+                            ;; too old
+                            (< (:time event) (- start-time duration))
+                            (assoc state :send nil)
+
+                            ;; in the previous buffer
+                            (and (<= (- start-time duration)
+                                     (:time event))
+                                 (< (:time event)
+                                    start-time))
+                            (-> (update state :previous-buffer conj event)
+                                (assoc :send nil))
+
+                            ;; in the next window
+                            ;; flush previous buffer and move current to previous
+                            (and (>= (:time event) (+ start-time duration))
+                                 (< (:time event) (+ start-time (* 2 duration))))
+                            (assoc state
+                                   :previous-buffer (:current-buffer state)
+                                   :send (:previous-buffer state)
+                                   :current-buffer [event]
+                                   :start-time (+ start-time duration))
+
+                            ;; flush everything
+                            :else
+                            (assoc state
+                                   :send (concat (:current-buffer state)
+                                                 (:previous-buffer state))
+                                   :previous-buffer []
+                                   :current-buffer [event]
+                                   :start-time (:time event)))))]
+        (doseq [event (sort-by field send)]
+          (call-rescue event children))))))
+
+(s/def ::ssort (s/cat :config (s/keys :req-un [::duration ::field])))
+
+(defn ssort
+  "Streaming sort.
+  Takes a configuration containing a `:duration` and a `:field` key.
+  The action will buffer events during `:duration` seconds and then
+  send the events downstream one by one, sorted by `:field`.
+
+  ```clojure
+  (ssort {:duration 10 :field :time}
+    (info))
+  ```
+
+  This example will sort events based on the :time field.
+
+  For example, if it get as input:
+
+  ```clojure
+  {:time 1} {:time 10} {:time 4} {:time 9} {:time 13} {:time 31}
+  ```
+
+  Info will receive these events:
+
+  ```clojure
+  {:time 1} {:time 4} {:time 9} {:time 10} {:time 13}
+  ```"
   [config & children]
   (spec/valid-action? ::moving-time-window [config])
   {:action :moving-time-window
@@ -2299,6 +2389,7 @@
    :sflatten sflatten*
    :sformat sformat*
    :split split*
+   :ssort ssort*
    :stable stable*
    :tag tag*
    :tagged-all tagged-all*
