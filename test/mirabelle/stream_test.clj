@@ -653,6 +653,7 @@
                                                 (a/coll-rate)
                                                 (a/coll-top 2)
                                                 (a/coll-bottom 2))
+                          (a/moving-time-window {:duration 3})
                           (a/increment)
                           (a/changed {:field :state :init "ok"})
                           (a/not-expired)

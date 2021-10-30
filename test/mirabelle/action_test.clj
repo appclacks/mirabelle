@@ -1077,3 +1077,34 @@
                   state
                   [[{:time 11} {:time 10} {:time 3} {:time 14}]]
                   [[{:time 3} {:time 10} {:time 11} {:time 14}]])))
+
+(deftest moving-time-window*
+  (let [[rec state] (recorder)]
+    (test-actions (a/moving-time-window* nil {:duration 5} rec)
+                  state
+                  [{:time 3}
+                   {:time 5}
+                   {:time 7}
+                   {:time 10}
+                   {:time 11}
+                   {:time 13}]
+                  [[{:time 3}]
+                   [{:time 3} {:time 5}]
+                   [{:time 3} {:time 5} {:time 7}]
+                   [{:time 7} {:time 10}]
+                   [{:time 7} {:time 10} {:time 11}]
+                   [{:time 10} {:time 11} {:time 13}]])
+    (test-actions (a/moving-time-window* nil {:duration 3} rec)
+                  state
+                  [{:time 1}
+                   {:time 2}
+                   {:time 3}
+                   {:time 4}
+                   {:time 5}
+                   {:time 6}]
+                  [[{:time 1}]
+                   [{:time 1} {:time 2}]
+                   [{:time 1} {:time 2} {:time 3}]
+                   [{:time 2} {:time 3} {:time 4}]
+                   [{:time 3} {:time 4} {:time 5}]
+                   [{:time 4} {:time 5} {:time 6}]])))

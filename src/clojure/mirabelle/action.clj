@@ -1156,9 +1156,6 @@
                          (let [delta (- (:time event) start-time)
                                dstart (- delta (mod delta duration))
                                empties (dec (/ dstart duration))
-                               ;; do we really need empty windows in
-                               ;; mirabelle ? Should we keep this Riemann
-                               ;; behavior ?
                                windows (conj (repeat empties []) buffer)]
                            (-> (update state :start-time + dstart)
                                (assoc :buffer [event]
@@ -2201,6 +2198,49 @@
    :params [(assoc config :init {} :aggr-fn :+)]
    :children children})
 
+(defn moving-time-window*
+  [_ {:keys [duration]} & children]
+  (let [state (atom {:cutoff 0
+                     :buffer []
+                     :send? true})]
+    (fn stream [event]
+      (let [result (swap!
+                    state
+                    (fn [{:keys [cutoff buffer]}]
+                      ; Compute minimum allowed time
+                      (let [cutoff (max cutoff (- (get event :time 0) duration))
+                            send? (or (nil? (:time event))
+                                      (< cutoff (:time event)))
+                            buffer (if send?
+                                        ; This event belongs in the buffer,
+                                        ; and our cutoff may have changed.
+                                     (vec (filter
+                                           (fn [e] (or (nil? (:time e))
+                                                       (< cutoff (:time e))))
+                                           (conj buffer event)))
+                                     buffer)]
+                        {:cutoff cutoff
+                         :buffer buffer
+                         :send? send?})))]
+        (when (:send? result)
+          (call-rescue (:buffer result) children))))))
+
+(s/def ::moving-time-window (s/cat :config (s/keys :req-un [::duration])))
+
+;; Copyright Riemann authors (riemann.io), thanks to them!
+(defn moving-time-window
+    "A sliding window of all events with times within the last n seconds. Uses
+  the maximum event time as the present-time horizon. Every time a new event
+  arrives within the window, emits a vector of events in the window to
+  children.
+
+  Events without times accrue in the current window."
+  [config & children]
+  (spec/valid-action? ::moving-time-window [config])
+  {:action :moving-time-window
+   :params [config]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :aggr-sum aggregation*
@@ -2243,6 +2283,7 @@
    :json-fields json-fields*
    :keep-keys keep-keys*
    :moving-event-window moving-event-window*
+   :moving-time-window moving-time-window*
    :not-expired not-expired*
    :outside-dt cond-dt*
    :over over*
