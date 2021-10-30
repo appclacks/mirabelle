@@ -1070,3 +1070,10 @@
                   state
                   [[{:metric -1} {:metric 30} {:metric 31} {:metric 50}]]
                   [[{:metric 30} {:metric 31}]])))
+
+(deftest coll-sort*-test
+  (let [[rec state] (recorder)]
+    (test-actions (a/coll-sort* nil :time rec)
+                  state
+                  [[{:time 11} {:time 10} {:time 3} {:time 14}]]
+                  [[{:time 3} {:time 10} {:time 11} {:time 14}]])))

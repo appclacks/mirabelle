@@ -318,6 +318,28 @@
   {:action :coll-min
    :children children})
 
+(s/def ::coll-sort (s/cat :field keyword?))
+
+(defn coll-sort*
+  [_ field & children]
+  (fn stream [events]
+    (call-rescue (sort-by field events) children)))
+
+(defn coll-sort
+  "Sort events based on the field passed as parameter
+  Should receive a list of events from the previous stream.
+
+  ```clojure
+  (fixed-event-window {:size 10}
+    (coll-sort :time
+      (debug)))
+  ```"
+  [field & children]
+    (spec/valid-action? ::coll-sort [field])
+  {:action :coll-sort
+   :params [field]
+   :children children})
+
 (defn test-action*
   [_ state]
   (fn stream [event]
@@ -2195,6 +2217,7 @@
    :coll-percentiles coll-percentiles*
    :coll-quotient coll-quotient*
    :coll-rate coll-rate*
+   :coll-sort coll-sort*
    :coll-sum coll-sum*
    :coll-top coll-top*
    :coll-where coll-where*

@@ -649,6 +649,7 @@
                                                 (a/coll-quotient)
                                                 (a/coll-min)
                                                 (a/coll-count)
+                                                (a/coll-sort :time)
                                                 (a/coll-rate)
                                                 (a/coll-top 2)
                                                 (a/coll-bottom 2))
