@@ -5,3 +5,16 @@ theme = "hugo-theme-learn"
 
 [params]
   disableInlineCopyToClipBoard = true
+
+
+[[menu.shortcuts]]
+name = "<i class='fab fa-github'></i> Github repository"
+identifier = "ds"
+url = "https://github.com/mcorbin/mirabelle"
+weight = 10
+
+[[menu.shortcuts]]
+name = "<i class='fas fa-bookmark'></i> Site theme"
+identifier = "learntheme"
+url = "https://github.com/matcornic/hugo-theme-learn/"
+weight = 20
