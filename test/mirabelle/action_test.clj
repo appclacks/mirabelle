@@ -86,7 +86,37 @@
     (test-actions (a/where* nil [:absent :tags "foo"] rec)
                   state
                   [{:metric 10} {:metric 10 :tags ["foo"]} {:tags []}]
-                  [{:metric 10} {:tags []}])))
+                  [{:metric 10} {:tags []}])
+    (test-actions (a/where* nil [:and
+                                 [:or
+                                  [:pos? :metric]
+                                  [:= :metric -1]]
+                                 [:and
+                                  [:= :service "foo"]
+                                  [:= :env "prod"]]] rec)
+                  state
+                  [{:metric 10 :service "foo" :env "prod"}
+                   {:metric 10 :service "foo" :env "dev"}
+                   {:metric 10 :service "bar" :env "prod"}
+                   {:metric -2 :service "foo" :env "prod"}
+                   {:metric -1 :service "foo" :env "prod"}]
+                  [{:metric 10 :service "foo" :env "prod"}
+                   {:metric -1 :service "foo" :env "prod"}])
+    (test-actions (a/where* nil [:and
+                                 [:and
+                                  [:= :host "bar"]
+                                  [:or
+                                   [:pos? :metric]
+                                   [:= :metric -1]]]
+                                 [:= :service "foo"]] rec)
+                  state
+                  [{:host "bar" :metric 10 :service "foo"}
+                   {:host "foo" :metric 10 :service "foo"}
+                   {:host "bar" :metric -1 :service "foo"}
+                   {:host "bar" :metric -2 :service "foo"}
+                   {:host "bar" :metric 10 :service "bar"}]
+                  [{:host "bar" :metric 10 :service "foo"}
+                   {:host "bar" :metric -1 :service "foo"}])))
 
 (deftest increment*-test
   (let [[rec state] (recorder)]

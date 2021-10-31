@@ -57,8 +57,10 @@
    (fn [conditions]
      (let [compile-conditions-fn
            (fn [cd] (reduce
-                     (fn [state condition]
-                       (conj state (compile-condition condition)))
+                     (fn [state [operation :as condition]]
+                       (if (or (= :and operation) (= :or operation))
+                         (conj state (compile-conditions condition))
+                         (conj state (compile-condition condition))))
                      []
                      cd))]
        (cond

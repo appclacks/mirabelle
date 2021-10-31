@@ -12,6 +12,13 @@
     [:and
      [:= :host "foo"]
      [:not-nil? :metric]]
+    [:and
+     [:or
+      [:= :host "foo"]
+      [:not-nil? :metric]]
+     [:and
+      [:= :service "bar"]
+      [:> :time 1]]]
     [:or
      [:= :host "foo"]
      [:not-nil? :metric]])
