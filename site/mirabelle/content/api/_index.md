@@ -32,7 +32,12 @@ The body is a json string like `{"config": "<stream-config>"}`.
 
 <stream-config> should be the stream EDN configuration as base64. For example `{:actions {:action :info}}` as base64 would be `ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfX0=`.
 
-You can also pass the `:default` option, like in the configuration, in order to specify if you want your stream to be used by default.
+You can pass the `:default` option, like in the configuration, in order to specify if you want your stream to be used by default.
+
+You can also set the `:persist` field to `true` in your stream configuration in order to persist it on disk.
+In that case, Mirabelle will write the stream configuration into the **first** directory referenced into the `:stream {:directory ..;}` configuration. The file name will be `<stream-name>.edn`.
+
+Deleting a stream through the API will also delete its file on the filesystem.
 
 ---
 
@@ -72,6 +77,8 @@ curl localhost:5558/api/v1/stream/trololo
 - **DELETE** `/api/v1/stream/<stream-name>`
 
 Delete a stream by name.
+
+If the stream was created using the API (see `Add a stream`) and persisted on disk, this call will also deleted its configuration file.
 
 ---
 

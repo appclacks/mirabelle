@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1633872343" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1633872343" rel="stylesheet">
-    <link href="/css/hybrid.css?1633872343" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1633872343" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1633872343" rel="stylesheet">
-    <link href="/css/auto-complete.css?1633872343" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1633872343" rel="stylesheet">
-    <link href="/css/theme.css?1633872343" rel="stylesheet">
-    <link href="/css/tabs.css?1633872343" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1633872343" rel="stylesheet">
+    <link href="/css/nucleus.css?1635692565" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1635692565" rel="stylesheet">
+    <link href="/css/hybrid.css?1635692565" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1635692565" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1635692565" rel="stylesheet">
+    <link href="/css/auto-complete.css?1635692565" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1635692565" rel="stylesheet">
+    <link href="/css/theme.css?1635692565" rel="stylesheet">
+    <link href="/css/tabs.css?1635692565" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1635692565" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1633872343"></script>
+    <script src="/js/jquery-3.3.1.min.js?1635692565"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1633872343"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1633872343"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1635692565"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1635692565"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1633872343"></script>
+<script type="text/javascript" src="/js/search.js?1635692565"></script>
 
     
   </div>
@@ -612,6 +612,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 <li><a href="/howto/stream/#modifying-events">Modifying events: update fields, values, set default values, select fields&hellip;</a></li>
 <li><a href="/howto/stream/#detect-state-transitions">Detect state transitions</a></li>
 <li><a href="/howto/stream/#events-windows">Work with windows (time windows, events windows&hellip;)</a></li>
+<li><a href="/howto/stream/#sort-events">Sort events</a></li>
 <li><a href="/howto/stream/#actions-on-list-of-events">Action on lists of events: max, min, count, percentiles, rate&hellip;</a></li>
 <li><a href="/howto/stream/#coalesce-and-project">Combine events from multiple hosts, correlate events between each others</a></li>
 <li><a href="/howto/stream/#throttle">The throttle action</a></li>
@@ -639,7 +640,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:log</span> <span style="color:#e6db74">:default</span> true}
     (<span style="color:#a6e22e">info</span>)))
-</code></pre></div><p>The <code>streams</code> action is the top level one, and will wrap all defined steams. Then, the <code>stream</code> action will define a stream. The action takes a map as parameter which indicates the stream name in the <code>:name</code> key.
+</code></pre></div><p>The <code>streams</code> action is the top level one, and will wrap all defined steams. Then, the <code>stream</code> action will define a stream. The action tapes a map as parameter which indicates the stream name in the <code>:name</code> key.
 The <code>:default</code> key indicates that events arriving to the Mirabelle TCP server should be sent to this stream (multiple streams can have <code>:default</code> set, in that case events will be forwarded by default to all of these streams).</p>
 <p>The <code>info</code> action will simply log all events flowing throught it.</p>
 <p>Let&rsquo;s now define another stream:</p>
@@ -673,7 +674,7 @@ an alert to an alerting system like Pagerduty for example).</p>
 </code></pre></div><p>You then need to compile this file using this command:</p>
 <pre><code>java -jar mirabelle.jar compile &lt;source-directory-containing-your-stream&gt; &lt;destination-directory&gt;
 </code></pre><p>For example, let&rsquo;s say you have put the previous stream in a file named <code>stream.clj</code> in the <code>/tmp/streams</code> directory.<br>
-If you launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</code>, your file will be compiled and a new <code>stream.clj</code> file will be created in the destination directory (which is <code>/tmp/compiled</code> here).</p>
+If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</code>, your file will be compiled and a new <code>stream.clj</code> file will be created in the destination directory (which is <code>/tmp/compiled</code> here).</p>
 <p>Let&rsquo;s do that.</p>
 <pre><code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled
 </code></pre><p>The resulting file in <code>/tmp/compiled/stream.clj</code> should be:</p>
@@ -706,7 +707,7 @@ If you launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</
 
 {<span style="color:#f92672">&#34;@timestamp&#34;</span>:<span style="color:#e6db74">&#34;2021-05-01T22:50:57.961+02:00&#34;</span>,<span style="color:#f92672">&#34;@version&#34;</span>:<span style="color:#e6db74">&#34;1&#34;</span>,<span style="color:#f92672">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;#riemann.codec.Event{:host \&#34;my-host\&#34;, :service \&#34;http_requests_duration_seconds\&#34;, :state \&#34;critical\&#34;, :description nil, :metric 2.0, :tags nil, :time 1.61990225796E9, :ttl nil, :x-client \&#34;riemann-c-client\&#34;}&#34;</span>,<span style="color:#f92672">&#34;logger_name&#34;</span>:<span style="color:#e6db74">&#34;mirabelle.action&#34;</span>,<span style="color:#f92672">&#34;thread_name&#34;</span>:<span style="color:#e6db74">&#34;defaultEventExecutorGroup-2-2&#34;</span>,<span style="color:#f92672">&#34;level&#34;</span>:<span style="color:#e6db74">&#34;ERROR&#34;</span>,<span style="color:#f92672">&#34;level_value&#34;</span>:<span style="color:#ae81ff">40000</span>}
 </code></pre></div><p>As you can see, the event is logged twice: one time by our <code>info</code> action, and the second time by <code>error</code> (you can see the <code>level</code> key in the log). In the second log, the <code>:state</code> was set to &ldquo;critical&rdquo;. Our threshold works !</p>
-<p>More examples are available at the bottom on this page, and availables actions are listed in the <a href="/howto/action-io-ref/">Actions and I/O reference</a> section of the documentation.</p>
+<p>More examples are available at the bottom on this page, and availables actions are listed in the <a href="/action-io-ref/">Actions and I/O reference</a> section of the documentation.</p>
 <p>Streams can also be created dynamically using <a href="/howto/dynamic-streams/">the API</a>.</p>
 <p>Mirabelle supports hot reload on a SIGKILL. On a reload, only streams which had their configurations modified will be reloaded. Streams created using the API will be unchanged.</p>
 <h3 id="include-streams-snippets-in-the-main-configurationn-profiles-and-variables">Include streams snippets in the main configurationn, profiles and variables</h3>
@@ -723,7 +724,7 @@ If you launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</
       (<span style="color:#a6e22e">error</span>))))
 </code></pre></div><p>In this example, we log events as error if they have <code>:service</code> equal to &ldquo;disk-used&rdquo; and if the <code>:metric</code> field is greater than a threshold.</p>
 <p>This threshold will not be the same depending of the <code>PROFILE</code> value. By defaut (if <code>PROFILE</code> is not set) the value will be <code>90</code>. If <code>PROFILE</code> is set to <code>preprod</code>, the threshold will be <code>70</code>, and <code>60</code> for <code>prod</code>.</p>
-<p>You can also use other Aero built-in readers described in the Aero <a href="https://github.com/juxt/aero">readme</a>, like <code>#env</code> to read an environment variable, <code>#join</code> and <code>#envf</code> to build strings based on multiple environment variables&hellip;</p>
+<p>You can also use other Aero build-in readers described in the Aero <a href="https://github.com/juxt/aero">readme</a>, like <code>#env</code> to read an environment variable, <code>#join</code> and <code>#envf</code> to build strings based on multiple nevironments variables&hellip;</p>
 <p><strong>Include</strong></p>
 <p>It&rsquo;s possible to include a configuration file in another one. Let&rsquo;s take this file named for example <code>log-service.clj</code>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#f92672">#</span>mirabelle/var <span style="color:#e6db74">:my-service</span>]
@@ -734,15 +735,15 @@ If you launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</
     (<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;disk-used&#34;</span>}})
     (<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;ram-used&#34;</span>}})))
 </code></pre></div><p>The <code>#mirabelle/var</code> reader allows you to read a variable passed to the <code>include</code> action (here, the variable is named <code>:my-service</code>).</p>
-<p>You can also override the default Mirabelle profile (passed as an environment variable) by passing the <code>:profile</code> key to the <code>include</code> options:</p>
+<p>You can also override the default Mirabelle profile (passed as an environment variable) by passing the <code>;profile</code> key to the <code>include</code> options:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;disk-used&#34;</span>}
                             <span style="color:#e6db74">:profile</span> <span style="color:#e6db74">:dev</span>})
 </code></pre></div><p>The <code>include</code> action allows you to create parameterizable configuration snippets.</p>
 <h3 id="io-and-async-queues">I/O and async queues</h3>
 <p>In the previous example, we are only logging events, which is not very useful. What if we want to interact with other systems, like sending alerts to a service like Pagerduty, or forward all events a timeserie database like InfluxDB ?</p>
-<p>I/O should be defined in the <code>:io</code> section fo the <a href="/howto/configuration/">configuration file</a>, in files in directories referenced in the <code>:directories</code> key. All I/O available natively are described in the <a href="/howto/action-io-ref/">Actions and I/O reference</a> section of the documentation.</p>
-<p>For example, Mirabelle supports sending alerts to Pagerduty. Let&rsquo;s configure a Pagerduty client and use it in a stream.</p>
-<p>First, create an EDN file in the <code>io</code> directory:</p>
+<p>I/O should be defined in the <code>:io</code> section fo the <a href="/howto/configuration/">configuration file</a>, in files in directories referenced in the <code>:directories</code> key. All I/O available natively are described in the <a href="/action-io-ref/">Actions and I/O reference</a> section of the documentation.</p>
+<p>For example, Mirabelle supports sending alert to Pagerduty. Let&rsquo;s configure a Pagerduty client and use it in a stream.</p>
+<p>First, create an EDN file in the <code>;io</code> directory:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:pagerduty-client</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:service-key</span> <span style="color:#e6db74">&#34;pagerduty-service-key&#34;</span>
                              <span style="color:#e6db74">:source-key</span> <span style="color:#e6db74">:service</span>
                              <span style="color:#e6db74">:summary-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:state</span>]
@@ -752,10 +753,10 @@ If you launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:pagerduty-example</span>}
     (<span style="color:#a6e22e">push-io!</span> <span style="color:#e6db74">:pagerduty</span>)))
-</code></pre></div><p>If this event is sent to Mirabelle:</p>
+</code></pre></div><p>If this event is set to Mirabelle:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">riemann-client send --metric-d <span style="color:#ae81ff">100</span> --service <span style="color:#e6db74">&#34;http_requests_duration_seconds&#34;</span> --state <span style="color:#e6db74">&#34;critical&#34;</span> --host<span style="color:#f92672">=</span>myhost --attribute<span style="color:#f92672">=</span>environment<span style="color:#f92672">=</span>prod
 </code></pre></div><p>You should see in Pagerduty a new triggered alert named <code>myhost - http_requests_duration_seconds - critical</code> containing all the informations about your event.</p>
-<p>You can check the <a href="/howto/action-io-ref/">I/O documentation</a> to have details about how the Pagerduty I/O can be used (to resolve alert automatically for example).</p>
+<p>You can check the <a href="/action-io-ref/">I/O documentation</a> to have details about how the Pagerduty I/O can be used (to resolve alert automatically for example).</p>
 <p>A special I/O is <code>async-queue</code>. You could define an async queue in the I/O configuration file:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:thread-pool</span> {<span style="color:#e6db74">:type</span> <span style="color:#e6db74">:async-queue</span>
                <span style="color:#e6db74">:config</span> {}}}
@@ -767,11 +768,11 @@ If you launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</
 <li><code>:queue-size</code>: the event queue size, default to 10000.</li>
 </ul>
 <p>You can check the <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html">javadoc</a> of the <code>ThreadPoolExecutor</code> class to know more about these parameters.</p>
-<p>This will create a new async queue named <code>:thread-pool</code>. When you use an async queue in a stream, events will be pushed into the queue and downstream actions will be executed in a dedicated threadpool:</p>
+<p>This will create a new async queue named <code>:thread-pool</code>. When you use an async queue in a stream, events will be pushed into the queue and downstream actions will be executed into a dedicated threadpool:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; we reference the async queue from the config as name</span>
 (<span style="color:#a6e22e">async-queue!</span> <span style="color:#e6db74">:thread-pool</span>
   (<span style="color:#a6e22e">some-blocking-action</span>))
-</code></pre></div><p>You can use async queues to avoid blocking the main Mirabelle threads and achieve better performance.</p>
+</code></pre></div><p>You can use async queues to avoid blocking the main Mirabelle threads and achieve better performances. Of course</p>
 <h3 id="events-time">Events time</h3>
 <p>In Mirabelle, <strong>all</strong> streams use the events time as a wall clock. All side effects (without exception), like flushing windows, will be triggered based on events time.</p>
 <p>It means the same events, in the same order, will <strong>always</strong> produce the same result. It&rsquo;s easy for users to <a href="/howto/tests/">write unit tests on streams</a> and to reason about streams thanks to this feature.</p>
@@ -782,7 +783,7 @@ If you launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</
 </ul>
 <p>Some use cases are explained in <a href="/production/#use-cases">this section</a> of the documentation.</p>
 <h3 id="more-examples">More examples</h3>
-<p>This section shows more advanced use cases for streams. Not all actions are described here, the list of all actions is available <a href="/howto/action-io-ref/">here</a>.</p>
+<p>This section shows more advanced use cases for streams. Not all actions are described here, the list of all actions is available <a href="/action-io-ref/">here</a>.</p>
 <h4 id="filtering-events">Filtering events</h4>
 <p>The first way of filtering events is to use the <code>where</code> action. For example, <code>(where [:= :service &quot;foo&quot;]</code> will keep all events with service &ldquo;foo&rdquo;.</p>
 <p>A lot of predicates can be used in <code>where</code>:</p>
@@ -828,8 +829,8 @@ For example, the <code>above-dt</code> stream will only let events pass if all e
 </code></pre></div><p>The <code>default</code> action is similar to <code>with</code> but it only accepts one value, and will only set the value if the value is not already defined in the event:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">default</span> <span style="color:#e6db74">:ttl</span> <span style="color:#ae81ff">60</span>
   (<span style="color:#a6e22e">info</span>))
-</code></pre></div><p>The <code>sdissoc</code> action takes a field or a list of fields and will remove them from the event. For example, <code>(sdissoc :host)</code> or <code>(sdissoc [:host :service])</code>.</p>
-<p>You can use <code>rename-keys</code> to rename some event keys:</p>
+</code></pre></div><p>The <code>sdissoc</code> action takes a field or a list of fields and will remove them from the vent. For example, <code>(sdissoc :host)</code> or <code>(sdissoc [:host :service])</code>.</p>
+<p>You can use <code>rename-keys</code> to rename some events keys:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(rename-keys {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>
               <span style="color:#e6db74">:environment</span> <span style="color:#e6db74">:env</span>})
 </code></pre></div><p>In this example, the <code>:host</code> key will be renamed <code>:service</code> and the <code>:environment</code> key is renamed <code>:env</code>. Existing values will be overrided.</p>
@@ -856,14 +857,27 @@ For example, the <code>above-dt</code> stream will only let events pass if all e
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">stable</span> <span style="color:#ae81ff">60</span> <span style="color:#e6db74">:state</span>
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>In this example, events wll be forwarded to the child action (<code>info</code>) only if the <code>:state</code> key is stable (has the same value) for all events during 60 seconds.</p>
-<h4 id="events-windows">Event Windows</h4>
-<p>You have three available window types in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
+<h4 id="events-windows">Events Windows</h4>
+<p>You have three windows types availables in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
 It means you should be careful about which action you will use downstream. It should be actions working on list of events.</p>
 <p>The first one, <code>fixed-time-window</code>, will buffer all events during a defined duration and then flush them downstream. For example, <code>(fixed-time-window {:duration 60})</code> will create windows of 60 seconds.</p>
-<p>The <code>fixed-event-window</code> action will created windows not based on time, but based on the number of events the action receives. For example, <code>(fixed-event-window {:size 10})</code> will buffer events until 10 are buffered, and then pass the window downstream.</p>
-<p>The <code>moving-event-window</code> action works like <code>fixed-event-window</code> but will pass events downstream for every event received. For example, <code>(moving-event-window {size 10})</code> will in that case always send downstream the last 10 events.</p>
-<h4 id="actions-on-list-of-events">Actions on lists of events</h4>
-<p>Several actions can be executed on lists of events (produced by <code>fixed-time-window</code> for example).</p>
+<p>The <code>fixed-event-window</code> action will created windows not based on time, but based on the number of events the action receives. For example, <code>(fixed-event-window {:size 60})</code> will buffer events until 10 are buffered, and then pass the window downstream.</p>
+<p>The <code>moving-event-window</code> action works like <code>fixed-event-window</code> but will pass events downstream for every event received. For example, <code>(moving-event-window {:size 10})</code> will in that case always send downstream the last 10 events.</p>
+<p>The <code>moving-time-window</code> action will return for each event all events from the last <code>duration</code> seconds, for example: <code>(moving-time-window {:duration 60})</code>.</p>
+<h4 id="sort-events">Sort events</h4>
+<p>The <code>ssort</code> action can be used to</p>
+<ul>
+<li>bufferize events for a given duration</li>
+<li>Send then downstream one by one sorted based on a field.</li>
+</ul>
+<p>Let&rsquo;s take for example <code>(ssort {:duration 10 :field :time})</code>. For this input:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">10</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">4</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">9</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">13</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">31</span>}
+</code></pre></div><p>The output would be:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">4</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">9</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">10</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">13</span>}
+</code></pre></div><p>Events are emitted downstream after twice the duration period. In this example, events received between times <code>0</code> and <code>10</code> will for example be emitted at time <code>20</code>.</p>
+<p>This action can be very useful to tolerate late events in streams. You could for example use <code>ssort</code> in front of a <code>fixed-time-window</code> stream in order to wait for late events before creating the time window.</p>
+<h4 id="actions-on-list-of-events">Actions on list of events</h4>
+<p>Several actions can be executed on list of events (produced by windows for example).</p>
 <p>Let&rsquo;s take this example which creates windows of 10 events and forwards them to multiple streams:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-event-window</span> {<span style="color:#e6db74">:size</span> <span style="color:#ae81ff">10</span>}
   (<span style="color:#a6e22e">coll-max</span>
@@ -883,6 +897,10 @@ It means you should be careful about which action you will use downstream. It sh
   (<span style="color:#a6e22e">coll-top</span> <span style="color:#ae81ff">10</span>
     (<span style="color:#a6e22e">info</span>))
   (<span style="color:#a6e22e">coll-bottom</span> <span style="color:#ae81ff">10</span>
+    (<span style="color:#a6e22e">info</span>))
+  (<span style="color:#a6e22e">coll-where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>]
+    (<span style="color:#a6e22e">info</span>))
+  (<span style="color:#a6e22e">coll-sort</span> <span style="color:#e6db74">:time</span>
     (<span style="color:#a6e22e">info</span>)))
 </code></pre></div><p><code>coll-max</code> will forward downstream the event with the biggest <code>:metric</code> field, <code>coll-min</code> will forward the event with the smallest <code>:metric</code>.
 <code>coll-sum</code> will sum all events <code>:metric</code> together.
@@ -894,9 +912,11 @@ The three previous streams use the latest event from the list of events to build
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
   (<span style="color:#a6e22e">coll-percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.98</span> <span style="color:#ae81ff">0.99</span>]
     (<span style="color:#a6e22e">info</span>)))
-</code></pre></div><p>In this example, we generate 60-seconds time windows and pass them to the <code>coll-percentiles</code> action. The action takes the wanted quantiles as parameter.</p>
-<p>The <code>coll-percentiles</code> action will produce for each quantile an event with the <code>:quantile</code> key set to the quantile value, and the <code>:metric</code> field set to the value computed from the list of events for this quantile. The quantiles <code>0</code> and <code>1</code> can also be used to get the smallest or biggest event.</p>
-<p>If needed, you can also flatten a list of events, to get back a single event using <code>sflatten</code>:</p>
+</code></pre></div><p>In this example, we generate 60-seconds time windows and pass them to the <code>coll-percentiles</code> action. The action takes que wanted quantiles as parameter.</p>
+<p>The <code>coll-percentiles</code> action will produce for each quantile an event with the <code>:quantile</code> key set to the quantile value, and the <code>;metric</code> field set to the value computed from the list of events for this quantile. The quantiles <code>0</code> and <code>1</code> can also be used to get the smallest of biggest event.</p>
+<p><code>coll-where</code> will keep only events in the list matching the provided conditio (see the <a href="/howto/stream/#filtering-events">filtering events</a> section.</p>
+<p><code>coll-sort</code> will sort events in the list based on the field passed as parameter.</p>
+<p>If needed, you can also flatten a list of events, to get back a single event using <code>flatten</code>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">moving-event-window</span> {<span style="color:#e6db74">:size</span> <span style="color:#ae81ff">10</span>}
   (<span style="color:#a6e22e">sflatten</span>
     (<span style="color:#a6e22e">info</span>)))
@@ -914,12 +934,12 @@ The three previous streams use the latest event from the list of events to build
       (<span style="color:#a6e22e">info</span>))))
 </code></pre></div><p>The <code>by</code> action takes a list of fields as parameter and will generate a new instance of the downstream actions for each unique values associated to the fields. Here for example, the computation will be done in isolation for each different <code>:host</code>.</p>
 <h4 id="coalesce-and-project">Coalesce and project</h4>
-<p>These two streams can help you doing computations on events from multiple sources.</p>
+<p>These two streams can help you doing computation on events from multiple sources.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_requests_duration_seconds&#34;</span>]
   (<span style="color:#a6e22e">coalesce</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">10</span> <span style="color:#e6db74">:fields</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:environment</span>]}
     (<span style="color:#a6e22e">coll-percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.98</span> <span style="color:#ae81ff">0.99</span>]
       (<span style="color:#a6e22e">info</span>))))
-</code></pre></div><p><code>coalesce</code> will return periodically (here, every 10 seconds) the latest event for each, in this example, <code>:host</code> and <code>environment</code>. For example, if you have 20 unique host/environment combinations push events regularly, coalesce will emit a list of 20 events (the latest for each combination).</p>
+</code></pre></div><p><code>coalesce</code> will return periodically (here, every 10 seconds) the latest event for each, in this example, <code>:host</code> and <code>environment</code>. For example, if you have 20 unique host/environment combination push event regularly, coalesce will emit a list of 20 events (the latest for each combination).</p>
 <p>Expired events are not emitted, so if a host stops pushing, its event will not be emitted once the event is expired.</p>
 <p><code>project</code> works like coalesce but instead to get the latest event based on some fields, you should provide <code>where</code> clauses:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(project [[<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;enqueues&#34;</span>]
@@ -927,9 +947,9 @@ The three previous streams use the latest event from the list of events to build
   (<span style="color:#a6e22e">coll-quotient</span>
     (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;enqueues per dequeue&#34;</span>
       (<span style="color:#a6e22e">info</span>))))
-</code></pre></div><p>In this example, we pass to project two <code>where</code> clauses, to divide the <code>:metric</code> from the first event with the other one.</p>
+</code></pre></div><p>In this example, we pass to project two <code>where</code> clauses, for example to divide the <code>:metric</code> from the first event with the other one.</p>
 <h4 id="throttle">Throttle</h4>
-<p>You can use the <code>throttle</code> action to limit the rate at which some events pass downstream. You can for example use it to avoid sending too many alerts to an external system:</p>
+<p>You can use the <code>throttle</code> action to let only some events pass at most every dt seconds. You can for example use it to avoid sending too many alerts to an external system:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">throttle</span> {<span style="color:#e6db74">:count</span> <span style="color:#ae81ff">3</span> <span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
   (<span style="color:#a6e22e">error</span>))
 </code></pre></div><p>In this example, throttle will only forward 3 events to the <code>error</code> action every 60 seconds.</p>
@@ -937,17 +957,17 @@ The three previous streams use the latest event from the list of events to build
 <p>The <code>dtt</code> action can be used to convert a counter (which could always increase) to a rate:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">ddt</span>
   (<span style="color:#a6e22e">info</span>))
-</code></pre></div><p>If this stream is fed with <code>{:metric 1 :time 1}</code> and then <code>{:metric 10 :time 4}</code> (these events could represent the count of requests to a HTTP server for example), the event <code>{:metric (/ 9 3) :time 4}</code> will be produced. This event is computed by doing <code>(10-1)/3</code> for the <code>:metric</code> field, and the <code>:time</code> field is the time of the latest event.</p>
+</code></pre></div><p>If this stream is fed with <code>{:metric 1 :time 1}</code> and then <code>{:metric 10 :time 4}</code> (these events could represent the count of requests to a HTTP server for example), the event <code>{:metric (/ 9 3) :time 4}</code> will be produced. This event is computed by doing <code>(10-1)/3</code> for the <code>;metric</code> field, and the <code>:time</code> field is the time of the latest event.</p>
 <p>The result is the rate of requests during this time period.</p>
 <h4 id="handle-exceptions-errors">Handle exceptions (errors)</h4>
-<p>Sometimes, streams can generate errors. For example, a downstream io can be unreachable, or you could try to do an invalid action on an event. Let&rsquo;s take an example:</p>
+<p>Sometimes, streams can generate errors. For example, a downstream service can be down, or you could try to do an invalid action on an event. Let&rsquo;s take an example:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">exception-stream</span>
   (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:metric</span> <span style="color:#e6db74">&#34;invalid!&#34;</span>
     (<span style="color:#a6e22e">increment</span>))
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>In this example, we associate a string to the event <code>:metric</code> field and then we try to incremen it. This will produce an exception.</p>
-<p><code>exception-stream</code> is an action which will catch all exceptions generated on its first child, generate an event from its exception, and pass it to its second child (<code>info</code> here). You can like that log errors, or forward them to another system.</p>
-<p>The error event generated by <code>exception-stream</code> looks like this:</p>
+<p><code>exception-stream</code> is an action which will catch all exception generated on its first child, generate an event from its exception, and pass it to its second child (<code>info</code> here). You can like that log errors, or forward them to another system.</p>
+<p>The error event generated by exception-stream looks like this:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1.620331421405</span>E9,
  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;mirabelle-exception&#34;</span>
  <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;error&#34;</span>
@@ -1290,19 +1310,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1633872343"></script>
-    <script src="/js/perfect-scrollbar.min.js?1633872343"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1633872343"></script>
-    <script src="/js/jquery.sticky.js?1633872343"></script>
-    <script src="/js/featherlight.min.js?1633872343"></script>
-    <script src="/js/highlight.pack.js?1633872343"></script>
+    <script src="/js/clipboard.min.js?1635692565"></script>
+    <script src="/js/perfect-scrollbar.min.js?1635692565"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1635692565"></script>
+    <script src="/js/jquery.sticky.js?1635692565"></script>
+    <script src="/js/featherlight.min.js?1635692565"></script>
+    <script src="/js/highlight.pack.js?1635692565"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1633872343"></script>
-    <script src="/js/learn.js?1633872343"></script>
-    <script src="/js/hugo-learn.js?1633872343"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1635692565"></script>
+    <script src="/js/learn.js?1635692565"></script>
+    <script src="/js/hugo-learn.js?1635692565"></script>
     
         
-            <script src="/mermaid/mermaid.js?1633872343"></script>
+            <script src="/mermaid/mermaid.js?1635692565"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

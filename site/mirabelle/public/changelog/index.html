@@ -12,20 +12,20 @@
     <title>Changelog :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1633872343" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1633872343" rel="stylesheet">
-    <link href="/css/hybrid.css?1633872343" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1633872343" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1633872343" rel="stylesheet">
-    <link href="/css/auto-complete.css?1633872343" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1633872343" rel="stylesheet">
-    <link href="/css/theme.css?1633872343" rel="stylesheet">
-    <link href="/css/tabs.css?1633872343" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1633872343" rel="stylesheet">
+    <link href="/css/nucleus.css?1635692565" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1635692565" rel="stylesheet">
+    <link href="/css/hybrid.css?1635692565" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1635692565" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1635692565" rel="stylesheet">
+    <link href="/css/auto-complete.css?1635692565" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1635692565" rel="stylesheet">
+    <link href="/css/theme.css?1635692565" rel="stylesheet">
+    <link href="/css/tabs.css?1635692565" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1635692565" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1633872343"></script>
+    <script src="/js/jquery-3.3.1.min.js?1635692565"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1633872343"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1633872343"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1635692565"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1635692565"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1633872343"></script>
+<script type="text/javascript" src="/js/search.js?1635692565"></script>
 
     
   </div>
@@ -553,6 +553,8 @@
     <div class="wrapper">
 <nav id="TableOfContents">
   <ul>
+    <li><a href="#v070">v0.7.0</a></li>
+    <li><a href="#v060">v0.6.0</a></li>
     <li><a href="#v050">v0.5.0</a></li>
     <li><a href="#v040">v0.4.0</a></li>
     <li><a href="#v030">v0.3.0</a></li>
@@ -582,7 +584,26 @@
 
 
 
-	<h2 id="v050">v0.5.0</h2>
+	<p>This is the list of user-facing changes for Mirabelle.</p>
+<h2 id="v070">v0.7.0</h2>
+<ul>
+<li>Add <code>/health</code> endpoint. Both <code>/health</code> and <code>/healthz</code> return the same thing.</li>
+<li>Improve websocket error messages on bad queries.</li>
+<li>Improve error messages in test mode.</li>
+<li>Add the ability to persist on the file system streams created through the API. It can be enabled by setting <code>persist</code> to <code>true</code> in the stream configuration.</li>
+<li>Add <code>coll-where</code> action. This action can be used to filter a list of events based on a condition.</li>
+<li>Add <code>coll-sort</code> action, which can be used to sort a collection of events based on a field.</li>
+<li>Add <code>moving-time-window</code> action. This window always return the events which arrived the last <code>duration</code> seconds.</li>
+<li>Add <code>ssort</code> action. This action buffers events for some time and send them one by one sorted to downstream actions. It can be a nice way to tolerate some late events in streams.</li>
+<li>Allow nesting <code>:or</code> add <code>and</code> values in conditions. For example <code>[:and [:or [:= :service &quot;foo&quot;] [:= :service &quot;bar&quot;]] [:&gt; :metric 1]]</code> is now a value condition.</li>
+</ul>
+<h2 id="v060">v0.6.0</h2>
+<ul>
+<li>Fix <code>default</code> action.</li>
+<li>Use maps instead of plain values for all actions dealing with internal states.</li>
+<li>Add <code>aggr-sum</code> action, which can be used to sum over time events.</li>
+</ul>
+<h2 id="v050">v0.5.0</h2>
 <ul>
 <li>Elasticsearch I/O</li>
 <li>Force the use of the #secret reader for sensitive information in I/O</li>
@@ -925,19 +946,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1633872343"></script>
-    <script src="/js/perfect-scrollbar.min.js?1633872343"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1633872343"></script>
-    <script src="/js/jquery.sticky.js?1633872343"></script>
-    <script src="/js/featherlight.min.js?1633872343"></script>
-    <script src="/js/highlight.pack.js?1633872343"></script>
+    <script src="/js/clipboard.min.js?1635692565"></script>
+    <script src="/js/perfect-scrollbar.min.js?1635692565"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1635692565"></script>
+    <script src="/js/jquery.sticky.js?1635692565"></script>
+    <script src="/js/featherlight.min.js?1635692565"></script>
+    <script src="/js/highlight.pack.js?1635692565"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1633872343"></script>
-    <script src="/js/learn.js?1633872343"></script>
-    <script src="/js/hugo-learn.js?1633872343"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1635692565"></script>
+    <script src="/js/learn.js?1635692565"></script>
+    <script src="/js/hugo-learn.js?1635692565"></script>
     
         
-            <script src="/mermaid/mermaid.js?1633872343"></script>
+            <script src="/mermaid/mermaid.js?1635692565"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

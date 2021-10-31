@@ -2324,10 +2324,15 @@
 
   ```clojure
   {:time 1} {:time 4} {:time 9} {:time 10} {:time 13}
-  ```"
+  ```
+  Events are emitted downstream after twice the duration period.
+  In this example, events received between times `0` and `10` will for
+  example be emitted at time `20`.
+
+  Too old events are dropped."
   [config & children]
-  (spec/valid-action? ::moving-time-window [config])
-  {:action :moving-time-window
+  (spec/valid-action? ::ssort [config])
+  {:action :ssort
    :params [config]
    :children children})
 

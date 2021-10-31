@@ -22,6 +22,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 - [Modifying events: update fields, values, set default values, select fields...](/howto/stream/#modifying-events)
 - [Detect state transitions](/howto/stream/#detect-state-transitions)
 - [Work with windows (time windows, events windows...)](/howto/stream/#events-windows)
+- [Sort events](/howto/stream/#sort-events)
 - [Action on lists of events: max, min, count, percentiles, rate...](/howto/stream/#actions-on-list-of-events)
 - [Combine events from multiple hosts, correlate events between each others](/howto/stream/#coalesce-and-project)
 - [The throttle action](/howto/stream/#throttle)
@@ -452,7 +453,32 @@ The first one, `fixed-time-window`, will buffer all events during a defined dura
 
 The `fixed-event-window` action will created windows not based on time, but based on the number of events the action receives. For example, `(fixed-event-window {:size 60})` will buffer events until 10 are buffered, and then pass the window downstream.
 
-The `moving-event-window` action works like `fixed-event-window` but will pass events downstream for every event received. For example, `(moving-event-window {size 10})` will in that case always send downstream the last 10 events.
+The `moving-event-window` action works like `fixed-event-window` but will pass events downstream for every event received. For example, `(moving-event-window {:size 10})` will in that case always send downstream the last 10 events.
+
+The `moving-time-window` action will return for each event all events from the last `duration` seconds, for example: `(moving-time-window {:duration 60})`.
+
+#### Sort events
+
+The `ssort` action can be used to
+
+- bufferize events for a given duration
+- Send then downstream one by one sorted based on a field.
+
+Let's take for example `(ssort {:duration 10 :field :time})`. For this input:
+
+```clojure
+{:time 1} {:time 10} {:time 4} {:time 9} {:time 13} {:time 31}
+```
+
+The output would be:
+
+```clojure
+{:time 1} {:time 4} {:time 9} {:time 10} {:time 13}
+```
+
+Events are emitted downstream after twice the duration period. In this example, events received between times `0` and `10` will for example be emitted at time `20`.
+
+This action can be very useful to tolerate late events in streams. You could for example use `ssort` in front of a `fixed-time-window` stream in order to wait for late events before creating the time window.
 
 #### Actions on list of events
 
@@ -479,6 +505,10 @@ Let's take this example which creates windows of 10 events and forwards them to 
   (coll-top 10
     (info))
   (coll-bottom 10
+    (info))
+  (coll-where [:= :service "foo"]
+    (info))
+  (coll-sort :time
     (info)))
 ```
 
@@ -501,6 +531,10 @@ The `coll-percentiles` action can also be used to compute percentiles on a list 
 In this example, we generate 60-seconds time windows and pass them to the `coll-percentiles` action. The action takes que wanted quantiles as parameter.
 
 The `coll-percentiles` action will produce for each quantile an event with the `:quantile` key set to the quantile value, and the `;metric` field set to the value computed from the list of events for this quantile. The quantiles `0` and `1` can also be used to get the smallest of biggest event.
+
+`coll-where` will keep only events in the list matching the provided conditio (see the [filtering events](/howto/stream/#filtering-events) section.
+
+`coll-sort` will sort events in the list based on the field passed as parameter.
 
 If needed, you can also flatten a list of events, to get back a single event using `flatten`:
 

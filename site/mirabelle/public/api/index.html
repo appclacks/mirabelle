@@ -12,20 +12,20 @@
     <title>HTTP API :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1633872343" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1633872343" rel="stylesheet">
-    <link href="/css/hybrid.css?1633872343" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1633872343" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1633872343" rel="stylesheet">
-    <link href="/css/auto-complete.css?1633872343" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1633872343" rel="stylesheet">
-    <link href="/css/theme.css?1633872343" rel="stylesheet">
-    <link href="/css/tabs.css?1633872343" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1633872343" rel="stylesheet">
+    <link href="/css/nucleus.css?1635692565" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1635692565" rel="stylesheet">
+    <link href="/css/hybrid.css?1635692565" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1635692565" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1635692565" rel="stylesheet">
+    <link href="/css/auto-complete.css?1635692565" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1635692565" rel="stylesheet">
+    <link href="/css/theme.css?1635692565" rel="stylesheet">
+    <link href="/css/tabs.css?1635692565" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1635692565" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1633872343"></script>
+    <script src="/js/jquery-3.3.1.min.js?1635692565"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1633872343"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1633872343"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1635692565"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1635692565"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1633872343"></script>
+<script type="text/javascript" src="/js/search.js?1635692565"></script>
 
     
   </div>
@@ -611,7 +611,10 @@
 </ul>
 <p>The body is a json string like <code>{&quot;config&quot;: &quot;&lt;stream-config&gt;&quot;}</code>.</p>
 <p><!-- raw HTML omitted --> should be the stream EDN configuration as base64. For example <code>{:actions {:action :info}}</code> as base64 would be <code>ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfX0=</code>.</p>
-<p>You can also pass the <code>:default</code> option, like in the configuration, in order to specify if you want your stream to be used by default.</p>
+<p>You can pass the <code>:default</code> option, like in the configuration, in order to specify if you want your stream to be used by default.</p>
+<p>You can also set the <code>:persist</code> field to <code>true</code> in your stream configuration in order to persist it on disk.
+In that case, Mirabelle will write the stream configuration into the <strong>first</strong> directory referenced into the <code>:stream {:directory ..;}</code> configuration. The file name will be <code>&lt;stream-name&gt;.edn</code>.</p>
+<p>Deleting a stream through the API will also delete its file on the filesystem.</p>
 <hr>
 <pre><code>curl -H &quot;Content-Type: application/json&quot; -X POST --data  '{&quot;config&quot;: &quot;ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfX0=&quot;}' 127.0.0.1:5558/api/v1/stream/foobar
 
@@ -637,6 +640,7 @@
 <li><strong>DELETE</strong> <code>/api/v1/stream/&lt;stream-name&gt;</code></li>
 </ul>
 <p>Delete a stream by name.</p>
+<p>If the stream was created using the API (see <code>Add a stream</code>) and persisted on disk, this call will also deleted its configuration file.</p>
 <hr>
 <pre><code>curl -X DELETE localhost:5558/api/v1/stream/trololo
 
@@ -989,19 +993,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1633872343"></script>
-    <script src="/js/perfect-scrollbar.min.js?1633872343"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1633872343"></script>
-    <script src="/js/jquery.sticky.js?1633872343"></script>
-    <script src="/js/featherlight.min.js?1633872343"></script>
-    <script src="/js/highlight.pack.js?1633872343"></script>
+    <script src="/js/clipboard.min.js?1635692565"></script>
+    <script src="/js/perfect-scrollbar.min.js?1635692565"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1635692565"></script>
+    <script src="/js/jquery.sticky.js?1635692565"></script>
+    <script src="/js/featherlight.min.js?1635692565"></script>
+    <script src="/js/highlight.pack.js?1635692565"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1633872343"></script>
-    <script src="/js/learn.js?1633872343"></script>
-    <script src="/js/hugo-learn.js?1633872343"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1635692565"></script>
+    <script src="/js/learn.js?1635692565"></script>
+    <script src="/js/hugo-learn.js?1635692565"></script>
     
         
-            <script src="/mermaid/mermaid.js?1633872343"></script>
+            <script src="/mermaid/mermaid.js?1635692565"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });
