@@ -111,9 +111,10 @@ Forward events to [ElasticSearch](https://www.elastic.co/fr/). This I/O forwards
 
 ## Actions
 
-The [generated documentation](/generated-doc/mirabelle.action.html) from the code contains explanations about the available actions. Here is the list:
+The [generated documentation](/generated-doc/mirabelle.action.html) from the code contains explanations and examples about the available actions. Here is the list:
 
 - above-dt
+- aggr-sum
 - async-queue!
 - below-dt
 - between-dt
@@ -127,14 +128,17 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - coll-percentiles
 - coll-quotient
 - coll-rate
+- coll-sort
 - coll-sum
 - coll-top
+- coll-where
 - critical
 - critical-dt
 - ddt
 - ddt-pos
 - debug
 - decrement
+- default
 - disk-queue!
 - error
 - ewma-timeless
@@ -151,6 +155,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - json-fields
 - keep-keys
 - moving-event-window
+- moving-time-window
 - not-expired
 - outside-dt
 - over
@@ -166,6 +171,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - sflatten
 - sformat
 - split
+- ssort
 - stable
 - tag
 - tagged-all

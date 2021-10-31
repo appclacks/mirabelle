@@ -12,20 +12,20 @@
     <title>I/O and actions reference :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1635692740" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1635692740" rel="stylesheet">
-    <link href="/css/hybrid.css?1635692740" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1635692740" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1635692740" rel="stylesheet">
-    <link href="/css/auto-complete.css?1635692740" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1635692740" rel="stylesheet">
-    <link href="/css/theme.css?1635692740" rel="stylesheet">
-    <link href="/css/tabs.css?1635692740" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1635692740" rel="stylesheet">
+    <link href="/css/nucleus.css?1635696736" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1635696736" rel="stylesheet">
+    <link href="/css/hybrid.css?1635696736" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1635696736" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1635696736" rel="stylesheet">
+    <link href="/css/auto-complete.css?1635696736" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1635696736" rel="stylesheet">
+    <link href="/css/theme.css?1635696736" rel="stylesheet">
+    <link href="/css/tabs.css?1635696736" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1635696736" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1635692740"></script>
+    <script src="/js/jquery-3.3.1.min.js?1635696736"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1635692740"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1635692740"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1635696736"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1635696736"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1635692740"></script>
+<script type="text/javascript" src="/js/search.js?1635696736"></script>
 
     
   </div>
@@ -672,9 +672,10 @@
                     <span style="color:#e6db74">:api-key</span> {<span style="color:#e6db74">:id</span> <span style="color:#e6db74">&#34;id&#34;</span>
                               <span style="color:#e6db74">:secret</span> <span style="color:#f92672">#</span>secret <span style="color:#e6db74">&#34;secret&#34;</span>}}}}
 </code></pre></div><h2 id="actions">Actions</h2>
-<p>The <a href="/generated-doc/mirabelle.action.html">generated documentation</a> from the code contains explanations about the available actions. Here is the list:</p>
+<p>The <a href="/generated-doc/mirabelle.action.html">generated documentation</a> from the code contains explanations and examples about the available actions. Here is the list:</p>
 <ul>
 <li>above-dt</li>
+<li>aggr-sum</li>
 <li>async-queue!</li>
 <li>below-dt</li>
 <li>between-dt</li>
@@ -688,14 +689,17 @@
 <li>coll-percentiles</li>
 <li>coll-quotient</li>
 <li>coll-rate</li>
+<li>coll-sort</li>
 <li>coll-sum</li>
 <li>coll-top</li>
+<li>coll-where</li>
 <li>critical</li>
 <li>critical-dt</li>
 <li>ddt</li>
 <li>ddt-pos</li>
 <li>debug</li>
 <li>decrement</li>
+<li>default</li>
 <li>disk-queue!</li>
 <li>error</li>
 <li>ewma-timeless</li>
@@ -712,6 +716,7 @@
 <li>json-fields</li>
 <li>keep-keys</li>
 <li>moving-event-window</li>
+<li>moving-time-window</li>
 <li>not-expired</li>
 <li>outside-dt</li>
 <li>over</li>
@@ -727,6 +732,7 @@
 <li>sflatten</li>
 <li>sformat</li>
 <li>split</li>
+<li>ssort</li>
 <li>stable</li>
 <li>tag</li>
 <li>tagged-all</li>
@@ -1063,19 +1069,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1635692740"></script>
-    <script src="/js/perfect-scrollbar.min.js?1635692740"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1635692740"></script>
-    <script src="/js/jquery.sticky.js?1635692740"></script>
-    <script src="/js/featherlight.min.js?1635692740"></script>
-    <script src="/js/highlight.pack.js?1635692740"></script>
+    <script src="/js/clipboard.min.js?1635696736"></script>
+    <script src="/js/perfect-scrollbar.min.js?1635696736"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1635696736"></script>
+    <script src="/js/jquery.sticky.js?1635696736"></script>
+    <script src="/js/featherlight.min.js?1635696736"></script>
+    <script src="/js/highlight.pack.js?1635696736"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1635692740"></script>
-    <script src="/js/learn.js?1635692740"></script>
-    <script src="/js/hugo-learn.js?1635692740"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1635696736"></script>
+    <script src="/js/learn.js?1635696736"></script>
+    <script src="/js/hugo-learn.js?1635696736"></script>
     
         
-            <script src="/mermaid/mermaid.js?1635692740"></script>
+            <script src="/mermaid/mermaid.js?1635696736"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });
