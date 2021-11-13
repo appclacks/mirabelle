@@ -1,10 +1,11 @@
 (ns mirabelle.io.influxdb
   (:require [clojure.spec.alpha :as s]
             [clojure.tools.logging :as log]
+            [corbihttp.spec :as spec]
             [com.stuartsierra.component :as component]
             [exoscale.cloak :as cloak]
             [mirabelle.io :as io]
-            [mirabelle.spec :as spec])
+            [mirabelle.spec :as mspec])
   (:import com.influxdb.client.InfluxDBClient
            com.influxdb.client.InfluxDBClientFactory
            com.influxdb.client.InfluxDBClientOptions
@@ -103,7 +104,7 @@
                      ]
   component/Lifecycle
   (start [this]
-    (spec/valid? ::influxdb config)
+    (mspec/valid? ::influxdb config)
     (if client
       this
       (let [config (merge default-config config)

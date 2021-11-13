@@ -1,5 +1,6 @@
 (ns mirabelle.http
-  (:require [corbihttp.interceptor.error :as itc-error]
+  (:require [corbihttp.interceptor.auth :as itc-auth]
+            [corbihttp.interceptor.error :as itc-error]
             [corbihttp.interceptor.handler :as itc-handler]
             [corbihttp.interceptor.id :as itc-id]
             [corbihttp.interceptor.json :as itc-json]
@@ -10,12 +11,14 @@
             [mirabelle.handler :as mh]))
 
 (defn interceptor-chain
-  [{:keys [api-handler registry]}]
+  [{:keys [api-handler registry config]}]
   [itc-response/response ;;leave
    (itc-error/last-error registry) ;;error
    (itc-metric/response-metrics registry) ;; leave
    itc-json/json ;; leave
    itc-error/error ;; error
+   (when-let [basic-auth (:basic-auth config)]
+     (itc-auth/basic-auth basic-auth))
    (itc-route/route {:dispatch-map mh/dispatch-map
                      :registry registry
                      :handler-component api-handler

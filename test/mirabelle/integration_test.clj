@@ -13,10 +13,14 @@
 
 (use-fixtures :once system-fixture)
 
+(def basic {"authorization" (str "Basic " (b64/to-base64
+                                           "foo:my-password"))})
+
 (deftest http-test
   (testing "healthz"
     (let [resp (http/get "http://localhost:5558/healthz"
-                         {:as :json})]
+                         {:as :json
+                          :headers basic})]
       (is (= 200 (:status resp)))
       (is (= {:message "ok"}
              (:body resp)))))
@@ -28,6 +32,7 @@
           resp (http/post "http://localhost:5558/api/v1/stream/test-foo"
                           {:content-type :json
                            :as :json
+                           :headers basic
                            :body body})]
       (is (= 200 (:status resp)))
       (is (= {:message "stream added"}
@@ -38,6 +43,7 @@
           resp (http/put "http://localhost:5558/api/v1/stream/test-foo"
                          {:content-type :json
                           :as :json
+                          :headers basic
                           :body body})]
       (is (= 200 (:status resp)))
       (is (= {:message "ok"}
@@ -47,6 +53,7 @@
           resp (http/put "http://localhost:5558/api/v1/stream/test-bar"
                          {:content-type :json
                           :throw-exceptions false
+                          :headers basic
                           :as :json
                           :body body})]
       (is (= 404 (:status resp)))
@@ -59,6 +66,7 @@
                    json/generate-string)
           resp (http/post "http://localhost:5558/api/v1/index/test-foo/search"
                           {:content-type :json
+                           :headers basic
                            :throw-exceptions false
                            :as :json
                            :body body})]
@@ -71,6 +79,7 @@
                    json/generate-string)
           resp (http/post "http://localhost:5558/api/v1/index/test-bar/search"
                           {:content-type :json
+                           :headers basic
                            :throw-exceptions false
                            :as :json
                            :body body})]
@@ -79,7 +88,8 @@
              (json/parse-string (:body resp) true)))))
   (testing "get-stream"
     (let [resp (http/get "http://localhost:5558/api/v1/stream/test-foo"
-                         {:as :json})]
+                         {:as :json
+                          :headers basic})]
       (is (= 200 (:status resp)))
       (is (= {:config (-> {:actions {:action :index :params [[:host]]} :default false}
                           pr-str
@@ -88,30 +98,35 @@
              (:body resp)))))
   (testing "list-streams"
     (let [resp (http/get "http://localhost:5558/api/v1/stream"
-                         {:as :json})
+                         {:as :json
+                          :headers basic})
           streams (-> resp :body :streams set)]
       (is (= 200 (:status resp)))
       (is (streams "test-foo"))))
   (testing "current-time"
     (let [resp (http/get "http://localhost:5558/api/v1/index/test-foo/current-time"
-                         {:as :json})]
+                         {:as :json
+                          :headers basic})]
       (is (= 200 (:status resp)))
       (is (= {:current-time 3}
              (:body resp)))))
   (testing "remove-stream"
     (let [resp (http/delete "http://localhost:5558/api/v1/stream/test-foo"
-                            {:as :json})]
+                            {:as :json
+                             :headers basic})]
       (is (= 200 (:status resp)))
       (is (= {:message "stream removed"}
              (:body resp))))
     (let [resp (http/get "http://localhost:5558/api/v1/stream"
-                         {:as :json})
+                         {:as :json
+                          :headers basic})
           streams (-> resp :body :streams set)]
       (is (= 200 (:status resp)))
       (is (not (streams "test-foo")))))
   (testing "not-found"
     (let [resp (http/delete "http://localhost:5558/api/v1/notfound"
                             {:as :json
+                             :headers basic
                              :throw-exceptions false})]
       (is (= 404 (:status resp)))
       (is (= {:error "uri /api/v1/notfound not found for method delete"}
@@ -121,9 +136,25 @@
                    json/generate-string)
           resp (http/post "http://localhost:5558/api/v1/index/test-foo/search"
                           {:content-type :json
+                           :headers basic
                            :throw-exceptions false
                            :as :json
                            :body body})]
       (is (= 400 (:status resp)))
       (is (= {:error "field query is incorrect"}
-             (json/parse-string (:body resp) true))))))
+             (json/parse-string (:body resp) true)))))
+  (testing "bad auth"
+    (let [resp (http/get "http://localhost:5558/healthz"
+                         {:as :json
+                          :throw-exceptions false})]
+      (is (= 401 (:status resp))))
+    (let [resp (http/get "http://localhost:5558/healthz"
+                         {:as :json
+                          :headers {"authorization" "Basic"}
+                          :throw-exceptions false})]
+      (is (= 401 (:status resp))))
+    (let [resp (http/get "http://localhost:5558/healthz"
+                         {:as :json
+                          :headers {"authorization" (b64/to-base64 "foo:")}
+                          :throw-exceptions false})]
+      (is (= 401 (:status resp))))))

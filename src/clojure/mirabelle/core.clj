@@ -4,6 +4,7 @@
             [corbihttp.http :as corbihttp]
             [corbihttp.log :as log]
             [corbihttp.metric :as metric]
+            [corbihttp.spec :as spec]
             [mirabelle.config :as config]
             [mirabelle.db.queue :as queue]
             [mirabelle.handler :as handler]
@@ -97,10 +98,10 @@
     (System/exit 1))
   (let [src-dir (second args)
         dst-dir (nth args 2)]
-    (when-not (s/valid? ::config/directory-spec src-dir)
+    (when-not (s/valid? ::spec/directory-spec src-dir)
       (log/error {} (format "%s is not a directory" src-dir))
       (System/exit 1))
-    (when-not (s/valid? ::config/directory-spec dst-dir)
+    (when-not (s/valid? ::spec/directory-spec dst-dir)
       (log/error {} (format "%s is not a directory" src-dir))
       (System/exit 1))
     (config/compile-config! src-dir dst-dir))

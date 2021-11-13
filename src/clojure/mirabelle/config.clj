@@ -3,7 +3,9 @@
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
             [clojure.spec.alpha :as s]
+            [corbihttp.spec :as spec]
             [corbihttp.error :as error]
+            [corbihttp.http :as http]
             [corbihttp.log :as log]
             [environ.core :as env]
             [exoscale.cloak :as cloak]
@@ -13,36 +15,23 @@
             [mirabelle.path :as path])
   (:import java.io.File))
 
-(s/def ::file-spec (fn [path]
-                     (let [file (io/file path)]
-                       (and (.exists file)
-                            (.isFile file)))))
-(s/def ::directory-spec (fn [path]
-                          (let [file (io/file path)]
-                            (and (.exists file)
-                                 (.isDirectory file)))))
 (s/def ::non-empty-string (s/and string? not-empty))
 
-(s/def ::host ::non-empty-string)
-(s/def ::port pos-int?)
-(s/def ::cacert ::file-spec)
-(s/def ::cert ::file-spec)
-(s/def ::key ::file-spec)
 (s/def ::native? boolean)
 (s/def ::event-executor-size pos-int?)
 
-(s/def ::tcp (s/keys :req-un [::host
-                              ::port]
-                     :opt-un [::cacert
-                              ::cert
+(s/def ::tcp (s/keys :req-un [::spec/host
+                              ::spec/port]
+                     :opt-un [::spec/cacert
+                              ::spec/cert
+                              ::spec/key
                               ::native?
-                              ::event-executor-size
-                              ::key]))
+                              ::event-executor-size]))
 
-(s/def ::websocket (s/keys :req-un [::host
-                                    ::port]))
+(s/def ::websocket (s/keys :req-un [::spec/host
+                                    ::spec/port]))
 
-(s/def ::directories (s/coll-of ::directory-spec))
+(s/def ::directories (s/coll-of ::spec/directory-spec))
 
 (s/def ::actions (s/map-of keyword? symbol?))
 (s/def ::stream (s/keys :opt-un [::directories
@@ -53,10 +42,10 @@
 (s/def ::test (s/keys :opt-un [::directories]))
 (s/def ::roll-cycle keyword?)
 
-(s/def ::directory ::directory-spec)
+(s/def ::directory ::spec/directory-spec)
 (s/def ::queue (s/keys :req-un [::directory]
                        :opt-un [::roll-cycle]))
-(s/def ::config (s/keys :req-un [::tcp ::websocket]
+(s/def ::config (s/keys :req-un [::tcp ::websocket ::http/http]
                         :opt-un [::stream ::io ::test ::queue]))
 
 (defmethod aero/reader 'secret

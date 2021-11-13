@@ -2,13 +2,14 @@
   (:require [cheshire.core :as json]
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
+            [corbihttp.spec :as spec]
             [clojure.spec.alpha :as s]
             [exoscale.cloak :as cloak]
             [less.awful.ssl :as less-ssl]
             [mirabelle.b64 :as b64]
             [mirabelle.config :as config]
             [mirabelle.io :as io]
-            [mirabelle.spec :as spec]
+            [mirabelle.spec :as mspec]
             [mirabelle.time :as time])
   (:import java.time.Instant
            java.time.format.DateTimeFormatter
@@ -145,7 +146,7 @@
                           ^ResponseListener response-listener]
   component/Lifecycle
   (start [this]
-    (spec/valid? ::elasticsearch config)
+    (mspec/valid? ::elasticsearch config)
     (if client
       this
       (-> (assoc this

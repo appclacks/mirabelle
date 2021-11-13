@@ -1,7 +1,9 @@
 {:tcp {:host "0.0.0.0"
        :port 5555}
  :http {:host "0.0.0.0"
-        :port 5558}
+        :port 5558
+        :basic-auth {:username "foo"
+                     :password #secret "my-password"}}
  :websocket {:host "0.0.0.0"
              :port 5556}
  :queue {:directory "dev/queue"}

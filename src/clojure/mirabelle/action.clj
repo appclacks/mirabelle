@@ -5,6 +5,7 @@
             [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [corbihttp.log :as log]
+            [corbihttp.spec :as spec]
             [exoscale.ex :as ex]
             [mirabelle.action.condition :as cd]
             [mirabelle.b64 :as b64]
@@ -14,7 +15,7 @@
             [mirabelle.io :as io]
             [mirabelle.math :as math]
             [mirabelle.pubsub :as pubsub]
-            [mirabelle.spec :as spec])
+            [mirabelle.spec :as mspec])
   (:import java.util.concurrent.Executor))
 
 (s/def ::size pos-int?)
@@ -78,7 +79,7 @@
 
   Here, we keep only events with :host = foo and with :metric > 10"
   [conditions & children]
-  (spec/valid-action? ::where [conditions])
+  (mspec/valid-action? ::where [conditions])
   {:action :where
    :params [conditions]
    :children children})
@@ -100,7 +101,7 @@
                       [:> :metric 10]))
   ```"
   [conditions & children]
-  (spec/valid-action? ::coll-where [conditions])
+  (mspec/valid-action? ::coll-where [conditions])
   {:action :coll-where
    :params [conditions]
    :children children})
@@ -218,7 +219,7 @@
 
   This example will return a vector events partitioned 5 by 5."
   [config & children]
-  (spec/valid-action? ::fixed-event-window [config])
+  (mspec/valid-action? ::fixed-event-window [config])
   {:action :fixed-event-window
    :params [config]
    :children children})
@@ -335,7 +336,7 @@
       (debug)))
   ```"
   [field & children]
-    (spec/valid-action? ::coll-sort [field])
+    (mspec/valid-action? ::coll-sort [field])
   {:action :coll-sort
    :params [field]
    :children children})
@@ -473,7 +474,7 @@
   In this example, if the events `:metric` field are greater than 100 for more than 10 seconds, events are passed downstream.
   "
   [config & children]
-  (spec/valid-action? ::above-dt [config])
+  (mspec/valid-action? ::above-dt [config])
   {:action :above-dt
    :params [[:> :metric (:threshold config)] (:duration config)]
    :children children})
@@ -495,7 +496,7 @@
   In this example, if the events `:metric` field are lower than 100 for more than 10 seconds, events are passed downstream.
   "
   [config & children]
-  (spec/valid-action? ::below-dt [config])
+  (mspec/valid-action? ::below-dt [config])
   {:action :below-dt
    :params [[:< :metric (:threshold config)] (:duration config)]
    :children children})
@@ -517,7 +518,7 @@
   In this example, if the events `:metric` field are between 50 ans 100 for more than 10 seconds, events are passed downstream.
   "
   [config & children]
-  (spec/valid-action? ::between-dt [config])
+  (mspec/valid-action? ::between-dt [config])
   {:action :between-dt
    :params [[:and
              [:> :metric (:low config)]
@@ -543,7 +544,7 @@
   In this example, if the events `:metric` field are outside the 50-100 range for more than 10 seconds, events are passed downstream.
   "
   [config & children]
-  (spec/valid-action? ::outside-dt [config])
+  (mspec/valid-action? ::outside-dt [config])
   {:action :outside-dt
    :params [[:or
              [:< :metric (:low config)]
@@ -567,7 +568,7 @@
   In this example, if the events `:state` are \"critical\" for more than 10 seconds, events are passed downstream.
   "
   [config & children]
-  (spec/valid-action? ::critical-dt [config])
+  (mspec/valid-action? ::critical-dt [config])
   {:action :critical-dt
    :params [[:= :state "critical"]
             (:duration config)]
@@ -620,7 +621,7 @@
       (call-rescue (assoc event field value) children)
       (call-rescue event children))))
 
-(s/def ::default (s/cat :field spec/not-null :value any?))
+(s/def ::default (s/cat :field mspec/not-null :value any?))
 
 (defn default
   "Set a default value for an event
@@ -633,7 +634,7 @@
   In this example, all events where `:state` is not set will be updated with
   `:state` to \"ok\"."
   [field value & children]
-  (spec/valid-action? ::default [field value])
+  (mspec/valid-action? ::default [field value])
   {:action :default
    :params [field value]
    :children children})
@@ -664,7 +665,7 @@
 
   I/O are automatically discarded in test mode."
   [io-name]
-  (spec/valid-action? ::push-io! [io-name])
+  (mspec/valid-action? ::push-io! [io-name])
   {:action :push-io!
    :params [io-name]})
 
@@ -754,7 +755,7 @@
   Expired events will be removed from the list.
   "
   [config & children]
-  (spec/valid-action? ::coalesce [config])
+  (mspec/valid-action? ::coalesce [config])
   {:action :coalesce
    :children children
    :params [config]})
@@ -878,7 +879,7 @@
 
   This example adds the tag \"foo\" and \"bar\" to events."
   [tags & children]
-  (spec/valid-action? ::tag [tags])
+  (mspec/valid-action? ::tag [tags])
   {:action :tag
    :params [tags]
    :children children})
@@ -910,7 +911,7 @@
 
   This example removes the tags \"foo\" and \"bar\" from events"
   [tags & children]
-  (spec/valid-action? ::untag [tags])
+  (mspec/valid-action? ::untag [tags])
   {:action :untag
    :params [tags]
    :children children})
@@ -945,7 +946,7 @@
   This example keeps only events tagged \"foo\" and \"bar\".
   "
   [tags & children]
-  (spec/valid-action? ::tagged-all [tags])
+  (mspec/valid-action? ::tagged-all [tags])
   {:action :tagged-all
    :params [tags]
    :children children})
@@ -1011,7 +1012,7 @@
   This example will multiply the :metric field for all events by 1000.
   "
   [factor & children]
-  (spec/valid-action? ::scale [factor])
+  (mspec/valid-action? ::scale [factor])
   {:action :scale
    :params [factor]
    :children children})
@@ -1063,7 +1064,7 @@
                                   (do
                                     (swap! children conj (first clause))
                                     [:always-true])))))]
-    (spec/valid-action? (s/coll-of ::condition) clauses-fn)
+    (mspec/valid-action? (s/coll-of ::condition) clauses-fn)
     {:action :split
      :params [clauses-fn]
      :children @children}))
@@ -1116,7 +1117,7 @@
   In this example, throttle will let 3 events pass at most every 10 seconds.
   Other events, or events with no time, are filtered."
   [config & children]
-  (spec/valid-action? ::throttle [config])
+  (mspec/valid-action? ::throttle [config])
   {:action :throttle
    :params [config]
    :children children})
@@ -1183,7 +1184,7 @@
   ```
   "
   [config & children]
-  (spec/valid-action? ::fixed-time-window [config])
+  (mspec/valid-action? ::fixed-time-window [config])
   {:action :fixed-time-window
    :params [config]
    :children children})
@@ -1210,7 +1211,7 @@
     (coll-mean (info))
   ```"
   [config & children]
-  (spec/valid-action? ::moving-event-window [config])
+  (mspec/valid-action? ::moving-event-window [config])
   {:action :moving-event-window
    :params [config]
    :children children})
@@ -1239,7 +1240,7 @@
   r=1/2 means the current event counts for half, the previous event for 1/4,
   the previous event for 1/8, and so on."
   [r & children]
-  (spec/valid-action? ::ewma-timeless [r])
+  (mspec/valid-action? ::ewma-timeless [r])
   {:action :ewma-timeless
    :params [r]
    :children children})
@@ -1263,7 +1264,7 @@
     (info))
   ```"
   [n & children]
-  (spec/valid-action? ::over [n])
+  (mspec/valid-action? ::over [n])
   {:action :over
    :params [n]
    :children children})
@@ -1288,7 +1289,7 @@
   ```
   "
   [n & children]
-  (spec/valid-action? ::under [n])
+  (mspec/valid-action? ::under [n])
   {:action :under
    :params [n]
    :children children})
@@ -1323,7 +1324,7 @@
 
   This stream is useful to get only events making a transition."
   [config & children]
-  (spec/valid-action? ::changed [config])
+  (mspec/valid-action? ::changed [config])
   {:action :changed
    :params [config]
    :children children})
@@ -1409,7 +1410,7 @@
   latest event from the \"dequeues\" one.
   "
   [conditions & children]
-  (spec/valid-action? ::project [conditions])
+  (mspec/valid-action? ::project [conditions])
   {:action :project
    :params [conditions]
    :children children})
@@ -1441,7 +1442,7 @@
 
   This example will index events by host and services."
   [labels]
-  (spec/valid-action? ::index [labels])
+  (mspec/valid-action? ::index [labels])
   {:action :index
    :params [labels]})
 
@@ -1486,7 +1487,7 @@
   (sdissoc [:environment :host] (info))
   ```"
   [fields & children]
-  (spec/valid-action? ::sdissoc [fields])
+  (mspec/valid-action? ::sdissoc [fields])
   {:action :sdissoc
    :params [(if (keyword? fields) [fields] fields)]
    :children children})
@@ -1514,7 +1515,7 @@
     (coll-percentiles [0.5 0.75 0.98 0.99]))
   ```"
   [points & children]
-  (spec/valid-action? ::coll-percentiles [points])
+  (mspec/valid-action? ::coll-percentiles [points])
   {:action :coll-percentiles
    :params [points]
    :children children})
@@ -1549,7 +1550,7 @@
 
   This example generates a moving window for each host/service combination."
   [fields & children]
-  (spec/valid-action? ::by [fields])
+  (mspec/valid-action? ::by [fields])
   {:action :by
    :params [fields]
    :children children})
@@ -1598,7 +1599,7 @@
   ([]
    (reinject! nil))
   ([destination-stream]
-   (spec/valid-action? ::reinject [destination-stream])
+   (mspec/valid-action? ::reinject [destination-stream])
    {:action :reinject!
     :params [destination-stream]}))
 
@@ -1625,7 +1626,7 @@
     (info))
   ```"
   [queue-name & children]
-  (spec/valid-action? ::async-queue! [queue-name])
+  (mspec/valid-action? ::async-queue! [queue-name])
   {:action :async-queue!
    :params [queue-name]
    :children children})
@@ -1667,7 +1668,7 @@
   In test mode, all events with `:service` \"foo\" will be saved in a tap
   named `:foo`"
   [tap-name]
-  (spec/valid-action? ::tap [tap-name])
+  (mspec/valid-action? ::tap [tap-name])
   {:action :tap
    :params [tap-name]})
 
@@ -1701,7 +1702,7 @@
   data, with keywords as keys.
   "
   [fields & children]
-  (spec/valid-action? ::json-fields [fields])
+  (mspec/valid-action? ::json-fields [fields])
   {:action :tap
    :params [(if (keyword? fields) [fields] fields)]
    :children children})
@@ -1817,7 +1818,7 @@
   ```"
   ([interval] (reaper interval nil))
   ([interval destination-stream]
-   (spec/valid-action? ::reaper [interval destination-stream])
+   (mspec/valid-action? ::reaper [interval destination-stream])
    {:action :reaper
     :params [interval destination-stream]
     :children []}))
@@ -1843,7 +1844,7 @@
   "
   [field & children]
   (let [fields (if (keyword? field) [field] field)]
-    (spec/valid-action? ::to-base64 [fields])
+    (mspec/valid-action? ::to-base64 [fields])
     {:action :to-base64
      :params [fields]
      :children children}))
@@ -1869,7 +1870,7 @@
   "
   [field & children]
   (let [fields (if (keyword? field) [field] field)]
-    (spec/valid-action? ::from-base64 [fields])
+    (mspec/valid-action? ::from-base64 [fields])
     {:action :from-base64
      :params [fields]
      :children children}))
@@ -1903,7 +1904,7 @@
   More information about availables formatters in the Clojure documentation:
   https://clojuredocs.org/clojure.core/format"
   [template target-field fields & children]
-  (spec/valid-action? ::sformat [template target-field fields])
+  (mspec/valid-action? ::sformat [template target-field fields])
   {:action :sformat
    :params [template target-field fields]
    :children children})
@@ -1927,7 +1928,7 @@
 
   Users can then subscribe to channels using the websocket engine."
   [channel]
-  (spec/valid-action? ::publish! [channel])
+  (mspec/valid-action? ::publish! [channel])
   {:action :publish!
    :params [channel]
    :children []})
@@ -1948,7 +1949,7 @@
       (info)))
   ```"
   [nb-events & children]
-  (spec/valid-action? ::coll-top [nb-events])
+  (mspec/valid-action? ::coll-top [nb-events])
   {:action :coll-top
    :params [nb-events]
    :children children})
@@ -1969,7 +1970,7 @@
       (info)))
   ```"
   [nb-events & children]
-  (spec/valid-action? ::coll-bottom [nb-events])
+  (mspec/valid-action? ::coll-bottom [nb-events])
   {:action :coll-bottom
    :params [nb-events]
    :children children})
@@ -2041,7 +2042,7 @@
   In this example, events will be forwarded of the value of the `:state` key
   is the same for at least 10 seconds"
   [dt field & children]
-  (spec/valid-action? ::stable [dt field])
+  (mspec/valid-action? ::stable [dt field])
   {:action :stable
    :params [dt field]
    :children children})
@@ -2065,7 +2066,7 @@
   `:environment` key is renamed `:env`.
   Existing values will be overrided."
   [replacement & children]
-  (spec/valid-action? ::rename-keys [replacement])
+  (mspec/valid-action? ::rename-keys [replacement])
   {:action :rename-keys
    :params [replacement]
    :children children})
@@ -2085,7 +2086,7 @@
     (info))
   ```"
   [keys-to-keep & children]
-  (spec/valid-action? ::keep-keys [keys-to-keep])
+  (mspec/valid-action? ::keep-keys [keys-to-keep])
   {:action :keep-keys
    :params [keys-to-keep]
    :children children})
@@ -2129,7 +2130,7 @@
                                                      :variables {:foo \"bar\"})
   ```"
   [path config]
-  (spec/valid-action? ::include [path config])
+  (mspec/valid-action? ::include [path config])
   (binding [*ns* (find-ns 'mirabelle.action)]
     (let [profile (or (:profile config)
                       (get-env-profile))]
@@ -2193,7 +2194,7 @@
 
 (defn aggr-sum
   [config & children]
-  (spec/valid-action? ::aggr-sum [config])
+  (mspec/valid-action? ::aggr-sum [config])
   {:action :aggr-sum
    :params [(assoc config :init {} :aggr-fn :+)]
    :children children})
@@ -2236,7 +2237,7 @@
 
   Events without times accrue in the current window."
   [config & children]
-  (spec/valid-action? ::moving-time-window [config])
+  (mspec/valid-action? ::moving-time-window [config])
   {:action :moving-time-window
    :params [config]
    :children children})
@@ -2331,7 +2332,7 @@
 
   Too old events are dropped."
   [config & children]
-  (spec/valid-action? ::ssort [config])
+  (mspec/valid-action? ::ssort [config])
   {:action :ssort
    :params [config]
    :children children})

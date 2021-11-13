@@ -2,14 +2,15 @@
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (ns mirabelle.io.pagerduty
   (:require [cheshire.core :as json]
-            [com.stuartsierra.component :as component]
             [clj-http.client :as client]
             [clojure.spec.alpha :as s]
             [clojure.string :as string]
+            [com.stuartsierra.component :as component]
+            [corbihttp.spec :as spec]
             [exoscale.cloak :as cloak]
             [exoscale.ex :as ex]
             [mirabelle.io :as io]
-            [mirabelle.spec :as spec]
+            [mirabelle.spec :as mspec]
             [mirabelle.time :as time]))
 
 (def event-url "https://events.pagerduty.com/v2/enqueue")
@@ -95,7 +96,7 @@
                       dedup-keys]
   component/Lifecycle
   (start [this]
-    (spec/valid? ::pagerduty this))
+    (mspec/valid? ::pagerduty this))
   (stop [this] this)
   io/IO
   (inject! [this events]

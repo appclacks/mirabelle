@@ -1,14 +1,11 @@
 (ns mirabelle.spec
   (:require [clojure.spec.alpha :as s]
-            [clojure.string :as string]
             [corbihttp.log :as log]
-            [exoscale.cloak :as cloak]
+            [corbihttp.spec :as spec]
             [exoscale.ex :as ex]))
 
-(s/def ::ne-string (s/and string? (complement string/blank?)))
-(s/def ::secret cloak/secret?)
 (s/def ::keyword-or-str (s/or :keyword keyword?
-                              :string ::ne-string))
+                              :string ::spec/ne-string))
 
 (defn not-null [v] (not (nil? v)))
 
@@ -26,9 +23,9 @@
                             (pr-str value)))
       (throw e))))
 
-(s/def :mirabelle.index/query ::ne-string)
+(s/def :mirabelle.index/query ::spec/ne-string)
 (s/def :mirabelle.stream/name keyword?)
-(s/def :mirabelle.stream/config ::ne-string)
+(s/def :mirabelle.stream/config ::spec/ne-string)
 (s/def :mirabelle.stream/event map?)
 
 (s/def :mirabelle.http.index/search (s/keys :req-un [:mirabelle.index/query
