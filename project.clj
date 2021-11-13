@@ -6,7 +6,7 @@
   :dependencies [[cc.qbits/tape "0.3.4"]
                  [clj-http "3.12.3"]
                  [com.boundary/high-scale-lib "1.0.6"]
-                 [com.influxdb/influxdb-client-java "3.2.0"]
+                 [com.influxdb/influxdb-client-java "3.4.0"]
                  [exoscale/coax "1.0.0-alpha12"]
                  [http-kit "2.5.3"]
                  [io.netty/netty-all "4.1.58.Final"]
