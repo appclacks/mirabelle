@@ -682,7 +682,8 @@
                           (a/where [:and
                                     [:< :metric 10]
                                     [:> :metric 1]]))}
-        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+        {:keys [entrypoint]} (stream/compile-stream! {:source-stream "my-stream"}
+                                                     stream)]
     (is (fn? entrypoint))
     (entrypoint {:state "ok" :time 2 :metric 1 :host "foo" :service "a"})
     (entrypoint {:state "ok" :time 4 :metric 1 :host "foo" :service "a"})

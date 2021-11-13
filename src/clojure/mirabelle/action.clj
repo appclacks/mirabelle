@@ -144,17 +144,18 @@
 
 (defn log-action
   "Generic logger"
-  [level]
-  (fn stream [event]
-    (when-let [event (keep-non-discarded-events event)]
-      (condp = level
-        :debug (log/debug {} (json/generate-string event))
-        :info (log/info {} (json/generate-string event))
-        :error (log/error {} (json/generate-string event))))))
+  [source-stream level]
+  (let [meta {:stream (name source-stream)}]
+    (fn stream [event]
+      (when-let [event (keep-non-discarded-events event)]
+        (condp = level
+          :debug (log/debug meta (json/generate-string event))
+          :info (log/info meta (json/generate-string event))
+          :error (log/error meta (json/generate-string event)))))))
 
 (defn debug*
-  [_]
-  (log-action :debug))
+  [ctx]
+  (log-action (:source-stream ctx) :debug))
 
 (defn debug
   "Print the event in the logs using the debug level
@@ -167,8 +168,8 @@
   {:action :debug})
 
 (defn info*
-  [_]
-  (log-action :info))
+  [ctx]
+  (log-action (:source-stream ctx) :info))
 
 (defn info
   "Print the event in the logs using the info level
@@ -181,8 +182,8 @@
   {:action :info})
 
 (defn error*
-  [_]
-  (log-action :error))
+  [ctx]
+  (log-action (:source-stream ctx) :error))
 
 (defn error
   "Print the event in the logs using the error level
