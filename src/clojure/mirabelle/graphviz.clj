@@ -4,22 +4,22 @@
 
 
 (defn action->graphviz
-  [parent parent-params actions]
+  [parent actions]
   (doall
    (for [action actions]
      (let [action-name (name (:action action))
+           params (string/replace
+                   (->> (:params action)
+                        (map pr-str)
+                        (string/join ", ")
+                       )
+                   #"\""
+                   "'")
            node (str "a" (rand-int 1000000))
-           label (format "%s [label = \"%s\"]" node action-name)
-           line (format "%s -> %s [label = \"%s\"]"
-                        parent node
-                        (if-let [params parent-params]
-                          (clojure.string/replace (pr-str params)
-                                                  #"\""
-                                                  "'"
-                                                  )
-                          "next"))
+           label (format "%s [label = \"%s \n %s\"]" node action-name params)
+           line (format "%s -> %s "
+                        parent node)
            children (some->> (action->graphviz node
-                                               (:params action)
                                                (:children action))
                              seq
                              (clojure.string/join "\n"))]
@@ -33,8 +33,7 @@
            (for [[stream-name config] config]
              (let [action (:actions config)]
                (str (format "subgraph %s {\n" (name stream-name))
-                    (first (action->graphviz "entrypoint"
-                                             ""
+                    (first (action->graphviz (name stream-name)
                                              [action]))
                     "\n}"))))))
 
@@ -43,4 +42,9 @@
   (let [config (stream/read-edn-dirs streams-directories)]
 
     )
+  )
+
+(comment
+  (do (def config (stream/read-edn-dirs ["/etc/mirabelle/streams"]))
+      (spit "/tmp/graph/graph.dot" (stream->graphviz config)))
   )
