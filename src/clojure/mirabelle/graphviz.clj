@@ -1,10 +1,10 @@
 (ns mirabelle.graphviz
   (:require [mirabelle.stream :as stream]
-            [clojure.string :as string]))
-
+            [clojure.string :as string])
+  (:import java.util.UUID))
 
 (defn action->graphviz
-  [parent actions]
+  [stream-name parent actions]
   (doall
    (for [action actions]
      (let [action-name (name (:action action))
@@ -15,11 +15,19 @@
                        )
                    #"\""
                    "'")
-           node (str "a" (rand-int 1000000))
-           label (format "%s [label = \"%s \n %s\"]" node action-name params)
-           line (format "%s -> %s "
-                        parent node)
-           children (some->> (action->graphviz node
+           node (string/replace (str "a" (UUID/randomUUID))
+                                #"-"
+                                "")
+           label (format "%s [label = \"%s \n %s\"];" node action-name params)
+           line (cond-> (format "%s -> %s;"
+                                parent node)
+                  (= :reinject! (:action action))
+                  (str (format "\n%s -> \"%s entrypoint\""
+                               node
+                               (or (some-> (:params action) first name)
+                                   stream-name))))
+           children (some->> (action->graphviz stream-name
+                                               node
                                                (:children action))
                              seq
                              (clojure.string/join "\n"))]
@@ -32,9 +40,20 @@
            "\n"
            (for [[stream-name config] config]
              (let [action (:actions config)]
-               (str (format "subgraph %s {\n" (name stream-name))
-                    (first (action->graphviz (name stream-name)
-                                             [action]))
+               (str
+                (if (:default config)
+                  (str "default -> \"" (name stream-name)
+                       " entrypoint\";\n")
+                  "")
+                (format "subgraph cluster_%s {\nlabel = \"Stream %s\n%s\";\n"
+                        (name stream-name)
+                        (name stream-name)
+                        (:description config ""))
+                    (first (action->graphviz
+                            (name stream-name)
+                            (format "\"%s entrypoint\""
+                                    (name stream-name))
+                            [action]))
                     "\n}"))))))
 
 (defn graphviz
