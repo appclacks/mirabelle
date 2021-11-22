@@ -1038,7 +1038,7 @@
 (defn split
   "Split by conditions.
 
-  ```
+  ```clojure
   (split
     [:> :metric 10] (debug)
     [:> :metric 5] (info)
