@@ -54,7 +54,12 @@
 
 (defn load-config
   []
-  (let [config (aero/read-config (env/env :mirabelle-configuration) {})]
+  (let [config-path (env/env :mirabelle-configuration)
+        _ (when-not config-path
+            (throw (ex/ex-info
+                     "The MIRABELLE_CONFIGURATION variable should contain the path to the main configuration file."
+                    [::invalid [:corbi/user ::ex/incorrect]])))
+        config (aero/read-config config-path {})]
     (if (s/valid? ::config config)
       config
       (throw (ex/ex-info
