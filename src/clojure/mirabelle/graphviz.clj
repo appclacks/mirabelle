@@ -58,10 +58,9 @@
 
 (defn graphviz
   [streams-directories destination]
-  (let [config (stream/read-edn-dirs streams-directories)]
-
-    )
-  )
+  (let [config (stream/read-edn-dirs streams-directories)
+        result (stream->graphviz config)]
+    (spit destination result)))
 
 (comment
   (do (def config (stream/read-edn-dirs ["/etc/mirabelle/streams"]))

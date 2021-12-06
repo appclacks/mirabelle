@@ -7,6 +7,7 @@
             [corbihttp.spec :as spec]
             [mirabelle.config :as config]
             [mirabelle.db.queue :as queue]
+            [mirabelle.graphviz :as graphviz]
             [mirabelle.handler :as handler]
             [mirabelle.http :as http]
             [mirabelle.index :as index]
@@ -116,6 +117,16 @@
                      config)]
     (println test-result)))
 
+(defn graphviz
+  [args]
+  (let [config (config/load-config)
+        destination (second args)]
+    (log/infof {}
+               "Generating graphviz representation of the configuration in %s"
+               destination)
+    (graphviz/graphviz (get-in config [:stream :directories]) destination)))
+
+
 (defn -main
   "Starts the application"
   [& args]
@@ -123,6 +134,7 @@
     (condp = (first args)
       "compile" (compile! args)
       "test" (test!)
+      "graphviz" (graphviz args)
       "compile-test" (do (compile! args)
                          (test!))
       "compile_test" (do (compile! args)
