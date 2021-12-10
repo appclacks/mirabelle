@@ -27,7 +27,7 @@
   :source-paths ["src/clojure"]
   :plugins [[lein-codox "0.10.7"]]
   :codox {:source-uri "https://github.com/mcorbin/mirabelle/blob/{version}/{filepath}#L{line}"
-          :output-path "site/api"
+          :output-path "site/mirabelle/static/generated-doc"
           :metadata   {:doc/format :markdown}}
   :profiles {:dev {:dependencies [[pjstadig/humane-test-output "0.11.0"]
                                   [org.clojure/tools.namespace "1.1.0"]
