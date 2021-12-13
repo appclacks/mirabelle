@@ -856,19 +856,26 @@
 
 (deftest streams-test
   (is (= {:foo {:actions {:action :sdo
+                          :description {:message "Forward events to children"}
                           :children [{:action :increment
+                                      :description {:message "Increment the :metric field"}
                                       :children nil}]}}}
          (a/streams
           (a/stream
            {:name :foo}
            (a/increment)))))
   (is (= {:foo {:actions {:action :sdo
+                          :description {:message "Forward events to children"}
                           :children [{:action :increment
+                                      :description {:message "Increment the :metric field"}
                                       :children nil}]}}
           :bar {:actions {:action :sdo
+                          :description {:message "Forward events to children"}
                           :children [{:action :decrement
+                                      :description {:message "Decrement the :metric field"}
                                       :children nil}
                                      {:action :increment
+                                      :description {:message "Increment the :metric field"}
                                       :children nil}]}}}
          (a/streams
           (a/stream
@@ -882,19 +889,25 @@
 (deftest custom-test
   (is (= {:action :foo
           :params []
+          :description {:message "Use the custom action :foo", :params ""}
           :children [{:action :decrement
+                      :description {:message "Decrement the :metric field"}
                       :children nil}]}
          (a/custom :foo nil
                    (a/decrement))))
   (is (= {:action :foo
           :params []
+          :description {:message "Use the custom action :foo", :params "[]"}
           :children [{:action :decrement
+                      :description {:message "Decrement the :metric field"}
                       :children nil}]}
          (a/custom :foo []
                    (a/decrement))))
   (is (= {:action :foo
           :params [:a 1 "a"]
+          :description {:message "Use the custom action :foo", :params "[:a 1 \"a\"]"}
           :children [{:action :decrement
+                      :description {:message "Decrement the :metric field"}
                       :children nil}]}
          (a/custom :foo [:a 1 "a"]
                    (a/decrement)))))
@@ -1044,14 +1057,24 @@
 (deftest include-test
   (let [include-path (.getPath (io/resource "include/action"))]
     (is (= {:action :where
+            :description {:message "Filter events based on the provided condition",
+                          :params "[:= :service \"toto\"]"},
             :params [[:= :service "toto"]]
             :children
-            [{:action :with, :children nil, :params [{:state "critical"}]}]}
+            [{:action :with,
+              :description {:message "Set the field :state to critical"}
+              :children nil,
+              :params [{:state "critical"}]}]}
            (a/include include-path {:variables {:service "toto"}})))
     (is (= {:action :where
             :params [[:= :service "toto"]]
+            :description {:message "Filter events based on the provided condition",
+                          :params "[:= :service \"toto\"]"}
             :children
-            [{:action :with, :children nil, :params [{:state "info"}]}]}
+            [{:action :with,
+              :children nil,
+              :description {:message "Set the field :state to info"}
+              :params [{:state "info"}]}]}
            (a/include include-path {:variables {:service "toto"}
                                     :profile :prod})))))
 

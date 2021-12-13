@@ -81,6 +81,8 @@
   [conditions & children]
   (mspec/valid-action? ::where [conditions])
   {:action :where
+   :description {:message "Filter events based on the provided condition"
+                 :params (pr-str conditions)}
    :params [conditions]
    :children children})
 
@@ -103,6 +105,8 @@
   [conditions & children]
   (mspec/valid-action? ::coll-where [conditions])
   {:action :coll-where
+   :description {:message "Filter a list of events based on the provided condition"
+                 :params (pr-str conditions)}
    :params [conditions]
    :children children})
 
@@ -122,6 +126,7 @@
   "
   [& children]
   {:action :increment
+   :description {:message "Increment the :metric field"}
    :children children})
 
 (defn decrement*
@@ -140,6 +145,7 @@
   "
   [& children]
   {:action :decrement
+   :description {:message "Decrement the :metric field"}
    :children children})
 
 (defn log-action
@@ -165,7 +171,8 @@
     (debug))
   ```"
   []
-  {:action :debug})
+  {:action :debug
+   :description {:message "Print the event in the logs as debug"}})
 
 (defn info*
   [ctx]
@@ -179,7 +186,8 @@
     (info))
   ```"
   []
-  {:action :info})
+  {:action :info
+   :description {:message "Print the event in the logs as info"}})
 
 (defn error*
   [ctx]
@@ -193,7 +201,8 @@
     (debug))
   ```"
   []
-  {:action :error})
+  {:action :error
+   :description {:message "Print the event in the logs as error"}})
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn fixed-event-window*
@@ -222,6 +231,8 @@
   [config & children]
   (mspec/valid-action? ::fixed-event-window [config])
   {:action :fixed-event-window
+   :description {:message (format "Create a fixed event window of size %d"
+                                  (:size config))}
    :params [config]
    :children children})
 
@@ -244,6 +255,7 @@
   Computes the mean on windows of 10 events"
   [& children]
   {:action :coll-mean
+   :description {:message "Computes the mean of events"}
    :children children})
 
 (defn coll-max*
@@ -264,6 +276,7 @@
   Get the event the biggest metric on windows of 10 events"
   [& children]
   {:action :coll-max
+   :description {:message "Get the event with the biggest metric"}
    :children children})
 
 (defn coll-quotient*
@@ -278,6 +291,7 @@
   Should receive a list of events from the previous stream."
   [& children]
   {:action :coll-quotient
+   :description {:message "Get the event with the biggest metric"}
    :children children})
 
 (defn coll-sum*
@@ -298,6 +312,7 @@
   Sum all :metric fields for windows of 10 events"
   [& children]
   {:action :coll-sum
+   :description {:message "Get the event with the biggest metric"}
    :children children})
 
 (defn coll-min*
@@ -318,6 +333,7 @@
   Get the event the smallest metric on windows of 10 events"
   [& children]
   {:action :coll-min
+   :description {:message "Get the event with the smallest metric"}
    :children children})
 
 (s/def ::coll-sort (s/cat :field keyword?))
@@ -339,6 +355,7 @@
   [field & children]
     (mspec/valid-action? ::coll-sort [field])
   {:action :coll-sort
+   :description {:message (format "Sort events based on the field %s" field)}
    :params [field]
    :children children})
 
@@ -375,6 +392,7 @@
   "
   [& children]
   {:action :sdo
+   :description {:message "Forward events to children"}
    :children children})
 
 (defn expired*
@@ -399,6 +417,7 @@
   "
   [& children]
   {:action :expired
+   :description {:message "Keep expired events"}
    :children children})
 
 (defn not-expired*
@@ -422,6 +441,7 @@
   ```"
   [& children]
   {:action :not-expired
+   :description {:message "Remove expired events"}
    :children children})
 
 (defn cond-dt*
@@ -477,6 +497,10 @@
   [config & children]
   (mspec/valid-action? ::above-dt [config])
   {:action :above-dt
+   :description {:message
+                 (format "Keep events if :metric is greater than %d during %d seconds"
+                         (:threshold config)
+                         (:duration config))}
    :params [[:> :metric (:threshold config)] (:duration config)]
    :children children})
 
@@ -499,6 +523,10 @@
   [config & children]
   (mspec/valid-action? ::below-dt [config])
   {:action :below-dt
+   :description {:message
+                 (format "Keep events if :metric is lower than %d during %d seconds"
+                         (:threshold config)
+                         (:duration config))}
    :params [[:< :metric (:threshold config)] (:duration config)]
    :children children})
 
@@ -521,6 +549,11 @@
   [config & children]
   (mspec/valid-action? ::between-dt [config])
   {:action :between-dt
+   :description {:message
+                 (format "Keep events if :metric is between %d and %d during %d seconds"
+                         (:low config)
+                         (:high config)
+                         (:duration config))}
    :params [[:and
              [:> :metric (:low config)]
              [:< :metric (:high config)]]
@@ -547,6 +580,11 @@
   [config & children]
   (mspec/valid-action? ::outside-dt [config])
   {:action :outside-dt
+   :description {:message
+                 (format "Keep events if :metric is outside %d and %d during %d seconds"
+                         (:low config)
+                         (:high config)
+                         (:duration config))}
    :params [[:or
              [:< :metric (:low config)]
              [:> :metric (:high config)]]
@@ -571,6 +609,9 @@
   [config & children]
   (mspec/valid-action? ::critical-dt [config])
   {:action :critical-dt
+   :description {:message
+                 (format "Keep events if the state is critical for more than %d seconds"
+                         (:duration config))}
    :params [[:= :state "critical"]
             (:duration config)]
    :children children})
@@ -593,6 +634,7 @@
   "
   [& children]
   {:action :critical
+   :description {:message "Keep critical events"}
    :children children})
 
 (defn warning*
@@ -613,6 +655,7 @@
   "
   [& children]
   {:action :warning
+   :description {:message "Keep warning events"}
    :children children})
 
 (defn default*
@@ -637,6 +680,7 @@
   [field value & children]
   (mspec/valid-action? ::default [field value])
   {:action :default
+   :description {:message (format "Set (if nil) %s to %s" field (str value))}
    :params [field value]
    :children children})
 
@@ -668,6 +712,7 @@
   [io-name]
   (mspec/valid-action? ::push-io! [io-name])
   {:action :push-io!
+   :description {:message (format "Forward events to the I/O %s" io-name)}
    :params [io-name]})
 
 (defn coalesce*
@@ -758,6 +803,10 @@
   [config & children]
   (mspec/valid-action? ::coalesce [config])
   {:action :coalesce
+   :description {:message
+                 (format "Returns a list of the latest non-expired events for each fields (%d) combinations, every %s seconds"
+                         (:duration config)
+                         (pr-str (:fields config)))}
    :children children
    :params [config]})
 
@@ -789,6 +838,8 @@
   (cond
     (map? (first args))
     {:action :with
+     :description {:message "Merge the events with the provided fields"
+                   :params (pr-str (first args))}
      :children (rest args)
      :params [(first args)]}
 
@@ -798,6 +849,7 @@
         (throw (ex/ex-info (format "Invalid parameters for with: %s %s" k v)
                            {})))
       {:action :with
+       :description {:message (format "Set the field %s to %s" k (str v))}
        :children children
        :params [{k v}]})))
 
@@ -828,6 +880,7 @@
   "
   [& children]
   {:action :coll-rate
+   :description {:message "Takes a list of events and computes their rates"}
    :children children})
 
 (defn sflatten*
@@ -850,6 +903,7 @@
   ```"
   [& children]
   {:action :sflatten
+   :description {:message "Send events from a list downstream one by one"}
    :children children})
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
@@ -882,6 +936,7 @@
   [tags & children]
   (mspec/valid-action? ::tag [tags])
   {:action :tag
+   :description {:message (str "Tag events with %s" tags)}
    :params [tags]
    :children children})
 
@@ -914,6 +969,7 @@
   [tags & children]
   (mspec/valid-action? ::untag [tags])
   {:action :untag
+   :description {:message (str "Remove tags " tags)}
    :params [tags]
    :children children})
 
@@ -949,6 +1005,7 @@
   [tags & children]
   (mspec/valid-action? ::tagged-all [tags])
   {:action :tagged-all
+   :description {:message (str "Keep only events with tagged " tags)}
    :params [tags]
    :children children})
 
@@ -969,8 +1026,7 @@
                     (call-rescue (assoc event :metric diff) children)))))))))))
 
 (defn ddt
-  "Differentiate metrics with respect to time. Takes an optional number
-  followed by child streams.
+  "Differentiate metrics with respect to time.
   Emits an event for each event received, but with metric equal to
   the difference between the current event and the previous one, divided by the
   difference in their times. Skips events without metrics.
@@ -984,6 +1040,7 @@
   {:metric (/ 9 3) :time 4}."
   [& children]
   {:action :ddt
+   :description {:message "Differentiate metrics with respect to time"}
    :params [false]
    :children children})
 
@@ -992,6 +1049,7 @@
   This can be used for counters which may be reseted to zero for example."
   [& children]
   {:action :ddt-pos
+   :description {:message "Differentiate metrics with respect to time"}
    :params [true]
    :children children})
 
@@ -1015,6 +1073,7 @@
   [factor & children]
   (mspec/valid-action? ::scale [factor])
   {:action :scale
+   :description {:message (str "Multiples the :metric field by " factor)}
    :params [factor]
    :children children})
 
@@ -1067,6 +1126,8 @@
                                     [:always-true])))))]
     (mspec/valid-action? (s/coll-of ::condition) clauses-fn)
     {:action :split
+     :description {:message (format "Split metrics by the clauses provided as parameter")
+                   :params clauses-fn}
      :params [clauses-fn]
      :children @children}))
 
@@ -1120,6 +1181,9 @@
   [config & children]
   (mspec/valid-action? ::throttle [config])
   {:action :throttle
+   :description {:message (format "Let %d events pass at most every %d seconds"
+                                  (:count config)
+                                  (:duration config))}
    :params [config]
    :children children})
 
@@ -1187,6 +1251,8 @@
   [config & children]
   (mspec/valid-action? ::fixed-time-window [config])
   {:action :fixed-time-window
+   :description {:message (format "Build %d seconds fixed time windows"
+                                  (:duration config))}
    :params [config]
    :children children})
 
@@ -1214,6 +1280,8 @@
   [config & children]
   (mspec/valid-action? ::moving-event-window [config])
   {:action :moving-event-window
+   :description {:message (format "Build moving event window of size %s"
+                                  (:size config))}
    :params [config]
    :children children})
 
@@ -1243,6 +1311,7 @@
   [r & children]
   (mspec/valid-action? ::ewma-timeless [r])
   {:action :ewma-timeless
+   :description {:message "Exponential weighted moving average"}
    :params [r]
    :children children})
 
@@ -1267,6 +1336,7 @@
   [n & children]
   (mspec/valid-action? ::over [n])
   {:action :over
+   :description {:message (format "Keep events with metrics greater than %d" n)}
    :params [n]
    :children children})
 
@@ -1292,6 +1362,7 @@
   [n & children]
   (mspec/valid-action? ::under [n])
   {:action :under
+   :description {:message (format "Keep events with metrics under than %d" n)}
    :params [n]
    :children children})
 
@@ -1327,6 +1398,9 @@
   [config & children]
   (mspec/valid-action? ::changed [config])
   {:action :changed
+   :description {:message (format "Passes on events only if the field %s differs from the previous one (default %s)"
+                                  (:field config)
+                                  (:init config))}
    :params [config]
    :children children})
 
@@ -1413,6 +1487,8 @@
   [conditions & children]
   (mspec/valid-action? ::project [conditions])
   {:action :project
+   :description {:message "return the most recent events matching the conditions"
+                 :params (pr-str conditions)}
    :params [conditions]
    :children children})
 
@@ -1445,6 +1521,8 @@
   [labels]
   (mspec/valid-action? ::index [labels])
   {:action :index
+   :description {:message "Insert events into the index using the provided fields as keys"
+                 :params (pr-str labels)}
    :params [labels]})
 
 (defn coll-count*
@@ -1468,6 +1546,7 @@
   ```"
   [& children]
   {:action :coll-count
+   :description {:message "Count the number of events"}
    :children children})
 
 (s/def ::sdissoc (s/cat :sdissoc (s/or :single keyword?
@@ -1490,6 +1569,7 @@
   [fields & children]
   (mspec/valid-action? ::sdissoc [fields])
   {:action :sdissoc
+   :description {:message (format "Remove key(s) %s from events" (str fields))}
    :params [(if (keyword? fields) [fields] fields)]
    :children children})
 
@@ -1518,6 +1598,8 @@
   [points & children]
   (mspec/valid-action? ::coll-percentiles [points])
   {:action :coll-percentiles
+   :description {:message (format "Computes percentiles for quantiles %s"
+                                  (str points))}
    :params [points]
    :children children})
 
@@ -1553,6 +1635,7 @@
   [fields & children]
   (mspec/valid-action? ::by [fields])
   {:action :by
+   :description {:message (str "Split streams by field(s) " fields)}
    :params [fields]
    :children children})
 
@@ -1569,6 +1652,7 @@
   "Write events into the on-disk queue."
   []
   {:action :disk-queue!
+   :description {:message "Save events on on the disk queue"}
    :params []})
 
 (defn reinject!*
@@ -1602,6 +1686,10 @@
   ([destination-stream]
    (mspec/valid-action? ::reinject [destination-stream])
    {:action :reinject!
+    :description {:message (format "Reinject events on %s"
+                                   (if destination-stream
+                                     (str "stream " destination-stream)
+                                     "the current stream"))}
     :params [destination-stream]}))
 
 (s/def ::async-queue! (s/cat :queue-name keyword?))
@@ -1629,6 +1717,8 @@
   [queue-name & children]
   (mspec/valid-action? ::async-queue! [queue-name])
   {:action :async-queue!
+   :description {:message (format "Execute the children into the queue %s"
+                                  queue-name)}
    :params [queue-name]
    :children children})
 
@@ -1643,6 +1733,7 @@
   You can use this stream to avoid side effects in test mode."
   [& children]
   {:action :io
+   :description {:message "Discard all events in test mode"}
    :children children})
 
 (defn tap*
@@ -1671,6 +1762,7 @@
   [tap-name]
   (mspec/valid-action? ::tap [tap-name])
   {:action :tap
+   :description {:message (format "Save events into the tap %s" tap-name)}
    :params [tap-name]})
 
 (defn json-fields*
@@ -1705,6 +1797,8 @@
   [fields & children]
   (mspec/valid-action? ::json-fields [fields])
   {:action :tap
+   :description {:message "Parse the provided fields from json to edn"
+                 :params (pr-str fields)}
    :params [(if (keyword? fields) [fields] fields)]
    :children children})
 
@@ -1745,6 +1839,7 @@
     (ex/ex-incorrect! "The exception-stream action should take 2 children"
                       {}))
   {:action :exception-stream
+   :description {:message "Catches exceptions in the first action and reinject errors into the second one"}
    :children children})
 
 (defn stream
@@ -1781,6 +1876,8 @@
   ```"
   [action-name params & children]
   {:action action-name
+   :description {:message (str "Use the custom action " action-name)
+                 :params (str params)}
    :params (or params [])
    :children children})
 
@@ -1821,6 +1918,11 @@
   ([interval destination-stream]
    (mspec/valid-action? ::reaper [interval destination-stream])
    {:action :reaper
+    :description {:message (format "Expires events every %d second and reinject them into %s"
+                                   interval
+                                   (if destination-stream
+                                     (str "the stream " destination-stream)
+                                     (str "the current stream")))}
     :params [interval destination-stream]
     :children []}))
 
@@ -1847,6 +1949,8 @@
   (let [fields (if (keyword? field) [field] field)]
     (mspec/valid-action? ::to-base64 [fields])
     {:action :to-base64
+     :description {:message (format "Encodes field(s) %s to base64"
+                                    field)}
      :params [fields]
      :children children}))
 
@@ -1873,6 +1977,8 @@
   (let [fields (if (keyword? field) [field] field)]
     (mspec/valid-action? ::from-base64 [fields])
     {:action :from-base64
+     :description {:message (format "Decodes field(s) %s from base64"
+                                    field)}
      :params [fields]
      :children children}))
 
@@ -1907,6 +2013,10 @@
   [template target-field fields & children]
   (mspec/valid-action? ::sformat [template target-field fields])
   {:action :sformat
+   :description {:message (format "Set %s to value %s using fields %s"
+                                  target-field
+                                  template
+                                  fields)}
    :params [template target-field fields]
    :children children})
 
@@ -1931,6 +2041,7 @@
   [channel]
   (mspec/valid-action? ::publish! [channel])
   {:action :publish!
+   :description {:message (str "Publish events into the channel " channel)}
    :params [channel]
    :children []})
 
@@ -1946,12 +2057,14 @@
 
   ```clojure
   (fixed-time-window {:duration 60}
-    (coll-top
+    (coll-top 5
       (info)))
   ```"
   [nb-events & children]
   (mspec/valid-action? ::coll-top [nb-events])
   {:action :coll-top
+   :description {:message (format "Returns top %d events with the highest metrics"
+                                  nb-events)}
    :params [nb-events]
    :children children})
 
@@ -1963,16 +2076,18 @@
 (s/def ::coll-bottom (s/cat :nb-events pos-int?))
 
 (defn coll-bottom
-  "Receives a list of events, returns the top N events with the lowest metrics.
+  "Receives a list of events, returns the bottom N events with the lowest metrics.
 
   ```clojure
   (fixed-time-window {:duration 60}
-    (coll-bottom
+    (coll-bottom 5
       (info)))
   ```"
   [nb-events & children]
   (mspec/valid-action? ::coll-bottom [nb-events])
   {:action :coll-bottom
+   :description {:message (format "Returns bottom %d events with the lowest metrics"
+                                  nb-events)}
    :params [nb-events]
    :children children})
 
@@ -2045,6 +2160,9 @@
   [dt field & children]
   (mspec/valid-action? ::stable [dt field])
   {:action :stable
+   :description {:message (format "Returns events where the field %s is stable for more than %s seconds"
+                                  field
+                                  dt)}
    :params [dt field]
    :children children})
 
@@ -2069,6 +2187,8 @@
   [replacement & children]
   (mspec/valid-action? ::rename-keys [replacement])
   {:action :rename-keys
+   :description {:message "Rename events keys"
+                 :params (pr-str replacement)}
    :params [replacement]
    :children children})
 
@@ -2089,6 +2209,8 @@
   [keys-to-keep & children]
   (mspec/valid-action? ::keep-keys [keys-to-keep])
   {:action :keep-keys
+   :description {:message "Keep only the specified keys from events"
+                 :params (pr-str keys-to-keep)}
    :params [keys-to-keep]
    :children children})
 
@@ -2197,6 +2319,8 @@
   [config & children]
   (mspec/valid-action? ::aggr-sum [config])
   {:action :aggr-sum
+   :description {:message (format "Sum the events field from the last %s seconds"
+                                  (:duration config))}
    :params [(assoc config :init {} :aggr-fn :+)]
    :children children})
 
@@ -2240,6 +2364,8 @@
   [config & children]
   (mspec/valid-action? ::moving-time-window [config])
   {:action :moving-time-window
+   :description {:message (format "Build sliding windows of %d seconds"
+                                  (:duration config))}
    :params [config]
    :children children})
 
@@ -2335,6 +2461,9 @@
   [config & children]
   (mspec/valid-action? ::ssort [config])
   {:action :ssort
+   :description {:message (format "Sort events during %d seconds based on the field %s"
+                                  (:duration config)
+                                  (:field config))}
    :params [config]
    :children children})
 

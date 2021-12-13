@@ -3,22 +3,32 @@
             [clojure.string :as string])
   (:import java.util.UUID))
 
+(defn escape
+  "Change special characters into HTML character entities."
+  [text]
+  (.. ^String text
+    (string/replace "&" "&amp;")
+    (string/replace "<" "&lt;")
+    (string/replace ">" "&gt;")
+    (string/replace "\"" "&quot;")))
+
+;; worst code ever written
 (defn action->graphviz
   [stream-name parent actions]
   (doall
    (for [action actions]
      (let [action-name (name (:action action))
-           params (string/replace
-                   (->> (:params action)
-                        (map pr-str)
-                        (string/join ", ")
-                       )
-                   #"\""
-                   "'")
+           params (escape (or (get-in action [:description :params]) ""))
+           description (escape (get-in action [:description :message]))
            node (string/replace (str "a" (UUID/randomUUID))
                                 #"-"
                                 "")
-           label (format "%s [label = \"%s \n %s\"];" node action-name params)
+           label (format "%s [label=<<B>%s</B> <BR/><BR/> %s <BR/> %s>];"
+                         node
+                         action-name
+                         description
+                         (if (= "" params)
+                           params                                                                               (str "<BR/>" params)))
            line (cond-> (format "%s -> %s;"
                                 parent node)
                   (= :reinject! (:action action))
@@ -35,7 +45,7 @@
 
 (defn stream->graphviz
   [config]
-  (format "digraph {\n %s \n }"
+  (format "digraph {\nnode[shape=box];\n %s \n }"
           (string/join
            "\n"
            (for [[stream-name config] config]
@@ -45,7 +55,7 @@
                   (str "default -> \"" (name stream-name)
                        " entrypoint\";\n")
                   "")
-                (format "subgraph cluster_%s {\nlabel = \"Stream %s\n%s\";\n"
+                (format "subgraph cluster_%s {\nlabel =<<B>Stream %s</B><BR/>%s>;\nlabeljust=\"l\";\n"
                         (name stream-name)
                         (name stream-name)
                         (:description config ""))
@@ -64,5 +74,4 @@
 
 (comment
   (do (def config (stream/read-edn-dirs ["/etc/mirabelle/streams"]))
-      (spit "/tmp/graph/graph.dot" (stream->graphviz config)))
-  )
+      (spit "/tmp/graph/graph.dot" (stream->graphviz config))))
