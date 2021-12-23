@@ -226,9 +226,9 @@
                                 {:io {:file-example-io {:component io-component}}}
                                 stream)]
       (entrypoint {:state "critical" :time 1})
-      (entrypoint {:state "critical" :time 1 :tags ["discard"]})
-      (entrypoint [{:state "critical" :time 1 :tags ["discard"]}
-                   {:state "critical" :time 1 :tags ["discard"]}
+      (entrypoint {:state "critical" :time 1 :tags ["mirabelle/discard"]})
+      (entrypoint [{:state "critical" :time 1 :tags ["mirabelle/discard"]}
+                   {:state "critical" :time 1 :tags ["mirabelle/discard"]}
                    {:state "critical" :time 1 :tags ["ok"]}])
       (entrypoint {:state "critical" :time 2})
       (let [result (slurp file)]

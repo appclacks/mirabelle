@@ -18,12 +18,12 @@
   (is (= expected @state)))
 
 (deftest keep-non-discarded-events-test
-  (is (nil? (a/keep-non-discarded-events {:tags ["discard"]})))
+  (is (nil? (a/keep-non-discarded-events {:tags ["mirabelle/discard"]})))
   (is (= {:tags ["foo"]} (a/keep-non-discarded-events {:tags ["foo"]})))
   (is (= [{:tags ["foo"]}] (a/keep-non-discarded-events [{:tags ["foo"]}])))
-  (is (nil? (a/keep-non-discarded-events [{:tags ["discard"]}])))
+  (is (nil? (a/keep-non-discarded-events [{:tags ["mirabelle/discard"]}])))
   (is (= [{:tags ["ok"]}]
-         (a/keep-non-discarded-events [{:tags ["discard"]} {:tags ["ok"]}]))))
+         (a/keep-non-discarded-events [{:tags ["mirabelle/discard"]} {:tags ["ok"]}]))))
 
 (deftest where*-test
   (let [[rec state] (recorder)]

@@ -34,11 +34,11 @@
 
 (defn discard-fn
   [e]
-  (some #(= "discard" %) (:tags e)))
+  (some #(= "mirabelle/discard" %) (:tags e)))
 
 (defn keep-non-discarded-events
   "Takes an event or a list of events. Returns an event (or a list of events
-  depending of the input) with all events tagged \"discard\" filtered.
+  depending of the input) with all events tagged \"mirabelle/discard\" filtered.
   Returns nil if all events are filtered."
   [events]
   (if (sequential? events)
