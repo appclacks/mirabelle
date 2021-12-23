@@ -1,7 +1,6 @@
 ;; the code from this namespace is BAD
 (ns mirabelle.stream
   (:require [aero.core :as aero]
-            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.string :as string]
@@ -10,7 +9,6 @@
             [com.stuartsierra.component :as component]
             [exoscale.ex :as ex]
             [mirabelle.action :as action]
-            [mirabelle.db.queue :as q]
             mirabelle.config
             [mirabelle.index :as index]
             [mirabelle.io.elasticsearch :as elasticsearch]
@@ -208,12 +206,7 @@
       (set! compiled-io new-compiled-io)
       (set! compiled-streams {})
       (set! stream-timer timer)
-      (reload this)
-      ;; reload events from the queue
-      (when queue
-        (q/read-all! queue #(push! this
-                                   (update %1 :tags concat ["discard"])
-                                   :default))))
+      (reload this))
     this)
   (stop [_]
     ;; stop executors first to let them finish ongoing tasks

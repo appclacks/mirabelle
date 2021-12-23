@@ -9,7 +9,6 @@
             [exoscale.ex :as ex]
             [mirabelle.action.condition :as cd]
             [mirabelle.b64 :as b64]
-            [mirabelle.db.queue :as queue]
             [mirabelle.event :as e]
             [mirabelle.index :as index]
             [mirabelle.io :as io]
@@ -1639,22 +1638,6 @@
    :params [fields]
    :children children})
 
-(defn disk-queue!*
-  [context]
-  (if (:test-mode? context)
-    (fn stream [_] nil)
-    (let [queue (:queue context)]
-      (fn stream [events]
-        (when-let [events (keep-non-discarded-events events)]
-          (queue/write! queue events))))))
-
-(defn disk-queue!
-  "Write events into the on-disk queue."
-  []
-  {:action :disk-queue!
-   :description {:message "Save events on on the disk queue"}
-   :params []})
-
 (defn reinject!*
   [context destination-stream]
   (let [reinject-fn (:reinject context)
@@ -2494,7 +2477,6 @@
    :decrement decrement*
    :ddt ddt*
    :ddt-pos ddt*
-   :disk-queue! disk-queue!*
    :info info*
    :error error*
    :ewma-timeless ewma-timeless*

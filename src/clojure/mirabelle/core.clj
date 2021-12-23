@@ -6,7 +6,6 @@
             [corbihttp.metric :as metric]
             [corbihttp.spec :as spec]
             [mirabelle.config :as config]
-            [mirabelle.db.queue :as queue]
             [mirabelle.graphviz :as graphviz]
             [mirabelle.handler :as handler]
             [mirabelle.http :as http]
@@ -25,18 +24,14 @@
   nil)
 
 (defn build-system
-  [{:keys [tcp stream http queue io websocket]}]
+  [{:keys [tcp stream http io websocket]}]
   (let [registry (metric/registry-component {})
-        queue-component (if queue
-                          (component/start (queue/map->ChroniqueQueue queue))
-                          (queue/map->DummyQueue {}))
         index (component/start (index/map->Index {}))
         pubsub (component/start (pubsub/map->PubSub {}))]
     (component/system-map
      :registry registry
      :index index
      :pubsub pubsub
-     :queue queue-component
      :websocket (-> (websocket/map->WebsocketServer websocket)
                     (component/using [:pubsub :registry]))
      :http (-> (corbihttp/map->Server {:config http
@@ -49,7 +44,6 @@
                        :custom-io (:custom io)
                        :custom-actions (:actions stream)
                        :index index
-                       :queue queue-component
                        :registry registry
                        :pubsub pubsub})
      :index index

@@ -43,10 +43,8 @@
 (s/def ::roll-cycle keyword?)
 
 (s/def ::directory ::spec/directory-spec)
-(s/def ::queue (s/keys :req-un [::directory]
-                       :opt-un [::roll-cycle]))
 (s/def ::config (s/keys :req-un [::tcp ::websocket ::http/http]
-                        :opt-un [::stream ::io ::test ::queue]))
+                        :opt-un [::stream ::io ::test]))
 
 (defmethod aero/reader 'secret
   [_ _ value]

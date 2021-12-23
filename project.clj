@@ -3,8 +3,7 @@
   :url "https://github.com/mcorbin/mirabelle"
   :license {:name "EPL-1.0"
             :url "https://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[cc.qbits/tape "0.3.4"]
-                 [clj-http "3.12.3"]
+  :dependencies [[clj-http "3.12.3"]
                  [com.boundary/high-scale-lib "1.0.6"]
                  [com.influxdb/influxdb-client-java "3.4.0"]
                  [exoscale/coax "1.0.0-alpha12"]
