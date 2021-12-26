@@ -24,6 +24,8 @@ The Mirabelle configuration is defined in [EDN](https://github.com/edn-format/ed
  ;; The Mirabelle HTTP Server.
  ;; The :key, :cert, and :cacert optional parameters can be set to enable TLS (the
  ;; parameters are path to the cert files)
+ ;; :basic-auth can be set and should in this case contain :username "user" and
+ ;; :password #secret "password"
  :http {:host "0.0.0.0"
         :port 5558}
 
@@ -31,16 +33,10 @@ The Mirabelle configuration is defined in [EDN](https://github.com/edn-format/ed
  :websocket {:host "0.0.0.0"
              :port 5556}
 
- ;; Optional parameter indicating the directory of which Mirabelle should
- ;; save queued events. Check this section of the documentation for more
- ;; information:
- :queue {:directory "/usr/lib/mirabelle/queue"}
-
  ;; The "real time" streams configuration.
  ;; The directories parameter is a list of directories containing streams definitions
  ;; The actions parameter can be used to define custom actions which can then
- ;; be used inside streams. Check the "On Disk queue" section of the
- ;; documentation for more information.
+ ;; be used inside streams.
  :stream {:directories ["/usr/lib/mirabelle/streams/"]
           :actions {}}
 

@@ -1,4 +1,4 @@
-(defproject fr.mcorbin/mirabelle "0.7.0"
+(defproject fr.mcorbin/mirabelle "0.8.0"
   :description "A stream processing engine inspired by Riemann"
   :url "https://github.com/mcorbin/mirabelle"
   :license {:name "EPL-1.0"
@@ -15,7 +15,7 @@
                  [io.netty/netty-common "4.1.58.Final"]
                  [io.netty/netty-transport "4.1.58.Final"]
                  [io.netty/netty-resolver "4.1.58.Final"]
-                 [fr.mcorbin/corbihttp "0.18.0"]
+                 [fr.mcorbin/corbihttp "0.21.0"]
                  [org.clojure/clojure "1.10.3"]
                  [org.clojure/spec.alpha "0.2.194"]
                  [org.elasticsearch.client/elasticsearch-rest-client "7.14.1"]
@@ -24,7 +24,7 @@
   :global-vars {*warn-on-reflection* true}
   :target-path "target/%s"
   :source-paths ["src/clojure"]
-  :plugins [[lein-codox "0.10.7"]]
+  :plugins [[lein-codox "0.10.8"]]
   :codox {:source-uri "https://github.com/mcorbin/mirabelle/blob/{version}/{filepath}#L{line}"
           :output-path "site/mirabelle/static/generated-doc"
           :metadata   {:doc/format :markdown}}

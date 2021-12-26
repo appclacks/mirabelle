@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="generator" content="Hugo 0.91.2" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>I/O and actions reference :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1639169813" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1639169813" rel="stylesheet">
-    <link href="/css/hybrid.css?1639169813" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1639169813" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1639169813" rel="stylesheet">
-    <link href="/css/auto-complete.css?1639169813" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1639169813" rel="stylesheet">
-    <link href="/css/theme.css?1639169813" rel="stylesheet">
-    <link href="/css/tabs.css?1639169813" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1639169813" rel="stylesheet">
+    <link href="/css/nucleus.css?1640541382" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1640541382" rel="stylesheet">
+    <link href="/css/hybrid.css?1640541382" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1640541382" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1640541382" rel="stylesheet">
+    <link href="/css/auto-complete.css?1640541382" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1640541382" rel="stylesheet">
+    <link href="/css/theme.css?1640541382" rel="stylesheet">
+    <link href="/css/tabs.css?1640541382" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1640541382" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1639169813"></script>
+    <script src="/js/jquery-3.3.1.min.js?1640541382"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1639169813"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1639169813"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1640541382"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1640541382"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1639169813"></script>
+<script type="text/javascript" src="/js/search.js?1640541382"></script>
 
     
   </div>
@@ -284,32 +284,6 @@
         ">
       <a href="/howto/pubsub/">
           Publish Subscribe
-          
-      </a>
-      
-      
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
-
-
- 
-  
-    
-    <li data-nav-id="/howto/on-disk-queue/" title="On Disk queue" class="dd-item
-        
-        
-        
-        ">
-      <a href="/howto/on-disk-queue/">
-          On Disk queue
           
       </a>
       
@@ -613,11 +587,11 @@
 <p>I/O can be <a href="/howto/stream/#io-and-async-queues">referenced in streams</a> in order to forward events to external systems.</p>
 <h3 id="file">File</h3>
 <p>This I/O write all events into a file, as edn.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{my-io-file {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:path</span> <span style="color:#e6db74">&#34;/tmp/events?edn&#34;</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{my-io-file {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:path</span> <span style="color:#e6db74">&#34;/tmp/events?edn&#34;</span>}
              <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:file</span>}}
 </code></pre></div><h3 id="pagerduty">Pagerduty</h3>
 <p>This I/O forwards events to <a href="https://pagerduty.com">Pagerduty</a>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:pagerduty-client</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:service-key</span> <span style="color:#f92672">#</span>secret <span style="color:#e6db74">&#34;pagerduty-service-key&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:pagerduty-client</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:service-key</span> <span style="color:#f92672">#</span>secret <span style="color:#e6db74">&#34;pagerduty-service-key&#34;</span>
                              <span style="color:#e6db74">:source-key</span> <span style="color:#e6db74">:service</span>
                              <span style="color:#e6db74">:summary-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:state</span>]
                              <span style="color:#e6db74">:dedup-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>]
@@ -640,7 +614,7 @@
 <p>You can also set a <code>:pagerduty/action</code> key to your event in order to set the action (with the <code>with</code> action for example: <code>(with :pagerduty/action :trigger ...)</code></p>
 <h3 id="influxdb">InfluxDB</h3>
 <p>Forward events to the <a href="https://www.influxdata.com/">InfluxDB</a> timserie database. This I/O forwards events to InfluxDB asynchronously.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:influxdb</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:connection-string</span> <span style="color:#e6db74">&#34;http://127.0.0.1:8086&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:influxdb</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:connection-string</span> <span style="color:#e6db74">&#34;http://127.0.0.1:8086&#34;</span>
                      <span style="color:#e6db74">:bucket</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>
                      <span style="color:#e6db74">:org</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>
                      <span style="color:#e6db74">:measurement</span> <span style="color:#e6db74">:service</span>
@@ -658,7 +632,7 @@
 <p>You can also add the <code>:influxdb/measurement</code>, <code>:influxdb/fields</code> and <code>:influxdb/tags</code> to your events (using the <code>with</code> action for example) in order to override per event the default configuration for these options.</p>
 <h3 id="elasticsearch-beta">Elasticsearch (beta)</h3>
 <p>Forward events to <a href="https://www.elastic.co/fr/">ElasticSearch</a>. This I/O forwards events to Elasticsearch asynchronously.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:elastic</span> {<span style="color:#e6db74">:type</span> <span style="color:#e6db74">:elasticsearch</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:elastic</span> {<span style="color:#e6db74">:type</span> <span style="color:#e6db74">:elasticsearch</span>
            <span style="color:#e6db74">:config</span> {<span style="color:#75715e">;; the list of elasticsearch osts</span>
                     <span style="color:#e6db74">:hosts</span> [{<span style="color:#e6db74">:address</span> <span style="color:#e6db74">&#34;localhost&#34;</span>
                              <span style="color:#e6db74">:port</span> <span style="color:#ae81ff">9200</span>}]
@@ -689,77 +663,76 @@
 </code></pre></div><h2 id="actions">Actions</h2>
 <p>The <a href="/generated-doc/mirabelle.action.html">generated documentation</a> from the code contains explanations and examples about the available actions. Here is the list:</p>
 <ul>
-<li>above-dt</li>
-<li>aggr-sum</li>
-<li>async-queue!</li>
-<li>below-dt</li>
-<li>between-dt</li>
-<li>changed</li>
-<li>coalesce</li>
-<li>coll-bottom</li>
-<li>coll-count</li>
-<li>coll-max</li>
-<li>coll-mean</li>
-<li>coll-min</li>
-<li>coll-percentiles</li>
-<li>coll-quotient</li>
-<li>coll-rate</li>
-<li>coll-sort</li>
-<li>coll-sum</li>
-<li>coll-top</li>
-<li>coll-where</li>
-<li>critical</li>
-<li>critical-dt</li>
-<li>ddt</li>
-<li>ddt-pos</li>
-<li>debug</li>
-<li>decrement</li>
-<li>default</li>
-<li>disk-queue!</li>
-<li>error</li>
-<li>ewma-timeless</li>
-<li>exception-stream</li>
-<li>expired</li>
-<li>fixed-event-window</li>
-<li>fixed-time-window</li>
-<li>from-base64</li>
-<li>include</li>
-<li>increment</li>
-<li>index</li>
-<li>info</li>
-<li>io</li>
-<li>json-fields</li>
-<li>keep-keys</li>
-<li>moving-event-window</li>
-<li>moving-time-window</li>
-<li>not-expired</li>
-<li>outside-dt</li>
-<li>over</li>
-<li>project</li>
-<li>publish!</li>
-<li>push-io!</li>
-<li>reaper</li>
-<li>reinject!</li>
-<li>rename-keys</li>
-<li>scale</li>
-<li>sdissoc</li>
-<li>sdo</li>
-<li>sflatten</li>
-<li>sformat</li>
-<li>split</li>
-<li>ssort</li>
-<li>stable</li>
-<li>tag</li>
-<li>tagged-all</li>
-<li>tap</li>
-<li>test-action</li>
-<li>throttle</li>
-<li>to-base64</li>
-<li>under</li>
-<li>untag</li>
-<li>warning</li>
-<li>where</li>
-<li>with</li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-above-dt">above-dt</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-sum">aggr-sum</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-async-queue!">async-queue!</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-below-dt">below-dt</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-between-dt">between-dt</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-changed">changed</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coalesce">coalesce</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-bottom">coll-bottom</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-count">coll-count</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-max">coll-max</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-mean">coll-mean</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-min">coll-min</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-percentiles">coll-percentiles</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-quotient">coll-quotient</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-rate">coll-rate</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-sort">coll-sort</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-sum">coll-sum</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-top">coll-top</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-where">coll-where</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-critical">critical</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-critical-dt">critical-dt</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ddt">ddt</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ddt-pos">ddt-pos</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-debug">debug</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-decrement">decrement</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-default">default</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-error">error</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ewma-timeless">ewma-timeless</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-exception-stream">exception-stream</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-expired">expired</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-event-window">fixed-event-window</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-time-window">fixed-time-window</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-from-base64">from-base64</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-include">include</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-increment">increment</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-index">index</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-info">info</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-io">io</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-json-fields">json-fields</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-keep-keys">keep-keys</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-moving-event-window">moving-event-window</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-moving-time-window">moving-time-window</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-not-expired">not-expired</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-outside-dt">outside-dt</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-over">over</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-project">project</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-publish!">publish!</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-push-io!">push-io!</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-reaper">reaper</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-reinject!">reinject!</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-rename-keys">rename-keys</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-scale">scale</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sdissoc">sdissoc</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sdo">sdo</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sflatten">sflatten</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sformat">sformat</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-split">split</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ssort">ssort</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-stable">stable</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-tag">tag</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-tagged-all">tagged-all</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-tap">tap</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-test-action">test-action</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-throttle">throttle</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-to-base64">to-base64</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-under">under</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-untag">untag</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-warning">warning</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-where">where</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-with">with</a></li>
 </ul>
 
 
@@ -931,22 +904,6 @@
             
         
                     
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
             
         
                     
@@ -1084,19 +1041,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1639169813"></script>
-    <script src="/js/jquery.sticky.js?1639169813"></script>
-    <script src="/js/featherlight.min.js?1639169813"></script>
-    <script src="/js/highlight.pack.js?1639169813"></script>
+    <script src="/js/clipboard.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1640541382"></script>
+    <script src="/js/jquery.sticky.js?1640541382"></script>
+    <script src="/js/featherlight.min.js?1640541382"></script>
+    <script src="/js/highlight.pack.js?1640541382"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1639169813"></script>
-    <script src="/js/learn.js?1639169813"></script>
-    <script src="/js/hugo-learn.js?1639169813"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1640541382"></script>
+    <script src="/js/learn.js?1640541382"></script>
+    <script src="/js/hugo-learn.js?1640541382"></script>
     
         
-            <script src="/mermaid/mermaid.js?1639169813"></script>
+            <script src="/mermaid/mermaid.js?1640541382"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

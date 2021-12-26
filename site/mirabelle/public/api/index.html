@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="generator" content="Hugo 0.91.2" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>HTTP API :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1639169813" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1639169813" rel="stylesheet">
-    <link href="/css/hybrid.css?1639169813" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1639169813" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1639169813" rel="stylesheet">
-    <link href="/css/auto-complete.css?1639169813" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1639169813" rel="stylesheet">
-    <link href="/css/theme.css?1639169813" rel="stylesheet">
-    <link href="/css/tabs.css?1639169813" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1639169813" rel="stylesheet">
+    <link href="/css/nucleus.css?1640541382" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1640541382" rel="stylesheet">
+    <link href="/css/hybrid.css?1640541382" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1640541382" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1640541382" rel="stylesheet">
+    <link href="/css/auto-complete.css?1640541382" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1640541382" rel="stylesheet">
+    <link href="/css/theme.css?1640541382" rel="stylesheet">
+    <link href="/css/tabs.css?1640541382" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1640541382" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1639169813"></script>
+    <script src="/js/jquery-3.3.1.min.js?1640541382"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1639169813"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1639169813"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1640541382"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1640541382"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1639169813"></script>
+<script type="text/javascript" src="/js/search.js?1640541382"></script>
 
     
   </div>
@@ -284,32 +284,6 @@
         ">
       <a href="/howto/pubsub/">
           Publish Subscribe
-          
-      </a>
-      
-      
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
-
-
- 
-  
-    
-    <li data-nav-id="/howto/on-disk-queue/" title="On Disk queue" class="dd-item
-        
-        
-        
-        ">
-      <a href="/howto/on-disk-queue/">
-          On Disk queue
           
       </a>
       
@@ -611,7 +585,7 @@
 <li><strong>GET</strong> <code>/healthz</code> or <code>/health</code></li>
 </ul>
 <hr>
-<pre><code>curl localhost:5558/healthz
+<pre tabindex="0"><code>curl localhost:5558/healthz
 
 {&quot;message&quot;:&quot;ok&quot;}
 </code></pre><h2 id="metrics">Metrics</h2>
@@ -631,7 +605,7 @@
 In that case, Mirabelle will write the stream configuration into the <strong>first</strong> directory referenced into the <code>:stream {:directory ..;}</code> configuration. The file name will be <code>&lt;stream-name&gt;.edn</code>.</p>
 <p>Deleting a stream through the API will also delete its file on the filesystem.</p>
 <hr>
-<pre><code>curl -H &quot;Content-Type: application/json&quot; -X POST --data  '{&quot;config&quot;: &quot;ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfX0=&quot;}' 127.0.0.1:5558/api/v1/stream/foobar
+<pre tabindex="0"><code>curl -H &quot;Content-Type: application/json&quot; -X POST --data  '{&quot;config&quot;: &quot;ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfX0=&quot;}' 127.0.0.1:5558/api/v1/stream/foobar
 
 {&quot;message&quot;:&quot;stream added&quot;}
 </code></pre><h3 id="list-streams">List streams</h3>
@@ -640,14 +614,14 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
 </ul>
 <p>List all streams configured in Mirabelle.</p>
 <hr>
-<pre><code> curl localhost:5558/api/v1/stream
+<pre tabindex="0"><code> curl localhost:5558/api/v1/stream
 {&quot;streams&quot;:[&quot;bar&quot;,&quot;foo&quot;,&quot;trololo&quot;]}
 </code></pre><h3 id="get-a-stream">Get a stream</h3>
 <ul>
 <li><strong>GET</strong> <code>/api/v1/stream/&lt;stream-name&gt;</code></li>
 </ul>
 <p>Get a stream configuration and the time of its index.</p>
-<pre><code>curl localhost:5558/api/v1/stream/trololo
+<pre tabindex="0"><code>curl localhost:5558/api/v1/stream/trololo
 
 {&quot;config&quot;:&quot;ezphY3Rpb25zIHs6YWN0aW9uIDppbmZvfSwgOmRlZmF1bHQgZmFsc2V9&quot;,&quot;current-time&quot;:0}
 </code></pre><h3 id="remove-a-stream">Remove a stream</h3>
@@ -657,7 +631,7 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
 <p>Delete a stream by name.</p>
 <p>If the stream was created using the API (see <code>Add a stream</code>) and persisted on disk, this call will also deleted its configuration file.</p>
 <hr>
-<pre><code>curl -X DELETE localhost:5558/api/v1/stream/trololo
+<pre tabindex="0"><code>curl -X DELETE localhost:5558/api/v1/stream/trololo
 
 {&quot;message&quot;:&quot;stream removed&quot;}
 </code></pre><h3 id="push-an-event">Push an event</h3>
@@ -666,7 +640,7 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
 </ul>
 <p>Push an event to the specified stream.</p>
 <hr>
-<pre><code>curl -H &quot;Content-Type: application/json&quot; -X PUT --data '{&quot;event&quot;: {&quot;service&quot;: &quot;foo&quot;, &quot;metric&quot;: 10}}' 127.0.0.1:5558/api/v1/stream/foo
+<pre tabindex="0"><code>curl -H &quot;Content-Type: application/json&quot; -X PUT --data '{&quot;event&quot;: {&quot;service&quot;: &quot;foo&quot;, &quot;metric&quot;: 10}}' 127.0.0.1:5558/api/v1/stream/foo
 
 {&quot;message&quot;:&quot;ok&quot;}
 </code></pre><h3 id="query-the-index">Query the index</h3>
@@ -675,7 +649,7 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
 </ul>
 <p>Returns events matching the query for the index of the stream <code>&lt;stream-name&gt;</code>. The query passed in the body should be a <a href="/howto/stream/#filtering-events">where query</a>.</p>
 <hr>
-<pre><code>curl -H &quot;Content-Type: application/json&quot; -X POST --data '{&quot;query&quot;: &quot;Wzo9IDpzZXJ2aWNlICJmb28iXQ==&quot;}' 127.0.0.1:5558/api/v1/index/default/search
+<pre tabindex="0"><code>curl -H &quot;Content-Type: application/json&quot; -X POST --data '{&quot;query&quot;: &quot;Wzo9IDpzZXJ2aWNlICJmb28iXQ==&quot;}' 127.0.0.1:5558/api/v1/index/default/search
 
 {&quot;events&quot;:[]}
 </code></pre><h3 id="get-an-index-current-time">Get an index current time</h3>
@@ -684,7 +658,7 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
 </ul>
 <p>Get the current time for an index</p>
 <hr>
-<pre><code>curl localhost:5558/api/v1/index/my-stream/current-time
+<pre tabindex="0"><code>curl localhost:5558/api/v1/index/my-stream/current-time
 {&quot;current-time&quot;:0}
 </code></pre>
 
@@ -738,22 +712,6 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
                     
                     
 
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
                     
                         
             
@@ -1008,19 +966,19 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1639169813"></script>
-    <script src="/js/jquery.sticky.js?1639169813"></script>
-    <script src="/js/featherlight.min.js?1639169813"></script>
-    <script src="/js/highlight.pack.js?1639169813"></script>
+    <script src="/js/clipboard.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1640541382"></script>
+    <script src="/js/jquery.sticky.js?1640541382"></script>
+    <script src="/js/featherlight.min.js?1640541382"></script>
+    <script src="/js/highlight.pack.js?1640541382"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1639169813"></script>
-    <script src="/js/learn.js?1639169813"></script>
-    <script src="/js/hugo-learn.js?1639169813"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1640541382"></script>
+    <script src="/js/learn.js?1640541382"></script>
+    <script src="/js/hugo-learn.js?1640541382"></script>
     
         
-            <script src="/mermaid/mermaid.js?1639169813"></script>
+            <script src="/mermaid/mermaid.js?1640541382"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

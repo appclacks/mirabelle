@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="generator" content="Hugo 0.91.2" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Extend Mirabelle :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1639169813" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1639169813" rel="stylesheet">
-    <link href="/css/hybrid.css?1639169813" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1639169813" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1639169813" rel="stylesheet">
-    <link href="/css/auto-complete.css?1639169813" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1639169813" rel="stylesheet">
-    <link href="/css/theme.css?1639169813" rel="stylesheet">
-    <link href="/css/tabs.css?1639169813" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1639169813" rel="stylesheet">
+    <link href="/css/nucleus.css?1640541382" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1640541382" rel="stylesheet">
+    <link href="/css/hybrid.css?1640541382" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1640541382" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1640541382" rel="stylesheet">
+    <link href="/css/auto-complete.css?1640541382" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1640541382" rel="stylesheet">
+    <link href="/css/theme.css?1640541382" rel="stylesheet">
+    <link href="/css/tabs.css?1640541382" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1640541382" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1639169813"></script>
+    <script src="/js/jquery-3.3.1.min.js?1640541382"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1639169813"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1639169813"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1640541382"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1640541382"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1639169813"></script>
+<script type="text/javascript" src="/js/search.js?1640541382"></script>
 
     
   </div>
@@ -284,32 +284,6 @@
         ">
       <a href="/howto/pubsub/">
           Publish Subscribe
-          
-      </a>
-      
-      
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
-
-
- 
-  
-    
-    <li data-nav-id="/howto/on-disk-queue/" title="On Disk queue" class="dd-item
-        
-        
-        
-        ">
-      <a href="/howto/on-disk-queue/">
-          On Disk queue
           
       </a>
       
@@ -617,14 +591,14 @@
 </ul>
 <h2 id="initialize-the-project">Initialize the project</h2>
 <p>Once Leiningen is installed, you can initialize a new Clojure project (replace the latest parameter by your module name):</p>
-<pre><code>lein new app my-module-name
+<pre tabindex="0"><code>lein new app my-module-name
 </code></pre><p>Now, open the <code>project.clj</code> file in the <code>my-module</code> directory.</p>
 <p>First, remove the <code>:main ^:skip-aot my-module-name.core</code> line. Then, adds to the <code>:dependencies</code> list the Mirabelle project by adding <code>[fr.mcorbin/mirabelle &quot;&lt;replace-with-your-mirabelle-version&gt;&quot;]</code>. Be sure to use the same version than your Mirabelle version (it may in theory work with different versions but we never know).</p>
 <p>You can now open the file in <code>src/my_module_name/core.clj</code></p>
 <h2 id="write-a-custom-action">Write a custom action</h2>
 <p>In this example, we will create a simple action which will keep all events greater than a threshold, and remove the other events.</p>
 <p>Here would be the code of the <code>core.clj</code> file:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#66d9ef">ns </span>mirabelle-module.core
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#66d9ef">ns </span>mirabelle-module.core
   (<span style="color:#e6db74">:require</span> [mirabelle.action <span style="color:#e6db74">:as</span> a]
             [mirabelle.io <span style="color:#e6db74">:as</span> io]))
 
@@ -646,7 +620,7 @@
 <h2 id="write-a-custom-io">Write a custom I/O</h2>
 <p>I/O are stateful components which can be then referenced in Mirabelle to interact with external systems (timeserie databases, cloud services&hellip;).</p>
 <p>Let&rsquo;s define a simple I/O which will write events into a path (you can add the code at the end of the <code>core.clj</code> file):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#66d9ef">defrecord </span>CustomFileIO [registry path]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#66d9ef">defrecord </span>CustomFileIO [registry path]
   io/IO
   (<span style="color:#a6e22e">inject!</span> [this events]
     (doseq [event events]
@@ -666,23 +640,23 @@
 </ul>
 <p>You will need to reference the standalone jar in Mirabelle if you added extra dependencies to your project. Otherwise you can use the regular one.</p>
 <p>The first thing to do to use your module is to reference your new action and I/O in the Mirabelle <a href="/howto/configuration/">configuration files</a>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:stream</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;/etc/mirabelle/streams&#34;</span>]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:stream</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;/etc/mirabelle/streams&#34;</span>]
           <span style="color:#e6db74">:actions</span> {<span style="color:#e6db74">:keep-if-greater-than</span> my-module-name.core/keep-if-greater-than*}}
  <span style="color:#e6db74">:io</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;/etc/mirabelle/io&#34;</span>]
       <span style="color:#e6db74">:custom</span> {<span style="color:#e6db74">:custom-file</span> my-module-name.core/map-&gt;CustomFileIO}}}
 </code></pre></div><p>You can see that the <code>:keep-if-greater-than*</code> key references the function you wrote in your module, and that the <code>:custom-file</code> I/O references <code>my-module-name.core/map-&gt;CustomFileIO</code> (the map-&gt;CustomFileIO is automatically available, it&rsquo;s how Clojure records work).</p>
 <p>You can now use the <code>:custom-file</code> I/O type in your Mirabelle I/O configuration file. The <code>:config</code> key should contain your I/O configuration (here, the <code>path</code> parameter):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:my-custom-io</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:path</span> <span style="color:#e6db74">&#34;/tmp/custom&#34;</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:my-custom-io</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:path</span> <span style="color:#e6db74">&#34;/tmp/custom&#34;</span>}
                 <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:custom-file</span>}}
 </code></pre></div><p>You can also write a stream which use both your new action and the new I/O you declared:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
  (<span style="color:#a6e22e">stream</span>
   {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:foo</span> <span style="color:#e6db74">:default</span> true}
   (<span style="color:#a6e22e">info</span>)
   (<span style="color:#a6e22e">custom</span> <span style="color:#e6db74">:keep-if-greater-than</span> [<span style="color:#ae81ff">5</span>]
     (<span style="color:#a6e22e">push-io!</span> <span style="color:#e6db74">:my-custom-io</span>))))
 </code></pre></div><p>You should now launch Mirabelle and include your module jar in the command:</p>
-<pre><code>java -cp &quot;mirabelle.jar:your-module.jar&quot; mirabelle.core
+<pre tabindex="0"><code>java -cp &quot;mirabelle.jar:your-module.jar&quot; mirabelle.core
 </code></pre><p>Mirabele lshould be running, and if you push an event with a metric greater than 5 it should be written into the <code>/tmp/custom</code> path.</p>
 
 
@@ -736,22 +710,6 @@
                     
                     
 
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
                     
                         
             
@@ -1006,19 +964,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1639169813"></script>
-    <script src="/js/jquery.sticky.js?1639169813"></script>
-    <script src="/js/featherlight.min.js?1639169813"></script>
-    <script src="/js/highlight.pack.js?1639169813"></script>
+    <script src="/js/clipboard.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1640541382"></script>
+    <script src="/js/jquery.sticky.js?1640541382"></script>
+    <script src="/js/featherlight.min.js?1640541382"></script>
+    <script src="/js/highlight.pack.js?1640541382"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1639169813"></script>
-    <script src="/js/learn.js?1639169813"></script>
-    <script src="/js/hugo-learn.js?1639169813"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1640541382"></script>
+    <script src="/js/learn.js?1640541382"></script>
+    <script src="/js/hugo-learn.js?1640541382"></script>
     
         
-            <script src="/mermaid/mermaid.js?1639169813"></script>
+            <script src="/mermaid/mermaid.js?1640541382"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

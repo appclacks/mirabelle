@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="generator" content="Hugo 0.91.2" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Mirabelle in production :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1639169813" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1639169813" rel="stylesheet">
-    <link href="/css/hybrid.css?1639169813" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1639169813" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1639169813" rel="stylesheet">
-    <link href="/css/auto-complete.css?1639169813" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1639169813" rel="stylesheet">
-    <link href="/css/theme.css?1639169813" rel="stylesheet">
-    <link href="/css/tabs.css?1639169813" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1639169813" rel="stylesheet">
+    <link href="/css/nucleus.css?1640541382" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1640541382" rel="stylesheet">
+    <link href="/css/hybrid.css?1640541382" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1640541382" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1640541382" rel="stylesheet">
+    <link href="/css/auto-complete.css?1640541382" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1640541382" rel="stylesheet">
+    <link href="/css/theme.css?1640541382" rel="stylesheet">
+    <link href="/css/tabs.css?1640541382" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1640541382" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1639169813"></script>
+    <script src="/js/jquery-3.3.1.min.js?1640541382"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1639169813"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1639169813"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1640541382"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1640541382"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1639169813"></script>
+<script type="text/javascript" src="/js/search.js?1640541382"></script>
 
     
   </div>
@@ -284,32 +284,6 @@
         ">
       <a href="/howto/pubsub/">
           Publish Subscribe
-          
-      </a>
-      
-      
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
-
-
- 
-  
-    
-    <li data-nav-id="/howto/on-disk-queue/" title="On Disk queue" class="dd-item
-        
-        
-        
-        ">
-      <a href="/howto/on-disk-queue/">
-          On Disk queue
           
       </a>
       
@@ -615,7 +589,7 @@
 <p>Streams in Mirabelle can be either configured in <a href="/howto/configuration/">configuration files</a> or using <a href="/api/">the API</a>.</p>
 <p>As explained in <a href="/howto/stream/#streams">this section</a> of the documentation, events received by the Mirabelle TCP server will go by default into streams which have the tag <code>:default</code>. If you pass the <code>stream</code> attribute to an event, the event will be routed into the specified stream.</p>
 <p>For example, if I sent to the Mirabelle TCP server this event:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;foo&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;foo&#34;</span>
  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>
  <span style="color:#e6db74">:time</span> <span style="color:#e6db74">&#34;1620495335&#34;</span>
  <span style="color:#e6db74">:stream</span> <span style="color:#e6db74">&#34;bar&#34;</span>}
@@ -639,7 +613,7 @@
 <p>You can even use Mirabelle to play with old data, like &ldquo;let&rsquo;s reinject all data from 2 weeks ago into Mirabelle in order to compute some statistics, or detect weird things over time&rdquo; !</p>
 <p>And don&rsquo;t forget the <a href="/howto/pubsub/">Pub Sub</a>, which can really help you to see what is currently happening into Mirabelle.</p>
 <h2 id="fault-tolerance">Fault tolerance</h2>
-<p>Mirabelle is not a distributed system. Like in Riemann, streams states (like time windows) and the index are lost after a crash. You could use the <a href="/howto/on-disk-queue/">On Disk queue</a> in Mirabelle in order to rebuild the states but it has a lot of limitations (check the link for more information).</p>
+<p>Mirabelle is not a distributed system. Like in Riemann, streams states (like time windows) and the index are lost after a crash.</p>
 <p>You can always use continuous queries (and replay events if needed) in order to achieve fault tolerance. A computation failed because the machine crashes ? Just relaunch it with the same data.</p>
 <p>You can also put a thing like <a href="https://kafka.apache.org/">Kafka</a> in front of Riemann (or even push Riemann metrics to Kafka).</p>
 <p>I will soon add the possibility to forward events between Mirabelle instances, and I will also build a proxy which will be able to forward events to various Mirabelle instances based on some criteria/algorithms (duplicates to everyone, consistent hashing&hellip;).</p>
@@ -838,22 +812,6 @@
             
         
                     
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
             
         
                     
@@ -982,7 +940,7 @@
 	 
 	 
 		
-			<a class="nav nav-prev" href="/howto/on-disk-queue/" title="On Disk queue"> <i class="fa fa-chevron-left"></i></a>
+			<a class="nav nav-prev" href="/howto/pubsub/" title="Publish Subscribe"> <i class="fa fa-chevron-left"></i></a>
 		
 		
 			<a class="nav nav-next" href="/api/" title="HTTP API" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
@@ -995,19 +953,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1639169813"></script>
-    <script src="/js/jquery.sticky.js?1639169813"></script>
-    <script src="/js/featherlight.min.js?1639169813"></script>
-    <script src="/js/highlight.pack.js?1639169813"></script>
+    <script src="/js/clipboard.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1640541382"></script>
+    <script src="/js/jquery.sticky.js?1640541382"></script>
+    <script src="/js/featherlight.min.js?1640541382"></script>
+    <script src="/js/highlight.pack.js?1640541382"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1639169813"></script>
-    <script src="/js/learn.js?1639169813"></script>
-    <script src="/js/hugo-learn.js?1639169813"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1640541382"></script>
+    <script src="/js/learn.js?1640541382"></script>
+    <script src="/js/hugo-learn.js?1640541382"></script>
     
         
-            <script src="/mermaid/mermaid.js?1639169813"></script>
+            <script src="/mermaid/mermaid.js?1640541382"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

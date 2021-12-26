@@ -6,6 +6,13 @@ chapter: false
 
 This is the list of user-facing changes for Mirabelle.
 
+## v0.8.0
+
+- Removal of the "disk queue" feature: I was not happy about it
+- `mirabelle graphviz` subcommand to generate graphical representations of streams
+- Add the stream name in all actions logging events
+- Basic auth support for the HTTP server
+
 ## v0.7.0
 
 - Add `/health` endpoint. Both `/health` and `/healthz` return the same thing.

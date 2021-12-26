@@ -60,7 +60,7 @@ And don't forget the [Pub Sub](/howto/pubsub/), which can really help you to see
 
 ## Fault tolerance
 
-Mirabelle is not a distributed system. Like in Riemann, streams states (like time windows) and the index are lost after a crash. You could use the [On Disk queue](/howto/on-disk-queue/) in Mirabelle in order to rebuild the states but it has a lot of limitations (check the link for more information).
+Mirabelle is not a distributed system. Like in Riemann, streams states (like time windows) and the index are lost after a crash.
 
 You can always use continuous queries (and replay events if needed) in order to achieve fault tolerance. A computation failed because the machine crashes ? Just relaunch it with the same data.
 

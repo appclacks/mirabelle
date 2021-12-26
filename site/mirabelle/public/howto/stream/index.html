@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.80.0" />
+    <meta name="generator" content="Hugo 0.91.2" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1639169813" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1639169813" rel="stylesheet">
-    <link href="/css/hybrid.css?1639169813" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1639169813" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1639169813" rel="stylesheet">
-    <link href="/css/auto-complete.css?1639169813" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1639169813" rel="stylesheet">
-    <link href="/css/theme.css?1639169813" rel="stylesheet">
-    <link href="/css/tabs.css?1639169813" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1639169813" rel="stylesheet">
+    <link href="/css/nucleus.css?1640541382" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1640541382" rel="stylesheet">
+    <link href="/css/hybrid.css?1640541382" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1640541382" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1640541382" rel="stylesheet">
+    <link href="/css/auto-complete.css?1640541382" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1640541382" rel="stylesheet">
+    <link href="/css/theme.css?1640541382" rel="stylesheet">
+    <link href="/css/tabs.css?1640541382" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1640541382" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1639169813"></script>
+    <script src="/js/jquery-3.3.1.min.js?1640541382"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1639169813"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1639169813"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1640541382"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1640541382"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1639169813"></script>
+<script type="text/javascript" src="/js/search.js?1640541382"></script>
 
     
   </div>
@@ -284,32 +284,6 @@
         ">
       <a href="/howto/pubsub/">
           Publish Subscribe
-          
-      </a>
-      
-      
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
-
-
- 
-  
-    
-    <li data-nav-id="/howto/on-disk-queue/" title="On Disk queue" class="dd-item
-        
-        
-        
-        ">
-      <a href="/howto/on-disk-queue/">
-          On Disk queue
           
       </a>
       
@@ -633,6 +607,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 <li><a href="/howto/stream/#throttle">The throttle action</a></li>
 <li><a href="/howto/stream/#convert-a-counter-to-a-rate">Convert a counter to a rate</a></li>
 <li><a href="/howto/stream/#handle-exceptions-errors">Handle errors in streams</a></li>
+<li><a href="/howto/stream/#discarded-events">Discarded events</a></li>
 <li><a href="/howto/stream/#move-events-between-streams">Move events between streams</a></li>
 </ul>
 <h2 id="stream-dsl">Stream DSL</h2>
@@ -652,14 +627,14 @@ Not all availables actions and I/O are listed here. You can see the full list in
 </ul>
 <h3 id="streams">Streams</h3>
 <p>Steams have a name, and are composed by actions. Let&rsquo;s define a simple stream named <code>:log</code> which will log all events it receives:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:log</span> <span style="color:#e6db74">:default</span> true}
     (<span style="color:#a6e22e">info</span>)))
 </code></pre></div><p>The <code>streams</code> action is the top level one, and will wrap all defined steams. Then, the <code>stream</code> action will define a stream. The action tapes a map as parameter which indicates the stream name in the <code>:name</code> key.
 The <code>:default</code> key indicates that events arriving to the Mirabelle TCP server should be sent to this stream (multiple streams can have <code>:default</code> set, in that case events will be forwarded by default to all of these streams).</p>
 <p>The <code>info</code> action will simply log all events flowing throught it.</p>
 <p>Let&rsquo;s now define another stream:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:log</span> <span style="color:#e6db74">:default</span> true}
     (<span style="color:#a6e22e">info</span>))
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:http_requests_duration</span>}
@@ -679,7 +654,7 @@ an alert to an alerting system like Pagerduty for example).</p>
 <p>Now that we know how to write streams, let&rsquo;s use them.</p>
 <h3 id="edn-representation-and-compilation">EDN representation and compilation</h3>
 <p>The Mirabelle DSL should first be compiled to an EDN datastructure before being used by Mirabelle. Let&rsquo;s take the previous example stream and put it in a file:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:http_requests_duration</span>}
     (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_requests_duration_seconds&#34;</span>]
       (<span style="color:#a6e22e">info</span>)
@@ -687,13 +662,13 @@ an alert to an alerting system like Pagerduty for example).</p>
         (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>
           (<span style="color:#a6e22e">error</span>))))))
 </code></pre></div><p>You then need to compile this file using this command:</p>
-<pre><code>java -jar mirabelle.jar compile &lt;source-directory-containing-your-stream&gt; &lt;destination-directory&gt;
+<pre tabindex="0"><code>java -jar mirabelle.jar compile &lt;source-directory-containing-your-stream&gt; &lt;destination-directory&gt;
 </code></pre><p>For example, let&rsquo;s say you have put the previous stream in a file named <code>stream.clj</code> in the <code>/tmp/streams</code> directory.<br>
 If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</code>, your file will be compiled and a new <code>stream.clj</code> file will be created in the destination directory (which is <code>/tmp/compiled</code> here).</p>
 <p>Let&rsquo;s do that.</p>
-<pre><code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled
+<pre tabindex="0"><code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled
 </code></pre><p>The resulting file in <code>/tmp/compiled/stream.clj</code> should be:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:http_requests_duration</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:http_requests_duration</span>
  {<span style="color:#e6db74">:actions</span>
   {<span style="color:#e6db74">:action</span> <span style="color:#e6db74">:sdo</span>,
    <span style="color:#e6db74">:children</span>
@@ -712,13 +687,13 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 <p>Let&rsquo;s launch Mirabelle, with the <code>/tmp/compiled</code> directory referenced into the configuration on the <code>:stream section</code> (as explained in <a href="/howto/configuration/">the configuration documentation</a>).</p>
 <p>How to launch Mirabelle is explained in <a href="/howto/build/">this section</a>.</p>
 <p>Once Mirabelle started, you can send events to it. For that, you can check the <a href="/integration/">integration</a> documentation section for the available clients (Riemann clients are fully compatible with Mirabelle). In this example, I will use the <a href="https://github.com/algernon/riemann-c-client">Riemann C client</a> which provides a CLI and is available in many Linux package managers.</p>
-<pre><code>riemann-client send --metric-f 1 --service &quot;http_requests_duration_seconds&quot; --host=my-host
+<pre tabindex="0"><code>riemann-client send --metric-f 1 --service &quot;http_requests_duration_seconds&quot; --host=my-host
 </code></pre><p>If I send the previous event, I should see in Mirabelle logs:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{<span style="color:#f92672">&#34;@timestamp&#34;</span>:<span style="color:#e6db74">&#34;2021-05-01T22:48:58.786+02:00&#34;</span>,<span style="color:#f92672">&#34;@version&#34;</span>:<span style="color:#e6db74">&#34;1&#34;</span>,<span style="color:#f92672">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;#riemann.codec.Event{:host \&#34;my-host\&#34;, :service \&#34;http_requests_duration_seconds\&#34;, :state nil, :description nil, :metric 1.0, :tags nil, :time 1.619902138786E9, :ttl nil, :x-client \&#34;riemann-c-client\&#34;}&#34;</span>,<span style="color:#f92672">&#34;logger_name&#34;</span>:<span style="color:#e6db74">&#34;mirabelle.action&#34;</span>,<span style="color:#f92672">&#34;thread_name&#34;</span>:<span style="color:#e6db74">&#34;defaultEventExecutorGroup-2-8&#34;</span>,<span style="color:#f92672">&#34;level&#34;</span>:<span style="color:#e6db74">&#34;INFO&#34;</span>,<span style="color:#f92672">&#34;level_value&#34;</span>:<span style="color:#ae81ff">20000</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{<span style="color:#f92672">&#34;@timestamp&#34;</span>:<span style="color:#e6db74">&#34;2021-05-01T22:48:58.786+02:00&#34;</span>,<span style="color:#f92672">&#34;@version&#34;</span>:<span style="color:#e6db74">&#34;1&#34;</span>,<span style="color:#f92672">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;#riemann.codec.Event{:host \&#34;my-host\&#34;, :service \&#34;http_requests_duration_seconds\&#34;, :state nil, :description nil, :metric 1.0, :tags nil, :time 1.619902138786E9, :ttl nil, :x-client \&#34;riemann-c-client\&#34;}&#34;</span>,<span style="color:#f92672">&#34;logger_name&#34;</span>:<span style="color:#e6db74">&#34;mirabelle.action&#34;</span>,<span style="color:#f92672">&#34;thread_name&#34;</span>:<span style="color:#e6db74">&#34;defaultEventExecutorGroup-2-8&#34;</span>,<span style="color:#f92672">&#34;level&#34;</span>:<span style="color:#e6db74">&#34;INFO&#34;</span>,<span style="color:#f92672">&#34;level_value&#34;</span>:<span style="color:#ae81ff">20000</span>}
 </code></pre></div><p>My event was indeed logging by the <code>info</code> action in my stream. Let&rsquo;s send an event with the metric greater than our threshold:</p>
-<pre><code>riemann-client send --metric-f 2 --service &quot;http_requests_duration_seconds&quot; --host=my-host
+<pre tabindex="0"><code>riemann-client send --metric-f 2 --service &quot;http_requests_duration_seconds&quot; --host=my-host
 </code></pre><p>You will see in the Mirabelle logs:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{<span style="color:#f92672">&#34;@timestamp&#34;</span>:<span style="color:#e6db74">&#34;2021-05-01T22:50:57.960+02:00&#34;</span>,<span style="color:#f92672">&#34;@version&#34;</span>:<span style="color:#e6db74">&#34;1&#34;</span>,<span style="color:#f92672">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;#riemann.codec.Event{:host \&#34;my-host\&#34;, :service \&#34;http_requests_duration_seconds\&#34;, :state nil, :description nil, :metric 2.0, :tags nil, :time 1.61990225796E9, :ttl nil, :x-client \&#34;riemann-c-client\&#34;}&#34;</span>,<span style="color:#f92672">&#34;logger_name&#34;</span>:<span style="color:#e6db74">&#34;mirabelle.action&#34;</span>,<span style="color:#f92672">&#34;thread_name&#34;</span>:<span style="color:#e6db74">&#34;defaultEventExecutorGroup-2-2&#34;</span>,<span style="color:#f92672">&#34;level&#34;</span>:<span style="color:#e6db74">&#34;INFO&#34;</span>,<span style="color:#f92672">&#34;level_value&#34;</span>:<span style="color:#ae81ff">20000</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{<span style="color:#f92672">&#34;@timestamp&#34;</span>:<span style="color:#e6db74">&#34;2021-05-01T22:50:57.960+02:00&#34;</span>,<span style="color:#f92672">&#34;@version&#34;</span>:<span style="color:#e6db74">&#34;1&#34;</span>,<span style="color:#f92672">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;#riemann.codec.Event{:host \&#34;my-host\&#34;, :service \&#34;http_requests_duration_seconds\&#34;, :state nil, :description nil, :metric 2.0, :tags nil, :time 1.61990225796E9, :ttl nil, :x-client \&#34;riemann-c-client\&#34;}&#34;</span>,<span style="color:#f92672">&#34;logger_name&#34;</span>:<span style="color:#e6db74">&#34;mirabelle.action&#34;</span>,<span style="color:#f92672">&#34;thread_name&#34;</span>:<span style="color:#e6db74">&#34;defaultEventExecutorGroup-2-2&#34;</span>,<span style="color:#f92672">&#34;level&#34;</span>:<span style="color:#e6db74">&#34;INFO&#34;</span>,<span style="color:#f92672">&#34;level_value&#34;</span>:<span style="color:#ae81ff">20000</span>}
 
 {<span style="color:#f92672">&#34;@timestamp&#34;</span>:<span style="color:#e6db74">&#34;2021-05-01T22:50:57.961+02:00&#34;</span>,<span style="color:#f92672">&#34;@version&#34;</span>:<span style="color:#e6db74">&#34;1&#34;</span>,<span style="color:#f92672">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;#riemann.codec.Event{:host \&#34;my-host\&#34;, :service \&#34;http_requests_duration_seconds\&#34;, :state \&#34;critical\&#34;, :description nil, :metric 2.0, :tags nil, :time 1.61990225796E9, :ttl nil, :x-client \&#34;riemann-c-client\&#34;}&#34;</span>,<span style="color:#f92672">&#34;logger_name&#34;</span>:<span style="color:#e6db74">&#34;mirabelle.action&#34;</span>,<span style="color:#f92672">&#34;thread_name&#34;</span>:<span style="color:#e6db74">&#34;defaultEventExecutorGroup-2-2&#34;</span>,<span style="color:#f92672">&#34;level&#34;</span>:<span style="color:#e6db74">&#34;ERROR&#34;</span>,<span style="color:#f92672">&#34;level_value&#34;</span>:<span style="color:#ae81ff">40000</span>}
 </code></pre></div><p>As you can see, the event is logged twice: one time by our <code>info</code> action, and the second time by <code>error</code> (you can see the <code>level</code> key in the log). In the second log, the <code>:state</code> was set to &ldquo;critical&rdquo;. Our threshold works !</p>
@@ -729,7 +704,7 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 <p><strong>Profiles and readers</strong></p>
 <p>Mirabelle generates its configuration using the <a href="https://github.com/juxt/aero">Aero</a> Clojure library.</p>
 <p>You can set the <code>PROFILE</code> environment variable in order to use Aero <a href="https://github.com/juxt/aero#profile">profiles</a>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:foo</span> <span style="color:#e6db74">:default</span> true}
     (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:and</span>
              [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;disk-used&#34;</span>]
@@ -742,16 +717,16 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 <p>You can also use other Aero build-in readers described in the Aero <a href="https://github.com/juxt/aero">readme</a>, like <code>#env</code> to read an environment variable, <code>#join</code> and <code>#envf</code> to build strings based on multiple nevironments variables&hellip;</p>
 <p><strong>Include</strong></p>
 <p>It&rsquo;s possible to include a configuration file in another one. Let&rsquo;s take this file named for example <code>log-service.clj</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#f92672">#</span>mirabelle/var <span style="color:#e6db74">:my-service</span>]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#f92672">#</span>mirabelle/var <span style="color:#e6db74">:my-service</span>]
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>You can then use this file using <code>include</code> in a Mirabelle stream:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:foo</span> <span style="color:#e6db74">:default</span> true}
     (<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;disk-used&#34;</span>}})
     (<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;ram-used&#34;</span>}})))
 </code></pre></div><p>The <code>#mirabelle/var</code> reader allows you to read a variable passed to the <code>include</code> action (here, the variable is named <code>:my-service</code>).</p>
 <p>You can also override the default Mirabelle profile (passed as an environment variable) by passing the <code>;profile</code> key to the <code>include</code> options:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;disk-used&#34;</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">include</span> <span style="color:#e6db74">&#34;log-service.clj&#34;</span> {<span style="color:#e6db74">:variables</span> {<span style="color:#e6db74">:my-service</span> <span style="color:#e6db74">&#34;disk-used&#34;</span>}
                             <span style="color:#e6db74">:profile</span> <span style="color:#e6db74">:dev</span>})
 </code></pre></div><p>The <code>include</code> action allows you to create parameterizable configuration snippets.</p>
 <h3 id="io-and-async-queues">I/O and async queues</h3>
@@ -759,21 +734,21 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 <p>I/O should be defined in the <code>:io</code> section fo the <a href="/howto/configuration/">configuration file</a>, in files in directories referenced in the <code>:directories</code> key. All I/O available natively are described in the <a href="/action-io-ref/">Actions and I/O reference</a> section of the documentation.</p>
 <p>For example, Mirabelle supports sending alert to Pagerduty. Let&rsquo;s configure a Pagerduty client and use it in a stream.</p>
 <p>First, create an EDN file in the <code>;io</code> directory:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:pagerduty-client</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:service-key</span> <span style="color:#e6db74">&#34;pagerduty-service-key&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:pagerduty-client</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:service-key</span> <span style="color:#e6db74">&#34;pagerduty-service-key&#34;</span>
                              <span style="color:#e6db74">:source-key</span> <span style="color:#e6db74">:service</span>
                              <span style="color:#e6db74">:summary-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:state</span>]
                              <span style="color:#e6db74">:dedup-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>]}
                     <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:pagerduty</span>}}
 </code></pre></div><p>You can now use this I/O named <code>:pagerduty-client</code> in a stream by using the <code>push-io!</code> action:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
   (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:pagerduty-example</span>}
     (<span style="color:#a6e22e">push-io!</span> <span style="color:#e6db74">:pagerduty</span>)))
 </code></pre></div><p>If this event is set to Mirabelle:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">riemann-client send --metric-d <span style="color:#ae81ff">100</span> --service <span style="color:#e6db74">&#34;http_requests_duration_seconds&#34;</span> --state <span style="color:#e6db74">&#34;critical&#34;</span> --host<span style="color:#f92672">=</span>myhost --attribute<span style="color:#f92672">=</span>environment<span style="color:#f92672">=</span>prod
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">riemann-client send --metric-d <span style="color:#ae81ff">100</span> --service <span style="color:#e6db74">&#34;http_requests_duration_seconds&#34;</span> --state <span style="color:#e6db74">&#34;critical&#34;</span> --host<span style="color:#f92672">=</span>myhost --attribute<span style="color:#f92672">=</span>environment<span style="color:#f92672">=</span>prod
 </code></pre></div><p>You should see in Pagerduty a new triggered alert named <code>myhost - http_requests_duration_seconds - critical</code> containing all the informations about your event.</p>
 <p>You can check the <a href="/action-io-ref/">I/O documentation</a> to have details about how the Pagerduty I/O can be used (to resolve alert automatically for example).</p>
 <p>A special I/O is <code>async-queue</code>. You could define an async queue in the I/O configuration file:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:thread-pool</span> {<span style="color:#e6db74">:type</span> <span style="color:#e6db74">:async-queue</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:thread-pool</span> {<span style="color:#e6db74">:type</span> <span style="color:#e6db74">:async-queue</span>
                <span style="color:#e6db74">:config</span> {}}}
 </code></pre></div><p>Here are the parameters you can set in the async queue <code>:config</code> map:</p>
 <ul>
@@ -784,7 +759,7 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 </ul>
 <p>You can check the <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html">javadoc</a> of the <code>ThreadPoolExecutor</code> class to know more about these parameters.</p>
 <p>This will create a new async queue named <code>:thread-pool</code>. When you use an async queue in a stream, events will be pushed into the queue and downstream actions will be executed into a dedicated threadpool:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; we reference the async queue from the config as name</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; we reference the async queue from the config as name</span>
 (<span style="color:#a6e22e">async-queue!</span> <span style="color:#e6db74">:thread-pool</span>
   (<span style="color:#a6e22e">some-blocking-action</span>))
 </code></pre></div><p>You can use async queues to avoid blocking the main Mirabelle threads and achieve better performances. Of course</p>
@@ -821,7 +796,7 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 </ul>
 <p>You can combine then with <code>:or</code> or <code>:and</code>. For example, <code>[:and [:= :service &quot;foo&quot;] [:&gt; :metric 10]]</code> will keep all events with <code>:service</code> &ldquo;foo&rdquo; and <code>:metric</code> greater than 10.</p>
 <p>The <code>split</code> action is a more powerful <code>where</code>:</p>
-<pre><code>(split
+<pre tabindex="0"><code>(split
   [:&gt; :metric 10] (debug)
   [:&gt; :metric 5] (info)
   (error))
@@ -830,46 +805,46 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 <p>You can also filter all events with <code>:state</code> &ldquo;critical&rdquo; using <code>(critical)</code>, filter events with <code>:state</code> &ldquo;warning&rdquo; using <code>(warning)</code>, and expired events using <code>(expired)</code> (<code>not-expired</code> also exists to do the opposite).</p>
 <p>Some streams can also be used to only let pass events if a condition is true for a given period of time.
 For example, the <code>above-dt</code> stream will only let events pass if all events received have their <code>:metric</code> fields above a threshold for a certain duration:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">above-dt</span> {<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1</span> <span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">above-dt</span> {<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1</span> <span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
   (<span style="color:#a6e22e">error</span>)))
 </code></pre></div><p>In this example, <code>above-dt</code> will let events pass (to log them as error) only if it receives events with <code>:metric</code> greater than 1 during more than 6O seconds.</p>
 <p>The streams <code>below-dt</code>, <code>between-dt</code>, <code>outside-dt</code>, <code>critical-dt</code> also work that way. They are useful to avoid alerting on spikes for examples.</p>
 <p>The <code>tagged-all</code> stream is also available to keep only events containing one tag or a set of tags: <code>(tagged-all &quot;foo&quot;)</code> or <code>(tagged-all [&quot;foo&quot; &quot;bar&quot;])</code>.</p>
 <h4 id="modifying-events">Modifying events</h4>
 <p>A lot of actions allow you to modify events. The first one, <code>with</code>, allows you to set a field (or multiple fields) to some specific values:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>
   (<span style="color:#a6e22e">info</span>))
 (<span style="color:#a6e22e">with</span> {<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span> <span style="color:#e6db74">:ttl</span> <span style="color:#ae81ff">60</span>}
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>The <code>default</code> action is similar to <code>with</code> but it only accepts one value, and will only set the value if the value is not already defined in the event:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">default</span> <span style="color:#e6db74">:ttl</span> <span style="color:#ae81ff">60</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">default</span> <span style="color:#e6db74">:ttl</span> <span style="color:#ae81ff">60</span>
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>The <code>sdissoc</code> action takes a field or a list of fields and will remove them from the vent. For example, <code>(sdissoc :host)</code> or <code>(sdissoc [:host :service])</code>.</p>
 <p>You can use <code>rename-keys</code> to rename some events keys:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(rename-keys {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(rename-keys {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>
               <span style="color:#e6db74">:environment</span> <span style="color:#e6db74">:env</span>})
 </code></pre></div><p>In this example, the <code>:host</code> key will be renamed <code>:service</code> and the <code>:environment</code> key is renamed <code>:env</code>. Existing values will be overrided.</p>
 <p>If you want to keep only some keys from an event (and so remove all the others), you can use <code>keep-keys</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">keep-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:time</span> <span style="color:#e6db74">:metric</span> <span style="color:#e6db74">:description</span> <span style="color:#e6db74">:environment</span>])
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">keep-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:time</span> <span style="color:#e6db74">:metric</span> <span style="color:#e6db74">:description</span> <span style="color:#e6db74">:environment</span>])
 </code></pre></div><p>Some actions can modify the <code>:metric</code> field. <code>increment</code> and <code>decrement</code> will add +1 or -1 to it, and you can use <code>scale</code> to multiply it with a value: <code>(scale 1000)</code> for example.</p>
 <p>You can also tags to events, for example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; add the &#34;foo&#34; tag to events</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; add the &#34;foo&#34; tag to events</span>
 (<span style="color:#a6e22e">tag</span> <span style="color:#e6db74">&#34;foo&#34;</span>)
 
 <span style="color:#75715e">;; add the &#34;foo&#34; and &#34;bar&#34; tags to events</span>
 (<span style="color:#a6e22e">tag</span> [<span style="color:#e6db74">&#34;foo&#34;</span> <span style="color:#e6db74">&#34;bar&#34;</span>])
 </code></pre></div><h4 id="detect-state-transitions">Detect state transitions</h4>
 <p>The <code>changed</code> action can be used to detect state transitions.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">changed</span> {<span style="color:#e6db74">:field</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">:init</span> <span style="color:#e6db74">&#34;ok&#34;</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">changed</span> {<span style="color:#e6db74">:field</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">:init</span> <span style="color:#e6db74">&#34;ok&#34;</span>}
   (<span style="color:#a6e22e">error</span>))
 </code></pre></div><p>In this example, events will only be passed downstream to the <code>error</code> action if the <code>:state</code> value is updated, the default value being <code>ok</code>. For example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;ok&#34;</span>} <span style="color:#75715e">;; filtered</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;ok&#34;</span>} <span style="color:#75715e">;; filtered</span>
 {<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>} <span style="color:#75715e">;; passed downstream</span>
 {<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>} <span style="color:#75715e">;; filtered</span>
 {<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>} <span style="color:#75715e">;; filtered</span>
 {<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;ok&#34;</span>} <span style="color:#75715e">;; passed downstream</span>
 </code></pre></div><p>You can also use the <code>stable</code> action to filter flapping states for example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">stable</span> <span style="color:#ae81ff">60</span> <span style="color:#e6db74">:state</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">stable</span> <span style="color:#ae81ff">60</span> <span style="color:#e6db74">:state</span>
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>In this example, events wll be forwarded to the child action (<code>info</code>) only if the <code>:state</code> key is stable (has the same value) for all events during 60 seconds.</p>
 <h4 id="events-windows">Events Windows</h4>
@@ -886,15 +861,15 @@ It means you should be careful about which action you will use downstream. It sh
 <li>Send then downstream one by one sorted based on a field.</li>
 </ul>
 <p>Let&rsquo;s take for example <code>(ssort {:duration 10 :field :time})</code>. For this input:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">10</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">4</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">9</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">13</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">31</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">10</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">4</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">9</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">13</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">31</span>}
 </code></pre></div><p>The output would be:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">4</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">9</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">10</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">13</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">4</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">9</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">10</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">13</span>}
 </code></pre></div><p>Events are emitted downstream after twice the duration period. In this example, events received between times <code>0</code> and <code>10</code> will for example be emitted at time <code>20</code>.</p>
 <p>This action can be very useful to tolerate late events in streams. You could for example use <code>ssort</code> in front of a <code>fixed-time-window</code> stream in order to wait for late events before creating the time window.</p>
 <h4 id="actions-on-list-of-events">Actions on list of events</h4>
 <p>Several actions can be executed on list of events (produced by windows for example).</p>
 <p>Let&rsquo;s take this example which creates windows of 10 events and forwards them to multiple streams:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-event-window</span> {<span style="color:#e6db74">:size</span> <span style="color:#ae81ff">10</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-event-window</span> {<span style="color:#e6db74">:size</span> <span style="color:#ae81ff">10</span>}
   (<span style="color:#a6e22e">coll-max</span>
     (<span style="color:#a6e22e">info</span>))
   (<span style="color:#a6e22e">coll-min</span>
@@ -924,7 +899,7 @@ It means you should be careful about which action you will use downstream. It sh
 <p><code>coll-mean</code> will compute the mean based on the event <code>:metric</code> fields. <code>coll-rate</code> compute the rate of events (the sum of all <code>:metrics</code> divided by the time range, based on the most ancient and most recent events), and <code>coll-count</code> will return a new event with <code>:metric</code> being the number of events in the window.<br>
 The three previous streams use the latest event from the list of events to build the new event.</p>
 <p>The <code>coll-percentiles</code> action can also be used to compute percentiles on a list of events:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
   (<span style="color:#a6e22e">coll-percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.98</span> <span style="color:#ae81ff">0.99</span>]
     (<span style="color:#a6e22e">info</span>)))
 </code></pre></div><p>In this example, we generate 60-seconds time windows and pass them to the <code>coll-percentiles</code> action. The action takes que wanted quantiles as parameter.</p>
@@ -932,32 +907,32 @@ The three previous streams use the latest event from the list of events to build
 <p><code>coll-where</code> will keep only events in the list matching the provided conditio (see the <a href="/howto/stream/#filtering-events">filtering events</a> section.</p>
 <p><code>coll-sort</code> will sort events in the list based on the field passed as parameter.</p>
 <p>If needed, you can also flatten a list of events, to get back a single event using <code>flatten</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">moving-event-window</span> {<span style="color:#e6db74">:size</span> <span style="color:#ae81ff">10</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">moving-event-window</span> {<span style="color:#e6db74">:size</span> <span style="color:#ae81ff">10</span>}
   (<span style="color:#a6e22e">sflatten</span>
     (<span style="color:#a6e22e">info</span>)))
 </code></pre></div><p>here, the events produced by <code>moving-event-window</code> will be sent one by one to <code>info</code>.</p>
 <h4 id="split-streams-by-fields">Split streams by fields</h4>
 <p>You will often need to split streams for a given field. For example, imagine you want to count the number of events emitted every 60 seconds <strong>by host</strong>. If you write this stream:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
   (<span style="color:#a6e22e">coll-count</span>
     (<span style="color:#a6e22e">info</span>)))
 </code></pre></div><p>You will have the number of events for all hosts.</p>
 <p>But if you write:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">by</span> [<span style="color:#e6db74">:host</span>]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">by</span> [<span style="color:#e6db74">:host</span>]
   (<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
     (<span style="color:#a6e22e">coll-count</span>
       (<span style="color:#a6e22e">info</span>))))
 </code></pre></div><p>The <code>by</code> action takes a list of fields as parameter and will generate a new instance of the downstream actions for each unique values associated to the fields. Here for example, the computation will be done in isolation for each different <code>:host</code>.</p>
 <h4 id="coalesce-and-project">Coalesce and project</h4>
 <p>These two streams can help you doing computation on events from multiple sources.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_requests_duration_seconds&#34;</span>]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_requests_duration_seconds&#34;</span>]
   (<span style="color:#a6e22e">coalesce</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">10</span> <span style="color:#e6db74">:fields</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:environment</span>]}
     (<span style="color:#a6e22e">coll-percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.98</span> <span style="color:#ae81ff">0.99</span>]
       (<span style="color:#a6e22e">info</span>))))
 </code></pre></div><p><code>coalesce</code> will return periodically (here, every 10 seconds) the latest event for each, in this example, <code>:host</code> and <code>environment</code>. For example, if you have 20 unique host/environment combination push event regularly, coalesce will emit a list of 20 events (the latest for each combination).</p>
 <p>Expired events are not emitted, so if a host stops pushing, its event will not be emitted once the event is expired.</p>
 <p><code>project</code> works like coalesce but instead to get the latest event based on some fields, you should provide <code>where</code> clauses:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(project [[<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;enqueues&#34;</span>]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(project [[<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;enqueues&#34;</span>]
           [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;dequeues&#34;</span>]]
   (<span style="color:#a6e22e">coll-quotient</span>
     (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;enqueues per dequeue&#34;</span>
@@ -965,25 +940,25 @@ The three previous streams use the latest event from the list of events to build
 </code></pre></div><p>In this example, we pass to project two <code>where</code> clauses, for example to divide the <code>:metric</code> from the first event with the other one.</p>
 <h4 id="throttle">Throttle</h4>
 <p>You can use the <code>throttle</code> action to let only some events pass at most every dt seconds. You can for example use it to avoid sending too many alerts to an external system:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">throttle</span> {<span style="color:#e6db74">:count</span> <span style="color:#ae81ff">3</span> <span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">throttle</span> {<span style="color:#e6db74">:count</span> <span style="color:#ae81ff">3</span> <span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
   (<span style="color:#a6e22e">error</span>))
 </code></pre></div><p>In this example, throttle will only forward 3 events to the <code>error</code> action every 60 seconds.</p>
 <h4 id="convert-a-counter-to-a-rate">Convert a counter to a rate</h4>
 <p>The <code>dtt</code> action can be used to convert a counter (which could always increase) to a rate:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">ddt</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">ddt</span>
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>If this stream is fed with <code>{:metric 1 :time 1}</code> and then <code>{:metric 10 :time 4}</code> (these events could represent the count of requests to a HTTP server for example), the event <code>{:metric (/ 9 3) :time 4}</code> will be produced. This event is computed by doing <code>(10-1)/3</code> for the <code>;metric</code> field, and the <code>:time</code> field is the time of the latest event.</p>
 <p>The result is the rate of requests during this time period.</p>
 <h4 id="handle-exceptions-errors">Handle exceptions (errors)</h4>
 <p>Sometimes, streams can generate errors. For example, a downstream service can be down, or you could try to do an invalid action on an event. Let&rsquo;s take an example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">exception-stream</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">exception-stream</span>
   (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:metric</span> <span style="color:#e6db74">&#34;invalid!&#34;</span>
     (<span style="color:#a6e22e">increment</span>))
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>In this example, we associate a string to the event <code>:metric</code> field and then we try to incremen it. This will produce an exception.</p>
 <p><code>exception-stream</code> is an action which will catch all exception generated on its first child, generate an event from its exception, and pass it to its second child (<code>info</code> here). You can like that log errors, or forward them to another system.</p>
 <p>The error event generated by exception-stream looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1.620331421405</span>E9,
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1.620331421405</span>E9,
  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;mirabelle-exception&#34;</span>
  <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;error&#34;</span>
  <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1</span>
@@ -993,10 +968,12 @@ The three previous streams use the latest event from the list of events to build
  <span style="color:#e6db74">:description</span> <span style="color:#e6db74">&#34;java.lang.ClassCastException: class java.lang.String cannot be cast to class java.lang.Number...&#34;</span>
 </code></pre></div><p>The event <code>:time</code> is the time of the event which generated the exception. The <code>:service</code> will always be <code>mirabelle-exception</code>, the <code>:state</code> &ldquo;error&rdquo; and the <code>:metric</code> 1.</p>
 <p>The event will have as tag &ldquo;exception&rdquo; and the exception class name. The <code>:exception</code> key will contain the JVM <code>Exception</code> instance, <code>:base-event</code> the full event which triggered the exception, and finally <code>:description</code> will contain a string representation of the exception (including the stacktrace).</p>
+<h4 id="discarded-events">Discarded events</h4>
+<p>If your event has the the <code>mirabelle/discard</code> tag, the event will be ignored by every action triggering side effects (logging, I/O, publish!).</p>
 <h4 id="move-events-between-streams">Move events between streams</h4>
 <p>You can reinject events from a stream to itself, or to another stream (a dynamic stream for example).</p>
 <p>By default, events are reinjected into the current stream. You can specify the name of the targeted stream if needed:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; send events into the current stream</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#75715e">;; send events into the current stream</span>
 (<span style="color:#a6e22e">reinject!</span>)
 
 <span style="color:#75715e">;; send events to another stream</span>
@@ -1112,22 +1089,6 @@ The three previous streams use the latest event from the list of events to build
                     
                         
                         
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
                     
                 
                 
@@ -1325,19 +1286,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.min.js?1639169813"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1639169813"></script>
-    <script src="/js/jquery.sticky.js?1639169813"></script>
-    <script src="/js/featherlight.min.js?1639169813"></script>
-    <script src="/js/highlight.pack.js?1639169813"></script>
+    <script src="/js/clipboard.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.min.js?1640541382"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1640541382"></script>
+    <script src="/js/jquery.sticky.js?1640541382"></script>
+    <script src="/js/featherlight.min.js?1640541382"></script>
+    <script src="/js/highlight.pack.js?1640541382"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1639169813"></script>
-    <script src="/js/learn.js?1639169813"></script>
-    <script src="/js/hugo-learn.js?1639169813"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1640541382"></script>
+    <script src="/js/learn.js?1640541382"></script>
+    <script src="/js/hugo-learn.js?1640541382"></script>
     
         
-            <script src="/mermaid/mermaid.js?1639169813"></script>
+            <script src="/mermaid/mermaid.js?1640541382"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

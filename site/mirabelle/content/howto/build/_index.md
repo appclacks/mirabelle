@@ -9,7 +9,7 @@ disableToc: false
 In order to build Mirabelle, you need to install:
 
 - [Leiningen](https://leiningen.org/), the Clojure build tool.
-- Java. Mirabelle is tested under Java 11 (LTS).
+- Java. Mirabelle is tested under Java 17 (LTS).
 
 Then, clone the Mirabelle [Git repository](https://github.com/mcorbin/mirabelle). You can now build the project with `lein uberjar`.
 
@@ -53,7 +53,7 @@ docker run -p 5555:5555 -p 5556:5556 -p 5558:5558 \
 -v /etc/mirabelle/streams:/streams \
 -v /etc/mirabelle/config.edn:/config/config.edn \
 -e MIRABELLE_CONFIGURATION=/config/config.edn \
-mcorbin/mirabelle:v0.7.0
+mcorbin/mirabelle:v0.8.0
 ```
 
 ## Using Leiningen
