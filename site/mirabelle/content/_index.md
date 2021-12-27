@@ -55,7 +55,7 @@ You could write a Mirabelle stream which will compute on the fly the quantiles f
 (streams
   (stream {:name :percentiles :default true}
     (where [:= :service "http_request_duration_seconds"]
-      (fixed-time-window 60
+      (fixed-time-window {:duration 60}
         (coll-percentiles [0.5 0.75 0.99]
           (where [:and [:= :quantile 0.99]
                        [:> :metric 1]]
@@ -105,12 +105,11 @@ Here is a more complete and commented example, with multiple actions performed i
         (by [:host]
           ;; if the metric is greater than 1 for more than 60 seconds
           ;; Pass events downstream
-          (above-dt 1 60
+          (above-dt {:threshold 1 :duration 60}
             ;; pass the state to critical
             (with :state "critical"
               ;; one alert only every 60 sec to avoid flooding pagerduty
-              (throttle 60
+              (throttle {:duration 60 :count 1}
                 (push-io! :pagerduty)))))))))
 ```
 
-As you can see, events can flow in multiple branches without causing side effects.
