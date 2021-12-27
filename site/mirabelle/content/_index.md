@@ -105,7 +105,7 @@ Here is a more complete and commented example, with multiple actions performed i
         (by [:host]
           ;; if the metric is greater than 1 for more than 60 seconds
           ;; Pass events downstream
-          (above-dt {:threshold 1 :duration 60}
+          (above-dt {:duration 60 :threshold 1}
             ;; pass the state to critical
             (with :state "critical"
               ;; one alert only every 60 sec to avoid flooding pagerduty
