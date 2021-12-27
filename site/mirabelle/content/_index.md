@@ -16,13 +16,11 @@ Mirabelle is currently in alpha, but I'm eager to receive feedback.
 
 ## Compatible with Riemann
 
-Mirabelle is heavily inspired by [Riemann](https://riemann.io/). Actually, part of the Mirabelle codebase (some streams and the TCP server implementation for example) was imported from Riemann (these parts are mentioned in the codebase).
+Mirabelle is heavily inspired by [Riemann](https://riemann.io/). Actually, parts of the Mirabelle codebase (like the TCP server implementation for example) were taken from Riemann (these parts are mentioned in the codebase).
 
 I would like to thank all Riemann maintainers and contributors for this amazing tool.
 
-Mirabelle use the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also added a lot of new features).
-
-Like Riemann, Mirabelle provides an index which can be queried (and on which you can subscribe) in order to explore your system state.
+Mirabelle uses the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also contains a lot of new features).
 
 ## Streams clocks, real time, continuous queries
 
