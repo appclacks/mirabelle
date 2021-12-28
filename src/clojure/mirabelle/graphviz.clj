@@ -14,7 +14,7 @@
 
 ;; worst code ever written
 (defn action->graphviz
-  [stream-name parent actions]
+  [stream-name parent actions subgraph-connections]
   (doall
    (for [action actions]
      (let [action-name (name (:action action))
@@ -29,42 +29,47 @@
                          description
                          (if (= "" params)
                            params                                                                               (str "<BR/>" params)))
-           line (cond-> (format "%s -> %s;"
-                                parent node)
-                  (= :reinject! (:action action))
-                  (str (format "\n%s -> \"%s entrypoint\""
-                               node
-                               (or (some-> (:params action) first name)
-                                   stream-name))))
+           _ (when (= :reinject! (:action action))
+               (swap! subgraph-connections str (format "\n%s -> \"%s entrypoint\""
+                                                       node
+                                                       (or (some-> (:params action)
+                                                                   first name)
+                                                           stream-name))))
+           line (format "%s -> %s;"
+                        parent node)
            children (some->> (action->graphviz stream-name
                                                node
-                                               (:children action))
+                                               (:children action)
+                                               subgraph-connections)
                              seq
                              (clojure.string/join "\n"))]
        (str label "\n" line "\n" (or children ""))))))
 
 (defn stream->graphviz
   [config]
-  (format "digraph {\nnode[shape=box];\n %s \n }"
-          (string/join
-           "\n"
-           (for [[stream-name config] config]
-             (let [action (:actions config)]
-               (str
-                (if (:default config)
-                  (str "default -> \"" (name stream-name)
-                       " entrypoint\";\n")
-                  "")
-                (format "subgraph cluster_%s {\nlabel =<<B>Stream %s</B><BR/>%s>;\nlabeljust=\"l\";\n"
-                        (name stream-name)
-                        (name stream-name)
-                        (:description config ""))
-                    (first (action->graphviz
-                            (name stream-name)
-                            (format "\"%s entrypoint\""
-                                    (name stream-name))
-                            [action]))
-                    "\n}"))))))
+  (let [subgraph-connections (atom "")]
+    (format "digraph {\nnode[shape=box];\n %s \n %s }"
+            (string/join
+             "\n"
+             (for [[stream-name config] config]
+               (let [action (:actions config)]
+                 (str
+                  (if (:default config)
+                    (str "default -> \"" (name stream-name)
+                         " entrypoint\";\n")
+                    "")
+                  (format "subgraph cluster_%s {\nlabel =<<B>Stream %s</B><BR/>%s>;\nlabeljust=\"l\";\n"
+                          (name stream-name)
+                          (name stream-name)
+                          (:description config ""))
+                  (first (action->graphviz
+                          (name stream-name)
+                          (format "\"%s entrypoint\""
+                                  (name stream-name))
+                          [action]
+                          subgraph-connections))
+                  "\n}"))))
+            @subgraph-connections)))
 
 (defn graphviz
   [streams-directories destination]
