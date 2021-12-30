@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1640699819" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1640699819" rel="stylesheet">
-    <link href="/css/hybrid.css?1640699819" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1640699819" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1640699819" rel="stylesheet">
-    <link href="/css/auto-complete.css?1640699819" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1640699819" rel="stylesheet">
-    <link href="/css/theme.css?1640699819" rel="stylesheet">
-    <link href="/css/tabs.css?1640699819" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1640699819" rel="stylesheet">
+    <link href="/css/nucleus.css?1640866534" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1640866534" rel="stylesheet">
+    <link href="/css/hybrid.css?1640866534" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1640866534" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1640866534" rel="stylesheet">
+    <link href="/css/auto-complete.css?1640866534" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1640866534" rel="stylesheet">
+    <link href="/css/theme.css?1640866534" rel="stylesheet">
+    <link href="/css/tabs.css?1640866534" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1640866534" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1640699819"></script>
+    <script src="/js/jquery-3.3.1.min.js?1640866534"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1640699819"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1640699819"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1640866534"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1640866534"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1640699819"></script>
+<script type="text/javascript" src="/js/search.js?1640866534"></script>
 
     
   </div>
@@ -650,7 +650,7 @@ tp keep only events with <code>:metric</code> greater than <code>1.5</code> (we 
 we want to alert if an http request takes longer than 1.5 seconds).</p>
 <p>Finally, the event <code>:state</code> is set to &ldquo;critical&rdquo; using the <code>with</code> action, and finally the event is logged as error using <code>error</code> (we could in a real setup send
 an alert to an alerting system like Pagerduty for example).</p>
-<p>As you can see, streams can have multiple branches. It&rsquo;s not an issue at all, modifying events in multiple branches, streams, or threads will <strong>never</strong> produce side effects, it&rsquo;s completely safe.</p>
+<p>streams can have multiple branches. It&rsquo;s not an issue at all, modifying events in multiple branches, streams, or threads will <strong>never</strong> produce side effects, it&rsquo;s completely safe.</p>
 <p>Now that we know how to write streams, let&rsquo;s use them.</p>
 <h3 id="edn-representation-and-compilation">EDN representation and compilation</h3>
 <p>The Mirabelle DSL should first be compiled to an EDN datastructure before being used by Mirabelle. Let&rsquo;s take the previous example stream and put it in a file:</p>
@@ -682,7 +682,7 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
        ({<span style="color:#e6db74">:action</span> <span style="color:#e6db74">:with</span>,
          <span style="color:#e6db74">:children</span> ({<span style="color:#e6db74">:action</span> <span style="color:#e6db74">:error</span>}),
          <span style="color:#e6db74">:params</span> [{<span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>}]})})})}}}
-</code></pre></div><p>As you can see, the Mirabelle DSL was compiled to an EDN representation. You can easily map what you have defined in the DSL (stream name, actions, branches&hellip;) to the generated EDN datastructure.</p>
+</code></pre></div><p>The Mirabelle DSL was compiled to an EDN representation. You can easily map what you have defined in the DSL (stream name, actions, branches&hellip;) to the generated EDN datastructure.</p>
 <p>You are now ready to use your stream.</p>
 <p>Let&rsquo;s launch Mirabelle, with the <code>/tmp/compiled</code> directory referenced into the configuration on the <code>:stream section</code> (as explained in <a href="/howto/configuration/">the configuration documentation</a>).</p>
 <p>How to launch Mirabelle is explained in <a href="/howto/build/">this section</a>.</p>
@@ -696,7 +696,7 @@ If ou launch <code>java -jar mirabelle.jar compile /tmp/streams /tmp/compiled</c
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{<span style="color:#f92672">&#34;@timestamp&#34;</span>:<span style="color:#e6db74">&#34;2021-05-01T22:50:57.960+02:00&#34;</span>,<span style="color:#f92672">&#34;@version&#34;</span>:<span style="color:#e6db74">&#34;1&#34;</span>,<span style="color:#f92672">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;#riemann.codec.Event{:host \&#34;my-host\&#34;, :service \&#34;http_requests_duration_seconds\&#34;, :state nil, :description nil, :metric 2.0, :tags nil, :time 1.61990225796E9, :ttl nil, :x-client \&#34;riemann-c-client\&#34;}&#34;</span>,<span style="color:#f92672">&#34;logger_name&#34;</span>:<span style="color:#e6db74">&#34;mirabelle.action&#34;</span>,<span style="color:#f92672">&#34;thread_name&#34;</span>:<span style="color:#e6db74">&#34;defaultEventExecutorGroup-2-2&#34;</span>,<span style="color:#f92672">&#34;level&#34;</span>:<span style="color:#e6db74">&#34;INFO&#34;</span>,<span style="color:#f92672">&#34;level_value&#34;</span>:<span style="color:#ae81ff">20000</span>}
 
 {<span style="color:#f92672">&#34;@timestamp&#34;</span>:<span style="color:#e6db74">&#34;2021-05-01T22:50:57.961+02:00&#34;</span>,<span style="color:#f92672">&#34;@version&#34;</span>:<span style="color:#e6db74">&#34;1&#34;</span>,<span style="color:#f92672">&#34;message&#34;</span>:<span style="color:#e6db74">&#34;#riemann.codec.Event{:host \&#34;my-host\&#34;, :service \&#34;http_requests_duration_seconds\&#34;, :state \&#34;critical\&#34;, :description nil, :metric 2.0, :tags nil, :time 1.61990225796E9, :ttl nil, :x-client \&#34;riemann-c-client\&#34;}&#34;</span>,<span style="color:#f92672">&#34;logger_name&#34;</span>:<span style="color:#e6db74">&#34;mirabelle.action&#34;</span>,<span style="color:#f92672">&#34;thread_name&#34;</span>:<span style="color:#e6db74">&#34;defaultEventExecutorGroup-2-2&#34;</span>,<span style="color:#f92672">&#34;level&#34;</span>:<span style="color:#e6db74">&#34;ERROR&#34;</span>,<span style="color:#f92672">&#34;level_value&#34;</span>:<span style="color:#ae81ff">40000</span>}
-</code></pre></div><p>As you can see, the event is logged twice: one time by our <code>info</code> action, and the second time by <code>error</code> (you can see the <code>level</code> key in the log). In the second log, the <code>:state</code> was set to &ldquo;critical&rdquo;. Our threshold works !</p>
+</code></pre></div><p>The event is logged twice: one time by our <code>info</code> action, and the second time by <code>error</code> (you can see the <code>level</code> key in the log). In the second log, the <code>:state</code> was set to &ldquo;critical&rdquo;. Our threshold works !</p>
 <p>More examples are available at the bottom on this page, and availables actions are listed in the <a href="/action-io-ref/">Actions and I/O reference</a> section of the documentation.</p>
 <p>Streams can also be created dynamically using <a href="/howto/dynamic-streams/">the API</a>.</p>
 <p>Mirabelle supports hot reload on a SIGKILL. On a reload, only streams which had their configurations modified will be reloaded. Streams created using the API will be unchanged.</p>
@@ -1286,19 +1286,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1640699819"></script>
-    <script src="/js/perfect-scrollbar.min.js?1640699819"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1640699819"></script>
-    <script src="/js/jquery.sticky.js?1640699819"></script>
-    <script src="/js/featherlight.min.js?1640699819"></script>
-    <script src="/js/highlight.pack.js?1640699819"></script>
+    <script src="/js/clipboard.min.js?1640866534"></script>
+    <script src="/js/perfect-scrollbar.min.js?1640866534"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1640866534"></script>
+    <script src="/js/jquery.sticky.js?1640866534"></script>
+    <script src="/js/featherlight.min.js?1640866534"></script>
+    <script src="/js/highlight.pack.js?1640866534"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1640699819"></script>
-    <script src="/js/learn.js?1640699819"></script>
-    <script src="/js/hugo-learn.js?1640699819"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1640866534"></script>
+    <script src="/js/learn.js?1640866534"></script>
+    <script src="/js/hugo-learn.js?1640866534"></script>
     
         
-            <script src="/mermaid/mermaid.js?1640699819"></script>
+            <script src="/mermaid/mermaid.js?1640866534"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

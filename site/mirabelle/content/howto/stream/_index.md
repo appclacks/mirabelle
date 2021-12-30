@@ -89,7 +89,7 @@ we want to alert if an http request takes longer than 1.5 seconds).
 Finally, the event `:state` is set to "critical" using the `with` action, and finally the event is logged as error using `error` (we could in a real setup send
 an alert to an alerting system like Pagerduty for example).
 
-As you can see, streams can have multiple branches. It's not an issue at all, modifying events in multiple branches, streams, or threads will **never** produce side effects, it's completely safe.
+streams can have multiple branches. It's not an issue at all, modifying events in multiple branches, streams, or threads will **never** produce side effects, it's completely safe.
 
 Now that we know how to write streams, let's use them.
 
@@ -141,7 +141,7 @@ The resulting file in `/tmp/compiled/stream.clj` should be:
          :params [{:state "critical"}]})})})}}}
 ```
 
-As you can see, the Mirabelle DSL was compiled to an EDN representation. You can easily map what you have defined in the DSL (stream name, actions, branches...) to the generated EDN datastructure.
+The Mirabelle DSL was compiled to an EDN representation. You can easily map what you have defined in the DSL (stream name, actions, branches...) to the generated EDN datastructure.
 
 You are now ready to use your stream.
 
@@ -175,7 +175,7 @@ You will see in the Mirabelle logs:
 {"@timestamp":"2021-05-01T22:50:57.961+02:00","@version":"1","message":"#riemann.codec.Event{:host \"my-host\", :service \"http_requests_duration_seconds\", :state \"critical\", :description nil, :metric 2.0, :tags nil, :time 1.61990225796E9, :ttl nil, :x-client \"riemann-c-client\"}","logger_name":"mirabelle.action","thread_name":"defaultEventExecutorGroup-2-2","level":"ERROR","level_value":40000}
 ```
 
-As you can see, the event is logged twice: one time by our `info` action, and the second time by `error` (you can see the `level` key in the log). In the second log, the `:state` was set to "critical". Our threshold works !
+The event is logged twice: one time by our `info` action, and the second time by `error` (you can see the `level` key in the log). In the second log, the `:state` was set to "critical". Our threshold works !
 
 More examples are available at the bottom on this page, and availables actions are listed in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
 
