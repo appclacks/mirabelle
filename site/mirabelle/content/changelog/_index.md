@@ -6,6 +6,10 @@ chapter: false
 
 This is the list of user-facing changes for Mirabelle.
 
+## v0.9.0
+
+Fix a bug in the `mirabelle graphviz` command.
+
 ## v0.8.0
 
 - Removal of the "disk queue" feature: I was not happy about it
