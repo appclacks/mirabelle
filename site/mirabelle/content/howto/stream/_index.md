@@ -12,7 +12,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 - [What is a Mirabelle event](/howto/stream/#events)
 - [What is a Mirabelle stream](/howto/stream/#streams)
 - [Compilation and EDN representation of streams and compilation](/howto/stream/#edn-representation-and-compilation)
-- [Include streams snippets in the main configuration, use profiles and variables](/howto/stream/#include-streams-snippets-in-the-main-configurationn-profiles-and-variables)
+- [Include streams snippets in the main configuration, use profiles and variables](/howto/stream/#include-streams-snippets-in-the-main-configuration-profiles-and-variables)
 - [IO and Async Queue: how to make Mirabelle communicate with external systems](/howto/stream/#io-and-async-queues)
 - [How Mirabelle handles time](/howto/stream/#events-time)
 
@@ -183,7 +183,7 @@ Streams can also be created dynamically using [the API](/howto/dynamic-streams/)
 
 Mirabelle supports hot reload on a SIGKILL. On a reload, only streams which had their configurations modified will be reloaded. Streams created using the API will be unchanged.
 
-### Include streams snippets in the main configurationn, profiles and variables
+### Include streams snippets in the main configuration, profiles and variables
 
 **Profiles and readers**
 
