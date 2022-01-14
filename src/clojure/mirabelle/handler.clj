@@ -81,43 +81,23 @@
 
 (def path-vars-regex #"[a-zA-Z0-9~._+~-]+")
 
-(def dispatch-map
-  {:index/search {:path [#"api/v1/index/" [path-vars-regex :name] #"/search/?"]
-                  :method :post
-                  :handler-fn search-index
-                  :spec :mirabelle.http.index/search}
-   :index/current-time {:path [#"api/v1/index/" [path-vars-regex :name] #"/current-time/?"]
-                        :method :get
-                        :spec :mirabelle.http.index/current-time
-                        :handler-fn current-time}
-   :stream/list {:path [#"api/v1/stream/?"]
-                 :method :get
-                 :handler-fn list-streams}
-   :stream/event {:path [#"api/v1/stream/" [path-vars-regex :name] #"/?"]
-                  :method :put
-                  :handler-fn push-event
-                  :spec :mirabelle.http.stream/event}
-   :stream/add {:path [#"api/v1/stream/" [path-vars-regex :name] #"/?"]
-                :method :post
-                :handler-fn add-stream
-                :spec :mirabelle.http.stream/add}
-   :stream/remove {:path [#"api/v1/stream/" [path-vars-regex :name] #"/?"]
-                   :method :delete
-                   :handler-fn remove-stream
-                   :spec :mirabelle.http.stream/remove}
-   :stream/get {:path [#"api/v1/stream/" [path-vars-regex :name] #"/?"]
-                :method :get
-                :handler-fn get-stream
-                :spec :mirabelle.http.stream/get}
-   :system/metrics {:path "metrics"
-                    :method :get
-                    :handler-fn metrics}
-   :system/healthz {:path "healthz"
-                    :method :get
-                    :handler-fn healthz}
-   :system/health {:path "health"
-                   :method :get
-                   :handler-fn healthz}})
+(def router
+  [["/api/v1/index/:name/search" {:post {:spec :mirabelle.http.index/search
+                                         :handler search-index}}]
+   ["/api/v1/index/:name/current-time" {:get {:spec :mirabelle.http.index/current-time
+                                              :handler current-time}}]
+   ["/api/v1/stream" {:get {:handler list-streams}}]
+   ["/api/v1/stream/:name" {:put {:handler push-event
+                                  :spec :mirabelle.http.stream/event}
+                            :post {:handler add-stream
+                                   :spec :mirabelle.http.stream/add}
+                            :get {:handler get-stream
+                                  :spec :mirabelle.http.stream/get}
+                            :delete {:handler remove-stream
+                                     :spec :mirabelle.http.stream/remove}}]
+   ["/metrics" {:get {:handler metrics}}]
+   ["/healthz" {:get {:handler healthz}}]
+   ["/health" {:get {:handler healthz}}]])
 
 (defn assert-spec-valid
   [spec params]

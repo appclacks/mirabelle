@@ -19,15 +19,13 @@
    itc-error/error ;; error
    (when-let [basic-auth (:basic-auth config)]
      (itc-auth/basic-auth basic-auth))
-   (itc-route/route {:dispatch-map mh/dispatch-map
+   (itc-route/route {:router mh/router
                      :registry registry
-                     :handler-component api-handler
-                     :not-found-handler mh/not-found}) ;; enter
+                     :handler-component api-handler}) ;; enter
    itc-id/request-id ;;enter
    itc-ring/cookies ;; enter + leave
    itc-ring/params ;; enter
    itc-ring/keyword-params ;; enter
    itc-json/request-params ;; enter
-   (itc-handler/main-handler {:dispatch-map mh/dispatch-map
-                              :registry registry
+   (itc-handler/main-handler {:registry registry
                               :handler-component api-handler})])

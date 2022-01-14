@@ -1,8 +1,7 @@
 ;; This code is heavily inspired from the Riemann code base
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (ns mirabelle.transport.websocket
-  (:require [bidi.bidi :as bidi]
-            [cheshire.core :as json]
+  (:require [cheshire.core :as json]
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
             [corbihttp.metric :as metric]
@@ -14,7 +13,8 @@
             [mirabelle.index :as index]
             [mirabelle.pubsub :as pubsub]
             [mirabelle.b64 :as b64]
-            [org.httpkit.server :as http]))
+            [org.httpkit.server :as http]
+            [reitit.core :as r]))
 
 (defn http-query-map
   "Converts a URL query string into a map."
@@ -66,11 +66,10 @@
       ; Close channel on nil msg
       (http/on-receive ch (fn [data] (when-not data (http/close ch)))))))
 
-(def routes
-  ["/"
-   [[#"index/?" :ws/index]
-    [["channel/" :channel #"/?"] :ws/channel]
-    [true :ws/not-found]]])
+(def router
+  (r/router
+   [["/index" :ws/index]
+    ["/channel/:channel" :ws/channel]]))
 
 (defn handler
   [pubsub registry]
@@ -85,11 +84,13 @@
           (try
             (let [actions (atom [])
                   uri (:uri request)
-                  request (bidi/match-route* routes uri request)
-                  query-params (->(:query-string request)
-                                  http-query-map)
+                  route-match (r/match-by-path router uri)
+                  handler (or (-> route-match :data :name)
+                              :ws/not-found)
+                  query-params (-> (:query-string request)
+                                   http-query-map)
                   pred (request->pred query-params)]
-              (if (= :ws/not-found (:handler request))
+              (if (= :ws/not-found handler)
                 (do
                   (log/info {} "Unknown URI " (:uri request) ", closing")
                   (http/close ch))
@@ -100,7 +101,7 @@
                                    (swap! nb-conn dec)
                                    (doseq [action @actions]
                                      (action))))
-                  (condp = (:handler request)
+                  (condp = handler
                     :ws/index (ws-handler pubsub
                                           actions
                                           ch
@@ -112,7 +113,7 @@
                                             actions
                                             ch
                                             pred
-                                            (-> request :route-params :channel keyword))))))
+                                            (-> route-match :path-params :channel keyword))))))
 
             (catch Exception e
               (log/error {} e "Error in the websocket handler")
