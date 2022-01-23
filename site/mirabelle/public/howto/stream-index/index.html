@@ -9,7 +9,7 @@
 
     <link rel="icon" href="/images/favicon.png" type="image/png">
 
-    <title>Mirabelle in production :: Mirabelle</title>
+    <title>The index :: Mirabelle</title>
 
     
     <link href="/css/nucleus.css?1642939127" rel="stylesheet">
@@ -39,7 +39,7 @@
     </style>
     
   </head>
-  <body class="" data-url="/production/">
+  <body class="" data-url="/howto/stream-index/">
     <nav id="sidebar" class="">
 
 
@@ -93,7 +93,7 @@
   
     
     <li data-nav-id="/howto/" title="How to" class="dd-item
-        
+        parent
         
         
         ">
@@ -252,8 +252,8 @@
   
     
     <li data-nav-id="/howto/stream-index/" title="The index" class="dd-item
-        
-        
+        parent
+        active
         
         ">
       <a href="/howto/stream-index/">
@@ -311,8 +311,8 @@
   
     
     <li data-nav-id="/production/" title="Mirabelle in production" class="dd-item
-        parent
-        active
+        
+        
         
         ">
       <a href="/production/">
@@ -529,7 +529,13 @@
             
           
           
-            <a href='/'></a> > Mirabelle in production
+            
+            
+          
+          
+            <a href='/'></a> > <a href='/howto/'>How to</a> > The index
+          
+        
           
         
           
@@ -542,18 +548,10 @@
     <div class="wrapper">
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#streams-guarantees-and-performances">Streams guarantees and performances</a></li>
-    <li><a href="#use-cases">Use cases</a></li>
-    <li><a href="#fault-tolerance">Fault tolerance</a></li>
-    <li><a href="#metrics">Metrics</a>
-      <ul>
-        <li><a href="#tcp-server">TCP server</a></li>
-        <li><a href="#http-server">HTTP server</a></li>
-        <li><a href="#websocket-server">Websocket server</a></li>
-        <li><a href="#streams">Streams</a></li>
-        <li><a href="#async-queues">Async queues</a></li>
-      </ul>
-    </li>
+    <li><a href="#how-to-push-events-into-the-index">How to push events into the index</a></li>
+    <li><a href="#expiration">Expiration</a></li>
+    <li><a href="#queries">Queries</a></li>
+    <li><a href="#pub-sub">Pub Sub</a></li>
   </ul>
 </nav>
     </div>
@@ -571,7 +569,7 @@
           
             <h1>
               
-              Mirabelle in production
+              The index
             </h1>
           
 
@@ -579,74 +577,39 @@
 
 
 
-	<p><em>Warning</em>: Mirabelle is for now not ready for production, it&rsquo;s still alpha software.</p>
-<p>Is section is about the Mirabelle streams guarantees, Mirabelle use cases, fault tolerance and the metrics exposed by Mirabelle.</p>
-<h2 id="streams-guarantees-and-performances">Streams guarantees and performances</h2>
-<p>Like in Riemann, Mirabelle acknowledges events. Behaviors describe in <a href="http://riemann.io/howto.html#client-backpressure-latency-and-queues">this section</a> of the Riemann documentation are also true for Mirabelle (note that a couple of stuff, like some metrics, are renamed/a bit different in Mirabelle).</p>
-<p>it&rsquo;s up to you to use (or not) <a href="/howto/stream/#io-and-async-queues">asynchronous queues</a> if you want to.</p>
-<p>Although Mirabelle supports receiving events on its HTTP server, please use the TCP/protobuf one if possible: performances will be <em>way</em> better.</p>
-<h2 id="use-cases">Use cases</h2>
-<p>Streams in Mirabelle can be either configured in <a href="/howto/configuration/">configuration files</a> or using <a href="/api/">the API</a>.</p>
-<p>As explained in <a href="/howto/stream/#streams">this section</a> of the documentation, events received by the Mirabelle TCP server will go by default into streams which have the tag <code>:default</code>. If you pass the <code>stream</code> attribute to an event, the event will be routed into the specified stream.</p>
-<p>For example, if I sent to the Mirabelle TCP server this event:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;foo&#34;</span>
- <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>
- <span style="color:#e6db74">:time</span> <span style="color:#e6db74">&#34;1620495335&#34;</span>
- <span style="color:#e6db74">:stream</span> <span style="color:#e6db74">&#34;bar&#34;</span>}
-</code></pre></div><p>The event will be routed to the stream named <code>bar</code>. Other streams (defined in the configuration or using this API) will not see the event.</p>
-<p>Remember, in Mirabelle, each stream has its own &ldquo;clock&rdquo; based on the time of the events it receives.</p>
-<p>Also, all streams created using the API will have a dedicated <a href="/howto/stream-index/">index</a>. The streams from the configuration share the same index instance.</p>
-<p>Mirabelle is also able to <a href="/howto/stream/#move-events-between-streams">move events between streams</a>.</p>
-<p>It means you can have streams for various use cases. For example, you could have streams:</p>
-<ul>
-<li>Defined in the configuration with <code>:default</code> to <code>true</code> in order to do &ldquo;real time&rdquo; computation on events.</li>
-<li>Defined in the configuration but without <code>:default</code>, and then send events to them specifically using the Mirabelle TCP or HTTP server.</li>
-<li>Create streams using the API on demand. Streams with <code>:default true</code> created through the API will also receive all events flowing through the Mirabelle TCP server. You could like that enable a stream, and then remove it once you&rsquo;re done.</li>
-</ul>
-<p>You can also perform continuous queries using Mirabelle. Indeed, if you compute things on the fly using events coming from multiple hosts (like, time windows on events coming from various hosts or services), Mirabelle may only be able to do approximation on the computations.</p>
-<p>As previously mentioned, Mirabelle streams use the events time for their clocks, so &ldquo;old&rdquo; events could be removed from computations. But it&rsquo;s OK, because there are ways of mitigating that (accept events and actions until they are not expired, so if your events have a TTL of 60 seconds, it&rsquo;s OK if they arrive a few seconds late). I also like the Riemann philosophy which is <code>mostly correct information right now is more useful, than totally correct information only available once the failure is over</code>.</p>
-<p>But what if you want totally correct information ? In that case, you can just:</p>
-<ul>
-<li>Forward all raw events to an external system (timeseries database for example)</li>
-<li>Reinject them a bit later, sorted, into Mirabelle. It could be a dedicated Mirabelle instance, or a dedicated stream on your first instance. In this mode, you should have totally correct computations.</li>
-</ul>
-<p>You can even use Mirabelle to play with old data, like &ldquo;let&rsquo;s reinject all data from 2 weeks ago into Mirabelle in order to compute some statistics, or detect weird things over time&rdquo; !</p>
-<p>And don&rsquo;t forget the <a href="/howto/pubsub/">Pub Sub</a>, which can really help you to see what is currently happening into Mirabelle.</p>
-<h2 id="fault-tolerance">Fault tolerance</h2>
-<p>Mirabelle is not a distributed system. Like in Riemann, streams states (like time windows) and the index are lost after a crash.</p>
-<p>You can always use continuous queries (and replay events if needed) in order to achieve fault tolerance. A computation failed because the machine crashes ? Just relaunch it with the same data.</p>
-<p>You can also put a thing like <a href="https://kafka.apache.org/">Kafka</a> in front of Riemann (or even push Riemann metrics to Kafka).</p>
-<p>I will soon add the possibility to forward events between Mirabelle instances, and I will also build a proxy which will be able to forward events to various Mirabelle instances based on some criteria/algorithms (duplicates to everyone, consistent hashing&hellip;).</p>
-<h2 id="metrics">Metrics</h2>
-<p>Mirabelle exposes a <code>/metrics</code> endpoint. For example, a lot of JVM internal metrics are exposed. Here are describe some interesting metrics.</p>
-<h3 id="tcp-server">TCP server</h3>
-<ul>
-<li><code>tcp_request_duration_seconds</code>: the TCP requests duration (quantiles), for example <code>tcp_request_duration_seconds{quantile=&quot;0.5&quot;,} 0.0</code>.</li>
-<li><code>netty_event_executor_queue_size</code>: the Netty queue size. If this metric is high, it means your streams are not processing fast enough.</li>
-</ul>
-<h3 id="http-server">HTTP server</h3>
-<ul>
-<li>
-<p><code>http_request_duration_seconds</code>: the HTTP requests duration (quantiles), for example: <code>http_request_duration_seconds{method=&quot;put&quot;,uri=&quot;/api/v1/stream/streaming&quot;,quantile=&quot;0.75&quot;,} 0.002490368</code></p>
-</li>
-<li>
-<p><code>http_responses_total</code>: HTTP responses count, for example: <code>http_responses_total{method=&quot;put&quot;,status=&quot;200&quot;,uri=&quot;/api/v1/stream/streaming&quot;,} 1.0</code></p>
-</li>
-</ul>
-<h3 id="websocket-server">Websocket server</h3>
-<ul>
-<li><code>websocket_connection_count</code>: Number of actives websocket connections</li>
-</ul>
-<h3 id="streams">Streams</h3>
-<ul>
-<li><code>stream_duration_seconds</code>: The time events pass into the streaming engine (quantiles) for example <code>stream_duration_seconds{quantile=&quot;0.5&quot;,} 3.4816E-5</code>.</li>
-</ul>
-<h3 id="async-queues">Async queues</h3>
-<p>For each async queues, you have these metrics (the <code>executor</code> label is the async queue name):</p>
-<ul>
-<li><code>executor_queue_remaining_capacity</code>: The remaining capacity of the executor queue, example <code>executor_queue_remaining_capacity{executor=&quot;thread-pool&quot;,} 10000.0</code>.</li>
-<li><code>executor_queue_tasks</code>: the accepted and completed tasks in the executor, for example <code>executor_queue_tasks{executor=&quot;thread-pool&quot;,state=&quot;accepted&quot;,}</code> or <code>executor_queue_tasks{executor=&quot;thread-pool&quot;,state=&quot;completed&quot;,}</code></li>
-</ul>
+	<p>The Mirabelle Index is an in memory map which can be used to store events.</p>
+<p>Each Mirabelle stream (generated from the configuration file or from the API) has its own, dedicated index instance.</p>
+<h2 id="how-to-push-events-into-the-index">How to push events into the index</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">stream</span>
+  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:bar</span> <span style="color:#e6db74">:default</span> true}
+  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>]
+    (index [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>])))
+</code></pre></div><p>In this example, all events with <code>:service</code> &ldquo;bar&rdquo; will be added to the index. They will be indexed by their <code>:host</code> and <code>:service</code> key.</p>
+<p>For example, if these two events <code>{:host &quot;foo&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code> and <code>{:host &quot;mirabelle&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code> arrive in the system, the index would contain two keys:</p>
+<p><code>{:host &quot;foo&quot; :service &quot;bar&quot;}</code> -&gt; <code>{:host &quot;foo&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code>
+<code>{:host &quot;mirabelle&quot; :service &quot;bar&quot;}</code> -&gt; <code>{:host &quot;mirabelle&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code></p>
+<p>If a new event arrives for an already existing key, the old key is overrided.</p>
+<p>You can have multiple calls to <code>index</code> in Mirabelle, and index events based on the fields you want.</p>
+<h2 id="expiration">Expiration</h2>
+<p>In Mirabelle, events have a <code>:time</code> (when the event was generated) and optionally a TTL. The default TTL for events in the index is <code>120</code> (in seconds). You could also add another default TTL using the <code>with</code> stream.</p>
+<p>For example, an event with <code>:time</code> 1 and <code>:ttl</code> 120 would be expired at time 122.</p>
+<p>Expiration is important. First, a lot of streams which work on windows of events will remove expired events automatically. Indeed, if you use for example <a href="/howto/stream/#coalesce-and-project">coalesce</a>, you don&rsquo;t want to keep forever the latest event for a host which does not emit anymore. When the event is expired, it&rsquo;s removed from the action.</p>
+<p>Expiration can also be used to detect services which stopped emitting.</p>
+<p>Indeed, if an event stored in the index is expired, it will be reinjected into the stream with <code>:state &quot;expired&quot;</code>. You could then catch it with something like:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">expired</span>
+  (<span style="color:#a6e22e">error</span>))
+</code></pre></div><p>By forwarding expired events into dedicated actions, you can for example trigger alerts based on that.</p>
+<p>In order to trigger event expiration from events stored into the index, we should use the <code>reaper</code> action. All streams in Riemann are using the events clocks to trigger side effects, and the reaper action will update the index clock if needed, trigger events expiration, and then reinject the events into streams:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">reaper</span> <span style="color:#ae81ff">5</span>)
+(<span style="color:#a6e22e">reaper</span> <span style="color:#ae81ff">5</span> <span style="color:#e6db74">:custom-stream</span>)
+</code></pre></div><p>The <code>reaper</code> action takes as first parameter the interval (in seconds) on which the reaper stream will expire events. Don&rsquo;t forget you should feed the reaper action with events in order to move its clock.</p>
+<p>The <code>custom-stream</code> parameter is optional. By default, events are reinjected into the current stream. You can also pass a stream name to the reaper action in order to reinject events into another stream.</p>
+<p>I recommand you to not call forward all events to the reaper (it will impact performances). Instead, identify a couple of events arriving regularly, and forward them to the reaper in order to update the index clock.</p>
+<h2 id="queries">Queries</h2>
+<p>You can query the events stored into the index. The query should be a valid <a href="/howto/stream/#filtering-events">where clause</a> in base64. For example <code>[:and [:&gt; :metric 10] [:= :service &quot;bar&quot;]]</code> would be <code>WzphbmQgWzo+IDptZXRyaWMgMTBdIFs6PSA6c2VydmljZSAiYmFyIl1d</code>.</p>
+<p>You can send queries using the Mirabelle (or Riemann) TCP clients, or using the <a href="http://localhost:1313/api/#query-the-index">HTTP API</a>.</p>
+<h2 id="pub-sub">Pub Sub</h2>
+<p>Users can subscribe to the index using Websocket, in order to see in real time which events are indexed. Check the <a href="howto/pubsub/">pubsub documentation</a> for more information.</p>
 
 
 
@@ -687,8 +650,6 @@
             
                 
                     
-                        
-                        
                     
                 
                 
@@ -704,6 +665,9 @@
             
             
                 
+                    
+                        
+                        
                     
                 
                 
@@ -785,6 +749,7 @@
             
                 
                     
+                    
                 
                 
 
@@ -792,6 +757,28 @@
                     
                     
 
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
                     
             
         
@@ -812,33 +799,10 @@
             
         
                     
-            
-        
-                    
                         
             
             
                 
-                    
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                        
-                        
                     
                 
                 
@@ -940,10 +904,10 @@
 	 
 	 
 		
-			<a class="nav nav-prev" href="/howto/pubsub/" title="Publish Subscribe"> <i class="fa fa-chevron-left"></i></a>
+			<a class="nav nav-prev" href="/howto/action-io-ref/" title="I/O and actions reference"> <i class="fa fa-chevron-left"></i></a>
 		
 		
-			<a class="nav nav-next" href="/api/" title="HTTP API" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+			<a class="nav nav-next" href="/howto/pubsub/" title="Publish Subscribe" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
 		
 	
     </div>

@@ -42,7 +42,7 @@ New actions which I think could be interesting were added to Mirabelle. Also, no
 
 Mirabelle provides an [HTTP API](/api) which allow you to manage streams dynamically (create, list, get, remove), and to gather information about your system:
 
-- Querying the [Index](/howto/index/) and the current index time
+- Querying the [Index](/howto/stream-index/) and the current index time
 - Pushing events
 - Retrieving Mirabelle metrics which are exposed using the Prometheus format.
 

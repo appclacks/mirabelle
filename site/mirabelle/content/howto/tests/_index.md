@@ -88,7 +88,7 @@ Tests can also take a `:target` configuration, for example:
 
 In this example, events in `:input` will only be injected into the `:foo` stream.
 
-One dedicated [index](/howto/index/) is created for each test.
+One dedicated [index](/howto/stream-index/) is created for each test.
 
 ## Things excluded from tests
 

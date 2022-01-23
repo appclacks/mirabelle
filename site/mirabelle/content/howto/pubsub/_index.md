@@ -4,7 +4,7 @@ weight: 14
 disableToc: false
 ---
 
-The Mirabelle Websocket server allows user to subscribe to the streams [index](/howto/index/) or to channels.
+The Mirabelle Websocket server allows user to subscribe to the streams [index](/howto/stream-index/) or to channels.
 
 ## An example
 

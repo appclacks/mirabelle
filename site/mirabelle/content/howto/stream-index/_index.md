@@ -50,7 +50,7 @@ By forwarding expired events into dedicated actions, you can for example trigger
 In order to trigger event expiration from events stored into the index, we should use the `reaper` action. All streams in Riemann are using the events clocks to trigger side effects, and the reaper action will update the index clock if needed, trigger events expiration, and then reinject the events into streams:
 
 ```clojure
-(reaper)
+(reaper 5)
 (reaper 5 :custom-stream)
 ```
 

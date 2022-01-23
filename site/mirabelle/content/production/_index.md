@@ -35,7 +35,7 @@ The event will be routed to the stream named `bar`. Other streams (defined in th
 
 Remember, in Mirabelle, each stream has its own "clock" based on the time of the events it receives.
 
-Also, all streams created using the API will have a dedicated [index](/howto/index/). The streams from the configuration share the same index instance.
+Also, all streams created using the API will have a dedicated [index](/howto/stream-index/). The streams from the configuration share the same index instance.
 
 Mirabelle is also able to [move events between streams](/howto/stream/#move-events-between-streams).
 
