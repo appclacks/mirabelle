@@ -132,7 +132,7 @@
   When s is empty, returns an empty list."
   [s points]
   (map (fn [pname event]
-         (assoc event :quantile pname))
+         (assoc event :quantile (str pname)))
        points
        (sorted-sample-extract s points)))
 
