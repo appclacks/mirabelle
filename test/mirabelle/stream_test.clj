@@ -606,6 +606,8 @@
                           (a/decrement)
                           (a/include include-path {:variables {:service "toto"}
                                                    :profile :prod})
+                          (a/smax)
+                          (a/smin)
                           (a/stable 5 :state)
                           (a/project [[:= :host "foo"]
                                       [:= :service "bar"]])
@@ -713,3 +715,40 @@
             {:time 50, :metric 0}
             {:time 60 :metric 0}]
            @recorder))))
+
+(deftest smax-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/smax (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:time 0 :metric 10})
+    (entrypoint {:time 7 :metric 1})
+    (entrypoint {:time 11 :metric 20})
+    (entrypoint {:time 14 :metric 12})
+    (is (= [{:time 0 :metric 10}
+            {:time 0 :metric 10}
+            {:time 11 :metric 20}
+            {:time 11 :metric 20}]
+           @recorder))))
+
+(deftest smin-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/smin (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:time 0 :metric 10})
+    (entrypoint {:time 7 :metric 1})
+    (entrypoint {:time 11 :metric 20})
+    (entrypoint {:time 14 :metric 12})
+    (entrypoint {:time 12 :metric -1})
+    (entrypoint {:time 20 :metric 2})
+    (is (= [{:time 0 :metric 10}
+            {:time 7 :metric 1}
+            {:time 7 :metric 1}
+            {:time 7 :metric 1}
+            {:time 12 :metric -1}
+            {:time 12 :metric -1}]
+           @recorder))))
+

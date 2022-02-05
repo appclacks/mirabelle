@@ -2483,16 +2483,75 @@
 
   If it receives for example:
 
+  ```clojure
   [{:time 1 :metric 10} {:time 9 :metric 20} {:time 20 :metric 30}}
+  ```
 
   It will produces (30-10 = 20):
 
+  ```clojure
   {:time 20 :metric 20}
+  ```
 
   Events produced with a negative metric (which can happen if the counter is resetted) are not send."
   [& children]
   {:action :coll-increase
-   :description {:message "Takes a list of events and computes their rates"}
+   :description {:message "Takes a list of events and computes the increase of the :metric field"}
+   :children children})
+
+(defn scondition*
+  [_ {:keys [condition]} & children]
+  (let [result (atom {})]
+    (fn [event]
+      (if (condition event @result)
+        (do (reset! result event)
+            (call-rescue event children))
+        (call-rescue @result children)))))
+
+(defn smax
+  "Send downstream the event with the biggest :metric every time it receives an event
+
+  ```clojure
+  (smap
+    (info))
+  ```
+
+  If the events `{:time 1 :metric 10} {:time 2 :metric 3} {:time 3 :metric 11}`
+  are injected, `info` will receive:
+
+  ```
+  {:time 1 :metric 10} {:time 1 :metric 10} {:time 3 :metric 11}
+  ```
+  "
+  [& children]
+  {:action :smax
+   :description {:message "Send downstream the event with the biggest :metric every time it receives an event"}
+   :params [{:condition (fn [event result]
+                          (or (not (:metric result))
+                              (> (:metric event) (:metric result))))}]
+   :children children})
+
+(defn smin
+  "Send downstream the event with the lowest :metric every time it receives an event
+
+  ```clojure
+  (smin
+    (info))
+  ```
+
+  If the events `{:time 1 :metric 10} {:time 2 :metric 3} {:time 3 :metric 11}`
+  are injected, `info` will receive:
+
+  ```clojure
+  {:time 1 :metric 10} {:time 2 :metric 3} {:time 3 :metric 11}
+  ```
+  "
+  [& children]
+  {:action :smin
+   :description {:message "Send downstream the event with the lowest :metric every time it receives an event"}
+   :params [{:condition (fn [event result]
+                          (or (not (:metric result))
+                              (< (:metric event) (:metric result))))}]
    :children children})
 
 (def action->fn
@@ -2552,6 +2611,8 @@
    :sdo sdo*
    :sflatten sflatten*
    :sformat sformat*
+   :smax scondition*
+   :smin scondition*
    :split split*
    :ssort ssort*
    :stable stable*
