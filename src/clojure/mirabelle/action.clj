@@ -2450,6 +2450,51 @@
    :params [config]
    :children children})
 
+(defn coll-increase*
+  [_ & children]
+  (fn [[event & events]]
+    (when (and event events)
+      (let [{:keys [most-recent-event oldest-event]}
+            (reduce
+             (fn [{:keys [most-recent-event oldest-event] :as state} event]
+               (cond
+
+                 (< (:time event) (:time oldest-event))
+                 (assoc state :oldest-event event)
+
+                 (> (:time event) (:time most-recent-event))
+                 (assoc state :most-recent-event event)
+
+                 :else
+                 state))
+             {:most-recent-event event
+              :oldest-event event}
+             events)
+            new-metric (- (:metric most-recent-event)
+                          (:metric oldest-event))]
+        ;; check if the counter was resetted
+        (when (> new-metric 0)
+          (call-rescue (assoc most-recent-event :metric new-metric) children))))))
+
+(defn coll-increase
+  "Receives a list of events which should represent an always-increasing counter
+  and returns the latest event with its :metric field set to the value of the
+  increase between the oldest and the latest event.
+
+  If it receives for example:
+
+  [{:time 1 :metric 10} {:time 9 :metric 20} {:time 20 :metric 30}}
+
+  It will produces (30-10 = 20):
+
+  {:time 20 :metric 20}
+
+  Events produced with a negative metric (which can happen if the counter is resetted) are not send."
+  [& children]
+  {:action :coll-increase
+   :description {:message "Takes a list of events and computes their rates"}
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :aggr-sum aggregation*
@@ -2460,6 +2505,7 @@
    :coalesce coalesce*
    :coll-bottom coll-bottom*
    :coll-count coll-count*
+   :coll-increase coll-increase*
    :coll-max coll-max*
    :coll-mean coll-mean*
    :coll-min coll-min*

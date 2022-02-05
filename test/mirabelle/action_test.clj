@@ -1224,3 +1224,21 @@
                    {:time 9}
                    {:time 10}
                    {:time 13}])))
+
+(deftest coll-increase*
+  (let [[rec state] (recorder)]
+    (test-actions (a/coll-increase* nil rec)
+                  state
+                  [[{:time 1 :metric 10}
+                    {:time 2 :metric 20}
+                    {:time 11 :metric 50}]
+                   [{:time 14 :metric 60}
+                    {:time 28 :metric 90}]]
+                  [{:time 11 :metric 40}
+                   {:time 28 :metric 30}]))
+  (let [[rec state] (recorder)]
+    (test-actions (a/coll-increase* nil rec)
+                  state
+                  [[{:time 1 :metric 10}
+                    {:time 2 :metric 20}
+                    {:time 11 :metric 1}]][])))
