@@ -1,25 +1,41 @@
 (ns mirabelle.handler
-  (:require [clojure.edn :as edn]
+  (:require [byte-streams :as bs]
+            [clojure.edn :as edn]
+            [com.stuartsierra.component :as component]
             [corbihttp.metric :as metric]
             [exoscale.ex :as ex]
             [mirabelle.b64 :as b64]
             [mirabelle.index :as index]
-            [mirabelle.stream :as stream]))
+            [mirabelle.prometheus :as prometheus]
+            [mirabelle.stream :as stream])
+  (:import io.micrometer.core.instrument.Counter
+           io.micrometer.prometheus.PrometheusMeterRegistry
+           org.xerial.snappy.Snappy
+           prometheus.Remote$WriteRequest))
 
 (defprotocol IHandler
   (healthz [this params] "Healthz handler")
-  (add-stream [this params] "add a new stream")
+  (add-stream [this params] "Add a new stream")
   (get-stream [this params] "Get a stream")
-  (remove-stream [this params] "remove a stream")
-  (search-index [this params] "query the index")
-  (list-streams [this params] "list streams")
+  (remove-stream [this params] "Remove a stream")
+  (search-index [this params] "Query the index")
+  (list-streams [this params] "List streams")
   (push-event [this params] "Push an event to a stream")
-  (current-time [this params] "get the current time of the real time engine.")
+  (current-time [this params] "Get the current time of a given stream's index.")
+  (prom-remote-write [this params] "Prometheus remote write endpoint")
   (not-found [this params] "Not found handler")
   (metrics [this params] "Return the metrics"))
 
 (defrecord Handler [stream-handler
-                    registry]
+                    ^PrometheusMeterRegistry registry
+                    ^Counter prom-counter]
+  component/Lifecycle
+  (start [this]
+    (assoc this :prom-counter (metric/get-counter! registry
+                                                   :prometheus-remote-write
+                                                   {})))
+  (stop [this]
+    (assoc this :prom-counter nil))
   IHandler
   (healthz [_ _]
     {:status 200
@@ -64,6 +80,18 @@
   (list-streams [_ _]
     {:status 200
      :body {:streams (stream/list-streams stream-handler)}})
+  (prom-remote-write [_ request]
+    (let [^java.io.InputStream body (:body request)
+          ^"[B" body-bytes (bs/to-byte-array body)
+          ^"[B" uncompressed-body (Snappy/uncompress body-bytes)
+          ^Remote$WriteRequest write-request (Remote$WriteRequest/parseFrom
+                                              uncompressed-body)
+          events-series (prometheus/write-request->events write-request)]
+      (.increment ^Counter prom-counter (.getTimeseriesCount write-request))
+      (doseq [serie events-series]
+        (doseq [event serie]
+          (stream/push! stream-handler event :default)))
+      {:status 200}))
   (current-time [_ {:keys [all-params]}]
     {:status 200
      :body {:current-time (-> (stream/get-stream stream-handler
@@ -95,6 +123,7 @@
                                   :spec :mirabelle.http.stream/get}
                             :delete {:handler remove-stream
                                      :spec :mirabelle.http.stream/remove}}]
+   ["/api/v1/prometheus/remote-write" {:post {:handler prom-remote-write}}]
    ["/metrics" {:get {:handler metrics}}]
    ["/healthz" {:get {:handler healthz}}]
    ["/health" {:get {:handler healthz}}]])
