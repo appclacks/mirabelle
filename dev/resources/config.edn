@@ -1,3 +1,4 @@
+;; for tests
 {:tcp {:host "0.0.0.0"
        :port 5555}
  :http {:host "0.0.0.0"
@@ -14,3 +15,19 @@
  :logging {:level "info"
            :console {:encoder :json}}
  :test {:directories ["dev/resources/tests"]}}
+
+;; local env
+;; {:tcp {:host "0.0.0.0"
+;;        :port 5555
+;;        :native? true}
+;;  :http {:host "0.0.0.0"
+;;         :port 5558}
+;;  :websocket {:host "0.0.0.0"
+;;              :port 5556}
+;;  :stream {:directories ["/etc/mirabelle/streams"]
+;;           :actions {}}
+;;  :io {:directories ["/etc/mirabelle/io"]
+;;       :custom {}}
+;;  :test {:directories ["/etc/mirabelle/tests"]}
+;;  :logging {:level "info"
+;;            :console {:encoder :json}}}

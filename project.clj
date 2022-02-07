@@ -5,6 +5,8 @@
             :url "https://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[clj-http "3.12.3"]
                  [com.boundary/high-scale-lib "1.0.6"]
+                 [com.google.protobuf/protobuf-java "3.19.1"]
+                 [com.google.protobuf/protobuf-java-util "3.19.1"]
                  [com.influxdb/influxdb-client-java "3.4.0"]
                  [http-kit "2.5.3"]
                  [io.netty/netty-all "4.1.58.Final"]
@@ -14,15 +16,17 @@
                  [io.netty/netty-common "4.1.58.Final"]
                  [io.netty/netty-transport "4.1.58.Final"]
                  [io.netty/netty-resolver "4.1.58.Final"]
-                 [fr.mcorbin/corbihttp "0.25.0"]
+                 [fr.mcorbin/corbihttp "0.27.0"]
                  [org.clojure/clojure "1.10.3"]
                  [org.clojure/spec.alpha "0.2.194"]
                  [org.elasticsearch.client/elasticsearch-rest-client "7.14.1"]
-                 [riemann-clojure-client "0.5.1"]]
+                 [org.xerial.snappy/snappy-java "1.1.8.4"]
+                 [riemann-clojure-client "0.5.3"]]
   :main ^:skip-aot mirabelle.core
   :global-vars {*warn-on-reflection* true}
   :target-path "target/%s"
   :source-paths ["src/clojure"]
+  :java-source-paths ["src/java"]
   :plugins [[lein-codox "0.10.8"]]
   :codox {:source-uri "https://github.com/mcorbin/mirabelle/blob/{version}/{filepath}#L{line}"
           :output-path "site/mirabelle/static/generated-doc"
@@ -31,7 +35,6 @@
                                   [org.clojure/tools.namespace "1.1.0"]
                                   [org.clojure/data.fressian "1.0.0"]
                                   [com.clojure-goes-fast/clj-memory-meter "0.1.3"]]
-                   :source-paths ["dev"]
                    :plugins [[lein-ancient "0.6.15"]
                              [lein-environ "1.1.0"]]
                    :resource-paths ["resources" "test/resources" "gen-resources"]
