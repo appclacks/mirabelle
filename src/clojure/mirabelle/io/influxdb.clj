@@ -47,24 +47,23 @@
     (double n)
     n))
 
+(def default-tags #{:host :service})
+
 (defn event->point
   "Converts an event to an InfluxDB Point."
   [config event]
   (let [tags (select-keys event
-                          (apply conj
-                                 (:tags config)
-                                 (:influxdb/tags event)))
-        fields (select-keys event
-                            (apply conj
-                                   (:fields config)
-                                   (:influxdb/fields event)))
-        measurement (get event (or (:influxdb/measurement event)
-                                   (:measurement config)))
+                          (:influxdb/tags event
+                                          default-tags))
+        fields (select-keys event (:influxdb/fields event))
+        measurement (:service event)
         point (Point/measurement measurement)]
     (doseq [[k v] tags]
       (.addTag point (name k) v))
     (doseq [[k v] fields]
-      (.addField point (name k) (converts-double v)))
+      (.addField point
+                 ^String (name k)
+                 (converts-double v)))
     (.time point
            ^Long (long (* 1000000 (:time event)))
            WritePrecision/US)
@@ -76,9 +75,6 @@
 (s/def ::username ::spec/ne-string)
 (s/def ::password ::spec/secret)
 (s/def ::token ::spec/secret)
-(s/def ::tags (s/coll-of keyword?))
-(s/def ::fields (s/coll-of keyword?))
-(s/def ::measurement keyword?)
 (s/def ::default-tags (s/map-of ::spec/keyword-or-str
                                 ::spec/keyword-or-str))
 
@@ -90,9 +86,6 @@
                                    ::bucket
                                    ::org]
                           :opt-un [::username
-                                   ::tags
-                                   ::measurement
-                                   ::fields
                                    ::password
                                    ::token
                                    ::default-tags]))
