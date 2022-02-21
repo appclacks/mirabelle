@@ -2630,9 +2630,10 @@
 
 (defn gen-doc
   []
-  (spit "/tmp/foo" (->> (assoc action->fn :include nil)
-                        keys
-                        (map name)
-                        sort
-                        (reduce (fn [s v] (str s
-                                               (format "\n- [%s](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-%s)" v v))) ""))))
+  (spit "/tmp/mirabelle-doc"
+        (->> (assoc action->fn :include nil)
+             keys
+             (map name)
+             sort
+             (reduce (fn [s v] (str s
+                                    (format "\n- [%s](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-%s)" v v))) ""))))
