@@ -55,7 +55,7 @@
   (let [tags (select-keys event
                           (:influxdb/tags event
                                           default-tags))
-        fields (select-keys event (:influxdb/fields event))
+        fields (select-keys event (:influxdb/fields event (:fields config)))
         measurement (:service event)
         point (Point/measurement measurement)]
     (doseq [[k v] tags]
@@ -75,6 +75,7 @@
 (s/def ::username ::spec/ne-string)
 (s/def ::password ::spec/secret)
 (s/def ::token ::spec/secret)
+(s/def ::fields (s/coll-of keyword?))
 (s/def ::default-tags (s/map-of ::spec/keyword-or-str
                                 ::spec/keyword-or-str))
 
@@ -87,6 +88,7 @@
                                    ::org]
                           :opt-un [::username
                                    ::password
+                                   ::fields
                                    ::token
                                    ::default-tags]))
 
