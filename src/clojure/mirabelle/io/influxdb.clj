@@ -80,8 +80,7 @@
                                 ::spec/keyword-or-str))
 
 (def default-config
-  {:tags []
-   :fields []})
+  {:fields []})
 
 (s/def ::influxdb (s/keys :req-un [::connection-string
                                    ::bucket

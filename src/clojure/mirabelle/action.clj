@@ -2554,6 +2554,30 @@
                               (< (:metric event) (:metric result))))}]
    :children children})
 
+(defn extract*
+  [_ k & children]
+  (fn [event]
+    (when-let [result (get event k)]
+      (call-rescue result children))))
+
+(s/def ::extract (s/cat :k keyword?))
+
+(defn extract
+  "Takes a key as parameter and send downstream the content of this key.
+
+  ```clojure
+  (extract :base-event
+    (info))
+  ```
+
+  If `extract` receives in this example `{:time 1 :base-event {:time 1 :service \"foo\" :host \"bar\"}`, `info` will receive the content of `:base-time`."
+  [k & children]
+  (mspec/valid-action? ::extract [k])
+  {:action :smin
+   :description {:message (format "Extract the key %s from the event and send its value downstream" k)}
+   :params [k]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :aggr-sum aggregation*
@@ -2584,6 +2608,7 @@
    :ddt-pos ddt*
    :info info*
    :error error*
+   :extract extract*
    :ewma-timeless ewma-timeless*
    :exception-stream exception-stream*
    :expired expired*

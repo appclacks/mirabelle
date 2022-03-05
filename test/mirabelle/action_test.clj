@@ -1242,3 +1242,14 @@
                   [[{:time 1 :metric 10}
                     {:time 2 :metric 20}
                     {:time 11 :metric 1}]][])))
+
+(deftest extract-test
+  (let [[rec state] (recorder)]
+    (test-actions (a/extract* nil :foo rec)
+                  state
+                  [{:foo {:time 1}}
+                   {:foo {:time 2} :bar "a"}
+                   {:foo nil}
+                   {}]
+                  [{:time 1}
+                   {:time 2}])))
