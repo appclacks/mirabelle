@@ -8,7 +8,6 @@
                  [com.google.protobuf/protobuf-java "3.19.4"]
                  [com.google.protobuf/protobuf-java-util "3.19.4"]
                  [com.influxdb/influxdb-client-java "4.3.0"]
-                 [http-kit "2.5.3"]
                  [io.netty/netty-all "4.1.58.Final"]
                  [io.netty/netty-codec "4.1.58.Final"]
                  [io.netty/netty-handler "4.1.58.Final"]

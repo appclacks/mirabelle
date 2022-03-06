@@ -28,9 +28,6 @@
                               ::native?
                               ::event-executor-size]))
 
-(s/def ::websocket (s/keys :req-un [::spec/host
-                                    ::spec/port]))
-
 (s/def ::directories (s/coll-of ::spec/directory-spec))
 
 (s/def ::actions (s/map-of keyword? symbol?))
@@ -43,7 +40,7 @@
 (s/def ::roll-cycle keyword?)
 
 (s/def ::directory ::spec/directory-spec)
-(s/def ::config (s/keys :req-un [::tcp ::websocket ::http/http]
+(s/def ::config (s/keys :req-un [::tcp ::http/http]
                         :opt-un [::stream ::io ::test]))
 
 (defmethod aero/reader 'secret

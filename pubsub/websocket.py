@@ -11,7 +11,7 @@ import time
 
 parser = argparse.ArgumentParser(description='Mirabelle python websocket')
 parser.add_argument('--host', default="localhost", help='Mirabelle host (default `localhost`)')
-parser.add_argument('--port', default=5556, type=int, help='Mirabelle port (default `5556`)')
+parser.add_argument('--port', default=5558, type=int, help='Mirabelle port (default `5558`)')
 parser.add_argument('--query', default="[:always-true]", help='Query (default `[:always-true]`)')
 parser.add_argument('--channel', default="default-index", help='The channel to subscribe (default `default-index`)')
 parser.add_argument('--no-indent', dest='indent', action='store_true', help='indent json')
