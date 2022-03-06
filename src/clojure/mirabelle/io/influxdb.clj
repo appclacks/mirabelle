@@ -47,19 +47,21 @@
     (double n)
     n))
 
-(def default-tags #{:host :service})
+(def keys-to-remove-tags #{:metric :time :tags})
 
 (defn event->point
   "Converts an event to an InfluxDB Point."
   [config event]
-  (let [tags (select-keys event
-                          (:influxdb/tags event
-                                          default-tags))
-        fields (select-keys event (:influxdb/fields event (:fields config)))
+  (let [fields (select-keys event (:influxdb/fields event (:fields config)))
         measurement (:service event)
         point (Point/measurement measurement)]
-    (doseq [[k v] tags]
-      (.addTag point (name k) v))
+    (if-let [tags (:influxdb/tags event)]
+      (doseq [k tags]
+        (.addTag point (name k) (get event k)))
+      (doseq [[k v] event]
+        (when (and (not (contains? fields k))
+                   (not (keys-to-remove-tags k)))
+          (.addTag point (name k) v))))
     (doseq [[k v] fields]
       (.addField point
                  ^String (name k)
