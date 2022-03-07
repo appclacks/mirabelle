@@ -2,9 +2,7 @@
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (ns mirabelle.transport.websocket
   (:require [cheshire.core :as json]
-            [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
-            [corbihttp.metric :as metric]
             [clj-http.util :as clj-http]
             [clojure.edn :as edn]
             [clojure.string :as string]
@@ -13,8 +11,9 @@
             [mirabelle.index :as index]
             [mirabelle.pubsub :as pubsub]
             [mirabelle.b64 :as b64]
-            [org.httpkit.server :as http]
-            [reitit.core :as r]))
+            [reitit.core :as r]
+            [ring.adapter.jetty9.websocket :as websocket])
+  (:import org.eclipse.jetty.websocket.api.WebSocketAdapter))
 
 (defn http-query-map
   "Converts a URL query string into a map."
@@ -42,92 +41,71 @@
           edn/read-string
           condition/compile-conditions)
       (catch Exception e
-        (ex/ex-incorrect! (format "Invalid websocket query %s" query)
+        (ex/ex-incorrect! (format "Invalid websocket query %s (base64)" query)
                           (ex-data e)
                           e)))))
-
-(defn ws-handler
-  [pubsub actions ch pred channel]
-  (if-not (http/websocket? ch)
-    (log/info {} "Ignoring non-websocket request to websocket server.")
-    (let [handler (fn emit [event]
-                    (when (pred event)
-                      (http/send! ch (json/generate-string event))))
-          sub-id (pubsub/add pubsub channel handler)]
-      (log/info {} (format "New websocket subscription %s %s" channel sub-id))
-
-      ;; When the channel closes, unsubscribe.
-      (swap! actions conj
-             (fn []
-               (log/info {} (format "Closing websocket subscription %s %s"
-                                    channel sub-id))
-               (pubsub/rm pubsub channel sub-id)))
-
-      ; Close channel on nil msg
-      (http/on-receive ch (fn [data] (when-not data (http/close ch)))))))
 
 (def router
   (r/router
    [["/index" :ws/index]
     ["/channel/:channel" :ws/channel]]))
 
-(defn handler
-  [pubsub registry]
-  (let [nb-conn (atom 0)]
-    (metric/gauge! registry
-                   :websocket.connection.count
-                   {}
-                   (fn [] @nb-conn))
-    (fn handle [request]
-      (http/with-channel request ch
-        (when (http/websocket? ch)
-          (try
-            (let [actions (atom [])
-                  uri (:uri request)
-                  route-match (r/match-by-path router uri)
-                  handler (or (-> route-match :data :name)
-                              :ws/not-found)
-                  query-params (-> (:query-string request)
-                                   http-query-map)
-                  pred (request->pred query-params)]
-              (if (= :ws/not-found handler)
-                (do
-                  (log/info {} "Unknown URI " (:uri request) ", closing")
-                  (http/close ch))
-                (do
-                  (swap! nb-conn inc)
-                  (http/on-close ch
-                                 (fn [_]
-                                   (swap! nb-conn dec)
-                                   (doseq [action @actions]
-                                     (action))))
-                  (condp = handler
-                    :ws/index (ws-handler pubsub
-                                          actions
-                                          ch
-                                          pred
-                                          (index/channel (get query-params
-                                                              "stream"
-                                                              :default)))
-                    :ws/channel (ws-handler pubsub
-                                            actions
-                                            ch
-                                            pred
-                                            (-> route-match :path-params :channel keyword))))))
+(defn ws-handler
+  [ps actions ws pred channel]
+  (let [handler (fn emit [event]
+                  (when (pred event)
+                    (websocket/send! ws (.getBytes (json/generate-string event)))))
+        sub-id (pubsub/add ps channel handler)]
+    (log/info {} (format "New websocket subscription %s %s" channel sub-id))
 
-            (catch Exception e
-              (log/error {} e "Error in the websocket handler")
-              (http/close ch))))))))
+    (swap! actions conj
+           (fn []
+             (log/info {} (format "Closing websocket subscription %s %s"
+                                  channel sub-id))
+             (pubsub/rm ps channel sub-id)))))
 
-(defrecord WebsocketServer [host port server pubsub registry]
-  component/Lifecycle
-  (start [this]
-    (assoc this :server (http/run-server
-                         (handler pubsub registry)
-                         {:ip host :port port})))
-  (stop [_]
-    (when server
-      (try
-        (server)
-        (catch Exception e
-          (log/error {} e))))))
+(defn websocket-handler [pubsub nb-conn]
+  (fn [upgrade-request]
+    (let [provided-subprotocols (:websocket-subprotocols upgrade-request)
+          provided-extensions (:websocket-extensions upgrade-request)
+          actions (atom [])]
+      {:on-connect (fn on-connect [ws]
+                     (let [request (websocket/req-of ws)
+                           uri (:uri request)
+                           route-match (r/match-by-path router uri)
+                           handler (or (-> route-match :data :name)
+                                       :ws/not-found)
+                           query-params (-> (:query-string request)
+                                            http-query-map)
+                           pred (request->pred query-params)]
+                       (if (= :ws/not-found handler)
+                         (do
+                           (log/info {} "Unknown URI " (:uri request) ", closing websocket connection")
+                           (websocket/close! ws))
+                         (do
+                           (swap! nb-conn inc)
+                           (condp = handler
+                             :ws/index (ws-handler pubsub
+                                                   actions
+                                                   ws
+                                                   pred
+                                                   (index/channel (get query-params
+                                                                       "stream"
+                                                                       :default)))
+                             :ws/channel (ws-handler pubsub
+                                                     actions
+                                                     ws
+                                                     pred
+                                                     (-> route-match :path-params :channel keyword)))))))
+       :on-close (fn on-close [_ status-code reason]
+                   (log/info {} (format "Closing Websocket connection status=%d reason=%s" status-code reason))
+                   (swap! nb-conn dec)
+                   (doseq [action @actions]
+                     (action)))
+       :on-error (fn on-error [ws e]
+                   (log/error {} e "Error in the websocket handler")
+                   (websocket/close! ws))
+       :on-ping (fn on-ping [^WebSocketAdapter ws payload]
+                  (-> ws .getRemote (.sendPong payload)))
+       :subprotocol (first provided-subprotocols)
+       :extentions provided-extensions})))

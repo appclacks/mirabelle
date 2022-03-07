@@ -104,7 +104,7 @@
       ; Record time from parse to write completion
       (addListener
         (reify ChannelFutureListener
-          (operationComplete [this fut]
+          (operationComplete [_ _]
             (.record tcp-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS)))))))
 
 (defn ssl-handler

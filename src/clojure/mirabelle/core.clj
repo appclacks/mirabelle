@@ -14,7 +14,6 @@
             [mirabelle.transport :as transport]
             [mirabelle.pubsub :as pubsub]
             [mirabelle.transport.tcp :as tcp]
-            [mirabelle.transport.websocket :as websocket]
             [mirabelle.stream :as stream]
             [signal.handler :refer [with-handler]]
             [unilog.config :refer [start-logging!]])
@@ -24,7 +23,7 @@
   nil)
 
 (defn build-system
-  [{:keys [tcp stream http io websocket]}]
+  [{:keys [tcp stream http io]}]
   (let [registry (metric/registry-component {})
         index (component/start (index/map->Index {}))
         pubsub (component/start (pubsub/map->PubSub {}))]
@@ -32,12 +31,10 @@
      :registry registry
      :index index
      :pubsub pubsub
-     :websocket (-> (websocket/map->WebsocketServer websocket)
-                    (component/using [:pubsub :registry]))
      :http (-> (corbihttp/map->Server {:config http
                                        :registry registry
                                        :chain-builder http/interceptor-chain})
-               (component/using [:api-handler]))
+               (component/using [:api-handler :pubsub]))
      :stream-handler (stream/map->StreamHandler
                       {:streams-directories (:directories stream)
                        :io-directories (:directories io)

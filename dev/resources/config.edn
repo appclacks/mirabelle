@@ -5,8 +5,6 @@
         :port 5558
         :basic-auth {:username "foo"
                      :password #secret "my-password"}}
- :websocket {:host "0.0.0.0"
-             :port 5556}
  :queue {:directory "dev/queue"}
  :stream {:directories ["dev/resources/streams"]
           :actions {:custom mirabelle.action/where*}}

@@ -82,7 +82,7 @@
 (defn http-config-callback
   [{:keys [cacert cert thread-count basic-auth] :as config}]
   (reify RestClientBuilder$HttpClientConfigCallback
-    (^HttpAsyncClientBuilder customizeHttpClient [this ^HttpAsyncClientBuilder builder]
+    (^HttpAsyncClientBuilder customizeHttpClient [_ ^HttpAsyncClientBuilder builder]
      (when thread-count
        (let [reactor-builder (IOReactorConfig/custom)]
          (.setIoThreadCount reactor-builder thread-count)
