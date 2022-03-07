@@ -2299,6 +2299,12 @@
 (s/def ::aggr-sum (s/cat :config (s/keys :req-un [::duration])))
 
 (defn aggr-sum
+  "Sum the events field from the last dt seconds.
+
+  ```clojure
+  (aggr-sum {:duration 10}
+    (info))
+  ```"
   [config & children]
   (mspec/valid-action? ::aggr-sum [config])
   {:action :aggr-sum
