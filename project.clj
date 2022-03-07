@@ -15,7 +15,7 @@
                  [io.netty/netty-common "4.1.58.Final"]
                  [io.netty/netty-transport "4.1.58.Final"]
                  [io.netty/netty-resolver "4.1.58.Final"]
-                 [fr.mcorbin/corbihttp "0.28.0"]
+                 [fr.mcorbin/corbihttp "0.29.0"]
                  [org.clojure/clojure "1.10.3"]
                  [org.clojure/spec.alpha "0.3.218"]
                  [org.elasticsearch.client/elasticsearch-rest-client "7.14.1"]
