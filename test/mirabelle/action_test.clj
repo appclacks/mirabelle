@@ -543,28 +543,51 @@
                    {:metric 1 :time 18 :state "ok"}])))
 
 (deftest fixed-time-window*-test
-  (let [[rec state] (recorder)]
-    (test-actions (a/aggregation* nil
-                                  {:duration 5 :aggr-fn :fixed-time-window}
-                                  rec)
-                  state
-                  [{:metric 1 :time 0 :state "ok"}
-                   {:metric 1 :time 1 :state "ok"}
-                   {:metric 1 :time 3 :state "ok"}
-                   {:metric 1 :time 5 :state "ok"}
-                   {:metric 1 :time 7 :state "ok"}
-                   {:metric 1 :time 9 :state "ok"}
-                   {:metric 1 :time 10 :state "ok"}
-                   {:metric 1 :time 29 :state "ok"}
-                   {:metric 1 :time 31 :state "ok"}]
-                  [[{:metric 1 :time 0 :state "ok"}
-                    {:metric 1 :time 1 :state "ok"}
-                    {:metric 1 :time 3 :state "ok"}]
-                   [{:metric 1 :time 5 :state "ok"}
-                    {:metric 1 :time 7 :state "ok"}
-                    {:metric 1 :time 9 :state "ok"}]
-                   [{:metric 1 :time 10 :state "ok"}]
-                   [{:metric 1 :time 29 :state "ok"}]])))
+  (testing "no delay"
+    (let [[rec state] (recorder)]
+      (test-actions (a/aggregation* nil
+                                    {:duration 5 :aggr-fn :fixed-time-window}
+                                    rec)
+                    state
+                    [{:metric 1 :time 0 :state "ok"}
+                     {:metric 1 :time 1 :state "ok"}
+                     {:metric 1 :time 3 :state "ok"}
+                     {:metric 1 :time 5 :state "ok"}
+                     {:metric 1 :time 7 :state "ok"}
+                     {:metric 1 :time 9 :state "ok"}
+                     {:metric 1 :time 10 :state "ok"}
+                     {:metric 1 :time 29 :state "ok"}
+                     {:metric 1 :time 31 :state "ok"}]
+                    [[{:metric 1 :time 0 :state "ok"}
+                      {:metric 1 :time 1 :state "ok"}
+                      {:metric 1 :time 3 :state "ok"}]
+                     [{:metric 1 :time 5 :state "ok"}
+                      {:metric 1 :time 7 :state "ok"}
+                      {:metric 1 :time 9 :state "ok"}]
+                     [{:metric 1 :time 10 :state "ok"}]
+                     [{:metric 1 :time 29 :state "ok"}]])))
+  (testing "a lot of delay"
+    (let [[rec state] (recorder)]
+      (test-actions (a/aggregation* nil
+                                    {:duration 5
+                                     :aggr-fn :fixed-time-window
+                                     :delay 30}
+                                    rec)
+                    state
+                    [{:metric -10 :time -10}
+                     {:metric 1 :time 0}
+                     {:metric 20 :time 3}
+                     {:metric -9 :time -9}
+                     {:metric 12 :time 20}
+                     {:metric 24 :time 2}
+                     {:metric 2 :time 34}
+                     {:metric 1 :time 36}
+                     ]
+                    [[{:metric -10 :time -10}
+                      {:metric -9 :time -9}]
+                     [{:metric 1 :time 0}
+                      {:metric 20 :time 3}
+                      {:metric 24 :time 2}]]))))
 
 (deftest moving-event-window*-test
   (let [[rec state] (recorder)]
