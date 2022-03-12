@@ -1079,27 +1079,78 @@
                                     :profile :prod})))))
 
 (deftest aggregation*-test
-  (let [[rec state] (recorder)]
-    (test-actions (a/aggregation* nil
-                                  {:duration 10
-                                   :aggr-fn :+
-                                   :init {}}
-                                  rec)
-                  state
-                  [{:time 0 :metric 10}
-                   {:time 7 :metric 1}
-                   {:time 11 :metric 3}
-                   {:time 14 :metric 8}
-                   {:time 19 :metric 1}
-                   {:time 20 :metric 2}
-                   {:time 23 :metric 4}
-                   {:time 60 :metric 1}]
-                  [{:time 10 :metric 11}
-                   {:time 20 :metric 12}
-                   {:time 30, :metric 6}
-                   {:time 40, :metric 0}
-                   {:time 50, :metric 0}
-                   {:time 60 :metric 0}])))
+  (testing "no delay"
+    (let [[rec state] (recorder)]
+      (test-actions (a/aggregation* nil
+                                    {:duration 10
+                                     :aggr-fn :+
+                                     :delay 0}
+                                    rec)
+                    state
+                    [{:time 0 :metric 10}
+                     {:time 7 :metric 1}
+                     {:time 11 :metric 3}
+                     {:time 14 :metric 8}
+                     {:time 19 :metric 1}
+                     {:time 20 :metric 2}
+                     {:time 23 :metric 4}
+                     {:time 60 :metric 1}
+                     {:time 64 :metric 4}
+                     {:time 70 :metric 3}]
+                    [{:time 7 :metric 11}
+                     {:time 19 :metric 12}
+                     {:time 23 :metric 6}
+                     {:time 64 :metric 5}])))
+  (testing "delay"
+    (let [[rec state] (recorder)]
+      (test-actions (a/aggregation* nil
+                                    {:duration 10
+                                     :aggr-fn :+
+                                     :delay 5}
+                                    rec)
+                    state
+                    [{:time 0 :metric 10}
+                     {:time 7 :metric 1}
+                     {:time 11 :metric 3}
+                     ;; delayed events
+                     {:time 8 :metric 2}
+                     {:time 9 :metric 2}
+                     ;; too old
+                     {:time 1 :metric 2}
+                     {:time 14 :metric 8}
+                     {:time 19 :metric 1}
+                     {:time 20 :metric 2}
+                     {:time 23 :metric 4}
+                     {:time 25 :metric 4}]
+                    [{:time 9 :metric 15}
+                     {:time 19 :metric 12}])))
+  (testing "delay negative events"
+    (let [[rec state] (recorder)]
+      (test-actions (a/aggregation* nil
+                                    {:duration 10
+                                     :aggr-fn :+
+                                     :delay 5}
+                                    rec)
+                    state
+                    [{:time 0 :metric 10}
+                     ;; delayed events
+                     {:time -3 :metric 10}
+                     {:time -2 :metric 1}
+                     ;;
+                     {:time 3 :metric 1}
+                     {:time 11 :metric 3}
+                     {:time 8 :metric 2}
+                     {:time 9 :metric 2}
+                     ;; too old
+                     {:time 1 :metric 2}
+                     {:time 14 :metric 8}
+                     {:time 19 :metric 1}
+                     {:time 20 :metric 2}
+                     {:time 23 :metric 4}
+                     {:time 25 :metric 4}]
+                    [{:time -2 :metric 11}
+                     {:time 9 :metric 15}
+                     {:time 19 :metric 12}]))))
 
 (deftest coll-where*-test
   (let [[rec state] (recorder)]

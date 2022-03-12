@@ -18,6 +18,7 @@
   (:import java.util.concurrent.Executor))
 
 (s/def ::size pos-int?)
+(s/def ::delay pos-int?)
 (s/def ::duration pos-int?)
 (s/def ::threshold number?)
 (s/def ::high number?)
@@ -2246,57 +2247,86 @@
                profile (assoc :profile profile)
                (:variables config) (assoc :variables (:variables config))))))))
 
-(def keyword->aggr-f
-  {:+ +})
+(def keyword->aggr-fn
+  {:+ (fn [state event]
+        (if state
+          (if (> (:time event) (:time state))
+            (update event :metric + (:metric state))
+            (update state :metric + (:metric event)))
+          event))})
+
+(defn get-window
+  [event start-time duration]
+  (let [window (/ (- (:time event) start-time) duration)]
+    (if (>= window 0)
+      (int window)
+      (dec (int window)))))
 
 (defn aggregation*
-  [_ {:keys [duration aggr-fn init]} & children]
-  (let [aggr-fn (get keyword->aggr-f, aggr-fn)
+  [_ {:keys [duration] :as config} & children]
+  (let [accepted-delay (:delay config 0)
+        aggr-fn (get keyword->aggr-fn (:aggr-fn config))
         state (atom {:start-time nil
-                     :result init
-                     :windows nil})]
+                     :current-window nil
+                     :current-time nil
+                     :windows {}
+                     :to-send nil})]
     (when-not aggr-fn
       (ex/ex-fault! (format "Invalid aggregation function %s" aggr-fn)
                     {:aggr-fn aggr-fn}))
     (fn stream [event]
       (let [s (swap! state
-                     (fn [{:keys [start-time result] :as state}]
+                     (fn [{:keys [start-time current-window current-time] :as state}]
+
                        (cond
-                         ;; No start time
+                         ;; No start time, initialize everything
                          (nil? start-time)
-                         (assoc state :start-time (:time event)
-                                :result event
-                                :windows nil)
+                         (assoc state
+                                :start-time (:time event)
+                                :current-time (:time event)
+                                :current-window (get-window event (:time event) duration)
+                                :to-send nil
+                                :windows {(get-window event (:time event) duration)
+                                          (aggr-fn nil event)})
 
-                         ;; Too old
-                         (< (:time event) start-time)
-                         (assoc state :windows nil)
-
-                         ;; Within window
-                         (< (:time event) (+ start-time duration))
-                         (-> (update-in state [:result :metric] aggr-fn (:metric event))
-                             (assoc :windows nil))
-
-                         ;; Above window
+                         ;; before current window
+                         (< (get-window event start-time duration)
+                            current-window)
+                         (if (< (:time event)
+                                (- current-time
+                                   accepted-delay))
+                           ;; too old, just drop it
+                           (assoc state :to-send nil)
+                           ;; in toleration
+                           (-> (update-in state
+                                          [:windows (get-window event start-time duration)]
+                                          aggr-fn
+                                          event)
+                               (assoc :to-send nil)))
+                         ;; within or above windows
                          :else
-                         (let [result (assoc result :time (+ start-time duration))
-                               delta (- (:time event) start-time)
-                               dstart (- delta (mod delta duration))
-                               empties (dec (/ dstart duration))
-                               windows (concat [result]
-                                               (mapv #(update (assoc result
-                                                                     :metric 0)
-                                                              :time
-                                                              + (* duration (inc %)))
-                                                     (range empties)))]
-                           (-> (update state :start-time + dstart)
-                               (assoc :result event
-                                      :windows windows))))))]
-        (when-let [windows (:windows s)]
+                         (let [window (get-window event start-time duration)
+                               windows (:windows state)
+                               current-time (max (:current-time state)
+                                                 (:time event))
+                               windows-to-send (->> (keys windows)
+                                                    (filter #(>= (- current-time accepted-delay)
+                                                                 ;; time of the end of the window
+                                                                 (+ start-time (* (inc %) duration)))))]
+                           (-> (update state :windows
+                                       #(apply dissoc % windows-to-send))
+                               (update-in [:windows window]
+                                          aggr-fn
+                                          event)
+                               (assoc :current-window window
+                                      :current-time current-time
+                                      :to-send (vals (select-keys windows windows-to-send))))))))]
+        (when-let [windows (:to-send s)]
           (doseq [w windows]
             (call-rescue w children)))))))
 
-(s/def ::aggr-sum (s/cat :config (s/keys :req-un [::duration])))
+(s/def ::aggr-sum (s/cat :config (s/keys :req-un [::duration]
+                                         :opt-un [::delay])))
 
 (defn aggr-sum
   "Sum the events field from the last dt seconds.
@@ -2304,13 +2334,23 @@
   ```clojure
   (aggr-sum {:duration 10}
     (info))
-  ```"
+  ```
+
+  You can pass a `:delay` key to the configuration in order to tolerate late
+  events. In that case, events from previous windows will be flushed after this
+  delay:
+
+  ```clojure
+  (aggr-sum {:duration 10 :delay 5}
+    (info))
+  ```
+  "
   [config & children]
   (mspec/valid-action? ::aggr-sum [config])
   {:action :aggr-sum
    :description {:message (format "Sum the events field from the last %s seconds"
                                   (:duration config))}
-   :params [(assoc config :init {} :aggr-fn :+)]
+   :params [(assoc config :aggr-fn :+ :delay 0)]
    :children children})
 
 (defn moving-time-window*
