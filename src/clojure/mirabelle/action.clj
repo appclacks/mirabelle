@@ -18,7 +18,7 @@
   (:import java.util.concurrent.Executor))
 
 (s/def ::size pos-int?)
-(s/def ::delay pos-int?)
+(s/def ::delay nat-int?)
 (s/def ::duration pos-int?)
 (s/def ::threshold number?)
 (s/def ::high number?)
@@ -2248,7 +2248,19 @@
                (:variables config) (assoc :variables (:variables config))))))))
 
 (def keyword->aggr-fn
-  {:+ (fn [state event]
+  {:max (fn [state event]
+          (if state
+            (if (> (:metric state) (:metric event))
+              state
+              event)
+            event))
+   :min (fn [state event]
+          (if state
+            (if (< (:metric state) (:metric event))
+              state
+              event)
+            event))
+   :+ (fn [state event]
         (if state
           (if (> (:time event) (:time state))
             (update event :metric + (:metric state))
@@ -2311,7 +2323,7 @@
                                                  (:time event))
                                windows-to-send (->> (keys windows)
                                                     (filter #(>= (- current-time accepted-delay)
-                                                                 ;; time of the end of the window
+                                                                 ;; time of the end of the old window
                                                                  (+ start-time (* (inc %) duration)))))]
                            (-> (update state :windows
                                        #(apply dissoc % windows-to-send))
@@ -2326,6 +2338,12 @@
             (call-rescue w children)))))))
 
 (s/def ::aggr-sum (s/cat :config (s/keys :req-un [::duration]
+                                         :opt-un [::delay])))
+
+(s/def ::aggr-max (s/cat :config (s/keys :req-un [::duration]
+                                         :opt-un [::delay])))
+
+(s/def ::aggr-min (s/cat :config (s/keys :req-un [::duration]
                                          :opt-un [::delay])))
 
 (defn aggr-sum
@@ -2343,14 +2361,61 @@
   ```clojure
   (aggr-sum {:duration 10 :delay 5}
     (info))
-  ```
-  "
+  ```"
   [config & children]
   (mspec/valid-action? ::aggr-sum [config])
   {:action :aggr-sum
    :description {:message (format "Sum the events field from the last %s seconds"
                                   (:duration config))}
-   :params [(assoc config :aggr-fn :+ :delay 0)]
+   :params [(assoc config :aggr-fn :+)]
+   :children children})
+
+(defn aggr-max
+  "Get the max event from the last dt seconds.
+
+  ```clojure
+  (aggr-max {:duration 10}
+    (info))
+  ```
+
+  You can pass a `:delay` key to the configuration in order to tolerate late
+  events. In that case, events from previous windows will be flushed after this
+  delay:
+
+  ```clojure
+  (aggr-max {:duration 10 :delay 5}
+    (info))
+  ```"
+  [config & children]
+  (mspec/valid-action? ::aggr-max [config])
+  {:action :aggr-max
+   :description {:message (format "Get the max event from the last %s seconds"
+                                  (:duration config))}
+   :params [(assoc config :aggr-fn :max)]
+   :children children})
+
+(defn aggr-min
+  "Get the min event from the last dt seconds.
+
+  ```clojure
+  (aggr-min {:duration 10}
+    (info))
+  ```
+
+  You can pass a `:delay` key to the configuration in order to tolerate late
+  events. In that case, events from previous windows will be flushed after this
+  delay:
+
+  ```clojure
+  (aggr-min {:duration 10 :delay 5}
+    (info))
+  ```"
+  [config & children]
+  (mspec/valid-action? ::aggr-max [config])
+  {:action :aggr-min
+   :description {:message (format "Get the min event from the last %s seconds"
+                                  (:duration config))}
+   :params [(assoc config :aggr-fn :min)]
    :children children})
 
 (defn moving-time-window*
@@ -2626,6 +2691,8 @@
 
 (def action->fn
   {:above-dt cond-dt*
+   :aggr-max aggregation*
+   :aggr-min aggregation*
    :aggr-sum aggregation*
    :async-queue! async-queue!*
    :below-dt cond-dt*
