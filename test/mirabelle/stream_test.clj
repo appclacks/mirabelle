@@ -845,6 +845,28 @@
               {:time 35 :metric 10}]
              @recorder)))))
 
+(deftest fixed-time-window-test
+  (testing "delay"
+    (let [recorder (atom [])
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/fixed-time-window {:duration 10 :delay 5}
+                                       (a/test-action recorder))}
+          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+      (entrypoint {:time 0 :metric 10})
+      (entrypoint {:time 7 :metric 1})
+      (entrypoint {:time 19 :metric 1})
+      (entrypoint {:time 14 :metric -10})
+      (entrypoint {:time 20 :metric 2})
+      (entrypoint {:time 23 :metric 4})
+      (entrypoint {:time 60 :metric 1})
+      (entrypoint {:time 76 :metric 1})
+      (is (= [[{:time 0 :metric 10} {:time 7 :metric 1} ]
+              [{:time 19 :metric 1} {:time 14 :metric -10}]
+              [{:time 20 :metric 2} {:time 23 :metric 4}]
+              [{:time 60 :metric 1}]]
+             @recorder)))))
+
 (deftest smax-test
   (let [recorder (atom [])
         stream {:name "my-stream"

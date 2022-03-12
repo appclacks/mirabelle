@@ -544,9 +544,9 @@
 
 (deftest fixed-time-window*-test
   (let [[rec state] (recorder)]
-    (test-actions (a/fixed-time-window* nil
-                                        {:duration 5}
-                                        rec)
+    (test-actions (a/aggregation* nil
+                                  {:duration 5 :aggr-fn :fixed-time-window}
+                                  rec)
                   state
                   [{:metric 1 :time 0 :state "ok"}
                    {:metric 1 :time 1 :state "ok"}
@@ -564,8 +564,6 @@
                     {:metric 1 :time 7 :state "ok"}
                     {:metric 1 :time 9 :state "ok"}]
                    [{:metric 1 :time 10 :state "ok"}]
-                   []
-                   []
                    [{:metric 1 :time 29 :state "ok"}]])))
 
 (deftest moving-event-window*-test

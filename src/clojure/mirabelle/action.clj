@@ -273,7 +273,9 @@
       (debug)))
   ```
 
-  Get the event the biggest metric on windows of 10 events"
+  Get the event the biggest metric on windows of 10 events.
+
+  Check `aggr-max` and `smax` as well."
   [& children]
   {:action :coll-max
    :description {:message "Get the event with the biggest metric"}
@@ -330,7 +332,9 @@
       (debug)))
   ```
 
-  Get the event the smallest metric on windows of 10 events"
+  Get the event the smallest metric on windows of 10 events.
+
+  Check `aggr-min` and `smin` as well."
   [& children]
   {:action :coll-min
    :description {:message "Get the event with the smallest metric"}
@@ -353,7 +357,7 @@
       (debug)))
   ```"
   [field & children]
-    (mspec/valid-action? ::coll-sort [field])
+  (mspec/valid-action? ::coll-sort [field])
   {:action :coll-sort
    :description {:message (format "Sort events based on the field %s" field)}
    :params [field]
@@ -1183,75 +1187,6 @@
   {:action :throttle
    :description {:message (format "Let %d events pass at most every %d seconds"
                                   (:count config)
-                                  (:duration config))}
-   :params [config]
-   :children children})
-
-;; Copyright Riemann authors (riemann.io), thanks to them!
-(defn fixed-time-window*
-  [_ {:keys [duration]} & children]
-  (let [state (atom {:start-time nil
-                     :buffer []
-                     :windows nil})]
-    (fn stream [event]
-      (let [s (swap! state
-                     (fn [{:keys [start-time buffer] :as state}]
-                       (cond
-                         ;; No time
-                         (nil? (:time event))
-                         (-> (update state :buffer conj event)
-                             (assoc :windows nil))
-
-                         ;; No start time
-                         (nil? start-time)
-                         (assoc state :start-time (:time event)
-                                :buffer [event]
-                                :windows nil)
-
-                         ;; Too old
-                         (< (:time event) start-time)
-                         (assoc state :windows nil)
-
-                         ;; Within window
-                         (< (:time event) (+ start-time duration))
-                         (-> (update state :buffer conj event)
-                             (assoc :windows nil))
-
-                         ;; Above window
-                         :else
-                         (let [delta (- (:time event) start-time)
-                               dstart (- delta (mod delta duration))
-                               empties (dec (/ dstart duration))
-                               windows (conj (repeat empties []) buffer)]
-                           (-> (update state :start-time + dstart)
-                               (assoc :buffer [event]
-                                      :windows windows))))))]
-        (when-let [windows (:windows s)]
-          (doseq [w windows]
-            (call-rescue w children)))))))
-
-(s/def ::fixed-time-window (s/cat :config (s/keys :req-un [::duration])))
-
-;; Copyright Riemann authors (riemann.io), thanks to them!
-(defn fixed-time-window
-  "A fixed window over the event stream in time. Emits vectors of events, such
-  that each vector has events from a distinct n-second interval. Windows do
-  *not* overlap; each event appears at most once in the output stream. Once an
-  event is emitted, all events *older or equal* to that emitted event are
-  silently dropped.
-
-  Events without times accrue in the current window.
-
-  ```clojure
-  (fixed-time-window {:duration 60}
-    (coll-max
-      (info)))
-  ```
-  "
-  [config & children]
-  (mspec/valid-action? ::fixed-time-window [config])
-  {:action :fixed-time-window
-   :description {:message (format "Build %d seconds fixed time windows"
                                   (:duration config))}
    :params [config]
    :children children})
@@ -2260,6 +2195,10 @@
               state
               event)
             event))
+   :fixed-time-window (fn [state event]
+                        (if state
+                          (conj state event)
+                          [event]))
    :+ (fn [state event]
         (if state
           (if (> (:time event) (:time state))
@@ -2416,6 +2355,38 @@
    :description {:message (format "Get the min event from the last %s seconds"
                                   (:duration config))}
    :params [(assoc config :aggr-fn :min)]
+   :children children})
+
+(s/def ::fixed-time-window (s/cat :config
+                                  (s/keys :req-un [::duration]
+                                          :opt-un [::delay])))
+
+(defn fixed-time-window
+  "A fixed window over the event stream in time. Emits vectors of events, such
+  that each vector has events from a distinct n-second interval. Windows do
+  *not* overlap; each event appears at most once in the output stream.
+
+  ```clojure
+  (fixed-time-window {:duration 60}
+    (coll-max
+      (info)))
+  ```
+
+  You can pass a `:delay` key to the configuration in order to tolerate late
+  events. In that case, previous windows will be flushed after this
+  delay:
+
+  ```clojure
+  (fixed-time-window {:duration 60 :delay 30}
+    (coll-max
+      (info)))
+  ```"
+  [config & children]
+  (mspec/valid-action? ::fixed-time-window [config])
+  {:action :fixed-time-window
+   :description {:message (format "Build %d seconds fixed time windows"
+                                  (:duration config))}
+   :params [(assoc config :aggr-fn :fixed-time-window)]
    :children children})
 
 (defn moving-time-window*
@@ -2726,7 +2697,7 @@
    :exception-stream exception-stream*
    :expired expired*
    :fixed-event-window fixed-event-window*
-   :fixed-time-window fixed-time-window*
+   :fixed-time-window aggregation*
    :from-base64 from-base64*
    :increment increment*
    :index index*
