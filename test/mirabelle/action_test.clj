@@ -1213,9 +1213,10 @@
 
 (deftest ssort*-test
   (let [[rec state] (recorder)]
-    (test-actions (a/ssort* nil {:duration 5 :field :time} rec)
+    (test-actions (a/aggregation* nil {:duration 5 :field :time :aggr-fn :ssort :delay 10} rec)
                   state
-                  [{:time 3}
+                  [{:time 0}
+                   {:time 3}
                    {:time 2}
                    {:time 4}
                    {:time 1}
@@ -1228,7 +1229,8 @@
                    {:time 51}
                    {:time 49}
                    {:time 100}]
-                  [{:time 1}
+                  [{:time 0}
+                   {:time 1}
                    {:time 2}
                    {:time 3}
                    {:time 4}
@@ -1241,33 +1243,32 @@
                    {:time 49}
                    {:time 51}]))
   (let [[rec state] (recorder)]
-    (test-actions (a/ssort* nil {:duration 5 :field :time} rec)
+    (test-actions (a/aggregation*  nil {:duration 5 :field :time :aggr-fn :ssort :delay 10} rec)
                   state
                   [{:time 1}
                    {:time 2}
                    {:time 4}
-                   {:state "ok"}
                    {:time 4}
                    {:time 7}
                    {:time 30}
                    {:time 24}
-                   {:time 40}]
-                  [{:state "ok"}
-                   {:time 1}
+                   {:time 41}]
+                  [{:time 1}
                    {:time 2}
                    {:time 4}
                    {:time 4}
                    {:time 7}
+                   {:time 24}
                    {:time 30}]))
   (let [[rec state] (recorder)]
-    (test-actions (a/ssort* nil {:duration 10 :field :time} rec)
+    (test-actions (a/aggregation* nil {:duration 10 :field :time :aggr-fn :ssort :delay 20} rec)
                   state
                   [{:time 1}
                    {:time 10}
                    {:time 4}
                    {:time 9}
                    {:time 13}
-                   {:time 31}]
+                   {:time 41}]
                   [{:time 1}
                    {:time 4}
                    {:time 9}

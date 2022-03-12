@@ -2189,6 +2189,10 @@
               state
               event)
             event))
+   :ssort (fn [state event]
+            (if state
+              (conj state event)
+              [event]))
    :min (fn [state event]
           (if state
             (if (< (:metric state) (:metric event))
@@ -2206,6 +2210,14 @@
             (update state :metric + (:metric event)))
           event))})
 
+(def keyword->aggr-finalizer-fn
+  {:ssort (fn [config windows]
+            (sort-by (:field config) (flatten windows)))})
+
+(defn default-aggr-finalizer
+  [_ event]
+  event)
+
 (defn get-window
   [event start-time duration]
   (let [window (/ (- (:time event) start-time) duration)]
@@ -2216,6 +2228,9 @@
 (defn aggregation*
   [_ {:keys [duration] :as config} & children]
   (let [accepted-delay (:delay config 0)
+        finalizer-fn (get keyword->aggr-finalizer-fn
+                          (:aggr-fn config)
+                          default-aggr-finalizer)
         aggr-fn (get keyword->aggr-fn (:aggr-fn config))
         state (atom {:start-time nil
                      :current-window nil
@@ -2228,10 +2243,12 @@
     (fn stream [event]
       (let [s (swap! state
                      (fn [{:keys [start-time current-window current-time] :as state}]
-
                        (cond
                          ;; No start time, initialize everything
                          (nil? start-time)
+                         ;; I'm sure the state can be simplified (eg deduct
+                         ;; start time from current time/window or stuff like that)
+                         ;; but at least this implementation works
                          (assoc state
                                 :start-time (:time event)
                                 :current-time (:time event)
@@ -2273,8 +2290,9 @@
                                       :current-time current-time
                                       :to-send (vals (select-keys windows windows-to-send))))))))]
         (when-let [windows (:to-send s)]
-          (doseq [w windows]
-            (call-rescue w children)))))))
+          (doseq [w (finalizer-fn config windows)]
+            (call-rescue w
+                         children)))))))
 
 (s/def ::aggr-sum (s/cat :config (s/keys :req-un [::duration]
                                          :opt-un [::delay])))
@@ -2434,65 +2452,8 @@
    :params [config]
    :children children})
 
-(defn ssort*
-  [_ {:keys [duration field]} & children]
-  (let [state (atom {:start-time nil
-                     :current-buffer []
-                     :previous-buffer []
-                     :send nil})]
-    (fn stream [event]
-      (when-let [{:keys [send]}
-                 (swap! state
-                        (fn [{:keys [start-time] :as state}]
-                          (cond
-                            ;; no start-time
-                            (nil? start-time)
-                            (assoc state
-                                   :start-time (:time event)
-                                   :current-buffer [event])
-                            ;; in the current buffer
-                            (or (nil? (:time event))
-                                (and (<= start-time
-                                         (:time event))
-                                     (< (:time event)
-                                        (+ start-time duration))))
-                            (-> (update state :current-buffer conj event)
-                                (assoc :send nil))
-
-                            ;; too old
-                            (< (:time event) (- start-time duration))
-                            (assoc state :send nil)
-
-                            ;; in the previous buffer
-                            (and (<= (- start-time duration)
-                                     (:time event))
-                                 (< (:time event)
-                                    start-time))
-                            (-> (update state :previous-buffer conj event)
-                                (assoc :send nil))
-
-                            ;; in the next window
-                            ;; flush previous buffer and move current to previous
-                            (and (>= (:time event) (+ start-time duration))
-                                 (< (:time event) (+ start-time (* 2 duration))))
-                            (assoc state
-                                   :previous-buffer (:current-buffer state)
-                                   :send (:previous-buffer state)
-                                   :current-buffer [event]
-                                   :start-time (+ start-time duration))
-
-                            ;; flush everything
-                            :else
-                            (assoc state
-                                   :send (concat (:current-buffer state)
-                                                 (:previous-buffer state))
-                                   :previous-buffer []
-                                   :current-buffer [event]
-                                   :start-time (:time event)))))]
-        (doseq [event (sort-by field send)]
-          (call-rescue event children))))))
-
-(s/def ::ssort (s/cat :config (s/keys :req-un [::duration ::field])))
+(s/def ::ssort (s/cat :config (s/keys :req-un [::duration ::field]
+                                      :opt-un [::delay])))
 
 (defn ssort
   "Streaming sort.
@@ -2518,18 +2479,24 @@
   ```clojure
   {:time 1} {:time 4} {:time 9} {:time 10} {:time 13}
   ```
-  Events are emitted downstream after twice the duration period.
-  In this example, events received between times `0` and `10` will for
-  example be emitted at time `20`.
 
-  Too old events are dropped."
+  You can add a `:delay` key to the action configuration in order to tolerate
+  late events:
+
+  ```clojure
+  (ssort {:duration 10 :field :time :delay 10}
+    (info))
+  ```
+
+  In this example, events from previous windows will be sent with a delay of
+  10 seconds."
   [config & children]
   (mspec/valid-action? ::ssort [config])
   {:action :ssort
    :description {:message (format "Sort events during %d seconds based on the field %s"
                                   (:duration config)
                                   (:field config))}
-   :params [config]
+   :params [(assoc config :aggr-fn :ssort)]
    :children children})
 
 (defn coll-increase*
@@ -2723,7 +2690,7 @@
    :smax scondition*
    :smin scondition*
    :split split*
-   :ssort ssort*
+   :ssort aggregation*
    :stable stable*
    :tag tag*
    :tagged-all tagged-all*
