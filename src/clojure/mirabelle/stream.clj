@@ -267,7 +267,9 @@
             (stream! s event)
             (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS))))
       (if-let [s (get compiled-streams stream)]
-        (stream! s event)
+        (let [t1 (System/nanoTime)]
+          (stream! s event)
+          (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS))
         (throw (ex/ex-info
                 (format "Stream %s not found" stream)
                 [::not-found [:corbi/user ::ex/not-found]])))))
