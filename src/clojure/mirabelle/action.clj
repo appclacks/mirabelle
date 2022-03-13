@@ -2542,7 +2542,7 @@
   {:time 20 :metric 20}
   ```
 
-  Events produced with a negative metric (which can happen if the counter is resetted) are not send."
+  Events produced with a negative metric (which can happen if the counter is resetted) are not send downstream."
   [& children]
   {:action :coll-increase
    :description {:message "Takes a list of events and computes the increase of the :metric field"}

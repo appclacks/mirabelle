@@ -80,17 +80,18 @@
   (list-streams [_ _]
     {:status 200
      :body {:streams (stream/list-streams stream-handler)}})
-  (prom-remote-write [_ request]
+  (prom-remote-write [_ {:keys [all-params] :as request}]
     (let [^java.io.InputStream body (:body request)
           ^"[B" body-bytes (bs/to-byte-array body)
           ^"[B" uncompressed-body (Snappy/uncompress body-bytes)
           ^Remote$WriteRequest write-request (Remote$WriteRequest/parseFrom
                                               uncompressed-body)
-          events-series (prometheus/write-request->events write-request)]
+          events-series (prometheus/write-request->events write-request)
+          stream-name (:name all-params)]
       (.increment ^Counter prom-counter (.getTimeseriesCount write-request))
       (doseq [serie events-series]
         (doseq [event serie]
-          (stream/push! stream-handler event :default)))
+          (stream/push! stream-handler event stream-name)))
       {:status 200}))
   (current-time [_ {:keys [all-params]}]
     {:status 200
@@ -123,7 +124,8 @@
                                   :spec :mirabelle.http.stream/get}
                             :delete {:handler remove-stream
                                      :spec :mirabelle.http.stream/remove}}]
-   ["/api/v1/prometheus/remote-write" {:post {:handler prom-remote-write}}]
+   ["/api/v1/prometheus/remote-write/:name" {:post {:handler prom-remote-write
+                                                    :spec :mirabelle.http.prometheus/remote-write}}]
    ["/metrics" {:get {:handler metrics}}]
    ["/healthz" {:get {:handler healthz}}]
    ["/health" {:get {:handler healthz}}]])

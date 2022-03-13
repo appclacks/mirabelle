@@ -20,8 +20,6 @@
 ;;        :native? true}
 ;;  :http {:host "0.0.0.0"
 ;;         :port 5558}
-;;  :websocket {:host "0.0.0.0"
-;;              :port 5556}
 ;;  :stream {:directories ["/etc/mirabelle/streams"]
 ;;           :actions {}}
 ;;  :io {:directories ["/etc/mirabelle/io"]
