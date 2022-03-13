@@ -12,20 +12,20 @@
     <title> :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1642939127" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1642939127" rel="stylesheet">
-    <link href="/css/hybrid.css?1642939127" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1642939127" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1642939127" rel="stylesheet">
-    <link href="/css/auto-complete.css?1642939127" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1642939127" rel="stylesheet">
-    <link href="/css/theme.css?1642939127" rel="stylesheet">
-    <link href="/css/tabs.css?1642939127" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1642939127" rel="stylesheet">
+    <link href="/css/nucleus.css?1648502615" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1648502615" rel="stylesheet">
+    <link href="/css/hybrid.css?1648502615" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1648502615" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1648502615" rel="stylesheet">
+    <link href="/css/auto-complete.css?1648502615" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1648502615" rel="stylesheet">
+    <link href="/css/theme.css?1648502615" rel="stylesheet">
+    <link href="/css/tabs.css?1648502615" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1648502615" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1642939127"></script>
+    <script src="/js/jquery-3.3.1.min.js?1648502615"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1642939127"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1642939127"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1648502615"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1648502615"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1642939127"></script>
+<script type="text/javascript" src="/js/search.js?1648502615"></script>
 
     
   </div>
@@ -528,10 +528,11 @@
 <p>Mirabelle can also route events to external systems (timeseries databases, logging systems, cloud monitoring services, etc.), fire alerts (e.g. to Pagerduty), write data into files and more.</p>
 <p>It also implements a publish-subscribe system, which allows you to see in real time (through Websockets) events flowing into streams.</p>
 <p>Mirabelle is currently in alpha, but I&rsquo;m eager to receive feedback.</p>
-<h2 id="mirabelle-uses-the-riemann-protocol">Mirabelle uses the Riemann protocol</h2>
+<h2 id="mirabelle-supports-multiple-inputs-protocols-including-the-riemann-one">Mirabelle supports multiple inputs protocols (including the Riemann one)</h2>
 <p>Mirabelle is heavily inspired by <a href="https://riemann.io/">Riemann</a>. Actually, parts of the Mirabelle codebase (like the TCP server implementation for example) were taken from Riemann (these parts are mentioned in the codebase).</p>
 <p>I would like to thank all Riemann maintainers and contributors for this amazing tool.</p>
 <p>Mirabelle uses the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also contains a lot of new features).</p>
+<p>Mirabelle also provides an HTTP API and natively supports receiving metrics in <a href="https://prometheus.io/docs/operating/integrations/">Prometheus remote write</a> format. See the <a href="/api/#prometheus-remote-write">API documentation</a> for more information.</p>
 <h2 id="streams-clocks-real-time-continuous-queries">Streams clocks, real time, continuous queries</h2>
 <p>In Mirabelle (and unlike Riemann), <strong>all</strong> streams advance based on the time of the events they receive. Because of that, it&rsquo;s super easy to reason about your streams, and to unit test them (the same inputs always produce the same outputs).</p>
 <p>In Mirabelle, events arrive by default in streams defined in the Mirabelle configuration file. As said previously, the Mirabelle clock for a stream will only advance if you send new events.</p>
@@ -553,7 +554,7 @@
     (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>]
       (<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
         (<span style="color:#a6e22e">coll-percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.99</span>]
-          (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:and</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:quantile</span> <span style="color:#ae81ff">0.99</span>]
+          (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:and</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:quantile</span> <span style="color:#e6db74">&#34;0.99&#34;</span>]
                        [<span style="color:#e6db74">:&gt;</span> <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1</span>]]
             (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>
               (<span style="color:#a6e22e">tap</span> <span style="color:#e6db74">:alert</span>)
@@ -572,7 +573,7 @@
                <span style="color:#e6db74">:tap-results</span> {<span style="color:#e6db74">:alert</span> [{<span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
                                       <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1.2</span>
                                       <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">30</span>
-                                      <span style="color:#e6db74">:quantile</span> <span style="color:#ae81ff">0.99</span>
+                                      <span style="color:#e6db74">:quantile</span> <span style="color:#e6db74">&#34;0.99&#34;</span>
                                       <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>}]}}}
 </code></pre></div><p>In this test, we inject into the <code>:percentiles</code> stream three events, and we verify that the tap named <code>:alert</code> contains the expected alert (the <code>0.99</code> quantile is greater than 1) generated for these events.</p>
 <p>Thanks to Clojure datastructures, there is <em>no side effects between streams and actions</em>. It&rsquo;s OK to modify events in parallel (in multiple threads) and to have multiple branches per stream. You can even pass events between streams (like described <a href="todo">here</a>). You are free to organize streams and how they communicate between each other exactly how you want to; the tool and its DSL will not limit you.</p>
@@ -889,19 +890,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1642939127"></script>
-    <script src="/js/perfect-scrollbar.min.js?1642939127"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1642939127"></script>
-    <script src="/js/jquery.sticky.js?1642939127"></script>
-    <script src="/js/featherlight.min.js?1642939127"></script>
-    <script src="/js/highlight.pack.js?1642939127"></script>
+    <script src="/js/clipboard.min.js?1648502615"></script>
+    <script src="/js/perfect-scrollbar.min.js?1648502615"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1648502615"></script>
+    <script src="/js/jquery.sticky.js?1648502615"></script>
+    <script src="/js/featherlight.min.js?1648502615"></script>
+    <script src="/js/highlight.pack.js?1648502615"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1642939127"></script>
-    <script src="/js/learn.js?1642939127"></script>
-    <script src="/js/hugo-learn.js?1642939127"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1648502615"></script>
+    <script src="/js/learn.js?1648502615"></script>
+    <script src="/js/hugo-learn.js?1648502615"></script>
     
         
-            <script src="/mermaid/mermaid.js?1642939127"></script>
+            <script src="/mermaid/mermaid.js?1648502615"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

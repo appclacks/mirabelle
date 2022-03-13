@@ -14,13 +14,15 @@ It also implements a publish-subscribe system, which allows you to see in real t
 
 Mirabelle is currently in alpha, but I'm eager to receive feedback.
 
-## Mirabelle uses the Riemann protocol
+## Mirabelle supports multiple inputs protocols (including the Riemann one)
 
 Mirabelle is heavily inspired by [Riemann](https://riemann.io/). Actually, parts of the Mirabelle codebase (like the TCP server implementation for example) were taken from Riemann (these parts are mentioned in the codebase).
 
 I would like to thank all Riemann maintainers and contributors for this amazing tool.
 
 Mirabelle uses the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also contains a lot of new features).
+
+Mirabelle also provides an HTTP API and natively supports receiving metrics in [Prometheus remote write](https://prometheus.io/docs/operating/integrations/) format. See the [API documentation](/api/#prometheus-remote-write) for more information.
 
 ## Streams clocks, real time, continuous queries
 
@@ -57,7 +59,7 @@ You could write a Mirabelle stream which will compute on the fly the quantiles f
     (where [:= :service "http_request_duration_seconds"]
       (fixed-time-window {:duration 60}
         (coll-percentiles [0.5 0.75 0.99]
-          (where [:and [:= :quantile 0.99]
+          (where [:and [:= :quantile "0.99"]
                        [:> :metric 1]]
             (with :state "critical"
               (tap :alert)
@@ -81,7 +83,7 @@ A test for this stream would be:
                :tap-results {:alert [{:service "http_request_duration_seconds"
                                       :metric 1.2
                                       :time 30
-                                      :quantile 0.99
+                                      :quantile "0.99"
                                       :state "critical"}]}}}
 ```
 

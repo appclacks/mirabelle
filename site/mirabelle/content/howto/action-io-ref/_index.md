@@ -92,7 +92,7 @@ Forward events to [ElasticSearch](https://www.elastic.co/fr/). This I/O forwards
                     ;; The default Elasticsearch index name
                     :default-index "abc"
                     ;; The default index pattern which will be added to the index
-                    ;; name
+                    ;; name. optional
                     :default-index-pattern "yyyy-MM-dd"
                     ;; Timeouts options (optional)
                     :connect-timeout 1000000
@@ -108,6 +108,8 @@ Forward events to [ElasticSearch](https://www.elastic.co/fr/). This I/O forwards
                     :api-key {:id "id"
                               :secret #secret "secret"}}}}
 ```
+
+You can set `:elasticsearch/index` to your event in order to forward an event to a specific index.
 
 ## Actions
 

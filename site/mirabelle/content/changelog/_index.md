@@ -6,6 +6,22 @@ chapter: false
 
 This is the list of user-facing changes for Mirabelle.
 
+## v0.10.0
+
+**Breaking changes**
+
+- The websocket server has been merged with the HTTP server
+- Percentiles stream: returns quantiles as string
+- InfluxDB I/O refactoring
+- `fixed-time-window`: to not send empty windows anymore
+- `ssort`: no delay by default
+
+**New features**
+
+- Prometheus remote write support on the HTTP server
+- New actions: `coll-increase`, `smax`, `smin`, `aggr-max`, `aggr-min`, `extract`
+- Support a `:delay` option on `ssort` and `fixed-time-window` actions
+
 ## v0.9.0
 
 Fix a bug in the `mirabelle graphviz` command.

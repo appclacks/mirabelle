@@ -12,20 +12,20 @@
     <title>Changelog :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1642939127" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1642939127" rel="stylesheet">
-    <link href="/css/hybrid.css?1642939127" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1642939127" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1642939127" rel="stylesheet">
-    <link href="/css/auto-complete.css?1642939127" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1642939127" rel="stylesheet">
-    <link href="/css/theme.css?1642939127" rel="stylesheet">
-    <link href="/css/tabs.css?1642939127" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1642939127" rel="stylesheet">
+    <link href="/css/nucleus.css?1648502615" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1648502615" rel="stylesheet">
+    <link href="/css/hybrid.css?1648502615" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1648502615" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1648502615" rel="stylesheet">
+    <link href="/css/auto-complete.css?1648502615" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1648502615" rel="stylesheet">
+    <link href="/css/theme.css?1648502615" rel="stylesheet">
+    <link href="/css/tabs.css?1648502615" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1648502615" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1642939127"></script>
+    <script src="/js/jquery-3.3.1.min.js?1648502615"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1642939127"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1642939127"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1648502615"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1648502615"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1642939127"></script>
+<script type="text/javascript" src="/js/search.js?1648502615"></script>
 
     
   </div>
@@ -542,6 +542,7 @@
     <div class="wrapper">
 <nav id="TableOfContents">
   <ul>
+    <li><a href="#v0100">v0.10.0</a></li>
     <li><a href="#v090">v0.9.0</a></li>
     <li><a href="#v080">v0.8.0</a></li>
     <li><a href="#v070">v0.7.0</a></li>
@@ -576,6 +577,21 @@
 
 
 	<p>This is the list of user-facing changes for Mirabelle.</p>
+<h2 id="v0100">v0.10.0</h2>
+<p><strong>Breaking changes</strong></p>
+<ul>
+<li>The websocket server has been merged with the HTTP server</li>
+<li>Percentiles stream: returns quantiles as string</li>
+<li>InfluxDB I/O refactoring</li>
+<li><code>fixed-time-window</code>: to not send empty windows anymore</li>
+<li><code>ssort</code>: no delay by default</li>
+</ul>
+<p><strong>New features</strong></p>
+<ul>
+<li>Prometheus remote write support on the HTTP server</li>
+<li>New actions: <code>coll-increase</code>, <code>smax</code>, <code>smin</code>, <code>aggr-max</code>, <code>aggr-min</code>, <code>extract</code></li>
+<li>Support a <code>:delay</code> option on <code>ssort</code> and <code>fixed-time-window</code> actions</li>
+</ul>
 <h2 id="v090">v0.9.0</h2>
 <p>Fix a bug in the <code>mirabelle graphviz</code> command.</p>
 <h2 id="v080">v0.8.0</h2>
@@ -930,19 +946,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1642939127"></script>
-    <script src="/js/perfect-scrollbar.min.js?1642939127"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1642939127"></script>
-    <script src="/js/jquery.sticky.js?1642939127"></script>
-    <script src="/js/featherlight.min.js?1642939127"></script>
-    <script src="/js/highlight.pack.js?1642939127"></script>
+    <script src="/js/clipboard.min.js?1648502615"></script>
+    <script src="/js/perfect-scrollbar.min.js?1648502615"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1648502615"></script>
+    <script src="/js/jquery.sticky.js?1648502615"></script>
+    <script src="/js/featherlight.min.js?1648502615"></script>
+    <script src="/js/highlight.pack.js?1648502615"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1642939127"></script>
-    <script src="/js/learn.js?1642939127"></script>
-    <script src="/js/hugo-learn.js?1642939127"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1648502615"></script>
+    <script src="/js/learn.js?1648502615"></script>
+    <script src="/js/hugo-learn.js?1648502615"></script>
     
         
-            <script src="/mermaid/mermaid.js?1642939127"></script>
+            <script src="/mermaid/mermaid.js?1648502615"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

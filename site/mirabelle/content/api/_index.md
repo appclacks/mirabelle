@@ -102,6 +102,19 @@ curl -H "Content-Type: application/json" -X PUT --data '{"event": {"service": "f
 {"message":"ok"}
 ```
 
+### Prometheus remote write
+
+- **POST** `/api/v1/prometheus/remote-write/<stream-name>`
+
+This endpoint can be used to send to a given Mirabelle stream Prometheus metrics. The Mirabelle endpoint should be configured into the [Prometheus configuration file](https://prometheus.io/docs/prometheus/latest/configuration/configuration/), for example:
+
+```yaml
+remote_write:
+  - url: 'http://localhost:5558/api/v1/prometheus/remote-write/default'
+```
+
+The metric name will be bind in Mirabelle to the event `:service` key, anc each label will be a key as well. The event `:metric` will contain the Prometheus meric value.
+
 ### Query the index
 
 - **GET** `/api/v1/index/<steam-name>/search`
