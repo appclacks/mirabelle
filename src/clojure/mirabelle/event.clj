@@ -45,3 +45,15 @@
 (defn sequential-events
   [event]
   (if (sequential? event) event (list event)))
+
+(defn most-recent-event
+  [e1 e2]
+  (if (> (:time e1) (:time e2))
+    e1
+    e2))
+
+(defn oldest-event
+  [e1 e2]
+  (if (> (:time e1) (:time e2))
+    e2
+    e1))

@@ -2210,6 +2210,111 @@
             (update state :metric + (:metric event)))
           event))})
 
+
+(comment [{10 [{:time 0 :metric 0} {:time 300 :metric 3000}]
+           50 [{:time 0 :metric 0} {:time 300 :metric 3000}]
+           100 [{:time 0 :metric 0} {:time 300 :metric 3000}]
+           200
+           300
+           500
+           1
+           2
+           3
+           5
+           :inf
+           }])
+
+
+
+(def le {"0.1" [{:time 0 :metric 0} {:time 300 :metric 3000}]
+         "0.2" [{:time 0 :metric 0} {:time 300 :metric 4000}]
+         "0.3" [{:time 0 :metric 0} {:time 330 :metric 5000}]
+         "0.7" [{:time 0 :metric 0} {:time 330 :metric 5500}]
+         "1" [{:time 0 :metric 0} {:time 330 :metric 6000}]
+         "+Inf" [{:time 0 :metric 0} {:time 330 :metric 6200}]
+         })
+
+
+
+
+(defn compute-bounds
+  [le-events rank]
+  (reduce (fn [[lower-bound upper-bound] [le event]]
+            (cond
+              ;; a lower bound is found
+              (< (:metric lower-bound) (:metric event) rank)
+              [(assoc event :le (Double. ^String le)) upper-bound]
+              ;; lower-bound found, is it upper bound ?
+              (and (< (:metric lower-bound) rank)
+                   (> (:metric event) rank)
+                   )
+              (reduced [lower-bound (assoc event :le (Double. ^String le))])
+              ;; default
+              :else
+              [lower-bound upper-bound])
+            )
+          [{:metric 0} {:metric Long/MAX_VALUE}]
+          (sort-by key (dissoc le-events "+Inf"))
+            )
+  )
+
+(defn compute-quantile
+  ;; tood: take multiple percentiles
+  [percentile le-events]
+  ;; todo loop instead of first
+  ;; todo incorrect, rate should be performed on the deltao n events for this serie.
+  (let [rates (into {}
+                    (map
+                     (fn [[le [oldest newest]]]
+                       (let [events-count (- (:metric newest) (- (:metric oldest)))
+                             time-diff (- (:time newest) (- (:time oldest)))
+                             rate (/ events-count time-diff)
+                             ]
+                         [le (assoc newest :quantile/count events-count :quantile/rate rate)]))
+                     le-events)
+                    )
+        rank (* percentile (get-in rates ["+Inf" :quantile/count]))
+        [lower-bound upper-bound] (compute-bounds rates rank)
+        result (+ (:le lower-bound)
+                  (* (- (:le upper-bound) (:le lower-bound)))
+                  (/ (:quantile/count lower-bound) (:quantile/count upper-bound))
+                  )
+        ]
+    
+    [rates rank [lower-bound upper-bound] result])
+  )
+
+(defn histogram-quantile-finalizer
+  ;; todo: only 3 params, percentile in config + multiple percentiles
+  [config windows]
+  ;; todo loop instead of first
+  (let [window (first windows)
+        rates (into {}
+                    (map (fn [[k [oldest newest]]]
+                           (let [events-count (- (:metric newest) (- (:metric oldest)))
+                                 time-diff (- (:time newest) (- (:time oldest)))
+                                 rate (/ events-count time-diff)
+                                 ]
+                             [ (assoc newest :quantile/count events-count :quantile/rate rate)]))
+                         []
+                         ))
+        
+        ]
+    )
+  )
+
+
+(defn histogram-quantile-aggr
+  [by-fields state event]
+  (let [k (select-keys by-fields event)]
+    (if-let [[oldest most-recent] (get state k)]
+      (assoc state k [(e/oldest-event oldest event)
+                      (e/most-recent-event most-recent event)])
+      (assoc state k [event event])
+      ))
+
+  )
+
 (def keyword->aggr-finalizer-fn
   {:ssort (fn [config windows]
             (sort-by (:field config) (flatten windows)))})
