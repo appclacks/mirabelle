@@ -2210,32 +2210,21 @@
             (update state :metric + (:metric event)))
           event))})
 
-
-(comment [{10 [{:time 0 :metric 0} {:time 300 :metric 3000}]
-           50 [{:time 0 :metric 0} {:time 300 :metric 3000}]
-           100 [{:time 0 :metric 0} {:time 300 :metric 3000}]
-           200
-           300
-           500
-           1
-           2
-           3
-           5
-           :inf
-           }])
-
-
-
-(def le {"0.1" [{:time 0 :metric 0} {:time 300 :metric 3000}]
-         "0.2" [{:time 0 :metric 0} {:time 300 :metric 4000}]
-         "0.3" [{:time 0 :metric 0} {:time 330 :metric 5000}]
-         "0.7" [{:time 0 :metric 0} {:time 330 :metric 5500}]
-         "1" [{:time 0 :metric 0} {:time 330 :metric 6000}]
-         "+Inf" [{:time 0 :metric 0} {:time 330 :metric 6200}]
+(def le {"0.1" [{:time 0 :metric 100} {:time 300 :metric 3100}]
+         "0.2" [{:time 0 :metric 200} {:time 300 :metric 4200}]
+         "0.3" [{:time 0 :metric 300} {:time 330 :metric 5300}]
+         "0.7" [{:time 0 :metric 400} {:time 330 :metric 6400}]
+         "1" [{:time 0 :metric 500} {:time 330 :metric 7500}]
+         "+Inf" [{:time 0 :metric 600} {:time 330 :metric 8600}]
          })
 
-
-
+(def le2 {"0.1" [{:time 0 :metric 200} {:time 300 :metric 3200}]
+         "0.2" [{:time 0 :metric 300} {:time 300 :metric 4300}]
+         "0.3" [{:time 0 :metric 400} {:time 330 :metric 5400}]
+         "0.7" [{:time 0 :metric 500} {:time 330 :metric 6500}]
+         "1" [{:time 0 :metric 600} {:time 330 :metric 7600}]
+         "+Inf" [{:time 0 :metric 700} {:time 330 :metric 8700}]
+         })
 
 (defn compute-bounds
   [le-events rank]
@@ -2259,25 +2248,27 @@
   )
 
 (defn compute-quantile
-  ;; tood: take multiple percentiles
   [percentile le-events]
   ;; todo loop instead of first
-  ;; todo incorrect, rate should be performed on the deltao n events for this serie.
   (let [rates (into {}
                     (map
                      (fn [[le [oldest newest]]]
-                       (let [events-count (- (:metric newest) (- (:metric oldest)))
-                             time-diff (- (:time newest) (- (:time oldest)))
-                             rate (/ events-count time-diff)
+                       (let [events-count (- (:metric newest) (:metric oldest))
                              ]
-                         [le (assoc newest :quantile/count events-count :quantile/rate rate)]))
+                         [le (assoc newest :metric events-count)]))
                      le-events)
                     )
-        rank (* percentile (get-in rates ["+Inf" :quantile/count]))
+        rank (* percentile (get-in rates ["+Inf" :metric]))
         [lower-bound upper-bound] (compute-bounds rates rank)
-        result (+ (:le lower-bound)
-                  (* (- (:le upper-bound) (:le lower-bound)))
-                  (/ (:quantile/count lower-bound) (:quantile/count upper-bound))
+        bucket-start (:le lower-bound)
+        bucket-end (:le upper-bound)
+        count (- (:metric upper-bound)
+                 (:metric lower-bound))
+        rank (- rank (:metric lower-bound))
+        
+        result (+ bucket-start
+                  (* (- bucket-end bucket-start)
+                     (/ rank count))
                   )
         ]
     
