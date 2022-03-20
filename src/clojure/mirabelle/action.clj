@@ -2226,53 +2226,56 @@
          "+Inf" [{:time 0 :metric 700} {:time 330 :metric 8700}]
          })
 
-(defn compute-bounds
-  [le-events rank]
-  (reduce (fn [[lower-bound upper-bound] [le event]]
-            (cond
-              ;; a lower bound is found
-              (< (:metric lower-bound) (:metric event) rank)
-              [(assoc event :le (Double. ^String le)) upper-bound]
-              ;; lower-bound found, is it upper bound ?
-              (and (< (:metric lower-bound) rank)
-                   (> (:metric event) rank)
-                   )
-              (reduced [lower-bound (assoc event :le (Double. ^String le))])
-              ;; default
-              :else
-              [lower-bound upper-bound])
-            )
-          [{:metric 0} {:metric Long/MAX_VALUE}]
-          (sort-by key (dissoc le-events "+Inf"))
-            )
-  )
+(def max-value-key-str (str Integer/MAX_VALUE))
+(def max-value-key (Float. ^String max-value-key-str))
+
+(defn bound
+  [buckets-sorted rank]
+  (loop [index 0]
+    (let [event (get buckets-sorted index)]
+      (if (>= (:metric event) rank)
+        [index event]
+        (recur (inc index))))))
 
 (defn compute-quantile
-  [percentile le-events]
+  [percentile buckets]
   ;; todo loop instead of first
-  (let [rates (into {}
-                    (map
-                     (fn [[le [oldest newest]]]
-                       (let [events-count (- (:metric newest) (:metric oldest))
-                             ]
-                         [le (assoc newest :metric events-count)]))
-                     le-events)
-                    )
-        rank (* percentile (get-in rates ["+Inf" :metric]))
-        [lower-bound upper-bound] (compute-bounds rates rank)
-        bucket-start (:le lower-bound)
-        bucket-end (:le upper-bound)
-        count (- (:metric upper-bound)
-                 (:metric lower-bound))
-        rank (- rank (:metric lower-bound))
-        
-        result (+ bucket-start
-                  (* (- bucket-end bucket-start)
-                     (/ rank count))
-                  )
+  (let [buckets-sorted (->> (-> (assoc buckets max-value-key-str (get buckets "+Inf"))
+                                (dissoc "+Inf"))
+                            (map
+                             (fn [[le [oldest newest]]]
+                               (let [events-count (- (:metric newest) (:metric oldest))]
+                                 (assoc newest
+                                        :metric events-count
+                                        :le (Float. ^String le)))))
+                            (sort-by :le)
+                            vec)
+        size (count buckets-sorted)
+        rank (* percentile (get-in buckets-sorted [(dec size) :metric]))
+        [b upper-bound] (bound buckets-sorted rank)
         ]
+    (if (= b (dec size))
+      (get-in buckets-sorted [(- size 2) :le])
+      (if (= 0 b)
+        (get-in buckets-sorted [0 :le])
+        (let [lower-bound (get buckets-sorted (dec b))
+              bucket-start (:le lower-bound)
+              bucket-end (:le upper-bound)
+              count (- (:metric upper-bound)
+                       (:metric lower-bound))
+              rank (- rank (:metric lower-bound))
+              
+              result (+ bucket-start
+                        (* (- bucket-end bucket-start)
+                           (/ rank count))
+                  )
+              ]
+          result
+          )
+        )
+      )
     
-    [rates rank [lower-bound upper-bound] result])
+)
   )
 
 (defn histogram-quantile-finalizer
