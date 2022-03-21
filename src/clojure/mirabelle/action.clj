@@ -2219,12 +2219,23 @@
          })
 
 (def le2 {"0.1" [{:time 0 :metric 200} {:time 300 :metric 3200}]
-         "0.2" [{:time 0 :metric 300} {:time 300 :metric 4300}]
-         "0.3" [{:time 0 :metric 400} {:time 330 :metric 5400}]
-         "0.7" [{:time 0 :metric 500} {:time 330 :metric 6500}]
-         "1" [{:time 0 :metric 600} {:time 330 :metric 7600}]
-         "+Inf" [{:time 0 :metric 700} {:time 330 :metric 8700}]
-         })
+          "0.2" [{:time 0 :metric 300} {:time 300 :metric 4300}]
+          "0.3" [{:time 0 :metric 400} {:time 330 :metric 5400}]
+          "0.7" [{:time 0 :metric 500} {:time 330 :metric 6500}]
+          "1" [{:time 0 :metric 600} {:time 330 :metric 7600}]
+          "+Inf" [{:time 0 :metric 700} {:time 330 :metric 8700}]
+          })
+
+{:host "foo" :metric 100 :time 300 :path "/foo" :le "0.1"}
+{:host "foo" :metric 300 :time 300 :path "/foo" :le "0.1"}
+
+;; config = {:by []}
+
+;; we should sum all metrics (same le), but what is different scrape time ?
+
+;; config {:by [:host}}
+
+;; we should sum by host
 
 (def max-value-key-str (str Integer/MAX_VALUE))
 (def max-value-key (Float. ^String max-value-key-str))
@@ -2267,44 +2278,17 @@
               
               result (+ bucket-start
                         (* (- bucket-end bucket-start)
-                           (/ rank count))
-                  )
-              ]
-          result
-          )
-        )
-      )
-    
-)
-  )
-
-(defn histogram-quantile-finalizer
-  ;; todo: only 3 params, percentile in config + multiple percentiles
-  [config windows]
-  ;; todo loop instead of first
-  (let [window (first windows)
-        rates (into {}
-                    (map (fn [[k [oldest newest]]]
-                           (let [events-count (- (:metric newest) (- (:metric oldest)))
-                                 time-diff (- (:time newest) (- (:time oldest)))
-                                 rate (/ events-count time-diff)
-                                 ]
-                             [ (assoc newest :quantile/count events-count :quantile/rate rate)]))
-                         []
-                         ))
-        
-        ]
-    )
-  )
-
+                           (/ rank count)))]
+          result)))))
 
 (defn histogram-quantile-aggr
   [by-fields state event]
-  (let [k (select-keys by-fields event)]
+  (let [k (select-keys by-fields event)
+        le (:le event)]
     (if-let [[oldest most-recent] (get state k)]
-      (assoc state k [(e/oldest-event oldest event)
-                      (e/most-recent-event most-recent event)])
-      (assoc state k [event event])
+      (assoc-in state [k le] [(e/oldest-event oldest event)
+                              (e/most-recent-event most-recent event)])
+      (assoc-in state [k le] [event event])
       ))
 
   )
