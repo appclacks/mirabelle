@@ -37,7 +37,8 @@
   (stop [this]
     (assoc this :prom-counter nil))
   IHandler
-  (healthz [_ _]
+  (healthz [_ request]
+    (println (pr-str request))
     {:status 200
      :body {:message "ok"}})
   (search-index [_ {:keys [all-params]}]

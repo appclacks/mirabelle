@@ -2226,8 +2226,22 @@
           "+Inf" [{:time 0 :metric 700} {:time 330 :metric 8700}]
           })
 
+
+(def le-aggr {{:host "foo" :path "/toto"}
+              {"0.1" [{:time 0 :metric 200} {:time 300 :metric 3200}]
+               "0.2" [{:time 0 :metric 300} {:time 300 :metric 4300}]
+               "0.3" [{:time 0 :metric 400} {:time 330 :metric 5400}]
+               "0.7" [{:time 0 :metric 500} {:time 330 :metric 6500}]
+               "1" [{:time 0 :metric 600} {:time 330 :metric 7600}]
+               "+Inf" [{:time 0 :metric 700} {:time 330 :metric 8700}]
+               }})
+
 {:host "foo" :metric 100 :time 300 :path "/foo" :le "0.1"}
 {:host "foo" :metric 300 :time 300 :path "/foo" :le "0.1"}
+
+{{:host "foo" :path "/foo"} {"0.1" []}
+ 
+ }
 
 ;; config = {:by []}
 
@@ -2248,48 +2262,66 @@
         [index event]
         (recur (inc index))))))
 
+(defn sort-buckets
+  [buckets]
+  (->> (-> (assoc buckets max-value-key-str (get buckets "+Inf"))
+           (dissoc "+Inf"))
+       (map
+        (fn [[le [oldest newest]]]
+          (let [events-count (- (:metric newest) (:metric oldest))]
+            (assoc newest
+                   :metric events-count
+                   :le (Float. ^String le)))))
+       (sort-by :le)
+       vec))
+
 (defn compute-quantile
   [percentile buckets]
   ;; todo loop instead of first
-  (let [buckets-sorted (->> (-> (assoc buckets max-value-key-str (get buckets "+Inf"))
-                                (dissoc "+Inf"))
-                            (map
-                             (fn [[le [oldest newest]]]
-                               (let [events-count (- (:metric newest) (:metric oldest))]
-                                 (assoc newest
-                                        :metric events-count
-                                        :le (Float. ^String le)))))
-                            (sort-by :le)
-                            vec)
-        size (count buckets-sorted)
-        rank (* percentile (get-in buckets-sorted [(dec size) :metric]))
-        [b upper-bound] (bound buckets-sorted rank)
+  (let [size (count buckets)
+        rank (* percentile (get-in buckets [(dec size) :metric]))
+        [b upper-bound] (bound buckets rank)
         ]
     (if (= b (dec size))
-      (get-in buckets-sorted [(- size 2) :le])
+      (get-in buckets [(- size 2) :le])
       (if (= 0 b)
-        (get-in buckets-sorted [0 :le])
-        (let [lower-bound (get buckets-sorted (dec b))
+        (get-in buckets [0 :le])
+        (let [lower-bound (get buckets (dec b))
               bucket-start (:le lower-bound)
               bucket-end (:le upper-bound)
               count (- (:metric upper-bound)
                        (:metric lower-bound))
               rank (- rank (:metric lower-bound))
-              
               result (+ bucket-start
                         (* (- bucket-end bucket-start)
                            (/ rank count)))]
-          result)))))
+          (assoc (get buckets b) :percentile result))))))
 
 (defn histogram-quantile-aggr
-  [by-fields state event]
-  (let [k (select-keys by-fields event)
+  [state event]
+  (let [k (select-keys event e/non-label-keys)
         le (:le event)]
     (if-let [[oldest most-recent] (get state k)]
       (assoc-in state [k le] [(e/oldest-event oldest event)
                               (e/most-recent-event most-recent event)])
-      (assoc-in state [k le] [event event])
-      ))
+      (assoc-in state [k le] [event event]))))
+
+(defn histogram-quantile-finalizer
+  [config windows]
+  ;; todo iterate on windows
+  (let [quantiles (:quantiles config)
+        window (first windows)]
+    (for [[labels buckets] window]
+      (let [buckets-sorted (sort-buckets buckets)]
+        (map
+         (fn [quantile]
+           (compute-quantile quantile buckets-sorted)
+
+           )
+         quantiles
+         ))
+      )
+    )
 
   )
 

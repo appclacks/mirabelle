@@ -2,6 +2,8 @@
   (:require [mirabelle.time :as t]
             [clojure.set :as set]))
 
+(def non-label-keys #{:metric :time :tags})
+
 (defn most-recent
   "Get the most recent event from an event list"
   [events]
