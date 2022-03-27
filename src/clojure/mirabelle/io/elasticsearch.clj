@@ -46,12 +46,12 @@
 (s/def ::service-token ::spec/secret)
 (s/def ::basic-auth (s/keys :req-un [::username ::password]))
 (s/def ::elasticsearch (s/keys :req-un [::hosts
-                                        ::default-index-pattern
                                         ::default-index
                                         ::scheme]
                                :opt-un [::config/cacert
                                         ::config/cert
                                         ::config/key
+                                        ::default-index-pattern
                                         ::connect-timeout
                                         ::socket-timeout
                                         ::thread-count
@@ -126,10 +126,13 @@
   [{:keys [default-index default-index-formatter]} event]
   (let [time (.atZone (Instant/ofEpochMilli (* 1000 (:time event (time/now))))
                       ZoneOffset/UTC)
-        index (format "%s-%s"
-                      (:elasticsearch/index event default-index)
-                      (.format ^DateTimeFormatter default-index-formatter
-                               time))]
+        base-index (:elasticsearch/index event default-index)
+        index (if default-index-formatter
+                (format "%s-%s"
+                        base-index
+                        (.format ^DateTimeFormatter default-index-formatter
+                                 time))
+                base-index)]
     (format "{\"index\":{\"_index\":\"%s\"}}\n%s\n"
             index
             (json/generate-string

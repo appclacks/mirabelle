@@ -17,4 +17,9 @@
               "\n")
          (es/format-event {:default-index "foo"
                            :default-index-formatter formatter}
+                          {:time 1 :service "foo"})))
+  (is (= (str "{\"index\":{\"_index\":\"foo\"}}\n"
+              "{\"service\":\"foo\",\"@timestamp\":\"1970-01-01T00:00:01Z\"}"
+              "\n")
+         (es/format-event {:default-index "foo"}
                           {:time 1 :service "foo"}))))
