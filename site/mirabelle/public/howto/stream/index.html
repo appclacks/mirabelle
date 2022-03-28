@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1642939127" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1642939127" rel="stylesheet">
-    <link href="/css/hybrid.css?1642939127" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1642939127" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1642939127" rel="stylesheet">
-    <link href="/css/auto-complete.css?1642939127" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1642939127" rel="stylesheet">
-    <link href="/css/theme.css?1642939127" rel="stylesheet">
-    <link href="/css/tabs.css?1642939127" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1642939127" rel="stylesheet">
+    <link href="/css/nucleus.css?1648502615" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1648502615" rel="stylesheet">
+    <link href="/css/hybrid.css?1648502615" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1648502615" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1648502615" rel="stylesheet">
+    <link href="/css/auto-complete.css?1648502615" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1648502615" rel="stylesheet">
+    <link href="/css/theme.css?1648502615" rel="stylesheet">
+    <link href="/css/tabs.css?1648502615" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1648502615" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1642939127"></script>
+    <script src="/js/jquery-3.3.1.min.js?1648502615"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1642939127"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1642939127"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1648502615"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1648502615"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1642939127"></script>
+<script type="text/javascript" src="/js/search.js?1648502615"></script>
 
     
   </div>
@@ -606,6 +606,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 <li><a href="/howto/stream/#coalesce-and-project">Combine events from multiple hosts, correlate events between each others</a></li>
 <li><a href="/howto/stream/#throttle">The throttle action</a></li>
 <li><a href="/howto/stream/#convert-a-counter-to-a-rate">Convert a counter to a rate</a></li>
+<li><a href="/howto/stream/#compute-maximum-and-minimum-values">Compute maximum and minimum values</a></li>
 <li><a href="/howto/stream/#handle-exceptions-errors">Handle errors in streams</a></li>
 <li><a href="/howto/stream/#discarded-events">Discarded events</a></li>
 <li><a href="/howto/stream/#move-events-between-streams">Move events between streams</a></li>
@@ -850,7 +851,7 @@ For example, the <code>above-dt</code> stream will only let events pass if all e
 <h4 id="events-windows">Events Windows</h4>
 <p>You have three windows types availables in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
 It means you should be careful about which action you will use downstream. It should be actions working on list of events.</p>
-<p>The first one, <code>fixed-time-window</code>, will buffer all events during a defined duration and then flush them downstream. For example, <code>(fixed-time-window {:duration 60})</code> will create windows of 60 seconds.</p>
+<p>The first one, <code>fixed-time-window</code>, will buffer all events during a defined duration and then flush them downstream. For example, <code>(fixed-time-window {:duration 60})</code> will create windows of 60 seconds. You can pass a <code>:delay</code> option to <code>fixed-time-window</code> to tolerate late events and avoid losing them (for example: <code>(fixed-time-window {:duration 60 :delay 30})</code>).</p>
 <p>The <code>fixed-event-window</code> action will created windows not based on time, but based on the number of events the action receives. For example, <code>(fixed-event-window {:size 60})</code> will buffer events until 10 are buffered, and then pass the window downstream.</p>
 <p>The <code>moving-event-window</code> action works like <code>fixed-event-window</code> but will pass events downstream for every event received. For example, <code>(moving-event-window {:size 10})</code> will in that case always send downstream the last 10 events.</p>
 <p>The <code>moving-time-window</code> action will return for each event all events from the last <code>duration</code> seconds, for example: <code>(moving-time-window {:duration 60})</code>.</p>
@@ -864,8 +865,8 @@ It means you should be careful about which action you will use downstream. It sh
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">10</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">4</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">9</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">13</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">31</span>}
 </code></pre></div><p>The output would be:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">4</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">9</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">10</span>} {<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">13</span>}
-</code></pre></div><p>Events are emitted downstream after twice the duration period. In this example, events received between times <code>0</code> and <code>10</code> will for example be emitted at time <code>20</code>.</p>
-<p>This action can be very useful to tolerate late events in streams. You could for example use <code>ssort</code> in front of a <code>fixed-time-window</code> stream in order to wait for late events before creating the time window.</p>
+</code></pre></div><p>You can pass a <code>:delay</code> option to <code>ssort</code> in order to not send events downstream immediately. For example <code>(ssort {:duration 10 :field :time :delay 10})</code> will send events downstream 10 seconds after their windows are closed.</p>
+<p>This action can be very useful to tolerate late events in streams. You could for example use <code>ssort</code> in front of another action in order to wait for late events.</p>
 <h4 id="actions-on-list-of-events">Actions on list of events</h4>
 <p>Several actions can be executed on list of events (produced by windows for example).</p>
 <p>Let&rsquo;s take this example which creates windows of 10 events and forwards them to multiple streams:</p>
@@ -895,8 +896,9 @@ It means you should be careful about which action you will use downstream. It sh
 </code></pre></div><p><code>coll-max</code> will forward downstream the event with the biggest <code>:metric</code> field, <code>coll-min</code> will forward the event with the smallest <code>:metric</code>.
 <code>coll-sum</code> will sum all events <code>:metric</code> together.
 <code>coll-quotient</code> will divide the first event <code>:metric</code> by the value of the next events.
-<code>coll-top</code> and <code>coll-bottom</code> returns the events with the top biggest (or top smallest) <code>:metric</code> field (for example, <code>coll-top</code> would return the 10 events with the biggest <code>:metric</code>).</p>
-<p><code>coll-mean</code> will compute the mean based on the event <code>:metric</code> fields. <code>coll-rate</code> compute the rate of events (the sum of all <code>:metrics</code> divided by the time range, based on the most ancient and most recent events), and <code>coll-count</code> will return a new event with <code>:metric</code> being the number of events in the window.<br>
+<code>coll-top</code> and <code>coll-bottom</code> returns the events with the top biggest (or top smallest) <code>:metric</code> field (for example, <code>coll-top</code> would return the 10 events with the biggest <code>:metric</code>).
+<code>coll-increase</code> should receives a list of events representing an always-increasing counter and will compute the increase between the oldest and the latest event.</p>
+<p><code>coll-mean</code> will compute the mean based on the event <code>:metric</code> fields. <code>coll-rate</code> compute the rate of events (the sum of all <code>:metrics</code> divided by the time range, based on the most ancient and most recent events), and <code>coll-count</code> will return a new event with <code>:metric</code> being the number of events in the window.
 The three previous streams use the latest event from the list of events to build the new event.</p>
 <p>The <code>coll-percentiles</code> action can also be used to compute percentiles on a list of events:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
@@ -949,14 +951,18 @@ The three previous streams use the latest event from the list of events to build
   (<span style="color:#a6e22e">info</span>))
 </code></pre></div><p>If this stream is fed with <code>{:metric 1 :time 1}</code> and then <code>{:metric 10 :time 4}</code> (these events could represent the count of requests to a HTTP server for example), the event <code>{:metric (/ 9 3) :time 4}</code> will be produced. This event is computed by doing <code>(10-1)/3</code> for the <code>;metric</code> field, and the <code>:time</code> field is the time of the latest event.</p>
 <p>The result is the rate of requests during this time period.</p>
+<h4 id="compute-maximum-and-minimum-values">Compute maximum and minimum values</h4>
+<p>We already saw in the <a href="/howto/stream/#actions-on-list-of-events">Action on lists of events: max, min, count, percentiles, rate&hellip;</a> section the <code>coll-max</code> and <code>coll-min</code> streams. You have two other ways to compute maximum and minimum values without having to build list of events.</p>
+<p><code>aggr-max</code> and <code>aggr-min</code> can be used to get the maximum or minimum events from the last seconds. For example, <code>(aggr-max {:duration 10})</code> will compute the maximum event for windows of 10 seconds. You can also configure these streams with a <code>:delay</code> value to tolerate late events (<code>(aggr-max {:duration 10 :delay 10})</code> for example).</p>
+<p><code>smax</code> and <code>smin</code> will send downstream <em>for each event they receive</em> the maximum or minimum event. The value is never resetted.</p>
 <h4 id="handle-exceptions-errors">Handle exceptions (errors)</h4>
 <p>Sometimes, streams can generate errors. For example, a downstream service can be down, or you could try to do an invalid action on an event. Let&rsquo;s take an example:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">exception-stream</span>
   (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:metric</span> <span style="color:#e6db74">&#34;invalid!&#34;</span>
     (<span style="color:#a6e22e">increment</span>))
-  (<span style="color:#a6e22e">info</span>))
+  (<span style="color:#a6e22e">error</span>))
 </code></pre></div><p>In this example, we associate a string to the event <code>:metric</code> field and then we try to incremen it. This will produce an exception.</p>
-<p><code>exception-stream</code> is an action which will catch all exception generated on its first child, generate an event from its exception, and pass it to its second child (<code>info</code> here). You can like that log errors, or forward them to another system.</p>
+<p><code>exception-stream</code> is an action which will catch all exception generated on its first child, generate an event from its exception, and pass it to its second child (<code>error</code> here). You can like that log errors, or forward them to another system.</p>
 <p>The error event generated by exception-stream looks like this:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1.620331421405</span>E9,
  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;mirabelle-exception&#34;</span>
@@ -968,7 +974,15 @@ The three previous streams use the latest event from the list of events to build
  <span style="color:#e6db74">:description</span> <span style="color:#e6db74">&#34;java.lang.ClassCastException: class java.lang.String cannot be cast to class java.lang.Number...&#34;</span>
 </code></pre></div><p>The event <code>:time</code> is the time of the event which generated the exception. The <code>:service</code> will always be <code>mirabelle-exception</code>, the <code>:state</code> &ldquo;error&rdquo; and the <code>:metric</code> 1.</p>
 <p>The event will have as tag &ldquo;exception&rdquo; and the exception class name. The <code>:exception</code> key will contain the JVM <code>Exception</code> instance, <code>:base-event</code> the full event which triggered the exception, and finally <code>:description</code> will contain a string representation of the exception (including the stacktrace).</p>
-<h4 id="discarded-events">Discarded events</h4>
+<p>You can extract the base event with the <code>extract</code> action, for example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">exception-stream</span>
+  (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:metric</span> <span style="color:#e6db74">&#34;invalid!&#34;</span>
+    (<span style="color:#a6e22e">increment</span>))
+  (<span style="color:#a6e22e">sdo</span>
+    (<span style="color:#a6e22e">error</span>)
+    (<span style="color:#a6e22e">extract</span> <span style="color:#e6db74">:base-event</span>
+      (<span style="color:#a6e22e">info</span>))))
+</code></pre></div><h4 id="discarded-events">Discarded events</h4>
 <p>If your event has the the <code>mirabelle/discard</code> tag, the event will be ignored by every action triggering side effects (logging, I/O, publish!).</p>
 <h4 id="move-events-between-streams">Move events between streams</h4>
 <p>You can reinject events from a stream to itself, or to another stream (a dynamic stream for example).</p>
@@ -1286,19 +1300,19 @@ The three previous streams use the latest event from the list of events to build
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1642939127"></script>
-    <script src="/js/perfect-scrollbar.min.js?1642939127"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1642939127"></script>
-    <script src="/js/jquery.sticky.js?1642939127"></script>
-    <script src="/js/featherlight.min.js?1642939127"></script>
-    <script src="/js/highlight.pack.js?1642939127"></script>
+    <script src="/js/clipboard.min.js?1648502615"></script>
+    <script src="/js/perfect-scrollbar.min.js?1648502615"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1648502615"></script>
+    <script src="/js/jquery.sticky.js?1648502615"></script>
+    <script src="/js/featherlight.min.js?1648502615"></script>
+    <script src="/js/highlight.pack.js?1648502615"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1642939127"></script>
-    <script src="/js/learn.js?1642939127"></script>
-    <script src="/js/hugo-learn.js?1642939127"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1648502615"></script>
+    <script src="/js/learn.js?1648502615"></script>
+    <script src="/js/hugo-learn.js?1648502615"></script>
     
         
-            <script src="/mermaid/mermaid.js?1642939127"></script>
+            <script src="/mermaid/mermaid.js?1648502615"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

@@ -27,6 +27,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 - [Combine events from multiple hosts, correlate events between each others](/howto/stream/#coalesce-and-project)
 - [The throttle action](/howto/stream/#throttle)
 - [Convert a counter to a rate](/howto/stream/#convert-a-counter-to-a-rate)
+- [Compute maximum and minimum values](/howto/stream/#compute-maximum-and-minimum-values)
 - [Handle errors in streams](/howto/stream/#handle-exceptions-errors)
 - [Discarded events](/howto/stream/#discarded-events)
 - [Move events between streams](/howto/stream/#move-events-between-streams)
@@ -450,7 +451,7 @@ In this example, events wll be forwarded to the child action (`info`) only if th
 You have three windows types availables in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
 It means you should be careful about which action you will use downstream. It should be actions working on list of events.
 
-The first one, `fixed-time-window`, will buffer all events during a defined duration and then flush them downstream. For example, `(fixed-time-window {:duration 60})` will create windows of 60 seconds.
+The first one, `fixed-time-window`, will buffer all events during a defined duration and then flush them downstream. For example, `(fixed-time-window {:duration 60})` will create windows of 60 seconds. You can pass a `:delay` option to `fixed-time-window` to tolerate late events and avoid losing them (for example: `(fixed-time-window {:duration 60 :delay 30})`).
 
 The `fixed-event-window` action will created windows not based on time, but based on the number of events the action receives. For example, `(fixed-event-window {:size 60})` will buffer events until 10 are buffered, and then pass the window downstream.
 
@@ -477,9 +478,9 @@ The output would be:
 {:time 1} {:time 4} {:time 9} {:time 10} {:time 13}
 ```
 
-Events are emitted downstream after twice the duration period. In this example, events received between times `0` and `10` will for example be emitted at time `20`.
+You can pass a `:delay` option to `ssort` in order to not send events downstream immediately. For example `(ssort {:duration 10 :field :time :delay 10})` will send events downstream 10 seconds after their windows are closed.
 
-This action can be very useful to tolerate late events in streams. You could for example use `ssort` in front of a `fixed-time-window` stream in order to wait for late events before creating the time window.
+This action can be very useful to tolerate late events in streams. You could for example use `ssort` in front of another action in order to wait for late events.
 
 #### Actions on list of events
 
@@ -517,8 +518,9 @@ Let's take this example which creates windows of 10 events and forwards them to 
 `coll-sum` will sum all events `:metric` together.
 `coll-quotient` will divide the first event `:metric` by the value of the next events.
 `coll-top` and `coll-bottom` returns the events with the top biggest (or top smallest) `:metric` field (for example, `coll-top` would return the 10 events with the biggest `:metric`).
+`coll-increase` should receives a list of events representing an always-increasing counter and will compute the increase between the oldest and the latest event.
 
-`coll-mean` will compute the mean based on the event `:metric` fields. `coll-rate` compute the rate of events (the sum of all `:metrics` divided by the time range, based on the most ancient and most recent events), and `coll-count` will return a new event with `:metric` being the number of events in the window.  
+`coll-mean` will compute the mean based on the event `:metric` fields. `coll-rate` compute the rate of events (the sum of all `:metrics` divided by the time range, based on the most ancient and most recent events), and `coll-count` will return a new event with `:metric` being the number of events in the window.
 The three previous streams use the latest event from the list of events to build the new event.
 
 The `coll-percentiles` action can also be used to compute percentiles on a list of events:
@@ -621,6 +623,14 @@ If this stream is fed with `{:metric 1 :time 1}` and then `{:metric 10 :time 4}`
 
 The result is the rate of requests during this time period.
 
+#### Compute maximum and minimum values
+
+We already saw in the [Action on lists of events: max, min, count, percentiles, rate...](/howto/stream/#actions-on-list-of-events) section the `coll-max` and `coll-min` streams. You have two other ways to compute maximum and minimum values without having to build list of events.
+
+`aggr-max` and `aggr-min` can be used to get the maximum or minimum events from the last seconds. For example, `(aggr-max {:duration 10})` will compute the maximum event for windows of 10 seconds. You can also configure these streams with a `:delay` value to tolerate late events (`(aggr-max {:duration 10 :delay 10})` for example).
+
+`smax` and `smin` will send downstream *for each event they receive* the maximum or minimum event. The value is never resetted. 
+
 #### Handle exceptions (errors)
 
 Sometimes, streams can generate errors. For example, a downstream service can be down, or you could try to do an invalid action on an event. Let's take an example:
@@ -629,12 +639,12 @@ Sometimes, streams can generate errors. For example, a downstream service can be
 (exception-stream
   (with :metric "invalid!"
     (increment))
-  (info))
+  (error))
 ```
 
 In this example, we associate a string to the event `:metric` field and then we try to incremen it. This will produce an exception.
 
-`exception-stream` is an action which will catch all exception generated on its first child, generate an event from its exception, and pass it to its second child (`info` here). You can like that log errors, or forward them to another system.
+`exception-stream` is an action which will catch all exception generated on its first child, generate an event from its exception, and pass it to its second child (`error` here). You can like that log errors, or forward them to another system.
 
 The error event generated by exception-stream looks like this:
 
@@ -652,6 +662,18 @@ The error event generated by exception-stream looks like this:
 The event `:time` is the time of the event which generated the exception. The `:service` will always be `mirabelle-exception`, the `:state` "error" and the `:metric` 1.
 
 The event will have as tag "exception" and the exception class name. The `:exception` key will contain the JVM `Exception` instance, `:base-event` the full event which triggered the exception, and finally `:description` will contain a string representation of the exception (including the stacktrace).
+
+You can extract the base event with the `extract` action, for example:
+
+```clojure
+(exception-stream
+  (with :metric "invalid!"
+    (increment))
+  (sdo
+    (error)
+    (extract :base-event
+      (info))))
+```
 
 #### Discarded events
 

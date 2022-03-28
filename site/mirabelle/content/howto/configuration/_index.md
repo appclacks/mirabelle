@@ -29,10 +29,6 @@ The Mirabelle configuration is defined in [EDN](https://github.com/edn-format/ed
  :http {:host "0.0.0.0"
         :port 5558}
 
- ;; The Mirabelle Websocket server
- :websocket {:host "0.0.0.0"
-             :port 5556}
-
  ;; The "real time" streams configuration.
  ;; The directories parameter is a list of directories containing streams definitions
  ;; The actions parameter can be used to define custom actions which can then

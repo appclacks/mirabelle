@@ -12,20 +12,20 @@
     <title>HTTP API :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1642939127" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1642939127" rel="stylesheet">
-    <link href="/css/hybrid.css?1642939127" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1642939127" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1642939127" rel="stylesheet">
-    <link href="/css/auto-complete.css?1642939127" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1642939127" rel="stylesheet">
-    <link href="/css/theme.css?1642939127" rel="stylesheet">
-    <link href="/css/tabs.css?1642939127" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1642939127" rel="stylesheet">
+    <link href="/css/nucleus.css?1648502615" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1648502615" rel="stylesheet">
+    <link href="/css/hybrid.css?1648502615" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1648502615" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1648502615" rel="stylesheet">
+    <link href="/css/auto-complete.css?1648502615" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1648502615" rel="stylesheet">
+    <link href="/css/theme.css?1648502615" rel="stylesheet">
+    <link href="/css/tabs.css?1648502615" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1648502615" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1642939127"></script>
+    <script src="/js/jquery-3.3.1.min.js?1648502615"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1642939127"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1642939127"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1648502615"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1648502615"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1642939127"></script>
+<script type="text/javascript" src="/js/search.js?1648502615"></script>
 
     
   </div>
@@ -551,6 +551,7 @@
         <li><a href="#get-a-stream">Get a stream</a></li>
         <li><a href="#remove-a-stream">Remove a stream</a></li>
         <li><a href="#push-an-event">Push an event</a></li>
+        <li><a href="#prometheus-remote-write">Prometheus remote write</a></li>
         <li><a href="#query-the-index">Query the index</a></li>
         <li><a href="#get-an-index-current-time">Get an index current time</a></li>
       </ul>
@@ -643,7 +644,15 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
 <pre tabindex="0"><code>curl -H &quot;Content-Type: application/json&quot; -X PUT --data '{&quot;event&quot;: {&quot;service&quot;: &quot;foo&quot;, &quot;metric&quot;: 10}}' 127.0.0.1:5558/api/v1/stream/foo
 
 {&quot;message&quot;:&quot;ok&quot;}
-</code></pre><h3 id="query-the-index">Query the index</h3>
+</code></pre><h3 id="prometheus-remote-write">Prometheus remote write</h3>
+<ul>
+<li><strong>POST</strong> <code>/api/v1/prometheus/remote-write/&lt;stream-name&gt;</code></li>
+</ul>
+<p>This endpoint can be used to send to a given Mirabelle stream Prometheus metrics. The Mirabelle endpoint should be configured into the <a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/">Prometheus configuration file</a>, for example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">remote_write</span>:
+  - <span style="color:#f92672">url</span>: <span style="color:#e6db74">&#39;http://localhost:5558/api/v1/prometheus/remote-write/default&#39;</span>
+</code></pre></div><p>The metric name will be bind in Mirabelle to the event <code>:service</code> key, anc each label will be a key as well. The event <code>:metric</code> will contain the Prometheus meric value.</p>
+<h3 id="query-the-index">Query the index</h3>
 <ul>
 <li><strong>GET</strong> <code>/api/v1/index/&lt;steam-name&gt;/search</code></li>
 </ul>
@@ -966,19 +975,19 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1642939127"></script>
-    <script src="/js/perfect-scrollbar.min.js?1642939127"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1642939127"></script>
-    <script src="/js/jquery.sticky.js?1642939127"></script>
-    <script src="/js/featherlight.min.js?1642939127"></script>
-    <script src="/js/highlight.pack.js?1642939127"></script>
+    <script src="/js/clipboard.min.js?1648502615"></script>
+    <script src="/js/perfect-scrollbar.min.js?1648502615"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1648502615"></script>
+    <script src="/js/jquery.sticky.js?1648502615"></script>
+    <script src="/js/featherlight.min.js?1648502615"></script>
+    <script src="/js/highlight.pack.js?1648502615"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1642939127"></script>
-    <script src="/js/learn.js?1642939127"></script>
-    <script src="/js/hugo-learn.js?1642939127"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1648502615"></script>
+    <script src="/js/learn.js?1648502615"></script>
+    <script src="/js/hugo-learn.js?1648502615"></script>
     
         
-            <script src="/mermaid/mermaid.js?1642939127"></script>
+            <script src="/mermaid/mermaid.js?1648502615"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

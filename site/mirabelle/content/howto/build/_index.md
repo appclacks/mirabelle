@@ -35,8 +35,6 @@ Let's say your I/O are in `/etc/mirabelle/io`, your EDN (compiled) streams in `/
        :native? true}
  :http {:host "0.0.0.0"
         :port 5558}
- :websocket {:host "0.0.0.0"
-             :port 5556}
  :stream {:directories ["/streams"]
           :actions {}}
  :io {:directories ["/io"]
@@ -48,12 +46,12 @@ Let's say your I/O are in `/etc/mirabelle/io`, your EDN (compiled) streams in `/
 You should now be able to launch Mirabelle using Docker (you can check the [Docker hub](https://hub.docker.com/r/mcorbin/mirabelle/tags) to get the latest release):
 
 ```
-docker run -p 5555:5555 -p 5556:5556 -p 5558:5558 \
+docker run -p 5555:5555 -p 5558:5558 \
 -v /etc/mirabelle/io:/io \
 -v /etc/mirabelle/streams:/streams \
 -v /etc/mirabelle/config.edn:/config/config.edn \
 -e MIRABELLE_CONFIGURATION=/config/config.edn \
-mcorbin/mirabelle:v0.9.0
+mcorbin/mirabelle:v0.10.0
 ```
 
 ## Using Leiningen

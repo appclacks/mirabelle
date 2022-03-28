@@ -2561,7 +2561,7 @@
   "Send downstream the event with the biggest :metric every time it receives an event
 
   ```clojure
-  (smap
+  (smax
     (info))
   ```
 
