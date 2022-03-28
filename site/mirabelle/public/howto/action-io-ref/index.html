@@ -12,20 +12,20 @@
     <title>I/O and actions reference :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1648502615" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1648502615" rel="stylesheet">
-    <link href="/css/hybrid.css?1648502615" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1648502615" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1648502615" rel="stylesheet">
-    <link href="/css/auto-complete.css?1648502615" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1648502615" rel="stylesheet">
-    <link href="/css/theme.css?1648502615" rel="stylesheet">
-    <link href="/css/tabs.css?1648502615" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1648502615" rel="stylesheet">
+    <link href="/css/nucleus.css?1648502980" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1648502980" rel="stylesheet">
+    <link href="/css/hybrid.css?1648502980" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1648502980" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1648502980" rel="stylesheet">
+    <link href="/css/auto-complete.css?1648502980" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1648502980" rel="stylesheet">
+    <link href="/css/theme.css?1648502980" rel="stylesheet">
+    <link href="/css/tabs.css?1648502980" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1648502980" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1648502615"></script>
+    <script src="/js/jquery-3.3.1.min.js?1648502980"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1648502615"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1648502615"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1648502980"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1648502980"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1648502615"></script>
+<script type="text/javascript" src="/js/search.js?1648502980"></script>
 
     
   </div>
@@ -553,7 +553,7 @@
         <li><a href="#file">File</a></li>
         <li><a href="#pagerduty">Pagerduty</a></li>
         <li><a href="#influxdb">InfluxDB</a></li>
-        <li><a href="#elasticsearch-beta">Elasticsearch (beta)</a></li>
+        <li><a href="#elasticsearch">Elasticsearch</a></li>
       </ul>
     </li>
     <li><a href="#actions">Actions</a></li>
@@ -630,7 +630,7 @@
 </code></pre></div><p>The <code>:measurement</code>, <code>:username</code>, <code>:password</code>, <code>:token</code>, <code>:default-tags</code>, <code>:tags</code> and <code>fields</code> parameters are optional. The <code>:measurement</code> parameter is the event key which will be used for the influxdb measurement</p>
 <p>Default tags will be added to all events. The <code>:tags</code> option contains the list of keys to convert to influxdb tags, and the <code>:fields</code> option for fields.</p>
 <p>You can also add the <code>:influxdb/measurement</code>, <code>:influxdb/fields</code> and <code>:influxdb/tags</code> to your events (using the <code>with</code> action for example) in order to override per event the default configuration for these options.</p>
-<h3 id="elasticsearch-beta">Elasticsearch (beta)</h3>
+<h3 id="elasticsearch">Elasticsearch</h3>
 <p>Forward events to <a href="https://www.elastic.co/fr/">ElasticSearch</a>. This I/O forwards events to Elasticsearch asynchronously.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:elastic</span> {<span style="color:#e6db74">:type</span> <span style="color:#e6db74">:elasticsearch</span>
            <span style="color:#e6db74">:config</span> {<span style="color:#75715e">;; the list of elasticsearch osts</span>
@@ -665,6 +665,8 @@
 <p>The <a href="/generated-doc/mirabelle.action.html">generated documentation</a> from the code contains explanations and examples about the available actions. Here is the list:</p>
 <ul>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-above-dt">above-dt</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-max">aggr-max</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-min">aggr-min</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-sum">aggr-sum</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-async-queue!">async-queue!</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-below-dt">below-dt</a></li>
@@ -673,6 +675,7 @@
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coalesce">coalesce</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-bottom">coll-bottom</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-count">coll-count</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-increase">coll-increase</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-max">coll-max</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-mean">coll-mean</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-min">coll-min</a></li>
@@ -694,6 +697,7 @@
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ewma-timeless">ewma-timeless</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-exception-stream">exception-stream</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-expired">expired</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-extract">extract</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-event-window">fixed-event-window</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-time-window">fixed-time-window</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-from-base64">from-base64</a></li>
@@ -720,6 +724,8 @@
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sdo">sdo</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sflatten">sflatten</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sformat">sformat</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-smax">smax</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-smin">smin</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-split">split</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ssort">ssort</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-stable">stable</a></li>
@@ -1042,19 +1048,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1648502615"></script>
-    <script src="/js/perfect-scrollbar.min.js?1648502615"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1648502615"></script>
-    <script src="/js/jquery.sticky.js?1648502615"></script>
-    <script src="/js/featherlight.min.js?1648502615"></script>
-    <script src="/js/highlight.pack.js?1648502615"></script>
+    <script src="/js/clipboard.min.js?1648502980"></script>
+    <script src="/js/perfect-scrollbar.min.js?1648502980"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1648502980"></script>
+    <script src="/js/jquery.sticky.js?1648502980"></script>
+    <script src="/js/featherlight.min.js?1648502980"></script>
+    <script src="/js/highlight.pack.js?1648502980"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1648502615"></script>
-    <script src="/js/learn.js?1648502615"></script>
-    <script src="/js/hugo-learn.js?1648502615"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1648502980"></script>
+    <script src="/js/learn.js?1648502980"></script>
+    <script src="/js/hugo-learn.js?1648502980"></script>
     
         
-            <script src="/mermaid/mermaid.js?1648502615"></script>
+            <script src="/mermaid/mermaid.js?1648502980"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

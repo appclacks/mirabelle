@@ -74,7 +74,7 @@ Default tags will be added to all events. The `:tags` option contains the list o
 
 You can also add the `:influxdb/measurement`, `:influxdb/fields` and `:influxdb/tags` to your events (using the `with` action for example) in order to override per event the default configuration for these options.
 
-### Elasticsearch (beta)
+### Elasticsearch
 
 Forward events to [ElasticSearch](https://www.elastic.co/fr/). This I/O forwards events to Elasticsearch asynchronously.
 
@@ -115,7 +115,10 @@ You can set `:elasticsearch/index` to your event in order to forward an event to
 
 The [generated documentation](/generated-doc/mirabelle.action.html) from the code contains explanations and examples about the available actions. Here is the list:
 
+
 - [above-dt](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-above-dt)
+- [aggr-max](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-max)
+- [aggr-min](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-min)
 - [aggr-sum](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-sum)
 - [async-queue!](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-async-queue!)
 - [below-dt](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-below-dt)
@@ -124,6 +127,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - [coalesce](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coalesce)
 - [coll-bottom](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-bottom)
 - [coll-count](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-count)
+- [coll-increase](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-increase)
 - [coll-max](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-max)
 - [coll-mean](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-mean)
 - [coll-min](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-min)
@@ -145,6 +149,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - [ewma-timeless](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ewma-timeless)
 - [exception-stream](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-exception-stream)
 - [expired](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-expired)
+- [extract](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-extract)
 - [fixed-event-window](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-event-window)
 - [fixed-time-window](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-time-window)
 - [from-base64](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-from-base64)
@@ -171,6 +176,8 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - [sdo](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sdo)
 - [sflatten](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sflatten)
 - [sformat](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-sformat)
+- [smax](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-smax)
+- [smin](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-smin)
 - [split](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-split)
 - [ssort](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ssort)
 - [stable](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-stable)
