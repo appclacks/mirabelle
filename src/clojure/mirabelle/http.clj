@@ -32,9 +32,9 @@
                    (fn [] @nb-conn))
     [(ws-interceptor pubsub nb-conn) ;; enter
      itc-response/response ;;leave
+     itc-json/json ;; leave
      (itc-error/last-error registry) ;;error
      (itc-metric/response-metrics registry) ;; leave
-     itc-json/json ;; leave
      itc-error/error ;; error
      (when-let [basic-auth (:basic-auth config)]
        (itc-auth/basic-auth basic-auth))
