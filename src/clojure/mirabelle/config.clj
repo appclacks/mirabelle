@@ -32,16 +32,14 @@
 
 (s/def ::actions (s/map-of keyword? symbol?))
 (s/def ::stream (s/keys :opt-un [::directories
-                                 ::io-directories
                                  ::actions]))
 
-(s/def ::io (s/keys :opt-un [::directories]))
+(s/def ::outputs (s/map-of keyword? map?))
 (s/def ::test (s/keys :opt-un [::directories]))
-(s/def ::roll-cycle keyword?)
 
 (s/def ::directory ::spec/directory-spec)
 (s/def ::config (s/keys :req-un [::tcp ::http/http]
-                        :opt-un [::stream ::io ::test]))
+                        :opt-un [::stream ::outputs ::test]))
 
 (defmethod aero/reader 'secret
   [_ _ value]

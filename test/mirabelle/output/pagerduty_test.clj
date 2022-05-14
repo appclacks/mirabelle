@@ -1,8 +1,8 @@
-(ns mirabelle.io.pagerduty-test
+(ns mirabelle.output.pagerduty-test
   (:require [clojure.test :refer :all]
             [com.stuartsierra.component :as component]
             [exoscale.cloak :as cloak]
-            [mirabelle.io.pagerduty :as pd]))
+            [mirabelle.output.pagerduty :as pd]))
 
 (deftest event+keys->str-test
   (is (= "foo - bar - baz"

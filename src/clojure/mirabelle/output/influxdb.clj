@@ -1,4 +1,4 @@
-(ns mirabelle.io.influxdb
+(ns mirabelle.output.influxdb
   (:require [clojure.spec.alpha :as s]
             [clojure.tools.logging :as log]
             [corbihttp.spec :as spec]
@@ -94,10 +94,10 @@
                                    ::default-tags]))
 
 ;; in Influx tags are indexed, not fields
-(defrecord InfluxIO [config
-                     ^InfluxDBClient client
-                     ^WriteApi write-api
-                     ]
+(defrecord Influx [config
+                   ^InfluxDBClient client
+                   ^WriteApi write-api
+                   ]
   component/Lifecycle
   (start [this]
     (mspec/valid? ::influxdb config)
@@ -112,7 +112,7 @@
   (stop [this]
     (.close client)
     (assoc this :client nil :write-api nil))
-  io/IO
+  io/Output
   (inject! [_ events]
     (doseq [event events]
       (.writePoint write-api (event->point config event)))))

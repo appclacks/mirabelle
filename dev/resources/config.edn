@@ -8,8 +8,9 @@
  :queue {:directory "dev/queue"}
  :stream {:directories ["dev/resources/streams"]
           :actions {:custom mirabelle.action/where*}}
- :io {:directories ["dev/resources/io"]
-      :custom {}}
+ :outputs {:write-file {:config {:path "/tmp/file"}
+                        :type :file}}
+ :custom-outputs {}
  :logging {:level "info"
            :console {:encoder :json}}
  :test {:directories ["dev/resources/tests"]}}
@@ -22,8 +23,8 @@
 ;;         :port 5558}
 ;;  :stream {:directories ["/etc/mirabelle/streams"]
 ;;           :actions {}}
-;;  :io {:directories ["/etc/mirabelle/io"]
-;;       :custom {}}
+;;  :outputs {:write-file {:config {:path "/tmp/file"
+;;                                  :type :file}}}
 ;;  :test {:directories ["/etc/mirabelle/tests"]}
 ;;  :logging {:level "info"
 ;;            :console {:encoder :json}}}

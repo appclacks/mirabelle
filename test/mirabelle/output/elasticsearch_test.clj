@@ -1,6 +1,6 @@
-(ns mirabelle.io.elasticsearch-test
+(ns mirabelle.output.elasticsearch-test
   (:require [clojure.test :refer :all]
-            [mirabelle.io.elasticsearch :as es])
+            [mirabelle.output.elasticsearch :as es])
   (:import java.time.format.DateTimeFormatter))
 
 (def formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd"))

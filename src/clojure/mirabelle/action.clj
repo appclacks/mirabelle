@@ -688,36 +688,37 @@
    :params [field value]
    :children children})
 
-(defn push-io!*
-  [context io-name]
+(defn output!*
+  [context output-name]
   ;; discard io in test mode
   (if (:test-mode? context)
     (fn stream [_] nil)
-    (if-let [io-component (get-in context [:io io-name :component])]
+    (if-let [output-component (get-in context [:outputs output-name :component])]
       (fn stream [event]
         (when-let [events (keep-non-discarded-events event)]
-          (io/inject! io-component (e/sequential-events events))))
-      (throw (ex/ex-incorrect (format "IO %s not found"
-                                      io-name))))))
+          (io/inject! output-component (e/sequential-events events))))
+      (throw (ex/ex-incorrect (format "Output %s not found"
+                                      output-name))))))
 
-(s/def ::push-io! (s/cat :io-name keyword?))
+(s/def ::output! (s/cat :output-name keyword?))
 
-(defn push-io!
+(defn output!
   "Push events to an external system.
 
-  I/O are defined in a dedicated file. If you create a new I/O named `:influxdb`
-  for example, you can use push-io! to push all events into this I/O:
+  Outputs are configured into the main Mirabelle configuration file.
+  If you create a new output named `:influxdb`
+  for example, you can use output! to push all events into this I/O:
 
   ```clojure
-  (push-io! :influxdb)
+  (output! :influxdb)
   ```
 
-  I/O are automatically discarded in test mode."
-  [io-name]
-  (mspec/valid-action? ::push-io! [io-name])
-  {:action :push-io!
-   :description {:message (format "Forward events to the I/O %s" io-name)}
-   :params [io-name]})
+  Outputs are automatically discarded in test mode."
+  [output-name]
+  (mspec/valid-action? ::output! [output-name])
+  {:action :output!
+   :description {:message (format "Forward events to the output %s" output-name)}
+   :params [output-name]})
 
 (defn coalesce*
   [_ {:keys [duration fields]} & children]
@@ -1617,7 +1618,7 @@
   [context queue-name & children]
   (if (:test-mode? context)
     (apply sdo* context children)
-    (if-let [^Executor executor (get-in context [:io queue-name :component])]
+    (if-let [^Executor executor (get-in context [:outputs queue-name :component])]
       (fn stream [event]
         (.execute executor
                   (fn []
@@ -2678,7 +2679,7 @@
    :over over*
    :project project*
    :publish! publish!*
-   :push-io! push-io!*
+   :output! output!*
    :reaper reaper*
    :reinject! reinject!*
    :rename-keys rename-keys*

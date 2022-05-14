@@ -23,7 +23,7 @@
   nil)
 
 (defn build-system
-  [{:keys [tcp stream http io]}]
+  [{:keys [tcp stream http outputs custom-outputs]}]
   (let [registry (metric/registry-component {})
         index (component/start (index/map->Index {}))
         pubsub (component/start (pubsub/map->PubSub {}))]
@@ -37,8 +37,8 @@
                (component/using [:api-handler :pubsub]))
      :stream-handler (stream/map->StreamHandler
                       {:streams-directories (:directories stream)
-                       :io-directories (:directories io)
-                       :custom-io (:custom io)
+                       :outputs-configurations outputs
+                       :custom-outputs custom-outputs
                        :custom-actions (:actions stream)
                        :index index
                        :registry registry

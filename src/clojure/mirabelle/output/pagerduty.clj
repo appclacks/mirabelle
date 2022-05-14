@@ -1,6 +1,6 @@
 ;; Part of this code is from the Riemann code base
 ;; Copyright Riemann authors (riemann.io), thanks to them!
-(ns mirabelle.io.pagerduty
+(ns mirabelle.output.pagerduty
   (:require [cheshire.core :as json]
             [clj-http.client :as client]
             [clojure.spec.alpha :as s]
@@ -98,7 +98,7 @@
   (start [this]
     (mspec/valid? ::pagerduty this))
   (stop [this] this)
-  io/IO
+  io/Output
   (inject! [this events]
     (doseq [event events]
       (send-event this

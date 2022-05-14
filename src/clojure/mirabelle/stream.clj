@@ -11,10 +11,10 @@
             [mirabelle.action :as action]
             mirabelle.config
             [mirabelle.index :as index]
-            [mirabelle.io.elasticsearch :as elasticsearch]
-            [mirabelle.io.file :as io-file]
-            [mirabelle.io.influxdb :as influxdb]
-            [mirabelle.io.pagerduty :as pagerduty]
+            [mirabelle.output.elasticsearch :as elasticsearch]
+            [mirabelle.output.file :as io-file]
+            [mirabelle.output.influxdb :as influxdb]
+            [mirabelle.output.pagerduty :as pagerduty]
             [mirabelle.pool :as pool])
   (:import [io.micrometer.core.instrument Timer]
            [java.io File]
@@ -66,52 +66,51 @@
               (compile! context)
               first)))
 
-(defn compile-io!
-  "Config an IO configuration.
-  {:type :file :config {:path ...}}.
+(defn compile-output!
+  "Config an output configuration.
 
-  Adds the :component key to the IO"
-  [registry io-name io-config custom-io]
-  (let [t (:type io-config)]
+  Adds the :component key to the output"
+  [registry output-name output-config custom-outputs]
+  (let [t (:type output-config)]
     (cond
-      ;; it's a custom IO
+      ;; it's a custom output
       ;; need to resolve the fn from the config
-      (get custom-io t)
-      (assoc io-config
+      (get custom-outputs t)
+      (assoc output-config
              :component
-             ((requiring-resolve (get custom-io t)) (assoc (:config io-config)
-                                                           :registry registry)))
+             ((requiring-resolve (get custom-outputs t)) (assoc (:config output-config)
+                                                                :registry registry)))
 
       (= :async-queue t)
-      (assoc io-config :component (pool/dynamic-thread-pool-executor registry
-                                                                     io-name
-                                                                     (:config io-config)))
+      (assoc output-config :component (pool/dynamic-thread-pool-executor registry
+                                                                         output-name
+                                                                         (:config output-config)))
 
       (= :file t)
-      (assoc io-config
+      (assoc output-config
              :component
-             (io-file/map->FileIO (:config io-config)))
+             (io-file/map->File (:config output-config)))
 
       (= :pagerduty t)
-      (assoc io-config
+      (assoc output-config
              :component
-             (component/start (pagerduty/map->Pagerduty (:config io-config))))
+             (component/start (pagerduty/map->Pagerduty (:config output-config))))
 
       (= :elasticsearch t)
-      (assoc io-config
+      (assoc output-config
              :component
              (component/start (elasticsearch/map->Elasticsearch
-                               {:config (:config io-config)})))
+                               {:config (:config output-config)})))
 
       (= :influxdb t)
-      (assoc io-config
+      (assoc output-config
              :component
-             (component/start (influxdb/map->InfluxIO
-                               {:config (:config io-config)})))
+             (component/start (influxdb/map->Influx
+                               {:config (:config output-config)})))
       :else
       (throw (ex/ex-incorrect
-              (format "Invalid IO: %s" t)
-              io-config)))))
+              (format "Invalid Output: %s" t)
+              output-config)))))
 
 (defn stream!
   [stream event]
@@ -169,15 +168,14 @@
 
 ;; I should simplify this crappy code
 (deftype StreamHandler [streams-directories ;; config
-                        io-directories;; config
+                        outputs-configurations;; config
                         lock
                         ;; streams from the config file
                         ^:volatile-mutable streams-configurations
-                        ^:volatile-mutable io-configurations
                         custom-actions
-                        custom-io
+                        custom-outputs
                         ^:volatile-mutable compiled-streams
-                        ^:volatile-mutable compiled-io
+                        ^:volatile-mutable compiled-outputs
                         ^:volatile-mutable ^Timer stream-timer
                         queue
                         registry
@@ -188,36 +186,34 @@
                         ]
   component/Lifecycle
   (start [this]
-    (let [new-io-configurations (read-edn-dirs io-directories)
-          new-compiled-io (->> new-io-configurations
-                               (map (fn [[k v]] [k (compile-io! registry
-                                                                k
-                                                                v
-                                                                custom-io)]))
-                               (into {}))
+    (let [new-compiled-outputs (->> outputs-configurations
+                                    (map (fn [[k v]] [k (compile-output! registry
+                                                                         k
+                                                                         v
+                                                                         custom-outputs)]))
+                                    (into {}))
           timer (metric/get-timer! registry
                                    :stream-duration
                                    {})]
-      (when-let [io (seq (map first new-io-configurations))]
+      (when-let [output (seq (map first outputs-configurations))]
         (log/infof {}
-                   "Adding IO %s"
-                   (string/join #", " io)))
-      (set! io-configurations new-io-configurations)
-      (set! compiled-io new-compiled-io)
+                   "Adding outputs %s"
+                   (string/join #", " output)))
+      (set! compiled-outputs new-compiled-outputs)
       (set! compiled-streams {})
       (set! stream-timer timer)
       (reload this))
     this)
   (stop [_]
     ;; stop executors first to let them finish ongoing tasks
-    (doseq [[_ queue] (filter #(= :async-queue (:type %)) compiled-io)]
+    (doseq [[_ queue] (filter #(= :async-queue (:type %)) compiled-outputs)]
       (let [^Executor executor (:component queue)]
         (pool/shutdown executor)))
-    (doseq [[_ io] (remove #(= :async-queue (:type %)) compiled-io)]
+    (doseq [[_ io] (remove #(= :async-queue (:type %)) compiled-outputs)]
       (component/stop io)))
   IStreamHandler
   (context [this source-stream]
-    {:io compiled-io
+    {:outputs compiled-outputs
      :registry registry
      :queue queue
      :tap tap
@@ -236,7 +232,7 @@
             ;; should be compiled first
             ;; todo filter real time streams
             streams-configs-to-compile (select-keys new-streams-configurations
-                                                   (set/union to-add to-reload))
+                                                    (set/union to-add to-reload))
             new-compiled-streams (->> streams-configs-to-compile
                                       (mapv (fn [[k v]]
                                               [k (compile-stream!
@@ -319,13 +315,12 @@
 
 (defn map->StreamHandler
   [{:keys [streams-directories
-           io-directories
+           outputs-configurations
            streams-configurations
-           io-configurations
            custom-actions
-           custom-io
+           custom-outputs
            compiled-streams
-           compiled-io
+           compiled-outputs
            stream-timer
            queue
            registry
@@ -333,21 +328,20 @@
            index
            pubsub]
     :or {streams-configurations {}
-         io-configurations {}
+         outputs-configurations {}
          custom-actions {}
-         custom-io {}
+         custom-outputs {}
          compiled-streams {}
-         compiled-io {}
+         compiled-outputs {}
          test-mode? false}}]
   (->StreamHandler streams-directories
-                   io-directories
+                   outputs-configurations
                    (Object.)
                    streams-configurations
-                   io-configurations
                    custom-actions
-                   custom-io
+                   custom-outputs
                    compiled-streams
-                   compiled-io
+                   compiled-outputs
                    stream-timer
                    queue
                    registry

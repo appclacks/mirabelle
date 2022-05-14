@@ -1,4 +1,4 @@
-(ns mirabelle.io.elasticsearch
+(ns mirabelle.output.elasticsearch
   (:require [cheshire.core :as json]
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
@@ -167,7 +167,7 @@
     (when client
       (.close ^RestClient client))
     (assoc this :client nil :response-listener nil))
-  io/IO
+  io/Output
   (inject! [_ events]
     (let [^Request request (Request. "POST" "/_bulk")]
       (.setEntity request

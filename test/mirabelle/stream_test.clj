@@ -6,8 +6,8 @@
             [corbihttp.metric :as metric]
             [mirabelle.action :as a]
             [mirabelle.index :as index]
-            [mirabelle.io.file :as io-file]
-            [mirabelle.io :refer [IO]]
+            [mirabelle.output.file :as output-file]
+            [mirabelle.io :refer [Output]]
             [mirabelle.pool :as pool]
             [mirabelle.pubsub :as pubsub]
             [mirabelle.stream :as stream]))
@@ -215,15 +215,15 @@
     (entrypoint {:metric 1 :time 1})
     (is (= [{:metric 2 :time 1}] @recorder))))
 
-(deftest io-file-test
+(deftest output-file-test
   (testing "non-test mode"
     (let [stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/push-io! :file-example-io)}
+                  :actions (a/output! :file-example-output)}
           file "/tmp/mirabelle-test-io"
-          io-component (io-file/map->FileIO {:path file})
+          output-component (output-file/map->File {:path file})
           {:keys [entrypoint]} (stream/compile-stream!
-                                {:io {:file-example-io {:component io-component}}}
+                                {:outputs {:file-example-output {:component output-component}}}
                                 stream)]
       (entrypoint {:state "critical" :time 1})
       (entrypoint {:state "critical" :time 1 :tags ["mirabelle/discard"]})
@@ -240,7 +240,7 @@
   (testing "test mode"
     (let [stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/push-io! :file-example-io)}
+                  :actions (a/output! :file-example-output)}
           {:keys [entrypoint]} (stream/compile-stream!
                                 {:test-mode? true}
                                 stream)]
@@ -335,21 +335,21 @@
             {:metric 12 :time 3}]
            @recorder))))
 
-(deftest compile-io!-test
+(deftest compile-output!-test
   (testing "file io"
-    (let [io-compiled (stream/compile-io! nil
-                                          :foo
-                                          {:type :file
-                                           :config {:path "/tmp/foo"}}
-                                          {})]
-      (is (satisfies? IO (:component io-compiled)))))
+    (let [io-compiled (stream/compile-output! nil
+                                              :foo
+                                              {:type :file
+                                               :config {:path "/tmp/foo"}}
+                                              {})]
+      (is (satisfies? Output (:component io-compiled)))))
   (testing "custom io"
-    (let [io-compiled (stream/compile-io! nil
-                                          :foo
-                                          {:type :custom
-                                           :config {:path "/tmp/foo"}}
-                                          {:custom 'mirabelle.io.file/map->FileIO})]
-      (is (satisfies? IO (:component io-compiled))))))
+    (let [io-compiled (stream/compile-output! nil
+                                              :foo
+                                              {:type :custom
+                                               :config {:path "/tmp/foo"}}
+                                              {:custom 'mirabelle.output.file/map->File})]
+      (is (satisfies? Output (:component io-compiled))))))
 
 (deftest config-keys-test
   (is (= #{:foo :bar}
@@ -391,7 +391,7 @@
                   :description "foo"
                   :actions (a/async-queue! :foo
                                            (a/test-action recorder))}
-          {:keys [entrypoint]} (stream/compile-stream! {:io {:foo queue}} stream)]
+          {:keys [entrypoint]} (stream/compile-stream! {:outputs {:foo queue}} stream)]
       (entrypoint {:metric 12 :time 1})
       (entrypoint {:metric 13 :time 1})
       (Thread/sleep 200)
@@ -415,7 +415,7 @@
 
 (deftest stream-component-test
   (let [streams-path (.getPath (io/resource "streams"))
-        io-path (.getPath (io/resource "ios"))
+        outputs-config {}
         streams {:foo {:actions {:action :fixed-event-window
                                  :params [{:size 100}]
                                  :children []}}
@@ -429,7 +429,7 @@
                                      :params [{:size 200}]
                                      :children []}}}
         handler (stream/map->StreamHandler {:streams-directories [streams-path]
-                                            :io-directories [io-path]
+                                            :outputs-config outputs-config
                                             :registry (metric/registry-component {})})]
     (spit (str streams-path "/" "streams.edn") (pr-str streams))
     (let [{:keys [compiled-streams
@@ -851,7 +851,7 @@
           stream {:name "my-stream"
                   :description "foo"
                   :actions (a/fixed-time-window {:duration 10 :delay 5}
-                                       (a/test-action recorder))}
+                                                (a/test-action recorder))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
