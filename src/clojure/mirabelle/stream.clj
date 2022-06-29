@@ -70,16 +70,16 @@
   "Config an output configuration.
 
   Adds the :component key to the output"
-  [registry output-name output-config custom-outputs]
+  [registry output-name output-config]
   (let [t (:type output-config)]
     (cond
       ;; it's a custom output
       ;; need to resolve the fn from the config
-      (get custom-outputs t)
+      (= :custom t)
       (assoc output-config
              :component
-             ((requiring-resolve (get custom-outputs t)) (assoc (:config output-config)
-                                                                :registry registry)))
+             ((requiring-resolve (:builder output-config)) (assoc (:config output-config)
+                                                                  :registry registry)))
 
       (= :async-queue t)
       (assoc output-config :component (pool/dynamic-thread-pool-executor registry
@@ -189,8 +189,7 @@
     (let [new-compiled-outputs (->> outputs-configurations
                                     (map (fn [[k v]] [k (compile-output! registry
                                                                          k
-                                                                         v
-                                                                         custom-outputs)]))
+                                                                         v)]))
                                     (into {}))
           timer (metric/get-timer! registry
                                    :stream-duration

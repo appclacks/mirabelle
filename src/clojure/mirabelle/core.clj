@@ -37,8 +37,8 @@
                (component/using [:api-handler :pubsub]))
      :stream-handler (stream/map->StreamHandler
                       {:streams-directories (:directories stream)
-                       :outputs-configurations outputs
-                       :custom-outputs custom-outputs
+                       :outputs-configurations (dissoc outputs :custom)
+                       :custom-outputs (:custom outputs {})
                        :custom-actions (:actions stream)
                        :index index
                        :registry registry

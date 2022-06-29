@@ -340,15 +340,14 @@
     (let [io-compiled (stream/compile-output! nil
                                               :foo
                                               {:type :file
-                                               :config {:path "/tmp/foo"}}
-                                              {})]
+                                               :config {:path "/tmp/foo"}})]
       (is (satisfies? Output (:component io-compiled)))))
   (testing "custom io"
     (let [io-compiled (stream/compile-output! nil
                                               :foo
                                               {:type :custom
-                                               :config {:path "/tmp/foo"}}
-                                              {:custom 'mirabelle.output.file/map->File})]
+                                               :builder 'mirabelle.output.file/map->File
+                                               :config {:path "/tmp/foo"}})]
       (is (satisfies? Output (:component io-compiled))))))
 
 (deftest config-keys-test

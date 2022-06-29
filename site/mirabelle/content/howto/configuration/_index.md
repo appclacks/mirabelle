@@ -36,11 +36,13 @@ The Mirabelle configuration is defined in [EDN](https://github.com/edn-format/ed
  :stream {:directories ["/usr/lib/mirabelle/streams/"]
           :actions {}}
 
- ;; I/O configurations.
+ ;; outputs configurations.
  ;; The directories parameter is a list of directories containing I/O definitions
- ;; The custom parameter can be used to define custom actions.
- :io {:directories ["dev/resources/examples/io"]
-      :custom {}}
+ :outputs {:write-file {:config {:path "/tmp/file"}
+                        :type :file}
+
+ ;; This parameter can be used to define custom outputs
+ custom-outputs {}
 
  ;; Logging configuration (https://github.com/pyr/unilog)
  :logging {:level "info"

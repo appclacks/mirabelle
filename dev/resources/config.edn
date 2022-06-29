@@ -9,8 +9,10 @@
  :stream {:directories ["dev/resources/streams"]
           :actions {:custom mirabelle.action/where*}}
  :outputs {:write-file {:config {:path "/tmp/file"}
-                        :type :file}}
- :custom-outputs {}
+                        :type :file}
+           :foo-custom {:builder mirabelle.output.file/map->File
+                        :type :custom
+                        :config {:path "/tmp/file2"}}}
  :logging {:level "info"
            :console {:encoder :json}}
  :test {:directories ["dev/resources/tests"]}}

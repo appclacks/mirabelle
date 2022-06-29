@@ -6,6 +6,13 @@ chapter: false
 
 This is the list of user-facing changes for Mirabelle.
 
+## v0.11.0
+
+**Breaking changes**
+
+- The Mirabelle outputs are now configured into the main configuration file and not in dedicated files referenced in the `:io` configuration key.
+The custom outputs definitions are also modified.
+
 ## v0.10.0
 
 **Breaking changes**
