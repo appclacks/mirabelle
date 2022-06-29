@@ -7,7 +7,7 @@
                  [com.boundary/high-scale-lib "1.0.6"]
                  [com.google.protobuf/protobuf-java "3.19.4"]
                  [com.google.protobuf/protobuf-java-util "3.19.4"]
-                 [com.influxdb/influxdb-client-java "4.3.0"]
+                 [com.influxdb/influxdb-client-java "6.2.0"]
                  [io.netty/netty-all "4.1.58.Final"]
                  [io.netty/netty-codec "4.1.58.Final"]
                  [io.netty/netty-handler "4.1.58.Final"]
@@ -19,9 +19,9 @@
                  [org.apache.kafka/kafka-clients "3.1.0"]
                  [org.clojure/clojure "1.11.1"]
                  [org.clojure/spec.alpha "0.3.218"]
-                 [org.elasticsearch.client/elasticsearch-rest-client "7.14.1"]
+                 [org.elasticsearch.client/elasticsearch-rest-client "8.3.0"]
                  [org.xerial.snappy/snappy-java "1.1.8.4"]
-                 [riemann-clojure-client "0.5.3"]]
+                 [riemann-clojure-client "0.5.4"]]
   :main ^:skip-aot mirabelle.core
   :global-vars {*warn-on-reflection* true}
   :target-path "target/%s"
@@ -32,7 +32,7 @@
           :output-path "site/mirabelle/static/generated-doc"
           :metadata   {:doc/format :markdown}}
   :profiles {:dev {:dependencies [[pjstadig/humane-test-output "0.11.0"]
-                                  [org.clojure/tools.namespace "1.2.0"]
+                                  [org.clojure/tools.namespace "1.3.0"]
                                   [org.clojure/data.fressian "1.0.0"]
                                   [com.clojure-goes-fast/clj-memory-meter "0.1.3"]]
                    :plugins [[lein-ancient "0.6.15"]
