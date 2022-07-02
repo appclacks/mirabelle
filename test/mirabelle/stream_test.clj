@@ -610,6 +610,7 @@
                           (a/aggr-max {:duration 5 :delay 2})
                           (a/aggr-min {:duration 5})
                           (a/aggr-sum {:duration 5})
+                          (a/aggr-mean {:duration 5})
                           (a/stable 5 :state)
                           (a/project [[:= :host "foo"]
                                       [:= :service "bar"]])
@@ -715,6 +716,23 @@
             {:time 19 :metric 12}
             {:time 23 :metric 6}
             {:time 60 :metric 1}]
+           @recorder))))
+
+(deftest aggr-mean-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/aggr-mean {:duration 10}
+                                      (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:time 0 :metric 10})
+    (entrypoint {:time 7 :metric 1})
+    (entrypoint {:time 11 :metric 4})
+    (entrypoint {:time 14 :metric 19})
+    (entrypoint {:time 17 :metric 2})
+    (entrypoint {:time 22 :metric 3})
+    (is (= [{:time 7 :metric (/ 11 2)}
+            {:time 17 :metric (/ 25 3)}]
            @recorder))))
 
 (deftest aggr-max-test
