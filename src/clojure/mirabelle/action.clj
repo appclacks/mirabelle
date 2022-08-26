@@ -1539,22 +1539,54 @@
    :params [points]
    :children children})
 
+
+(defn clear-forks
+  [state current-time fork-ttl]
+  (let [forks (->> (:forks state)
+                   (remove #(> (- current-time fork-ttl)
+                               (:time (second %))))
+                   (into {}))]
+    (assoc state :forks forks :last-gc current-time)
+    ))
+
+
+(defn get-fork-and-gc
+  [state new-fork fork-name current-time fork-ttl gc-interval]
+  (let [state (if (and gc-interval
+                       (or (= (:last-gc state) 0)
+                           (> current-time (+ (:last-gc state) gc-interval))))
+                (clear-forks state current-time fork-ttl)
+                state)]
+    (if-let [fork (get-in state [:forks fork-name :fork])]
+      ;; return the new fork
+      (-> (assoc state :returned-fork fork)
+          (assoc-in [:forks fork-name :time] current-time))
+      (let [new-fork-instance (new-fork)]
+        (-> (assoc-in state [:forks fork-name] {:fork new-fork-instance
+                                                :time current-time})
+            (assoc :returned-fork new-fork-instance))))))
+
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn by-fn
-  [fields new-fork]
+  [{:keys [fields gc-interval fork-ttl]} new-fork]
   (let [fields (flatten [fields])
         f (if (= 1 (count fields))
             (first fields)
             (apply juxt fields))
-        table (atom {})]
+        fork-ttl (or fork-ttl 3600)
+        state (atom {:last-gc 0})]
     (fn stream [event]
       (let [fork-name (f event)
-            fork (if-let [fork (@table fork-name)]
-                   fork
-                   ((swap! table assoc fork-name (new-fork)) fork-name))]
+            fork (:returned-fork (swap! state get-fork-and-gc new-fork fork-name (:time event) fork-ttl gc-interval))]
         (call-rescue event fork)))))
 
-(s/def ::by (s/cat :fields (s/coll-of keyword?)))
+(s/def :by/fields (s/coll-of keyword?))
+(s/def :by/gc-interval pos-int?)
+(s/def :by/fork-ttl pos-int?)
+
+(s/def ::by (s/cat :config (s/keys :req-un [:by/fields]
+                                   :opt-un [:by/gc-interval
+                                            :by/fork-ttl])))
 
 (defn by
   "Split stream by field
@@ -1568,11 +1600,11 @@
   ```
 
   This example generates a moving window for each host/service combination."
-  [fields & children]
-  (mspec/valid-action? ::by [fields])
+  [config & children]
+  (mspec/valid-action? ::by [config])
   {:action :by
-   :description {:message (str "Split streams by field(s) " fields)}
-   :params [fields]
+   :description {:message (str "Split streams by field(s) " (:fields config))}
+   :params [config]
    :children children})
 
 (defn reinject!*

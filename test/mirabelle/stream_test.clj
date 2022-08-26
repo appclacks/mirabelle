@@ -247,35 +247,82 @@
       (entrypoint {:state "critical" :time 1}))))
 
 (deftest by-test
-  (testing "simple example"
+  (comment(testing "simple example"
+            (let [recorder (atom [])
+                  stream {:name "my-stream"
+                          :description "foo"
+                          :actions (a/by {:fields [:host]}
+                                         (a/fixed-event-window {:size 2}
+                                                               (a/test-action recorder)))}
+                  {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+              (entrypoint {:host "foo" :metric 1 :time 1})
+              (entrypoint {:host "foo" :metric 2 :time 1})
+              (entrypoint {:host "bar" :metric 3 :time 1})
+              (entrypoint {:host "bar" :metric 4 :time 1})
+              (is (= [[{:host "foo" :metric 1 :time 1}
+                       {:host "foo" :metric 2 :time 1}]
+                      [{:host "bar" :metric 3 :time 1}
+                       {:host "bar" :metric 4 :time 1}]]
+                     @recorder))
+              (entrypoint {:host "bar" :metric 5 :time 2})
+              (entrypoint {:host "bar" :metric 6 :time 2})
+              (entrypoint {:host "baz" :metric 4 :time 1})
+              (entrypoint {:host "baz" :metric 7 :time 4})
+              (is (= [[{:host "foo" :metric 1 :time 1}
+                       {:host "foo" :metric 2 :time 1}]
+                      [{:host "bar" :metric 3 :time 1}
+                       {:host "bar" :metric 4 :time 1}]
+                      [{:host "bar" :metric 5 :time 2}
+                       {:host "bar" :metric 6 :time 2}]
+                      [{:host "baz" :metric 4 :time 1}
+                       {:host "baz" :metric 7 :time 4}]]
+                     @recorder))))
+          (testing "no expiration"
+            (let [recorder (atom [])
+                  stream {:name "my-stream"
+                          :description "foo"
+                          :actions (a/by {:fields [:host]
+                                          :gc-interval 10
+                                          :fork-ttl 10}
+                                         (a/fixed-event-window {:size 2}
+                                                               (a/test-action recorder)))}
+                  {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+              (entrypoint {:host "foo" :metric 1 :time 1})
+              (entrypoint {:host "foo" :metric 2 :time 4})
+              (entrypoint {:host "foo" :metric 3 :time 10})
+              (entrypoint {:host "foo" :metric 4 :time 15})
+              (entrypoint {:host "foo" :metric 5 :time 21})
+              (is (= [[{:host "foo" :metric 1 :time 1}
+                       {:host "foo" :metric 2 :time 4}]
+                      [{:host "foo" :metric 3 :time 10}
+                       {:host "foo" :metric 4 :time 15}]]
+                     @recorder)))))
+  (testing "expiration"
     (let [recorder (atom [])
           stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/by [:host]
+                  :actions (a/by {:fields [:host]
+                                  :gc-interval 10
+                                  :fork-ttl 10}
                                  (a/fixed-event-window {:size 2}
                                                        (a/test-action recorder)))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:host "foo" :metric 1 :time 1})
-      (entrypoint {:host "foo" :metric 2 :time 1})
-      (entrypoint {:host "bar" :metric 3 :time 1})
-      (entrypoint {:host "bar" :metric 4 :time 1})
-      (is (= [[{:host "foo" :metric 1 :time 1}
-               {:host "foo" :metric 2 :time 1}]
-              [{:host "bar" :metric 3 :time 1}
-               {:host "bar" :metric 4 :time 1}]]
-             @recorder))
-      (entrypoint {:host "bar" :metric 5 :time 2})
-      (entrypoint {:host "bar" :metric 6 :time 2})
-      (entrypoint {:host "baz" :metric 4 :time 1})
-      (entrypoint {:host "baz" :metric 7 :time 4})
-      (is (= [[{:host "foo" :metric 1 :time 1}
-               {:host "foo" :metric 2 :time 1}]
-              [{:host "bar" :metric 3 :time 1}
-               {:host "bar" :metric 4 :time 1}]
-              [{:host "bar" :metric 5 :time 2}
-               {:host "bar" :metric 6 :time 2}]
-              [{:host "baz" :metric 4 :time 1}
-               {:host "baz" :metric 7 :time 4}]]
+      (entrypoint {:host "foo" :metric 4 :time 15})
+      (entrypoint {:host "foo" :metric 5 :time 21})
+      (entrypoint {:host "foo" :metric 5 :time 23})
+      (entrypoint {:host "foo" :metric 5 :time 31})
+      (entrypoint {:host "foo" :metric 5 :time 32})
+      (entrypoint {:host "foo" :metric 5 :time 50})
+      (entrypoint {:host "foo" :metric 5 :time 89})
+      (entrypoint {:host "foo" :metric 5 :time 110})
+      (entrypoint {:host "foo" :metric 5 :time 111})
+      (is (= [[{:host "foo" :metric 4 :time 15}
+               {:host "foo" :metric 5 :time 21}]
+              [{:host "foo" :metric 5 :time 23}
+               {:host "foo" :metric 5 :time 31}]
+              [{:host "foo" :metric 5 :time 110}
+               {:host "foo" :metric 5 :time 111}]]
              @recorder)))))
 
 (deftest split-test
@@ -621,10 +668,10 @@
                           (a/sdissoc :foo)
                           (a/sformat "%s" :host [:service])
                           (a/exception-stream
-                           (a/by [:host])
+                           (a/by {:fields [:host]})
                            (a/decrement))
-                          (a/by [:host])
-                          (a/by [:host :service])
+                          (a/by {:fields [:host]})
+                          (a/by {:fields [:host :service]})
                           (a/sdissoc [:host :service])
                           (a/throttle {:count 1 :duration 10})
                           (a/warning)
@@ -634,7 +681,7 @@
                           (a/tap :foo)
                           (a/io)
                           (a/io
-                           (a/by [:host]))
+                           (a/by {:fields [:host]}))
                           (a/fixed-time-window {:duration 5})
                           (a/split
                            [:> :metric 10] (a/critical))
