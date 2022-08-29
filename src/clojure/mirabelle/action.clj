@@ -1546,13 +1546,12 @@
                    (remove #(> (- current-time fork-ttl)
                                (:time (second %))))
                    (into {}))]
-    (assoc state :forks forks :last-gc current-time)
-    ))
-
+    (assoc state :forks forks :last-gc current-time)))
 
 (defn get-fork-and-gc
   [state new-fork fork-name current-time fork-ttl gc-interval]
-  (let [state (if (and gc-interval
+  (let [current-time (max current-time (:time state current-time))
+        state (if (and gc-interval
                        (or (= (:last-gc state) 0)
                            (> current-time (+ (:last-gc state) gc-interval))))
                 (clear-forks state current-time fork-ttl)

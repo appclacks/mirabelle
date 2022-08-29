@@ -247,56 +247,56 @@
       (entrypoint {:state "critical" :time 1}))))
 
 (deftest by-test
-  (comment(testing "simple example"
-            (let [recorder (atom [])
-                  stream {:name "my-stream"
-                          :description "foo"
-                          :actions (a/by {:fields [:host]}
-                                         (a/fixed-event-window {:size 2}
-                                                               (a/test-action recorder)))}
-                  {:keys [entrypoint]} (stream/compile-stream! {} stream)]
-              (entrypoint {:host "foo" :metric 1 :time 1})
-              (entrypoint {:host "foo" :metric 2 :time 1})
-              (entrypoint {:host "bar" :metric 3 :time 1})
-              (entrypoint {:host "bar" :metric 4 :time 1})
-              (is (= [[{:host "foo" :metric 1 :time 1}
-                       {:host "foo" :metric 2 :time 1}]
-                      [{:host "bar" :metric 3 :time 1}
-                       {:host "bar" :metric 4 :time 1}]]
-                     @recorder))
-              (entrypoint {:host "bar" :metric 5 :time 2})
-              (entrypoint {:host "bar" :metric 6 :time 2})
-              (entrypoint {:host "baz" :metric 4 :time 1})
-              (entrypoint {:host "baz" :metric 7 :time 4})
-              (is (= [[{:host "foo" :metric 1 :time 1}
-                       {:host "foo" :metric 2 :time 1}]
-                      [{:host "bar" :metric 3 :time 1}
-                       {:host "bar" :metric 4 :time 1}]
-                      [{:host "bar" :metric 5 :time 2}
-                       {:host "bar" :metric 6 :time 2}]
-                      [{:host "baz" :metric 4 :time 1}
-                       {:host "baz" :metric 7 :time 4}]]
-                     @recorder))))
-          (testing "no expiration"
-            (let [recorder (atom [])
-                  stream {:name "my-stream"
-                          :description "foo"
-                          :actions (a/by {:fields [:host]
-                                          :gc-interval 10
-                                          :fork-ttl 10}
-                                         (a/fixed-event-window {:size 2}
-                                                               (a/test-action recorder)))}
-                  {:keys [entrypoint]} (stream/compile-stream! {} stream)]
-              (entrypoint {:host "foo" :metric 1 :time 1})
-              (entrypoint {:host "foo" :metric 2 :time 4})
-              (entrypoint {:host "foo" :metric 3 :time 10})
-              (entrypoint {:host "foo" :metric 4 :time 15})
-              (entrypoint {:host "foo" :metric 5 :time 21})
-              (is (= [[{:host "foo" :metric 1 :time 1}
-                       {:host "foo" :metric 2 :time 4}]
-                      [{:host "foo" :metric 3 :time 10}
-                       {:host "foo" :metric 4 :time 15}]]
-                     @recorder)))))
+  (testing "simple example"
+    (let [recorder (atom [])
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/by {:fields [:host]}
+                                 (a/fixed-event-window {:size 2}
+                                                       (a/test-action recorder)))}
+          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+      (entrypoint {:host "foo" :metric 1 :time 1})
+      (entrypoint {:host "foo" :metric 2 :time 1})
+      (entrypoint {:host "bar" :metric 3 :time 1})
+      (entrypoint {:host "bar" :metric 4 :time 1})
+      (is (= [[{:host "foo" :metric 1 :time 1}
+               {:host "foo" :metric 2 :time 1}]
+              [{:host "bar" :metric 3 :time 1}
+               {:host "bar" :metric 4 :time 1}]]
+             @recorder))
+      (entrypoint {:host "bar" :metric 5 :time 2})
+      (entrypoint {:host "bar" :metric 6 :time 2})
+      (entrypoint {:host "baz" :metric 4 :time 1})
+      (entrypoint {:host "baz" :metric 7 :time 4})
+      (is (= [[{:host "foo" :metric 1 :time 1}
+               {:host "foo" :metric 2 :time 1}]
+              [{:host "bar" :metric 3 :time 1}
+               {:host "bar" :metric 4 :time 1}]
+              [{:host "bar" :metric 5 :time 2}
+               {:host "bar" :metric 6 :time 2}]
+              [{:host "baz" :metric 4 :time 1}
+               {:host "baz" :metric 7 :time 4}]]
+             @recorder))))
+  (testing "no expiration"
+    (let [recorder (atom [])
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/by {:fields [:host]
+                                  :gc-interval 10
+                                  :fork-ttl 10}
+                                 (a/fixed-event-window {:size 2}
+                                                       (a/test-action recorder)))}
+          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+      (entrypoint {:host "foo" :metric 1 :time 1})
+      (entrypoint {:host "foo" :metric 2 :time 4})
+      (entrypoint {:host "foo" :metric 3 :time 10})
+      (entrypoint {:host "foo" :metric 4 :time 15})
+      (entrypoint {:host "foo" :metric 5 :time 21})
+      (is (= [[{:host "foo" :metric 1 :time 1}
+               {:host "foo" :metric 2 :time 4}]
+              [{:host "foo" :metric 3 :time 10}
+               {:host "foo" :metric 4 :time 15}]]
+             @recorder))))
   (testing "expiration"
     (let [recorder (atom [])
           stream {:name "my-stream"
@@ -323,6 +323,36 @@
                {:host "foo" :metric 5 :time 31}]
               [{:host "foo" :metric 5 :time 110}
                {:host "foo" :metric 5 :time 111}]]
+             @recorder))))
+  (testing "expiration and out of order"
+    (let [recorder (atom [])
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/by {:fields [:host]
+                                  :gc-interval 10
+                                  :fork-ttl 10}
+                                 (a/fixed-event-window {:size 2}
+                                                       (a/test-action recorder)))}
+          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+      (entrypoint {:host "foo" :metric 1 :time 1})
+      (entrypoint {:host "foo" :metric 4 :time 15})
+      (entrypoint {:host "foo" :metric 5 :time 13})
+      (entrypoint {:host "foo" :metric 5 :time 23})
+      (entrypoint {:host "foo" :metric 5 :time 31})
+      (entrypoint {:host "foo" :metric 5 :time 10})
+      (entrypoint {:host "foo" :metric 5 :time 11})
+      (entrypoint {:host "foo" :metric 5 :time 50})
+      (entrypoint {:host "foo" :metric 5 :time 89})
+      (entrypoint {:host "foo" :metric 5 :time 110})
+      (entrypoint {:host "foo" :metric 5 :time 10})
+      (is (= [[{:host "foo" :metric 4 :time 15}
+               {:host "foo" :metric 5 :time 13}]
+              [{:host "foo" :metric 5 :time 23}
+               {:host "foo" :metric 5 :time 31}]
+              [{:host "foo" :metric 5 :time 10}
+               {:host "foo" :metric 5 :time 11}]
+              [{:host "foo" :metric 5 :time 110}
+               {:host "foo" :metric 5 :time 10}]]
              @recorder)))))
 
 (deftest split-test
