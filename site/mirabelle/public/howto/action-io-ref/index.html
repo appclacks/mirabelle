@@ -12,20 +12,20 @@
     <title>I/O and actions reference :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1664833672" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1664833672" rel="stylesheet">
-    <link href="/css/hybrid.css?1664833672" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1664833672" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1664833672" rel="stylesheet">
-    <link href="/css/auto-complete.css?1664833672" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1664833672" rel="stylesheet">
-    <link href="/css/theme.css?1664833672" rel="stylesheet">
-    <link href="/css/tabs.css?1664833672" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1664833672" rel="stylesheet">
+    <link href="/css/nucleus.css?1664833842" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1664833842" rel="stylesheet">
+    <link href="/css/hybrid.css?1664833842" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1664833842" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1664833842" rel="stylesheet">
+    <link href="/css/auto-complete.css?1664833842" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1664833842" rel="stylesheet">
+    <link href="/css/theme.css?1664833842" rel="stylesheet">
+    <link href="/css/tabs.css?1664833842" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1664833842" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1664833672"></script>
+    <script src="/js/jquery-3.3.1.min.js?1664833842"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1664833672"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1664833672"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1664833842"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1664833842"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1664833672"></script>
+<script type="text/javascript" src="/js/search.js?1664833842"></script>
 
     
   </div>
@@ -548,7 +548,7 @@
     <div class="wrapper">
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#io">I/O</a>
+    <li><a href="#outputs">Outputs</a>
       <ul>
         <li><a href="#file">File</a></li>
         <li><a href="#pagerduty">Pagerduty</a></li>
@@ -583,12 +583,12 @@
 
 
 	<p>This section lists all built-in actions and I/O available in Mirabelle.</p>
-<h2 id="io">I/O</h2>
-<p>I/O can be <a href="/howto/stream/#io-and-async-queues">referenced in streams</a> in order to forward events to external systems.</p>
+<h2 id="outputs">Outputs</h2>
+<p>Outputs can be <a href="/howto/stream/#outputs-and-async-queues">referenced in streams</a> in order to forward events to external systems.</p>
 <h3 id="file">File</h3>
 <p>This I/O write all events into a file, as edn.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{my-io-file {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:path</span> <span style="color:#e6db74">&#34;/tmp/events?edn&#34;</span>}
-</span></span><span style="display:flex;"><span>             <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:file</span>}}
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:my-io-file</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:path</span> <span style="color:#e6db74">&#34;/tmp/events?edn&#34;</span>}
+</span></span><span style="display:flex;"><span>              <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:file</span>}}
 </span></span></code></pre></div><h3 id="pagerduty">Pagerduty</h3>
 <p>This I/O forwards events to <a href="https://pagerduty.com">Pagerduty</a>.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:pagerduty-client</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:service-key</span> <span style="color:#f92672">#</span>secret <span style="color:#e6db74">&#34;pagerduty-service-key&#34;</span>
@@ -1048,19 +1048,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1664833672"></script>
-    <script src="/js/perfect-scrollbar.min.js?1664833672"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1664833672"></script>
-    <script src="/js/jquery.sticky.js?1664833672"></script>
-    <script src="/js/featherlight.min.js?1664833672"></script>
-    <script src="/js/highlight.pack.js?1664833672"></script>
+    <script src="/js/clipboard.min.js?1664833842"></script>
+    <script src="/js/perfect-scrollbar.min.js?1664833842"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1664833842"></script>
+    <script src="/js/jquery.sticky.js?1664833842"></script>
+    <script src="/js/featherlight.min.js?1664833842"></script>
+    <script src="/js/highlight.pack.js?1664833842"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1664833672"></script>
-    <script src="/js/learn.js?1664833672"></script>
-    <script src="/js/hugo-learn.js?1664833672"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1664833842"></script>
+    <script src="/js/learn.js?1664833842"></script>
+    <script src="/js/hugo-learn.js?1664833842"></script>
     
         
-            <script src="/mermaid/mermaid.js?1664833672"></script>
+            <script src="/mermaid/mermaid.js?1664833842"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

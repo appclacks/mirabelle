@@ -13,7 +13,7 @@ Not all availables actions and I/O are listed here. You can see the full list in
 - [What is a Mirabelle stream](/howto/stream/#streams)
 - [Compilation and EDN representation of streams and compilation](/howto/stream/#edn-representation-and-compilation)
 - [Include streams snippets in the main configuration, use profiles and variables](/howto/stream/#include-streams-snippets-in-the-main-configuration-profiles-and-variables)
-- [IO and Async Queue: how to make Mirabelle communicate with external systems](/howto/stream/#io-and-async-queues)
+- [Outputs and Async Queues: how to make Mirabelle communicate with external systems](/howto/stream/#outputs-and-async-queues)
 - [How Mirabelle handles time](/howto/stream/#events-time)
 
 **Writing streams**

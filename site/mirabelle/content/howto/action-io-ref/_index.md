@@ -6,17 +6,17 @@ disableToc: false
 
 This section lists all built-in actions and I/O available in Mirabelle.
 
-## I/O
+## Outputs
 
-I/O can be [referenced in streams](/howto/stream/#io-and-async-queues) in order to forward events to external systems.
+Outputs can be [referenced in streams](/howto/stream/#outputs-and-async-queues) in order to forward events to external systems.
 
 ### File
 
 This I/O write all events into a file, as edn.
 
 ```clojure
-{my-io-file {:config {:path "/tmp/events?edn"}
-             :type :file}}
+{:my-io-file {:config {:path "/tmp/events?edn"}
+              :type :file}}
 ```
 
 ### Pagerduty
