@@ -115,9 +115,9 @@ You can set `:elasticsearch/index` to your event in order to forward an event to
 
 The [generated documentation](/generated-doc/mirabelle.action.html) from the code contains explanations and examples about the available actions. Here is the list:
 
-
 - [above-dt](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-above-dt)
 - [aggr-max](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-max)
+- [aggr-mean](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-mean)
 - [aggr-min](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-min)
 - [aggr-sum](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-aggr-sum)
 - [async-queue!](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-async-queue!)
@@ -163,11 +163,11 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - [moving-event-window](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-moving-event-window)
 - [moving-time-window](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-moving-time-window)
 - [not-expired](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-not-expired)
+- [output!](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-output!)
 - [outside-dt](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-outside-dt)
 - [over](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-over)
 - [project](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-project)
 - [publish!](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-publish!)
-- [push-io!](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-push-io!)
 - [reaper](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-reaper)
 - [reinject!](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-reinject!)
 - [rename-keys](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-rename-keys)
