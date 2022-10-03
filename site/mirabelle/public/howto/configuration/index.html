@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.91.2" />
+    <meta name="generator" content="Hugo 0.103.0" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Configuration :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1648502980" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1648502980" rel="stylesheet">
-    <link href="/css/hybrid.css?1648502980" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1648502980" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1648502980" rel="stylesheet">
-    <link href="/css/auto-complete.css?1648502980" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1648502980" rel="stylesheet">
-    <link href="/css/theme.css?1648502980" rel="stylesheet">
-    <link href="/css/tabs.css?1648502980" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1648502980" rel="stylesheet">
+    <link href="/css/nucleus.css?1664832451" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1664832451" rel="stylesheet">
+    <link href="/css/hybrid.css?1664832451" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1664832451" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1664832451" rel="stylesheet">
+    <link href="/css/auto-complete.css?1664832451" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1664832451" rel="stylesheet">
+    <link href="/css/theme.css?1664832451" rel="stylesheet">
+    <link href="/css/tabs.css?1664832451" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1664832451" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1648502980"></script>
+    <script src="/js/jquery-3.3.1.min.js?1664832451"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1648502980"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1648502980"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1664832451"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1664832451"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1648502980"></script>
+<script type="text/javascript" src="/js/search.js?1664832451"></script>
 
     
   </div>
@@ -148,7 +148,7 @@
   
     
     <li data-nav-id="/howto/configuration/" title="Configuration" class="dd-item
-        parent
+        
         active
         
         ">
@@ -572,46 +572,45 @@
 
 	<h1 id="mirabelle-configuration">Mirabelle configuration</h1>
 <p>The Mirabelle configuration is defined in <a href="https://github.com/edn-format/edn">EDN</a>. Here is an example configuration file:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#75715e">;; The Mirabelle TCP server. It&#39;s the server responsible for receiving events</span>
- <span style="color:#75715e">;; using the Riemann format (protobuf).</span>
- <span style="color:#75715e">;; the :key, :cert, and :cacert optional parameters can be set to enable TLS (the</span>
- <span style="color:#75715e">;; parameters are path to the cert files)</span>
- <span style="color:#75715e">;; The :event-executor-size optional parameter can be used to control the number</span>
- <span style="color:#75715e">;; of threads for the TCP server (default to number of cores).</span>
- <span style="color:#75715e">;; the :native? option can be used to enable epoll (on Linux) or kqueue (on mac or</span>
- <span style="color:#75715e">;; freebsd), which should increase performances.</span>
- <span style="color:#e6db74">:tcp</span> {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;0.0.0.0&#34;</span>
-       <span style="color:#e6db74">:port</span> <span style="color:#ae81ff">5555</span>
-       <span style="color:#e6db74">:native?</span> true}
-
- <span style="color:#75715e">;; The Mirabelle HTTP Server.</span>
- <span style="color:#75715e">;; The :key, :cert, and :cacert optional parameters can be set to enable TLS (the</span>
- <span style="color:#75715e">;; parameters are path to the cert files)</span>
- <span style="color:#75715e">;; :basic-auth can be set and should in this case contain :username &#34;user&#34; and</span>
- <span style="color:#75715e">;; :password #secret &#34;password&#34;</span>
- <span style="color:#e6db74">:http</span> {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;0.0.0.0&#34;</span>
-        <span style="color:#e6db74">:port</span> <span style="color:#ae81ff">5558</span>}
-
- <span style="color:#75715e">;; The &#34;real time&#34; streams configuration.</span>
- <span style="color:#75715e">;; The directories parameter is a list of directories containing streams definitions</span>
- <span style="color:#75715e">;; The actions parameter can be used to define custom actions which can then</span>
- <span style="color:#75715e">;; be used inside streams.</span>
- <span style="color:#e6db74">:stream</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;/usr/lib/mirabelle/streams/&#34;</span>]
-          <span style="color:#e6db74">:actions</span> {}}
-
- <span style="color:#75715e">;; I/O configurations.</span>
- <span style="color:#75715e">;; The directories parameter is a list of directories containing I/O definitions</span>
- <span style="color:#75715e">;; The custom parameter can be used to define custom actions.</span>
- <span style="color:#e6db74">:io</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;dev/resources/examples/io&#34;</span>]
-      <span style="color:#e6db74">:custom</span> {}}
-
- <span style="color:#75715e">;; Logging configuration (https://github.com/pyr/unilog)</span>
- <span style="color:#e6db74">:logging</span> {<span style="color:#e6db74">:level</span> <span style="color:#e6db74">&#34;info&#34;</span>
-           <span style="color:#e6db74">:console</span> {<span style="color:#e6db74">:encoder</span> <span style="color:#e6db74">:json</span>}}
-
-  <span style="color:#75715e">;; Directories containing test files</span>
- <span style="color:#e6db74">:test</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;dev/resources/examples/streams/tests/&#34;</span>]}}
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#75715e">;; The Mirabelle TCP server. It&#39;s the server responsible for receiving events</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; using the Riemann format (protobuf).</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; the :key, :cert, and :cacert optional parameters can be set to enable TLS (the</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; parameters are path to the cert files)</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; The :event-executor-size optional parameter can be used to control the number</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; of threads for the TCP server (default to number of cores).</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; the :native? option can be used to enable epoll (on Linux) or kqueue (on mac or</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; freebsd), which should increase performances.</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:tcp</span> {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;0.0.0.0&#34;</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">:port</span> <span style="color:#ae81ff">5555</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">:native?</span> true}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; The Mirabelle HTTP Server.</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; The :key, :cert, and :cacert optional parameters can be set to enable TLS (the</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; parameters are path to the cert files)</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; :basic-auth can be set and should in this case contain :username &#34;user&#34; and</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; :password #secret &#34;password&#34;</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:http</span> {<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;0.0.0.0&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">:port</span> <span style="color:#ae81ff">5558</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; The &#34;real time&#34; streams configuration.</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; The directories parameter is a list of directories containing streams definitions</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; The actions parameter can be used to define custom actions which can then</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; be used inside streams.</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:stream</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;/usr/lib/mirabelle/streams/&#34;</span>]
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">:actions</span> {}}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; outputs configurations.</span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; The directories parameter is a list of directories containing I/O definitions</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:outputs</span> {<span style="color:#e6db74">:write-file</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:path</span> <span style="color:#e6db74">&#34;/tmp/file&#34;</span>}
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:file</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e">;; Logging configuration (https://github.com/pyr/unilog)</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:logging</span> {<span style="color:#e6db74">:level</span> <span style="color:#e6db74">&#34;info&#34;</span>
+</span></span><span style="display:flex;"><span>           <span style="color:#e6db74">:console</span> {<span style="color:#e6db74">:encoder</span> <span style="color:#e6db74">:json</span>}}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">;; Directories containing test files</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:test</span> {<span style="color:#e6db74">:directories</span> [<span style="color:#e6db74">&#34;dev/resources/examples/streams/tests/&#34;</span>]}}
+</span></span></code></pre></div>
 
 
 
@@ -918,19 +917,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1648502980"></script>
-    <script src="/js/perfect-scrollbar.min.js?1648502980"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1648502980"></script>
-    <script src="/js/jquery.sticky.js?1648502980"></script>
-    <script src="/js/featherlight.min.js?1648502980"></script>
-    <script src="/js/highlight.pack.js?1648502980"></script>
+    <script src="/js/clipboard.min.js?1664832451"></script>
+    <script src="/js/perfect-scrollbar.min.js?1664832451"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1664832451"></script>
+    <script src="/js/jquery.sticky.js?1664832451"></script>
+    <script src="/js/featherlight.min.js?1664832451"></script>
+    <script src="/js/highlight.pack.js?1664832451"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1648502980"></script>
-    <script src="/js/learn.js?1648502980"></script>
-    <script src="/js/hugo-learn.js?1648502980"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1664832451"></script>
+    <script src="/js/learn.js?1664832451"></script>
+    <script src="/js/hugo-learn.js?1664832451"></script>
     
         
-            <script src="/mermaid/mermaid.js?1648502980"></script>
+            <script src="/mermaid/mermaid.js?1664832451"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

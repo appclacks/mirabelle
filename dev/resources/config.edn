@@ -5,7 +5,6 @@
         :port 5558
         :basic-auth {:username "foo"
                      :password #secret "my-password"}}
- :queue {:directory "dev/queue"}
  :stream {:directories ["dev/resources/streams"]
           :actions {:custom mirabelle.action/where*}}
  :outputs {:write-file {:config {:path "/tmp/file"}

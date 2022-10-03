@@ -63,7 +63,7 @@ You could write a Mirabelle stream which will compute on the fly the quantiles f
                        [:> :metric 1]]
             (with :state "critical"
               (tap :alert)
-              (push-io! :pagerduty))))))))
+              (output! :pagerduty))))))))
 ```
 
 The `tap` action is an action which will be only enabled in test mode, and which will save in a tap named `:alert` events passing by it. Indeed, everything can be unit tested easily in Mirabelle.
@@ -99,12 +99,12 @@ Here is a more complete and commented example, with multiple actions performed i
     (where [:= :service "http_request_duration_seconds"]
       (with :ttl 60
         ;; push everything into influxdb
-        (push-io! :influxdb)
+        (output! :influxdb)
         ;; index events in memory by host and service
         (index [:host :service])
         ;; by will generate a branch for each :host value. Like that, downstream
         ;; computations will be per host and will not conflict between each other
-        (by [:host]
+        (by {:fields [:host]}
           ;; if the metric is greater than 1 for more than 60 seconds
           ;; Pass events downstream
           (above-dt {:duration 60 :threshold 1}
@@ -112,6 +112,6 @@ Here is a more complete and commented example, with multiple actions performed i
             (with :state "critical"
               ;; one alert only every 60 sec to avoid flooding pagerduty
               (throttle {:duration 60 :count 1}
-                (push-io! :pagerduty)))))))))
+                (output! :pagerduty)))))))))
 ```
 

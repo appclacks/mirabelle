@@ -41,9 +41,6 @@ The Mirabelle configuration is defined in [EDN](https://github.com/edn-format/ed
  :outputs {:write-file {:config {:path "/tmp/file"}
                         :type :file}
 
- ;; This parameter can be used to define custom outputs
- custom-outputs {}
-
  ;; Logging configuration (https://github.com/pyr/unilog)
  :logging {:level "info"
            :console {:encoder :json}}

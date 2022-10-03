@@ -1594,11 +1594,25 @@
   particular value.
 
   ```clojure
-  (by [:host :service]
+  (by {:fields [:host :service]}
     (fixed-time-window {:duration 60}))
   ```
 
-  This example generates a moving window for each host/service combination."
+  This example generates a moving window for each host/service combination.
+
+  You can also pass the `:gc-interval` and `:fork-ttl` keys to the action.
+  This will enable garbage collections of children actions, executed every
+  `:gc-interval` (in seconds) and which will remove actions which didn't
+  receive events since `:fork-ttl` seconds
+
+  ```clojure
+  (by {:fields [:host :service]
+       :gc-interval 3600
+       :fork-ttl 1800}
+    (fixed-time-window {:duration 60}))
+  ```
+
+  "
   [config & children]
   (mspec/valid-action? ::by [config])
   {:action :by

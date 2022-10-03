@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.91.2" />
+    <meta name="generator" content="Hugo 0.103.0" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title> :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1648502980" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1648502980" rel="stylesheet">
-    <link href="/css/hybrid.css?1648502980" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1648502980" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1648502980" rel="stylesheet">
-    <link href="/css/auto-complete.css?1648502980" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1648502980" rel="stylesheet">
-    <link href="/css/theme.css?1648502980" rel="stylesheet">
-    <link href="/css/tabs.css?1648502980" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1648502980" rel="stylesheet">
+    <link href="/css/nucleus.css?1664832451" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1664832451" rel="stylesheet">
+    <link href="/css/hybrid.css?1664832451" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1664832451" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1664832451" rel="stylesheet">
+    <link href="/css/auto-complete.css?1664832451" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1664832451" rel="stylesheet">
+    <link href="/css/theme.css?1664832451" rel="stylesheet">
+    <link href="/css/tabs.css?1664832451" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1664832451" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1648502980"></script>
+    <script src="/js/jquery-3.3.1.min.js?1664832451"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1648502980"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1648502980"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1664832451"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1664832451"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1648502980"></script>
+<script type="text/javascript" src="/js/search.js?1664832451"></script>
 
     
   </div>
@@ -542,62 +542,62 @@
 <p>Being able to use the same tool for stream processing and to work on historical data is interesting. You could for example have a Mirabelle instance used for real time stream processing, and another one (or even the same one on dedicated streams) working on old data&hellip; It&rsquo;s up to you to decide !</p>
 <h2 id="stream-example-with-unit-tests">Stream example, with unit tests</h2>
 <p>Let&rsquo;s say a web application is pushing the duration (in seconds) of the HTTP requests it receives. This metric could be modeled using this Mirabelle event</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;my-server&#34;</span>
- <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
- <span style="color:#e6db74">:application</span> <span style="color:#e6db74">&#34;my-web-app&#34;</span>
- <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1619731016</span>,<span style="color:#ae81ff">145</span>
- <span style="color:#e6db74">:tags</span> [<span style="color:#e6db74">&#34;web&#34;</span>]
- <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">0.5</span>}
-</code></pre></div><p>You could write a Mirabelle stream which will compute on the fly the quantiles for this metric. In this example, Mirabelle will split the received events into 60 seconds windows, then compute the percentiles, set the event <code>:state</code> to &ldquo;critical&rdquo; and send an alert to Pagerduty if the <code>0.99</code> quantiles is greater than 1 second.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
-  (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:percentiles</span> <span style="color:#e6db74">:default</span> true}
-    (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>]
-      (<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
-        (<span style="color:#a6e22e">coll-percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.99</span>]
-          (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:and</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:quantile</span> <span style="color:#e6db74">&#34;0.99&#34;</span>]
-                       [<span style="color:#e6db74">:&gt;</span> <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1</span>]]
-            (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>
-              (<span style="color:#a6e22e">tap</span> <span style="color:#e6db74">:alert</span>)
-              (<span style="color:#a6e22e">push-io!</span> <span style="color:#e6db74">:pagerduty</span>))))))))
-</code></pre></div><p>The <code>tap</code> action is an action which will be only enabled in test mode, and which will save in a tap named <code>:alert</code> events passing by it. Indeed, everything can be unit tested easily in Mirabelle.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:host</span> <span style="color:#e6db74">&#34;my-server&#34;</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:application</span> <span style="color:#e6db74">&#34;my-web-app&#34;</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1619731016</span>,<span style="color:#ae81ff">145</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:tags</span> [<span style="color:#e6db74">&#34;web&#34;</span>]
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">0.5</span>}
+</span></span></code></pre></div><p>You could write a Mirabelle stream which will compute on the fly the quantiles for this metric. In this example, Mirabelle will split the received events into 60 seconds windows, then compute the percentiles, set the event <code>:state</code> to &ldquo;critical&rdquo; and send an alert to Pagerduty if the <code>0.99</code> quantiles is greater than 1 second.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">streams</span>
+</span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:percentiles</span> <span style="color:#e6db74">:default</span> true}
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>]
+</span></span><span style="display:flex;"><span>      (<span style="color:#a6e22e">fixed-time-window</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span>}
+</span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">coll-percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.99</span>]
+</span></span><span style="display:flex;"><span>          (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:and</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:quantile</span> <span style="color:#e6db74">&#34;0.99&#34;</span>]
+</span></span><span style="display:flex;"><span>                       [<span style="color:#e6db74">:&gt;</span> <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1</span>]]
+</span></span><span style="display:flex;"><span>            (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>
+</span></span><span style="display:flex;"><span>              (<span style="color:#a6e22e">tap</span> <span style="color:#e6db74">:alert</span>)
+</span></span><span style="display:flex;"><span>              (<span style="color:#a6e22e">output!</span> <span style="color:#e6db74">:pagerduty</span>))))))))
+</span></span></code></pre></div><p>The <code>tap</code> action is an action which will be only enabled in test mode, and which will save in a tap named <code>:alert</code> events passing by it. Indeed, everything can be unit tested easily in Mirabelle.</p>
 <p>A test for this stream would be:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:percentiles</span> {<span style="color:#e6db74">:input</span> [{<span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
-                        <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">0.1</span>
-                        <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>}
-                       {<span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
-                        <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1.2</span>
-                        <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">30</span>}
-                       {<span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
-                        <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">0.2</span>
-                        <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">70</span>}]
-               <span style="color:#e6db74">:tap-results</span> {<span style="color:#e6db74">:alert</span> [{<span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
-                                      <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1.2</span>
-                                      <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">30</span>
-                                      <span style="color:#e6db74">:quantile</span> <span style="color:#e6db74">&#34;0.99&#34;</span>
-                                      <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>}]}}}
-</code></pre></div><p>In this test, we inject into the <code>:percentiles</code> stream three events, and we verify that the tap named <code>:alert</code> contains the expected alert (the <code>0.99</code> quantile is greater than 1) generated for these events.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:percentiles</span> {<span style="color:#e6db74">:input</span> [{<span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">0.1</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>                       {<span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1.2</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">30</span>}
+</span></span><span style="display:flex;"><span>                       {<span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">0.2</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">70</span>}]
+</span></span><span style="display:flex;"><span>               <span style="color:#e6db74">:tap-results</span> {<span style="color:#e6db74">:alert</span> [{<span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>
+</span></span><span style="display:flex;"><span>                                      <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">1.2</span>
+</span></span><span style="display:flex;"><span>                                      <span style="color:#e6db74">:time</span> <span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>                                      <span style="color:#e6db74">:quantile</span> <span style="color:#e6db74">&#34;0.99&#34;</span>
+</span></span><span style="display:flex;"><span>                                      <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>}]}}}
+</span></span></code></pre></div><p>In this test, we inject into the <code>:percentiles</code> stream three events, and we verify that the tap named <code>:alert</code> contains the expected alert (the <code>0.99</code> quantile is greater than 1) generated for these events.</p>
 <p>Thanks to Clojure datastructures, there is <em>no side effects between streams and actions</em>. It&rsquo;s OK to modify events in parallel (in multiple threads) and to have multiple branches per stream. You can even pass events between streams (like described <a href="todo">here</a>). You are free to organize streams and how they communicate between each other exactly how you want to; the tool and its DSL will not limit you.</p>
 <p>Here is a more complete and commented example, with multiple actions performed in one stream:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
-  (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:multiple-branches</span>}
-    (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>]
-      (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:ttl</span> <span style="color:#ae81ff">60</span>
-        <span style="color:#75715e">;; push everything into influxdb</span>
-        (<span style="color:#a6e22e">push-io!</span> <span style="color:#e6db74">:influxdb</span>)
-        <span style="color:#75715e">;; index events in memory by host and service</span>
-        (index [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>])
-        <span style="color:#75715e">;; by will generate a branch for each :host value. Like that, downstream</span>
-        <span style="color:#75715e">;; computations will be per host and will not conflict between each other</span>
-        (<span style="color:#a6e22e">by</span> [<span style="color:#e6db74">:host</span>]
-          <span style="color:#75715e">;; if the metric is greater than 1 for more than 60 seconds</span>
-          <span style="color:#75715e">;; Pass events downstream</span>
-          (<span style="color:#a6e22e">above-dt</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span> <span style="color:#e6db74">:threshold</span> <span style="color:#ae81ff">1</span>}
-            <span style="color:#75715e">;; pass the state to critical</span>
-            (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>
-              <span style="color:#75715e">;; one alert only every 60 sec to avoid flooding pagerduty</span>
-              (<span style="color:#a6e22e">throttle</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span> <span style="color:#e6db74">:count</span> <span style="color:#ae81ff">1</span>}
-                (<span style="color:#a6e22e">push-io!</span> <span style="color:#e6db74">:pagerduty</span>)))))))))
-</code></pre></div>	
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">streams</span>
+</span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:multiple-branches</span>}
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>]
+</span></span><span style="display:flex;"><span>      (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:ttl</span> <span style="color:#ae81ff">60</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">;; push everything into influxdb</span>
+</span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">output!</span> <span style="color:#e6db74">:influxdb</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">;; index events in memory by host and service</span>
+</span></span><span style="display:flex;"><span>        (index [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>])
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">;; by will generate a branch for each :host value. Like that, downstream</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">;; computations will be per host and will not conflict between each other</span>
+</span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">by</span> {<span style="color:#e6db74">:fields</span> [<span style="color:#e6db74">:host</span>]}
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">;; if the metric is greater than 1 for more than 60 seconds</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">;; Pass events downstream</span>
+</span></span><span style="display:flex;"><span>          (<span style="color:#a6e22e">above-dt</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span> <span style="color:#e6db74">:threshold</span> <span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">;; pass the state to critical</span>
+</span></span><span style="display:flex;"><span>            (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#75715e">;; one alert only every 60 sec to avoid flooding pagerduty</span>
+</span></span><span style="display:flex;"><span>              (<span style="color:#a6e22e">throttle</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">60</span> <span style="color:#e6db74">:count</span> <span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>                (<span style="color:#a6e22e">output!</span> <span style="color:#e6db74">:pagerduty</span>)))))))))
+</span></span></code></pre></div>	
   
         
         </div>
@@ -890,19 +890,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1648502980"></script>
-    <script src="/js/perfect-scrollbar.min.js?1648502980"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1648502980"></script>
-    <script src="/js/jquery.sticky.js?1648502980"></script>
-    <script src="/js/featherlight.min.js?1648502980"></script>
-    <script src="/js/highlight.pack.js?1648502980"></script>
+    <script src="/js/clipboard.min.js?1664832451"></script>
+    <script src="/js/perfect-scrollbar.min.js?1664832451"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1664832451"></script>
+    <script src="/js/jquery.sticky.js?1664832451"></script>
+    <script src="/js/featherlight.min.js?1664832451"></script>
+    <script src="/js/highlight.pack.js?1664832451"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1648502980"></script>
-    <script src="/js/learn.js?1648502980"></script>
-    <script src="/js/hugo-learn.js?1648502980"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1664832451"></script>
+    <script src="/js/learn.js?1664832451"></script>
+    <script src="/js/hugo-learn.js?1664832451"></script>
     
         
-            <script src="/mermaid/mermaid.js?1648502980"></script>
+            <script src="/mermaid/mermaid.js?1664832451"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

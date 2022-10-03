@@ -12,6 +12,12 @@ This is the list of user-facing changes for Mirabelle.
 
 - The Mirabelle outputs are now configured into the main configuration file and not in dedicated files referenced in the `:io` configuration key.
 The custom outputs definitions are also modified.
+- The `by` action takes a map as parameter instead of a vector.
+
+**New features**
+
+- New ation `aggr-mean`.
+- The `by` action now supports garbage collection of old children actions instances.
 
 ## v0.10.0
 

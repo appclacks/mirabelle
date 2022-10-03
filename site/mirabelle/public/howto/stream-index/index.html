@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.91.2" />
+    <meta name="generator" content="Hugo 0.103.0" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>The index :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1648502980" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1648502980" rel="stylesheet">
-    <link href="/css/hybrid.css?1648502980" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1648502980" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1648502980" rel="stylesheet">
-    <link href="/css/auto-complete.css?1648502980" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1648502980" rel="stylesheet">
-    <link href="/css/theme.css?1648502980" rel="stylesheet">
-    <link href="/css/tabs.css?1648502980" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1648502980" rel="stylesheet">
+    <link href="/css/nucleus.css?1664832451" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1664832451" rel="stylesheet">
+    <link href="/css/hybrid.css?1664832451" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1664832451" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1664832451" rel="stylesheet">
+    <link href="/css/auto-complete.css?1664832451" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1664832451" rel="stylesheet">
+    <link href="/css/theme.css?1664832451" rel="stylesheet">
+    <link href="/css/tabs.css?1664832451" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1664832451" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1648502980"></script>
+    <script src="/js/jquery-3.3.1.min.js?1664832451"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1648502980"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1648502980"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1664832451"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1664832451"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1648502980"></script>
+<script type="text/javascript" src="/js/search.js?1664832451"></script>
 
     
   </div>
@@ -252,7 +252,7 @@
   
     
     <li data-nav-id="/howto/stream-index/" title="The index" class="dd-item
-        parent
+        
         active
         
         ">
@@ -580,11 +580,11 @@
 	<p>The Mirabelle Index is an in memory map which can be used to store events.</p>
 <p>Each Mirabelle stream (generated from the configuration file or from the API) has its own, dedicated index instance.</p>
 <h2 id="how-to-push-events-into-the-index">How to push events into the index</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">stream</span>
-  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:bar</span> <span style="color:#e6db74">:default</span> true}
-  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>]
-    (index [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>])))
-</code></pre></div><p>In this example, all events with <code>:service</code> &ldquo;bar&rdquo; will be added to the index. They will be indexed by their <code>:host</code> and <code>:service</code> key.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">stream</span>
+</span></span><span style="display:flex;"><span>  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:bar</span> <span style="color:#e6db74">:default</span> true}
+</span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>]
+</span></span><span style="display:flex;"><span>    (index [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>])))
+</span></span></code></pre></div><p>In this example, all events with <code>:service</code> &ldquo;bar&rdquo; will be added to the index. They will be indexed by their <code>:host</code> and <code>:service</code> key.</p>
 <p>For example, if these two events <code>{:host &quot;foo&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code> and <code>{:host &quot;mirabelle&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code> arrive in the system, the index would contain two keys:</p>
 <p><code>{:host &quot;foo&quot; :service &quot;bar&quot;}</code> -&gt; <code>{:host &quot;foo&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code>
 <code>{:host &quot;mirabelle&quot; :service &quot;bar&quot;}</code> -&gt; <code>{:host &quot;mirabelle&quot; :service &quot;bar&quot; :time 1 :ttl 60}</code></p>
@@ -596,13 +596,13 @@
 <p>Expiration is important. First, a lot of streams which work on windows of events will remove expired events automatically. Indeed, if you use for example <a href="/howto/stream/#coalesce-and-project">coalesce</a>, you don&rsquo;t want to keep forever the latest event for a host which does not emit anymore. When the event is expired, it&rsquo;s removed from the action.</p>
 <p>Expiration can also be used to detect services which stopped emitting.</p>
 <p>Indeed, if an event stored in the index is expired, it will be reinjected into the stream with <code>:state &quot;expired&quot;</code>. You could then catch it with something like:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">expired</span>
-  (<span style="color:#a6e22e">error</span>))
-</code></pre></div><p>By forwarding expired events into dedicated actions, you can for example trigger alerts based on that.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">expired</span>
+</span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">error</span>))
+</span></span></code></pre></div><p>By forwarding expired events into dedicated actions, you can for example trigger alerts based on that.</p>
 <p>In order to trigger event expiration from events stored into the index, we should use the <code>reaper</code> action. All streams in Riemann are using the events clocks to trigger side effects, and the reaper action will update the index clock if needed, trigger events expiration, and then reinject the events into streams:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">reaper</span> <span style="color:#ae81ff">5</span>)
-(<span style="color:#a6e22e">reaper</span> <span style="color:#ae81ff">5</span> <span style="color:#e6db74">:custom-stream</span>)
-</code></pre></div><p>The <code>reaper</code> action takes as first parameter the interval (in seconds) on which the reaper stream will expire events. Don&rsquo;t forget you should feed the reaper action with events in order to move its clock.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">reaper</span> <span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>(<span style="color:#a6e22e">reaper</span> <span style="color:#ae81ff">5</span> <span style="color:#e6db74">:custom-stream</span>)
+</span></span></code></pre></div><p>The <code>reaper</code> action takes as first parameter the interval (in seconds) on which the reaper stream will expire events. Don&rsquo;t forget you should feed the reaper action with events in order to move its clock.</p>
 <p>The <code>custom-stream</code> parameter is optional. By default, events are reinjected into the current stream. You can also pass a stream name to the reaper action in order to reinject events into another stream.</p>
 <p>I recommand you to not call forward all events to the reaper (it will impact performances). Instead, identify a couple of events arriving regularly, and forward them to the reaper in order to update the index clock.</p>
 <h2 id="queries">Queries</h2>
@@ -917,19 +917,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1648502980"></script>
-    <script src="/js/perfect-scrollbar.min.js?1648502980"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1648502980"></script>
-    <script src="/js/jquery.sticky.js?1648502980"></script>
-    <script src="/js/featherlight.min.js?1648502980"></script>
-    <script src="/js/highlight.pack.js?1648502980"></script>
+    <script src="/js/clipboard.min.js?1664832451"></script>
+    <script src="/js/perfect-scrollbar.min.js?1664832451"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1664832451"></script>
+    <script src="/js/jquery.sticky.js?1664832451"></script>
+    <script src="/js/featherlight.min.js?1664832451"></script>
+    <script src="/js/highlight.pack.js?1664832451"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1648502980"></script>
-    <script src="/js/learn.js?1648502980"></script>
-    <script src="/js/hugo-learn.js?1648502980"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1664832451"></script>
+    <script src="/js/learn.js?1664832451"></script>
+    <script src="/js/hugo-learn.js?1664832451"></script>
     
         
-            <script src="/mermaid/mermaid.js?1648502980"></script>
+            <script src="/mermaid/mermaid.js?1664832451"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

@@ -413,13 +413,13 @@
            @recorder))))
 
 (deftest compile-output!-test
-  (testing "file io"
+  (testing "file output"
     (let [io-compiled (stream/compile-output! nil
                                               :foo
                                               {:type :file
                                                :config {:path "/tmp/foo"}})]
       (is (satisfies? Output (:component io-compiled)))))
-  (testing "custom io"
+  (testing "custom output"
     (let [io-compiled (stream/compile-output! nil
                                               :foo
                                               {:type :custom

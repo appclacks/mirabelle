@@ -27,7 +27,7 @@ You can then run Mirabelle by launching `java -jar mirabelle.jar`.
 
 ## Using Docker
 
-Let's say your I/O are in `/etc/mirabelle/io`, your EDN (compiled) streams in `/etc/mirabelle/streams`, your configuration file in `/etc/mirabelle/config.edn`. The configuration file contains:
+Let's say your EDN (compiled) streams are in `/etc/mirabelle/streams`, your configuration file in `/etc/mirabelle/config.edn`. The configuration file contains:
 
 ```clojure
 {:tcp {:host "0.0.0.0"
@@ -37,8 +37,6 @@ Let's say your I/O are in `/etc/mirabelle/io`, your EDN (compiled) streams in `/
         :port 5558}
  :stream {:directories ["/streams"]
           :actions {}}
- :io {:directories ["/io"]
-      :custom {}}
  :logging {:level "info"
            :console {:encoder :json}}}
 ```
@@ -47,11 +45,10 @@ You should now be able to launch Mirabelle using Docker (you can check the [Dock
 
 ```
 docker run -p 5555:5555 -p 5558:5558 \
--v /etc/mirabelle/io:/io \
 -v /etc/mirabelle/streams:/streams \
 -v /etc/mirabelle/config.edn:/config/config.edn \
 -e MIRABELLE_CONFIGURATION=/config/config.edn \
-mcorbin/mirabelle:v0.10.0
+mcorbin/mirabelle:v0.11.0
 ```
 
 ## Using Leiningen

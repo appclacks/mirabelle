@@ -238,31 +238,31 @@ You can also override the default Mirabelle profile (passed as an environment va
 
 The `include` action allows you to create parameterizable configuration snippets.
 
-### I/O and async queues
+### outputs and async queues
 
 In the previous example, we are only logging events, which is not very useful. What if we want to interact with other systems, like sending alerts to a service like Pagerduty, or forward all events a timeserie database like InfluxDB ?
 
-I/O should be defined in the `:io` section fo the [configuration file](/howto/configuration/), in files in directories referenced in the `:directories` key. All I/O available natively are described in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
+Outputs should be defined in the `:outputs` section fo the [configuration file](/howto/configuration/). All outputs availables natively are described in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
 
-For example, Mirabelle supports sending alert to Pagerduty. Let's configure a Pagerduty client and use it in a stream.
+For example, Mirabelle supports sending alerts to Pagerduty. Let's configure a Pagerduty client and use it in a stream.
 
-First, create an EDN file in the `;io` directory:
+First, modify your configuration file to create an new `:pagerduty-client` output:
 
 ```clojure
-{:pagerduty-client {:config {:service-key "pagerduty-service-key"
-                             :source-key :service
-                             :summary-keys [:host :service :state]
-                             :dedup-keys [:host :service]}
-                    :type :pagerduty}}
+{:outputs {:pagerduty-client {:config {:service-key "pagerduty-service-key"
+                                       :source-key :service
+                                       :summary-keys [:host :service :state]
+                                       :dedup-keys [:host :service]}
+                              :type :pagerduty}}}
 ```
 
 
-You can now use this I/O named `:pagerduty-client` in a stream by using the `push-io!` action:
+You can now use this output named `:pagerduty-client` in a stream by using the `output!` action:
 
 ```clojure
 (streams
   (stream {:name :pagerduty-example}
-    (push-io! :pagerduty)))
+    (output! :pagerduty)))
 ```
 
 If this event is set to Mirabelle:
@@ -273,13 +273,13 @@ riemann-client send --metric-d 100 --service "http_requests_duration_seconds" --
 
 You should see in Pagerduty a new triggered alert named `myhost - http_requests_duration_seconds - critical` containing all the informations about your event.
 
-You can check the [I/O documentation](/action-io-ref/) to have details about how the Pagerduty I/O can be used (to resolve alert automatically for example).
+You can check the [I/O documentation](/action-io-ref/) to have details about how the Pagerduty output can be used (to resolve alert automatically for example).
 
-A special I/O is `async-queue`. You could define an async queue in the I/O configuration file:
+A special output is `async-queue`. You could define an async queue in the `:outputs` configuration key:
 
 ```clojure
-{:thread-pool {:type :async-queue
-               :config {}}}
+{:outputs {:thread-pool {:type :async-queue
+                         :config {}}}}
 ```
 
 Here are the parameters you can set in the async queue `:config` map:
@@ -564,13 +564,18 @@ You will have the number of events for all hosts.
 But if you write:
 
 ```clojure
-(by [:host]
+(by {:fields [:host]}
   (fixed-time-window {:duration 60}
     (coll-count
       (info))))
 ```
 
-The `by` action takes a list of fields as parameter and will generate a new instance of the downstream actions for each unique values associated to the fields. Here for example, the computation will be done in isolation for each different `:host`.
+The `by` action takes a map containing a `:fields` key as parameter and will generate a new instance of the downstream actions for each unique values associated to the fields. Here for example, the computation will be done in isolation for each different `:host`.
+
+You can also pass the `:gc-interval` and `:fork-ttl` keys to the `by` action.
+This will enable garbage collection, of children actions, executed every
+`:gc-interval` (in seconds) and which will remove actions which didn't
+receive events since `:fork-ttl` seconds.
 
 #### Coalesce and project
 

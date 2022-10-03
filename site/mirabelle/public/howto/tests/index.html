@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.91.2" />
+    <meta name="generator" content="Hugo 0.103.0" />
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Writing tests :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1648502980" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1648502980" rel="stylesheet">
-    <link href="/css/hybrid.css?1648502980" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1648502980" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1648502980" rel="stylesheet">
-    <link href="/css/auto-complete.css?1648502980" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1648502980" rel="stylesheet">
-    <link href="/css/theme.css?1648502980" rel="stylesheet">
-    <link href="/css/tabs.css?1648502980" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1648502980" rel="stylesheet">
+    <link href="/css/nucleus.css?1664832451" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1664832451" rel="stylesheet">
+    <link href="/css/hybrid.css?1664832451" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1664832451" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1664832451" rel="stylesheet">
+    <link href="/css/auto-complete.css?1664832451" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1664832451" rel="stylesheet">
+    <link href="/css/theme.css?1664832451" rel="stylesheet">
+    <link href="/css/tabs.css?1664832451" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1664832451" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1648502980"></script>
+    <script src="/js/jquery-3.3.1.min.js?1664832451"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1648502980"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1648502980"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1664832451"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1664832451"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1648502980"></script>
+<script type="text/javascript" src="/js/search.js?1664832451"></script>
 
     
   </div>
@@ -200,7 +200,7 @@
   
     
     <li data-nav-id="/howto/tests/" title="Writing tests" class="dd-item
-        parent
+        
         active
         
         ">
@@ -578,33 +578,33 @@
 	<p>Mirabelle ships with a complete test framework for streams.</p>
 <h2 id="running-tests">Running tests</h2>
 <p>First, let&rsquo;s define and <a href="/howto/stream/#edn-representation-and-compilation">compile</a> some streams:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">(<span style="color:#a6e22e">streams</span>
-
- (<span style="color:#a6e22e">stream</span>
-  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:foo</span>}
-  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>]
-    (<span style="color:#a6e22e">info</span>)
-    (<span style="color:#a6e22e">tap</span> <span style="color:#e6db74">:foo</span>)))
-
- (<span style="color:#a6e22e">stream</span>
-  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:bar</span>}
-  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:&gt;</span> <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">100</span>]
-    (<span style="color:#a6e22e">info</span>)
-    (<span style="color:#a6e22e">tap</span> <span style="color:#e6db74">:bar</span>))))
-</code></pre></div><p>The first stream named <code>:foo</code> will only keep all events with <code>:service</code> &ldquo;foo&rdquo; and log them. These events will also be registered into a <code>tap</code> named <code>:foo</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">streams</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> (<span style="color:#a6e22e">stream</span>
+</span></span><span style="display:flex;"><span>  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:foo</span>}
+</span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>]
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">info</span>)
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">tap</span> <span style="color:#e6db74">:foo</span>)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> (<span style="color:#a6e22e">stream</span>
+</span></span><span style="display:flex;"><span>  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:bar</span>}
+</span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:&gt;</span> <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">100</span>]
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">info</span>)
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">tap</span> <span style="color:#e6db74">:bar</span>))))
+</span></span></code></pre></div><p>The first stream named <code>:foo</code> will only keep all events with <code>:service</code> &ldquo;foo&rdquo; and log them. These events will also be registered into a <code>tap</code> named <code>:foo</code>.</p>
 <p>A tap is a Mirabelle action which only has an effect in test mode. Events will be saved into tap, and you will be able to check what was registered on the taps.</p>
 <p>Our second stream is also simple: it keeps all events with <code>:metric</code> greater to 100, log them, and push them into a tap named <code>:bar</code>.</p>
 <p>Let&rsquo;s write a test file for these streams. The tests file should be referenced in the <code>:test</code> section of the <a href="/howto/configuration/">configuration</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:test1</span> {<span style="color:#e6db74">:input</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
-                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}
-                 {<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">101</span>
-                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>}]
-
-         <span style="color:#e6db74">:tap-results</span> {<span style="color:#e6db74">:foo</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
-                              <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}]
-                       <span style="color:#e6db74">:bar</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">101</span>
-                              <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>}]}}}
-</code></pre></div><p>We defined here a test named <code>:test1</code>. You could have add more tests to the map (or in another files), all tests are run in isolation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:test1</span> {<span style="color:#e6db74">:input</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}
+</span></span><span style="display:flex;"><span>                 {<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">101</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>}]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>         <span style="color:#e6db74">:tap-results</span> {<span style="color:#e6db74">:foo</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                              <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}]
+</span></span><span style="display:flex;"><span>                       <span style="color:#e6db74">:bar</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">101</span>
+</span></span><span style="display:flex;"><span>                              <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>}]}}}
+</span></span></code></pre></div><p>We defined here a test named <code>:test1</code>. You could have add more tests to the map (or in another files), all tests are run in isolation.</p>
 <p>This <code>:test1</code> key contains a map with two keys:</p>
 <ul>
 <li><code>:input</code>: the events which will be injected into the streams</li>
@@ -617,25 +617,25 @@ java -jar mirabelle.jar test
 
 All tests successful
 </code></pre><p>If a test fails (let&rsquo;s say we modify the <code>:foo</code> tap result, you should get:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure"><span style="color:#ae81ff">1</span> errors
-Error in test <span style="color:#e6db74">:test1</span>
-Invalid result for tap <span style="color:#e6db74">:foo</span>
-expected<span style="color:#960050;background-color:#1e0010">:</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>, <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;not-good&#34;</span>}]
-actual<span style="color:#960050;background-color:#1e0010">:</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>, <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}]
-</code></pre></div><p>Tests can also take a <code>:target</code> configuration, for example:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-clojure" data-lang="clojure">{<span style="color:#e6db74">:test1</span> {<span style="color:#e6db74">:input</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
-                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}
-                 {<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">101</span>
-                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>}]
-         <span style="color:#e6db74">:target</span> <span style="color:#e6db74">:foo</span>
-         <span style="color:#e6db74">:tap-results</span> {<span style="color:#e6db74">:foo</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
-                              <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}]}}}
-</code></pre></div><p>In this example, events in <code>:input</code> will only be injected into the <code>:foo</code> stream.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span><span style="color:#ae81ff">1</span> errors
+</span></span><span style="display:flex;"><span>Error in test <span style="color:#e6db74">:test1</span>
+</span></span><span style="display:flex;"><span>Invalid result for tap <span style="color:#e6db74">:foo</span>
+</span></span><span style="display:flex;"><span>expected<span style="color:#960050;background-color:#1e0010">:</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>, <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;not-good&#34;</span>}]
+</span></span><span style="display:flex;"><span>actual<span style="color:#960050;background-color:#1e0010">:</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>, <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}]
+</span></span></code></pre></div><p>Tests can also take a <code>:target</code> configuration, for example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:test1</span> {<span style="color:#e6db74">:input</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}
+</span></span><span style="display:flex;"><span>                 {<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">101</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>}]
+</span></span><span style="display:flex;"><span>         <span style="color:#e6db74">:target</span> <span style="color:#e6db74">:foo</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#e6db74">:tap-results</span> {<span style="color:#e6db74">:foo</span> [{<span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                              <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;foo&#34;</span>}]}}}
+</span></span></code></pre></div><p>In this example, events in <code>:input</code> will only be injected into the <code>:foo</code> stream.</p>
 <p>One dedicated <a href="/howto/stream-index/">index</a> is created for each test.</p>
 <h2 id="things-excluded-from-tests">Things excluded from tests</h2>
 <p>In test mode, some streams behave differently than in the regular mode:</p>
 <ul>
-<li>All I/O (so <code>push-io</code> actions) are discarded.</li>
+<li>All I/O (so <code>output!</code> actions) are discarded.</li>
 <li>The <code>publish!</code> action is also discarded in test mode.</li>
 <li><code>async-queue</code> actions are replaced by a simple stream which forward all events to children. It allows you to test streams using async queues without dealing with their side effects.</li>
 <li>Everything wrapped in <code>io</code> will be discarded. The <code>io</code> action will in test mode discard all of its children (and on regular mode, just forward events to children).</li>
@@ -947,19 +947,19 @@ actual<span style="color:#960050;background-color:#1e0010">:</span> [{<span styl
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1648502980"></script>
-    <script src="/js/perfect-scrollbar.min.js?1648502980"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1648502980"></script>
-    <script src="/js/jquery.sticky.js?1648502980"></script>
-    <script src="/js/featherlight.min.js?1648502980"></script>
-    <script src="/js/highlight.pack.js?1648502980"></script>
+    <script src="/js/clipboard.min.js?1664832451"></script>
+    <script src="/js/perfect-scrollbar.min.js?1664832451"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1664832451"></script>
+    <script src="/js/jquery.sticky.js?1664832451"></script>
+    <script src="/js/featherlight.min.js?1664832451"></script>
+    <script src="/js/highlight.pack.js?1664832451"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1648502980"></script>
-    <script src="/js/learn.js?1648502980"></script>
-    <script src="/js/hugo-learn.js?1648502980"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1664832451"></script>
+    <script src="/js/learn.js?1664832451"></script>
+    <script src="/js/hugo-learn.js?1664832451"></script>
     
         
-            <script src="/mermaid/mermaid.js?1648502980"></script>
+            <script src="/mermaid/mermaid.js?1664832451"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

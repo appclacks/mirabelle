@@ -35,6 +35,7 @@
                                  ::actions]))
 
 (s/def ::outputs (s/map-of keyword? map?))
+(s/def ::custom-outputs (s/map-of keyword? any?))
 (s/def ::test (s/keys :opt-un [::directories]))
 
 (s/def ::directory ::spec/directory-spec)

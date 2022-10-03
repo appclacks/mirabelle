@@ -94,7 +94,7 @@ One dedicated [index](/howto/stream-index/) is created for each test.
 
 In test mode, some streams behave differently than in the regular mode:
 
-- All I/O (so `push-io` actions) are discarded.
+- All I/O (so `output!` actions) are discarded.
 - The `publish!` action is also discarded in test mode.
 - `async-queue` actions are replaced by a simple stream which forward all events to children. It allows you to test streams using async queues without dealing with their side effects.
 - Everything wrapped in `io` will be discarded. The `io` action will in test mode discard all of its children (and on regular mode, just forward events to children).

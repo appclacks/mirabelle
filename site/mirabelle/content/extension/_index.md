@@ -29,14 +29,16 @@ You will need to install:
 Once Leiningen is installed, you can initialize a new Clojure project (replace the latest parameter by your module name):
 
 ```
-lein new app my-module-name
+lein new app mymodule
 ```
 
 Now, open the `project.clj` file in the `my-module` directory.
 
 First, remove the `:main ^:skip-aot my-module-name.core` line. Then, adds to the `:dependencies` list the Mirabelle project by adding `[fr.mcorbin/mirabelle "<replace-with-your-mirabelle-version>"]`. Be sure to use the same version than your Mirabelle version (it may in theory work with different versions but we never know).
 
-You can now open the file in `src/my_module_name/core.clj`
+Be sure to also remove the `org.clojure/clojure` dependency from the `;dependencies` list, Clojure being already provided by Mirabelle itself.
+
+You can now open the file in `src/mymodule/core.clj`
 
 ## Write a custom action
 
@@ -45,7 +47,7 @@ In this example, we will create a simple action which will keep all events great
 Here would be the code of the `core.clj` file:
 
 ```clojure
-(ns mirabelle-module.core
+(ns mymodule.core
   (:require [mirabelle.action :as a]
             [mirabelle.io :as io]))
 
@@ -69,15 +71,15 @@ Then, we check if the event `:metric` field is greater than the threshold. If ye
 
 `call-rescue` is a function taking an event (or a list of events), the list of children, and will forward the event to each children. In our case, we only firward them of the `:metric` field is greater than the threshold.
 
-## Write a custom I/O
+## Write a custom output
 
-I/O are stateful components which can be then referenced in Mirabelle to interact with external systems (timeserie databases, cloud services...).
+Outputs are stateful components which can be then referenced in Mirabelle to interact with external systems (timeserie databases, cloud services...).
 
 Let's define a simple I/O which will write events into a path (you can add the code at the end of the `core.clj` file):
 
 ```clojure
-(defrecord CustomFileIO [registry path]
-  io/IO
+(defrecord CustomFileOutput [registry path]
+  io/Output
   (inject! [this events]
     (doseq [event events]
       (spit path (str (pr-str event) "\n") :append true))))
@@ -93,7 +95,7 @@ The `path` parameter will be set by the user (it's explained a bit later in the 
 
 The I/O records can also implement the `Lifecycle` protocol from the [https://github.com/stuartsierra/component](component library). it's very useful in order to initialize some states for your component, and properly shut it down if needed.
 
-## Use the custom action and I/O in Mirabelle
+## Use the custom action and the custom output in Mirabelle
 
 Now that our code is ready, let's use it in Mirabelle.
 
@@ -101,8 +103,8 @@ You should first run `lein uberjar` at the root of your project in order to buil
 
 Two files should be created in `target/uberjar/`:
 
-- A standalone jar, named `my-module-name-<version>-standalone.jar`
-- A regular jar, named `my-module-name-<version>.jar`
+- A standalone jar, named `mymodule-<version>-standalone.jar`
+- A regular jar, named `mymodule-<version>.jar`
 
 You will need to reference the standalone jar in Mirabelle if you added extra dependencies to your project. Otherwise you can use the regular one.
 
@@ -110,21 +112,15 @@ The first thing to do to use your module is to reference your new action and I/O
 
 ```clojure
 {:stream {:directories ["/etc/mirabelle/streams"]
-          :actions {:keep-if-greater-than my-module-name.core/keep-if-greater-than*}}
- :io {:directories ["/etc/mirabelle/io"]
-      :custom {:custom-file my-module-name.core/map->CustomFileIO}}}
+          :actions {:keep-if-greater-than mymodule.core/keep-if-greater-than*}}
+ :outputs {:custom-file {:type :custom
+                         :builder mymodule.core/map->CustomFileOutput
+                         :config {:path "/tmp/bar"}}}}
 ```
 
-You can see that the `:keep-if-greater-than*` key references the function you wrote in your module, and that the `:custom-file` I/O references `my-module-name.core/map->CustomFileIO` (the map->CustomFileIO is automatically available, it's how Clojure records work).
+You can see that the `:keep-if-greater-than*` key references the function you wrote in your module, and that the `:custom-file` Output references `my-module-name.core/map->CustomFileOutput` in `:builder` (the `map->CustomFileOutput` function is automatically available, it's how Clojure records work).
 
-You can now use the `:custom-file` I/O type in your Mirabelle I/O configuration file. The `:config` key should contain your I/O configuration (here, the `path` parameter):
-
-```clojure
-{:my-custom-io {:config {:path "/tmp/custom"}
-                :type :custom-file}}
-```
-
-You can also write a stream which use both your new action and the new I/O you declared:
+You can also write a stream which use both your new action and the new output you declared:
 
 ```clojure
 (streams
@@ -132,7 +128,7 @@ You can also write a stream which use both your new action and the new I/O you d
   {:name :foo :default true}
   (info)
   (custom :keep-if-greater-than [5]
-    (push-io! :my-custom-io))))
+    (output! :custom-file))))
 ```
 
 You should now launch Mirabelle and include your module jar in the command:
