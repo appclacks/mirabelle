@@ -10,4 +10,4 @@ Check the documentation (https://www.mirabelle.mcorbin.fr/) for more information
 
 ![Mirabelle schema](site/mirabelle/static/img/mirabelle_presentation.png)
 
-This project was inspired by Riemann (https://riemann.io/) codebase, which is licensed under Eclipse Public License 1.0. Some functions and components were reused in Mirabelle.
+This project was inspired by Riemann (https://riemann.io/), which is licensed under Eclipse Public License 1.0. Some functions and components from Riemann were reused in Mirabelle.
