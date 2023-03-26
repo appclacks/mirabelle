@@ -20,6 +20,12 @@
    :not-nil? (comp not nil?)
    :not= not=})
 
+(defn valid-condition-value?
+  [condition-value]
+  (if (sequential? condition-value)
+    (every? identity (map #(keyword? %) condition-value))
+    (keyword? condition-value)))
+
 (defn valid-condition?
   [condition]
   (and
@@ -35,7 +41,7 @@
      :else
      (and ((-> condition->fn keys set)
            (first condition))
-          (keyword? (second condition))))))
+          (valid-condition-value? (second condition))))))
 
 (defn compile-condition
   [[condition field & args]]
@@ -43,12 +49,16 @@
         regex? (= :regex condition)
         args (if (and regex? (string? (first args)))
                [(-> (first args) re-pattern)]
-               args)]
+               args)
+        fields (if (sequential? field)
+                   field
+                   [field])]
     (when (nil? condition-fn)
       (ex/ex-incorrect! "Invalid condition" {}))
-    (fn [event] (apply condition-fn
-                       (get event field)
-                       args))))
+    (fn [event]
+      (apply condition-fn
+             (get-in event fields)
+             args))))
 
 (def compile-conditions
   "Takes a condition and returns a function which can be applied to an
@@ -74,4 +84,5 @@
 
          :else
          (let [cond-fn (compile-condition conditions)]
-           (fn [event] (cond-fn event))))))))
+           (fn [event]
+             (cond-fn event))))))))

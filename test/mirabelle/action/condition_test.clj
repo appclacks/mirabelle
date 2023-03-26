@@ -4,6 +4,9 @@
 
 (deftest valid-condition?-test
   (are [condition] (cd/valid-condition? condition)
+    [:> [:foo :metric] 10]
+    [:> [:metric] 10]
+    [:> [:foo :bar :metric] 10]
     [:> :metric 10]
     [:regex :host "foo"]
     [:< :metric 10]

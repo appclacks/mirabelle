@@ -29,8 +29,12 @@
   (let [[rec state] (recorder)]
     (test-actions (a/where* nil [:pos? :metric] rec)
                   state
-                  [{:metric 10} {:metric 10}]
-                  [{:metric 10} {:metric 10}])
+                  [{:metric 10} {:metric -1}]
+                  [{:metric 10}])
+    (test-actions (a/where* nil [:pos? [:foo :metric]] rec)
+                  state
+                  [{:foo {:metric 10}} {:foo {:metric 11}} {:foo {:metric -7}}]
+                  [{:foo {:metric 10}} {:foo {:metric 11}}])
     (test-actions (a/where* nil [:pos? :metric] rec)
                   state
                   [{:metric -1} {:metric 30} {:metric 0}]
@@ -39,6 +43,10 @@
                   state
                   [{:metric -1} {:metric 30} {:metric 0}]
                   [{:metric 30}])
+    (test-actions (a/where* nil [:> [:foo :bar :metric] 20] rec)
+                  state
+                  [{:foo {:bar {:metric -1}}} {:foo {:bar {:metric 10}}} {:foo {:bar {:metric 31}}}]
+                  [{:foo {:bar {:metric 31}}}])
     (test-actions (a/where* nil [:> :metric 20] rec)
                   state
                   [{:metric -1} {:metric 30} {:metric 40}]
