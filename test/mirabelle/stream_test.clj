@@ -277,6 +277,27 @@
               [{:host "baz" :metric 4 :time 1}
                {:host "baz" :metric 7 :time 4}]]
              @recorder))))
+  (testing "nested fields"
+    (let [recorder (atom [])
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/by {:fields [:host [:nested :field :a]]}
+                                 (a/fixed-event-window {:size 2}
+                                                       (a/test-action recorder)))}
+          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+      (entrypoint {:host "foo" :nested {:field {:a "foo"}} :metric 1 :time 1})
+      (entrypoint {:host "foo" :nested {:field {:a "foo"}} :metric 2 :time 1})
+      (entrypoint {:host "foo" :nested {:field {:a "bar"}} :metric 3 :time 1})
+      (entrypoint {:host "foo" :nested {:field {:a "bar"}} :metric 4 :time 1})
+      (entrypoint {:host "baz" :nested {:field {:a "bar"}} :metric 5 :time 1})
+      (entrypoint {:host "baz" :nested {:field {:a "bar"}} :metric 6 :time 1})
+      (is (= [[{:host "foo" :nested {:field {:a "foo"}} :metric 1 :time 1}
+               {:host "foo" :nested {:field {:a "foo"}} :metric 2 :time 1}]
+              [{:host "foo" :nested {:field {:a "bar"}} :metric 3 :time 1}
+               {:host "foo" :nested {:field {:a "bar"}} :metric 4 :time 1}]
+              [{:host "baz" :nested {:field {:a "bar"}} :metric 5 :time 1}
+               {:host "baz" :nested {:field {:a "bar"}} :metric 6 :time 1}]]
+             @recorder))))
   (testing "no expiration"
     (let [recorder (atom [])
           stream {:name "my-stream"

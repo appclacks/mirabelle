@@ -1565,13 +1565,18 @@
                                                 :time current-time})
             (assoc :returned-fork new-fork-instance))))))
 
+
+(defn by-get-field-fn
+  [field]
+  (if (sequential? field)
+    #(get-in % field)
+    field))
+
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn by-fn
   [{:keys [fields gc-interval fork-ttl]} new-fork]
-  (let [fields (flatten [fields])
-        f (if (= 1 (count fields))
-            (first fields)
-            (apply juxt fields))
+  (let [f-list (map by-get-field-fn fields)
+        f (apply juxt f-list)
         fork-ttl (or fork-ttl 3600)
         state (atom {:last-gc 0})]
     (fn stream [event]
@@ -1579,7 +1584,8 @@
             fork (:returned-fork (swap! state get-fork-and-gc new-fork fork-name (:time event) fork-ttl gc-interval))]
         (call-rescue event fork)))))
 
-(s/def :by/fields (s/coll-of keyword?))
+(s/def :by/fields (s/coll-of (s/or :single keyword?
+                                   :multiple (s/coll-of keyword?))))
 (s/def :by/gc-interval pos-int?)
 (s/def :by/fork-ttl pos-int?)
 
