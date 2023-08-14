@@ -2245,6 +2245,12 @@
             (if state
               (conj state event)
               [event]))
+   :rate (fn [state event]
+           (if state
+             (-> (update state :count inc)
+                 (assoc :event (e/most-recent-event event (:event state))))
+             {:count 1
+              :event event}))
    :min (fn [state event]
           (if state
             (if (< (:metric state) (:metric event))
@@ -2255,7 +2261,7 @@
            (if state
              (-> (update state :sum + (:metric event 0))
                  (update :count inc)
-                 (assoc :event event))
+                 (assoc :event (e/most-recent-event event (:event state))))
              {:sum (:metric event 0)
               :count 1
               :event event}))
@@ -2273,8 +2279,11 @@
 (def keyword->aggr-finalizer-fn
   {:ssort (fn [config windows]
             (sort-by (:field config) (flatten windows)))
+   :rate (fn [config windows]
+           (map (fn [window]
+                  (assoc (:event window) :metric (/ (:count window) (:duration config))))
+                windows))
    :mean (fn [_ windows]
-           (println windows)
            (map (fn [window]
                   (assoc (:event window) :metric (/ (:sum window) (:count window))))
                 windows))})
@@ -2719,12 +2728,24 @@
    :params [k]
    :children children})
 
+(s/def ::aggr-rate (s/cat :config (s/keys :req-un [::duration]
+                                          :opt-un [::delay])))
+
+(defn aggr-rate
+  [config & children]
+  (mspec/valid-action? ::aggr-rate [config])
+  {:action :aggr-rate
+   :description {:message (format "Computes the rate of received events (by counting them) and emits it every %d seconds" (::duration config))}
+   :params [(assoc config :aggr-fn :rate)]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :aggr-max aggregation*
    :aggr-min aggregation*
    :aggr-mean aggregation*
    :aggr-sum aggregation*
+   :aggr-rate aggregation*
    :async-queue! async-queue!*
    :below-dt cond-dt*
    :between-dt cond-dt*

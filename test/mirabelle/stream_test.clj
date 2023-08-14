@@ -1018,3 +1018,51 @@
             {:time 12 :metric -1}]
            @recorder))))
 
+
+(deftest aggr-rate-test
+  (testing "no delay"
+    (let [recorder (atom [])
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/aggr-rate {:duration 10}
+                                        (a/test-action recorder))}
+          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+      (entrypoint {:time 0 :metric 10})
+      (entrypoint {:time 7 :metric 1})
+      (entrypoint {:time 11 :metric 3})
+      (entrypoint {:time 19 :metric 1})
+      (entrypoint {:time 14 :metric -10})
+      (entrypoint {:time 20 :metric 2})
+      (entrypoint {:time 23 :metric 4})
+      (entrypoint {:time 60 :metric 1})
+      (entrypoint {:time 71 :metric 1})
+      (is (= [{:time 7 :metric 2/10}
+              {:time 19 :metric 3/10}
+              {:time 23 :metric 2/10}
+              {:time 60 :metric 1/10}]
+             @recorder))))
+  (testing "with delay"
+    (let [recorder (atom [])
+          stream {:name "my-stream"
+                  :description "foo"
+                  :actions (a/aggr-rate {:duration 10 :delay 25}
+                                        (a/test-action recorder))}
+          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+      (entrypoint {:time 0 :metric 10})
+      (entrypoint {:time 7 :metric 1})
+      (entrypoint {:time 11 :metric 3})
+      (entrypoint {:time 19 :metric 1})
+      (entrypoint {:time 14 :metric 8})
+      (entrypoint {:time 25 :metric 2})
+      (entrypoint {:time 1 :metric -200})
+      (entrypoint {:time 23 :metric 4})
+      (entrypoint {:time 35 :metric 10})
+      (entrypoint {:time 12 :metric 20})
+      (entrypoint {:time 60 :metric 1})
+      (entrypoint {:time 71 :metric 1})
+      (is (= [{:time 7 :metric 3/10}
+              {:time 19 :metric 4/10}
+              {:time 25 :metric 2/10}
+              {:time 35 :metric 1/10}]
+             @recorder)))))
+

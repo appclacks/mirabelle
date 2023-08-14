@@ -1334,3 +1334,27 @@
                    {}]
                   [{:time 1}
                    {:time 2}])))
+
+(deftest aggr-rate*-test
+  (testing "no delay"
+    (let [[rec state] (recorder)]
+      (test-actions (a/aggregation* nil
+                                    {:duration 10
+                                     :aggr-fn :rate
+                                     :delay 0}
+                                    rec)
+                    state
+                    [{:time 0 :metric 10}
+                     {:time 7 :metric 1}
+                     {:time 11 :metric 3}
+                     {:time 14 :metric 8}
+                     {:time 19 :metric 1}
+                     {:time 20 :metric 2}
+                     {:time 21 :metric 2}
+                     {:time 21 :metric 2000}
+                     {:time 24 :metric 24}
+                     {:time 22 :metric 24}
+                     {:time 31 :metric 1}]
+                    [{:time 7 :metric 1/5}
+                     {:time 19 :metric 3/10}
+                     {:time 24 :metric 1/2}]))))

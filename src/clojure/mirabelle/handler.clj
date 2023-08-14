@@ -6,10 +6,12 @@
             [exoscale.ex :as ex]
             [mirabelle.b64 :as b64]
             [mirabelle.index :as index]
+            [mirabelle.otel.traces :as traces]
             [mirabelle.prometheus :as prometheus]
             [mirabelle.stream :as stream])
   (:import io.micrometer.core.instrument.Counter
            io.micrometer.prometheus.PrometheusMeterRegistry
+           io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest
            org.xerial.snappy.Snappy
            prometheus.Remote$WriteRequest))
 
@@ -23,6 +25,7 @@
   (push-event [this params] "Push an event to a stream")
   (current-time [this params] "Get the current time of a given stream's index.")
   (prom-remote-write [this params] "Prometheus remote write endpoint")
+  (otel-traces [this params] "Opentelemetry traces v1 endpoint")
   (not-found [this params] "Not found handler")
   (metrics [this params] "Return the metrics"))
 
@@ -93,6 +96,18 @@
         (doseq [event serie]
           (stream/push! stream-handler event stream-name)))
       {:status 200}))
+  (otel-traces [_ {:keys [all-params] :as request}]
+    (let [stream-name (:name all-params)
+          ^java.io.InputStream body (:body request)
+          ^"[B" body-bytes (bs/to-byte-array body)
+          ^ExportTraceServiceRequest service-request (ExportTraceServiceRequest/parseFrom body-bytes)
+          resources-spans (traces/service-request->events service-request)]
+      (doseq [resource-spans resources-spans]
+        (doseq [scope-spans resource-spans]
+          (doseq [event scope-spans]
+            (stream/push! stream-handler event stream-name)
+            )))
+      {:status 200}))
   (current-time [_ {:keys [all-params]}]
     {:status 200
      :body {:current-time (-> (stream/get-stream stream-handler
@@ -125,6 +140,8 @@
                             :delete {:handler remove-stream
                                      :spec :mirabelle.http.stream/remove}}]
    ["/api/v1/prometheus/remote-write/:name" {:post {:handler prom-remote-write
+                                                    :spec :mirabelle.http.prometheus/remote-write}}]
+   ["/api/v1/opentelemetry/v1/traces/:name" {:post {:handler otel-traces
                                                     :spec :mirabelle.http.prometheus/remote-write}}]
    ["/metrics" {:get {:handler metrics}}]
    ["/healthz" {:get {:handler healthz}}]
