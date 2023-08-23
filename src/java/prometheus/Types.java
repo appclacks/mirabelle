@@ -502,13 +502,13 @@ public final class Types {
       if (type_ != prometheus.Types.MetricMetadata.MetricType.UNKNOWN.getNumber()) {
         output.writeEnum(1, type_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(metricFamilyName_)) {
+      if (!getMetricFamilyNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, metricFamilyName_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(help_)) {
+      if (!getHelpBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, help_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(unit_)) {
+      if (!getUnitBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, unit_);
       }
       unknownFields.writeTo(output);
@@ -524,13 +524,13 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, type_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(metricFamilyName_)) {
+      if (!getMetricFamilyNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, metricFamilyName_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(help_)) {
+      if (!getHelpBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, help_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(unit_)) {
+      if (!getUnitBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, unit_);
       }
       size += unknownFields.getSerializedSize();
@@ -1345,7 +1345,7 @@ public final class Types {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (java.lang.Double.doubleToRawLongBits(value_) != 0) {
+      if (value_ != 0D) {
         output.writeDouble(1, value_);
       }
       if (timestamp_ != 0L) {
@@ -1360,7 +1360,7 @@ public final class Types {
       if (size != -1) return size;
 
       size = 0;
-      if (java.lang.Double.doubleToRawLongBits(value_) != 0) {
+      if (value_ != 0D) {
         size += com.google.protobuf.CodedOutputStream
           .computeDoubleSize(1, value_);
       }
@@ -2052,7 +2052,7 @@ public final class Types {
       for (int i = 0; i < labels_.size(); i++) {
         output.writeMessage(1, labels_.get(i));
       }
-      if (java.lang.Double.doubleToRawLongBits(value_) != 0) {
+      if (value_ != 0D) {
         output.writeDouble(2, value_);
       }
       if (timestamp_ != 0L) {
@@ -2071,7 +2071,7 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, labels_.get(i));
       }
-      if (java.lang.Double.doubleToRawLongBits(value_) != 0) {
+      if (value_ != 0D) {
         size += com.google.protobuf.CodedOutputStream
           .computeDoubleSize(2, value_);
       }
@@ -4749,10 +4749,10 @@ public final class Types {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
+      if (!getNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(value_)) {
+      if (!getValueBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, value_);
       }
       unknownFields.writeTo(output);
@@ -4764,10 +4764,10 @@ public final class Types {
       if (size != -1) return size;
 
       size = 0;
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
+      if (!getNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(value_)) {
+      if (!getValueBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, value_);
       }
       size += unknownFields.getSerializedSize();
@@ -6430,10 +6430,10 @@ public final class Types {
       if (type_ != prometheus.Types.LabelMatcher.Type.EQ.getNumber()) {
         output.writeEnum(1, type_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
+      if (!getNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, name_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(value_)) {
+      if (!getValueBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, value_);
       }
       unknownFields.writeTo(output);
@@ -6449,10 +6449,10 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, type_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
+      if (!getNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, name_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(value_)) {
+      if (!getValueBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, value_);
       }
       size += unknownFields.getSerializedSize();
@@ -7437,7 +7437,7 @@ public final class Types {
       if (stepMs_ != 0L) {
         output.writeInt64(1, stepMs_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(func_)) {
+      if (!getFuncBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, func_);
       }
       if (startMs_ != 0L) {
@@ -7468,7 +7468,7 @@ public final class Types {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(1, stepMs_);
       }
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(func_)) {
+      if (!getFuncBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, func_);
       }
       if (startMs_ != 0L) {

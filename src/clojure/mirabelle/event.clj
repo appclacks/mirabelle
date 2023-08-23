@@ -25,6 +25,13 @@
   (> (:time event1)
      (:time event2)))
 
+(defn most-recent-event
+  "Returns the most recent event between both"
+  [event1 event2]
+  (if (most-recent? event1 event2)
+    event1
+    event2))
+
 (defn critical?
   "Verifies if an event is critical"
   [event]

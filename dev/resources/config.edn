@@ -4,7 +4,8 @@
  :http {:host "0.0.0.0"
         :port 5558
         :basic-auth {:username "foo"
-                     :password #secret "my-password"}}
+                     :password #secret "my-password"}
+        }
  :stream {:directories ["dev/resources/streams"]
           :actions {:custom mirabelle.action/where*}}
  :outputs {:write-file {:config {:path "/tmp/file"}
