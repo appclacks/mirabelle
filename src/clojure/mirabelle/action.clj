@@ -25,8 +25,41 @@
 (s/def ::low number?)
 (s/def ::field keyword?)
 (s/def ::init any?)
-(s/def ::fields (s/coll-of keyword?))
+(s/def ::fields (s/coll-of (s/or :keyword keyword?
+                                 :seq (s/coll-of keyword?))))
 (s/def ::count pos-int?)
+
+(defn select-keys-nested
+  [event keyseq]
+  (loop [ret {} keys keyseq]
+    (if keys
+      (let [key (first keys)
+            seq-key? (sequential? key)
+            entry (if seq-key?
+                    (get-in event key ::not-found)
+                    (get event key ::not-found))]
+        (recur
+         (if (not= entry ::not-found)
+           (if seq-key?
+             (assoc-in ret key entry)
+             (assoc ret key entry))
+           ret)
+         (next keys)))
+      ret)))
+
+(defn dissoc-in
+  "Dissociates an entry from a nested associative structure returning a new
+  nested structure. keys is a sequence of keys. Any empty maps that result
+  will not be present in the new structure."
+  [m [k & ks :as keys]]
+  (if ks
+    (if-let [nextmap (get m k)]
+      (let [newmap (dissoc-in nextmap ks)]
+        (if (seq newmap)
+          (assoc m k newmap)
+          (dissoc m k)))
+      m)
+    (dissoc m k)))
 
 (defn call-rescue
   [event children]
@@ -726,7 +759,7 @@
                      :current-time 0
                      :last-tick nil
                      :window nil})
-        key-fn #(vals (select-keys % fields))]
+        key-fn #(vals (select-keys-nested % fields))]
     ;; the implementation can probably be optimized ?
     (fn stream [event]
       (let [buffer-update-fn (fn [current-event]
@@ -804,6 +837,13 @@
   kept and forwarded downstream. The `debug` action will then receive this list
   of events.
   Expired events will be removed from the list.
+
+  coalesce supports nested fields:
+
+  ```clojure
+  (coalesce {:duration 10 :fields [:host [:nested :field]]}
+    (debug)
+  ```
   "
   [config & children]
   (mspec/valid-action? ::coalesce [config])
@@ -1489,20 +1529,6 @@
                                        :multiple (s/coll-of (s/or
                                                              :keyword keyword?
                                                              :seq (s/coll-of keyword?))))))
-
-(defn dissoc-in
-  "Dissociates an entry from a nested associative structure returning a new
-  nested structure. keys is a sequence of keys. Any empty maps that result
-  will not be present in the new structure."
-  [m [k & ks :as keys]]
-  (if ks
-    (if-let [nextmap (get m k)]
-      (let [newmap (dissoc-in nextmap ks)]
-        (if (seq newmap)
-          (assoc m k newmap)
-          (dissoc m k)))
-      m)
-    (dissoc m k)))
 
 (defn sdissoc*
   [_ fields & children]
@@ -2196,21 +2222,7 @@
   (let [keyseq (seq keys-to-keep)]
     (fn stream [event]
       (call-rescue
-       (loop [ret {} keys keyseq]
-         (if keys
-           (let [key (first keys)
-                 seq-key? (sequential? key)
-                 entry (if seq-key?
-                         (get-in event key ::not-found)
-                         (get event key ::not-found))]
-             (recur
-              (if (not= entry ::not-found)
-                (if seq-key?
-                  (assoc-in ret key entry)
-                  (assoc ret key entry))
-                ret)
-              (next keys)))
-           ret))
+       (select-keys-nested event keyseq)
        children))))
 
 (s/def ::keep-keys (s/cat :keys-to-keep (s/coll-of (s/or :keyword keyword?

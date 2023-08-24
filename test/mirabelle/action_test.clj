@@ -295,6 +295,17 @@
     (is (= [#{{:host "1" :service "foo" :metric 1 :time 0 :ttl 20}
               {:host "1" :service "baz" :metric 1 :time 1 :ttl 20}
               {:host "1" :service "bar" :metric 1 :time 12 :ttl 20}}]
+           (map set @state))))
+  (let [state (atom [])
+        rec (fn [event] (swap! state conj event))
+        action (a/coalesce* nil {:duration 5 :fields [:host [:nested :service]]} rec)]
+    (doseq [event [{:host "1" :nested {:service "foo"} :metric 1 :time 0 :ttl 20}
+                   {:host "1" :nested {:service "baz"} :metric 1 :time 1 :ttl 20}
+                   {:host "1" :nested {:service "bar"} :metric 1 :time 12 :ttl 20}]]
+      (action event))
+    (is (= [#{{:host "1" :nested {:service "foo"} :metric 1 :time 0 :ttl 20}
+              {:host "1" :nested {:service "baz"} :metric 1 :time 1 :ttl 20}
+              {:host "1" :nested {:service "bar"} :metric 1 :time 12 :ttl 20}}]
            (map set @state)))))
 
 (deftest with*-test

@@ -778,6 +778,7 @@
                           (a/json-fields :foo)
                           (a/outside-dt {:low 2 :high 10 :duration 5})
                           (a/coalesce {:duration 2 :fields [:host]})
+                          (a/coalesce {:duration 2 :fields [:host [:nested :field]]})
                           (a/scale 100)
                           (a/with :foo 1)
                           (a/rename-keys {:host :service})
