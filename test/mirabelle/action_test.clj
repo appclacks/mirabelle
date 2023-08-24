@@ -815,6 +815,20 @@
                     :metric 3}]
                   [{:metric 1}
                    {:metric 2}
+                   {:metric 3}])
+    (test-actions (a/sdissoc* nil
+                              [:foo [:nested :key]]
+                              rec)
+                  state
+                  [{:foo 1
+                    :metric 1}
+                   {:nested {:key 1}
+                    :metric 2}
+                   {:nested {:key 2}
+                    :foo 1
+                    :metric 3}]
+                  [{:metric 1}
+                   {:metric 2}
                    {:metric 3}])))
 
 (deftest coll-percentiles*-test
@@ -1083,14 +1097,13 @@
                    {:service "bar"}
                    {}])
     (test-actions (a/keep-keys* nil
-                                [[:foo :bar :baz]]
+                                [[:foo :bar :baz] :a]
                                 rec)
                   state
-                  [{:host "foo" :foo {:bar {:baz "1"
+                  [{:a 1 :host "foo" :foo {:bar {:baz "1"
                                             :toto "2"}
-                                      :invalid true
-                                      }}]
-                  [{:foo {:bar {:baz "1"}}}])))
+                                      :invalid true}}]
+                  [{:a 1 :foo {:bar {:baz "1"}}}])))
 
 (deftest include-test
   (let [include-path (.getPath (io/resource "include/action"))]

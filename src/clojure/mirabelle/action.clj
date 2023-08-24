@@ -1486,21 +1486,50 @@
    :children children})
 
 (s/def ::sdissoc (s/cat :sdissoc (s/or :single keyword?
-                                       :multiple (s/coll-of keyword?))))
+                                       :multiple (s/coll-of (s/or
+                                                             :keyword keyword?
+                                                             :seq (s/coll-of keyword?))))))
+
+(defn dissoc-in
+  "Dissociates an entry from a nested associative structure returning a new
+  nested structure. keys is a sequence of keys. Any empty maps that result
+  will not be present in the new structure."
+  [m [k & ks :as keys]]
+  (if ks
+    (if-let [nextmap (get m k)]
+      (let [newmap (dissoc-in nextmap ks)]
+        (if (seq newmap)
+          (assoc m k newmap)
+          (dissoc m k)))
+      m)
+    (dissoc m k)))
 
 (defn sdissoc*
   [_ fields & children]
-  (fn stream [event]
-    (call-rescue (apply dissoc event fields)
-                 children)))
+  (let [to-remove (seq fields)]
+    (fn stream [event]
+      (call-rescue
+       (loop [result event key-list to-remove]
+         (if key-list
+           (let [key (first key-list)
+                 seq-key? (sequential? key)]
+             (recur
+              (if seq-key?
+                (dissoc-in result key)
+                (dissoc result key))
+              (next key-list)))
+           result))
+       children))))
 
 (defn sdissoc
-  "Remove a key (or a list of keys) from the events/
+  "Remove a key (or a list of keys) from the events.
 
   ```clojure
   (sdissoc :host (info))
 
   (sdissoc [:environment :host] (info))
+
+  (sdissoc [:environment [:nested :key] (info))
   ```"
   [fields & children]
   (mspec/valid-action? ::sdissoc [fields])
@@ -1612,12 +1641,11 @@
   receive events since `:fork-ttl` seconds
 
   ```clojure
-  (by {:fields [:host :service]
+  (by {:fields [:host :service [:a :nested-key]
        :gc-interval 3600
        :fork-ttl 1800}
     (fixed-time-window {:duration 60}))
   ```
-
   "
   [config & children]
   (mspec/valid-action? ::by [config])
@@ -2194,7 +2222,15 @@
   ```clojure
   (keep-keys [:host :metric :time :environment :description]
     (info))
-  ```"
+  ```
+
+  Also works with nested keys:
+
+  ```clojure
+  (keep-keys [:host :metric :time [:a :nested-key]]
+    (info))
+  ```
+"
   [keys-to-keep & children]
   (mspec/valid-action? ::keep-keys [keys-to-keep])
   {:action :keep-keys
