@@ -1,9 +1,12 @@
 (streams
   (stream {:name :test}
           ;(info)
-          (fixed-time-window
-           (ddt)
-           )
+          (by {:fields [[:attributes :http.route]
+                        [:attributes :http.http.method]]}
+              (aggr-rate {:duration 10 :delay 10}
+                         (publish! :rate)
+                         )
+              )
           ;; (by {:fields [[:attributes :http.route]
           ;;               [:attributes :http.http.method]]}
           ;;     (fixed-time-window {:duration 30}

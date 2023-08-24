@@ -772,6 +772,7 @@
                           (a/tag ["foo" "bar"])
                           (a/untag ["foo" "bar"])
                           (a/keep-keys [:host :service])
+                          (a/keep-keys [:host :service [:foo :bar]])
                           (a/json-fields [:foo :bar])
                           (a/json-fields :foo)
                           (a/outside-dt {:low 2 :high 10 :duration 5})

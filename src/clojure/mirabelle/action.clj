@@ -2165,10 +2165,28 @@
 
 (defn keep-keys*
   [_ keys-to-keep & children]
-  (fn stream [event]
-    (call-rescue (select-keys event keys-to-keep) children)))
+  (let [keyseq (seq keys-to-keep)]
+    (fn stream [event]
+      (call-rescue
+       (loop [ret {} keys keyseq]
+         (if keys
+           (let [key (first keys)
+                 seq-key? (sequential? key)
+                 entry (if seq-key?
+                         (get-in event key ::not-found)
+                         (get event key ::not-found))]
+             (recur
+              (if (not= entry ::not-found)
+                (if seq-key?
+                  (assoc-in ret key entry)
+                  (assoc ret key entry))
+                ret)
+              (next keys)))
+           ret))
+       children))))
 
-(s/def ::keep-keys (s/cat :keys-to-keep (s/coll-of keyword?)))
+(s/def ::keep-keys (s/cat :keys-to-keep (s/coll-of (s/or :keyword keyword?
+                                                         :seq (s/coll-of keyword?)))))
 
 (defn keep-keys
   "Keep only the specified keys for events.

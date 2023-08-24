@@ -1081,7 +1081,16 @@
                   [{:host "foo" :service "bar" :metric 10}
                    {:host "foo" :service "baz"}
                    {:service "bar"}
-                   {}])))
+                   {}])
+    (test-actions (a/keep-keys* nil
+                                [[:foo :bar :baz]]
+                                rec)
+                  state
+                  [{:host "foo" :foo {:bar {:baz "1"
+                                            :toto "2"}
+                                      :invalid true
+                                      }}]
+                  [{:foo {:bar {:baz "1"}}}])))
 
 (deftest include-test
   (let [include-path (.getPath (io/resource "include/action"))]
