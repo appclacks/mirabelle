@@ -23,7 +23,8 @@
 (s/def ::threshold number?)
 (s/def ::high number?)
 (s/def ::low number?)
-(s/def ::field keyword?)
+(s/def ::field (s/or :keyword keyword?
+                     :seq (s/coll-of keyword?)))
 (s/def ::init any?)
 (s/def ::fields (s/coll-of (s/or :keyword keyword?
                                  :seq (s/coll-of keyword?))))
@@ -1344,11 +1345,15 @@
 
 (defn changed*
   [_ {:keys [field init]} & children]
-  (let [state (atom [init nil])]
+  (let [state (atom [init nil])
+        nested? (sequential? field)]
     (fn stream [event]
       (let [[_ event] (swap! state
                              (fn [s]
-                               (let [current-val (get event field)]
+                               (let [current-val
+                                     (if nested?
+                                       (get-in event field)
+                                       (get event field))]
                                  (if (= (first s)
                                         current-val)
                                    [(first s) nil]
@@ -1370,7 +1375,13 @@
   For example, this action will let event pass if the :state field vary,
   the initial value being `ok`.
 
-  This stream is useful to get only events making a transition."
+  This stream is useful to get only events making a transition.
+
+  It also supported nested fields:
+
+  ```clojure
+  (changed {:field [:nested :field] :init \"ok\"})
+  ```"
   [config & children]
   (mspec/valid-action? ::changed [config])
   {:action :changed

@@ -735,7 +735,20 @@
                    {:metric 6 :state "critical"}]
                   [{:metric 3 :state "critical"}
                    {:metric 5 :state "ok"}
-                   {:metric 6 :state "critical"}])))
+                   {:metric 6 :state "critical"}]))
+  (let [[rec state] (recorder)]
+    (test-actions (a/changed* nil {:field [:nested :state] :init "ok"} rec)
+                  state
+                  [{:metric 1 :nested {:state "ok"}}
+                   {:metric 2 :nested {:state "ok"}}
+                   {:metric 3 :nested {:state "critical"}}
+                   {:metric 4 :nested {:state "critical"}}
+                   {:metric 4 :nested {:state "critical"}}
+                   {:metric 5 :nested {:state "ok"}}
+                   {:metric 6 :nested {:state "critical"}}]
+                  [{:metric 3 :nested {:state "critical"}}
+                   {:metric 5 :nested {:state "ok"}}
+                   {:metric 6 :nested {:state "critical"}}])))
 
 (deftest project*-test
   (let [[rec state] (recorder)]
