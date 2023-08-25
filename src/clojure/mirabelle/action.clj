@@ -1346,14 +1346,14 @@
 (defn changed*
   [_ {:keys [field init]} & children]
   (let [state (atom [init nil])
-        nested? (sequential? field)]
+        nested? (sequential? field)
+        get-fn (if nested?
+                 get-in
+                 get)]
     (fn stream [event]
       (let [[_ event] (swap! state
                              (fn [s]
-                               (let [current-val
-                                     (if nested?
-                                       (get-in event field)
-                                       (get event field))]
+                               (let [current-val (get-fn event field)]
                                  (if (= (first s)
                                         current-val)
                                    [(first s) nil]
