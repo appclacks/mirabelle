@@ -1350,7 +1350,19 @@
                    {:time 4}
                    {:time 9}
                    {:time 10}
-                   {:time 13}])))
+                   {:time 13}]))
+  (let [[rec state] (recorder)]
+    (test-actions (a/aggregation* nil {:duration 10 :field [:nested :a] :aggr-fn :ssort :nested? true} rec)
+                  state
+                  [{:time 1 :nested {:a 4}}
+                   {:time 3 :nested {:a 1}}
+                   {:time 7 :nested {:a -1}}
+                   {:time 9 :nested {:a 10}}
+                   {:time 11 :nested {:a 3}}]
+                  [{:time 7 :nested {:a -1}}
+                   {:time 3 :nested {:a 1}}
+                   {:time 1 :nested {:a 4}}
+                   {:time 9 :nested {:a 10}}])))
 
 (deftest coll-increase*
   (let [[rec state] (recorder)]

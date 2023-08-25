@@ -2355,7 +2355,11 @@
 
 (def keyword->aggr-finalizer-fn
   {:ssort (fn [config windows]
-            (sort-by (:field config) (flatten windows)))
+            (sort-by
+             (if (:nested? config)
+               (fn [event] (get-in event (:field config)))
+               (:field config))
+             (flatten windows)))
    :rate (fn [config windows]
            (map (fn [window]
                   (assoc (:event window) :metric (/ (:count window) (:duration config))))
@@ -2667,14 +2671,16 @@
   ```
 
   In this example, events from previous windows will be sent with a delay of
-  10 seconds."
+  10 seconds.
+
+  `ssort` supports sorting on a nested field (example `:field [:nested :field]`)"
   [config & children]
   (mspec/valid-action? ::ssort [config])
   {:action :ssort
    :description {:message (format "Sort events during %d seconds based on the field %s"
                                   (:duration config)
                                   (:field config))}
-   :params [(assoc config :aggr-fn :ssort)]
+   :params [(assoc config :aggr-fn :ssort :nested? (sequential? (:field config)))]
    :children children})
 
 (defn coll-increase*
