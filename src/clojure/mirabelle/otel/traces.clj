@@ -84,13 +84,13 @@
                Span$SpanKind/SPAN_KIND_CONSUMER :consumer
                :unrecognized)
         status (.getStatus span)
+        service (get-in resource [:attributes :service.name])
         status-code (condp = (.getCode status)
                       Status$StatusCode/STATUS_CODE_ERROR "error"
                       Status$StatusCode/STATUS_CODE_OK "ok"
-                      Status$StatusCode/STATUS_CODE_UNSET "unset"
-                      )
-        ]
+                      Status$StatusCode/STATUS_CODE_UNSET "unset")]
     {:resource resource
+     :service service
      :scope scope
      :schema-url schema-url
      :trace-id (byte-string->string (.getTraceId span))

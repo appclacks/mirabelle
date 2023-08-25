@@ -1631,7 +1631,6 @@
                                                 :time current-time})
             (assoc :returned-fork new-fork-instance))))))
 
-
 (defn by-get-field-fn
   [field]
   (if (sequential? field)
