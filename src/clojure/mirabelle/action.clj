@@ -2135,10 +2135,14 @@
                      ;; last flip time
                      :time nil
                      ;; clock
-                     :max-time 0})]
+                     :max-time 0})
+        nested? (sequential? field)
+        get-fn (if nested?
+                 get-in
+                 get)]
     (fn stream [event]
       (let [event-time (:time event)
-            event-state (get event field)]
+            event-state (get-fn event field)]
         (when event-time
           (let [{:keys [out]}
                 (swap! state
@@ -2173,7 +2177,8 @@
             (doseq [event out]
               (call-rescue event children))))))))
 
-(s/def ::stable (s/cat :dt pos-int? :field keyword?))
+(s/def ::stable (s/cat :dt pos-int? :field (s/or :keyword keyword?
+                                                 :seq (s/coll-of keyword?))))
 
 (defn stable
   "Takes a duration (dt) in second and a field name as parameter.
@@ -2192,7 +2197,14 @@
   ```
 
   In this example, events will be forwarded of the value of the `:state` key
-  is the same for at least 10 seconds"
+  is the same for at least 10 seconds.
+
+  Support nested fields:
+
+  ```clojure
+  (stable 10 [:nested :field]
+    (info))
+  ```."
   [dt field & children]
   (mspec/valid-action? ::stable [dt field])
   {:action :stable

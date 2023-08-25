@@ -710,6 +710,7 @@
                           (a/aggr-sum {:duration 5})
                           (a/aggr-mean {:duration 5})
                           (a/stable 5 :state)
+                          (a/stable 5 [:foo :bar])
                           (a/project [[:= :host "foo"]
                                       [:= :service "bar"]])
                           (a/to-base64 :host

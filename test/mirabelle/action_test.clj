@@ -1088,7 +1088,21 @@
                    {:state "ok" :time 38}
                    {:state "ok" :time 40}
                    {:state "ok" :time 41}
-                   {:state "ok" :time 52}])))
+                   {:state "ok" :time 52}])
+    (test-actions (a/stable* nil
+                             10
+                             [:nested :state]
+                             rec)
+                  state
+                  [{:nested {:state "critical"} :time 1}
+                   {:nested {:state "critical"} :time 9}
+                   {:nested {:state "critical"} :time 12}
+                   {:nested {:state "critical"} :time 13}
+                   ]
+                  [{:nested {:state "critical"} :time 1}
+                   {:nested {:state "critical"} :time 9}
+                   {:nested {:state "critical"} :time 12}
+                   {:nested {:state "critical"} :time 13}])))
 
 (deftest rename-keys*-test
   (let [[rec state] (recorder)]
