@@ -27,7 +27,7 @@
   [{:keys [api-handler registry config pubsub]}]
   (let [nb-conn (atom 0)]
     (metric/gauge! registry
-                   :websocket.connection.count
+                   :websocket.connections.count
                    {}
                    (fn [] @nb-conn))
     [(ws-interceptor pubsub nb-conn) ;; enter
