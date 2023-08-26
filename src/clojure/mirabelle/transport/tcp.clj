@@ -166,7 +166,7 @@
     (log/info {} "starting" (str "tcp-server " host ":" port))
     (let [killer (atom nil)
           timer (metric/get-timer! registry
-                                   :tcp-request-duration
+                                   :tcp-requests-duration
                                    {})
           so-backlog (int (or so-backlog 100))
           channel-grp (transport/channel-group
