@@ -72,8 +72,8 @@
 
 (defn span->event
   [^Span span scope resource schema-url]
-  (let [start-time (double (/ (.getStartTimeUnixNano span) 1000000000))
-        end-time (double (/ (.getEndTimeUnixNano span) 1000000000))
+  (let [start-time (.getStartTimeUnixNano span)
+        end-time (.getEndTimeUnixNano span)
         duration (- end-time start-time)
         kind (condp = (.getKind span)
                Span$SpanKind/SPAN_KIND_UNSPECIFIED :unspecified
@@ -100,7 +100,7 @@
      :parent-span-id (byte-string->string (.getParentSpanId span))
      :name (.getName span)
      :kind kind
-     :time end-time
+     :time (double (/ end-time 1000000000))
      :start-time start-time
      :metric duration
      :attributes (key-value-list->map (.getAttributesList span))
@@ -115,8 +115,7 @@
 (defn scope-span->events
   [^ScopeSpans scope-spans resource]
   (let [schema-url (.getSchemaUrl scope-spans)
-        scope (scope->map (.getScope scope-spans))
-        ]
+        scope (scope->map (.getScope scope-spans))]
     (map #(span->event % scope resource schema-url) (.getSpansList scope-spans))))
 
 (defn resource-span->events

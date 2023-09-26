@@ -34,14 +34,33 @@
              :params [:websocket],
              :children []}),
            :params [{:service "rate"}]})}
+        {:action :percentiles,
+         :description {:message "Computes the quantiles"},
+         :params
+         [{:duration 10,
+           :delay 5,
+           :nb-significant-digits 3,
+           :percentiles [0.99 0.5 0.75]}],
+         :children
+         ({:action :with,
+           :description
+           {:message "Set the field :service to stream-percentiles"},
+           :children
+           ({:action :publish!,
+             :description
+             {:message "Publish events into the channel :websocket"},
+             :params [:websocket],
+             :children []}),
+           :params [{:service "stream-percentiles"}]})}
         {:action :fixed-time-window,
          :description {:message "Build 10 seconds fixed time windows"},
          :params [{:duration 10, :aggr-fn :fixed-time-window}],
          :children
          ({:action :coll-percentiles,
            :description
-           {:message "Computes percentiles for quantiles [0.99]"},
-           :params [[0.99]],
+           {:message
+            "Computes percentiles for quantiles [0.99 0.5 0.75]"},
+           :params [[0.99 0.5 0.75]],
            :children
            ({:action :with,
              :description

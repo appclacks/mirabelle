@@ -1430,3 +1430,24 @@
                     [{:time 7 :metric 1/5}
                      {:time 19 :metric 3/10}
                      {:time 24 :metric 1/2}]))))
+
+(deftest percentiles
+  (let [[rec state] (recorder)]
+    (test-actions (a/percentiles* nil
+                                  {:percentiles [0 0.5 0.99 1]
+                                   :duration 10
+                                   :nb-significant-digits 3}
+                                  rec)
+                  state
+                  [{:time 1 :metric 100}
+                   {:time 2 :metric 200}
+                   {:time 2 :metric 200}
+                   {:time 2 :metric 200}
+                   {:time 2 :metric 200}
+                   {:time 2 :metric 200}
+                   {:time 4 :metric 800}
+                   {:time 12 :metric 800}]
+                  [{:time 12, :metric 100, :quantile 0}
+                   {:time 12, :metric 200, :quantile 0.5}
+                   {:time 12, :metric 800, :quantile 0.99}
+                   {:time 12, :metric 800, :quantile 1}])))

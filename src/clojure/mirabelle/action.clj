@@ -15,7 +15,9 @@
             [mirabelle.math :as math]
             [mirabelle.pubsub :as pubsub]
             [mirabelle.spec :as mspec])
-  (:import java.util.concurrent.Executor))
+  (:import java.util.concurrent.Executor
+           org.HdrHistogram.Histogram
+           org.HdrHistogram.Recorder))
 
 (s/def ::size pos-int?)
 (s/def ::delay nat-int?)
@@ -2833,6 +2835,78 @@
    :params [(assoc config :aggr-fn :rate)]
    :children children})
 
+(defn percentiles*
+  [_ {:keys [duration
+             percentiles
+             delay
+             highest-trackable-value
+             nb-significant-digits
+             lowest-discernible-value]}
+   & children]
+  (let [^Recorder recorder
+        (cond
+          lowest-discernible-value (Recorder. lowest-discernible-value
+                                              highest-trackable-value
+                                              nb-significant-digits)
+
+          highest-trackable-value (Recorder. ^Long highest-trackable-value
+                                             ^Integer nb-significant-digits)
+
+          :else (Recorder. ^Integer nb-significant-digits))
+        state (atom {:last-flush 0
+                     :emit? nil})
+        delay (or delay 0)]
+    (fn stream [event]
+      (let [state (swap! state (fn [{:keys [last-flush]}]
+                                 (cond
+                                   (= 0 last-flush)
+                                   {:last-flush (:time event) :emit? false}
+
+                                   (> (:time event)
+                                      (+ last-flush duration))
+                                   {:last-flush (:time event) :emit? true}
+
+                                   (>= (:time event)
+                                       (- last-flush delay))
+                                   {:last-flush last-flush :emit? false}
+
+                                   :else
+                                   {:last-flush last-flush :emit? false :discard true})))]
+        (when-not (:discard state)
+          (if (:emit? state)
+            (let [^Histogram histogram (.getIntervalHistogram recorder)]
+              (.recordValue recorder (:metric event))
+              (doseq [percentile percentiles]
+                (call-rescue (assoc event
+                                    :metric (.getValueAtPercentile histogram
+                                                                   (double (* 100 percentile)))
+                                    :quantile percentile)
+                             children)))
+            (.recordValue recorder (:metric event))))))))
+
+
+(s/def ::highest-trackable-value pos-int?)
+(s/def ::nb-significant-digits pos-int?)
+(s/def ::lowest-discernible-value number?)
+
+(s/def :percentiles/percentiles (s/coll-of number?))
+
+(s/def ::percentiles (s/cat :config (s/keys :req-un [::duration
+                                                     :percentiles/percentiles
+                                                     ::nb-significant-digits]
+                                            :opt-un [::delay
+                                                     ::highest-trackable-value
+                                                     ::lowest-discernible-value])))
+
+
+(defn percentiles
+  [config & children]
+  (mspec/valid-action? ::percentiles [config])
+  {:action :percentiles
+   :description {:message (format "Computes the quantiles %s" (:percentiles config))}
+   :params [config]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :aggr-max aggregation*
@@ -2884,6 +2958,7 @@
    :not-expired not-expired*
    :outside-dt cond-dt*
    :over over*
+   :percentiles percentiles*
    :project project*
    :publish! publish!*
    :output! output!*

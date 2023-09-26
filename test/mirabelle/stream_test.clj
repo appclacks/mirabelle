@@ -744,6 +744,9 @@
                           (a/info)
                           (a/error)
                           (a/expired)
+                          (a/percentiles {:percentiles [0.5 1]
+                                          :duration 10
+                                          :nb-significant-digits 3})
                           (a/fixed-event-window {:size 3}
                                                 (a/coll-increase)
                                                 (a/coll-where [:= :service "foo"])
