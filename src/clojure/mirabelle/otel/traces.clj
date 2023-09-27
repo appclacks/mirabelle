@@ -13,8 +13,7 @@
            io.opentelemetry.proto.trace.v1.Span$Link
            io.opentelemetry.proto.trace.v1.Status$StatusCode
            io.opentelemetry.proto.trace.v1.Span$SpanKind
-           org.apache.commons.codec.binary.Hex
-           ))
+           org.apache.commons.codec.binary.Hex))
 
 (declare key-value-list->map)
 
