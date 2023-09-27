@@ -122,8 +122,7 @@
   (let [^Resource resource (.getResource resource-span)
         scope-spans (.getScopeSpansList resource-span)
         resource-attributes (key-value-list->map (.getAttributesList resource))
-        schema-url (.getSchemaUrl resource-span)
-        ]
+        schema-url (.getSchemaUrl resource-span)]
     (map #(scope-span->events % {:attributes resource-attributes
                                  :schema-url schema-url})
          scope-spans)))

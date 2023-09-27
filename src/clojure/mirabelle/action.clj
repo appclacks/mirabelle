@@ -311,7 +311,7 @@
 
   Get the event the biggest metric on windows of 10 events.
 
-  Check `aggr-max` and `smax` as well."
+  Check `top` and `smax` as well."
   [& children]
   {:action :coll-max
    :description {:message "Get the event with the biggest metric"}
@@ -370,7 +370,7 @@
 
   Get the event the smallest metric on windows of 10 events.
 
-  Check `aggr-min` and `smin` as well."
+  Check `bottom` and `smin` as well."
   [& children]
   {:action :coll-min
    :description {:message "Get the event with the smallest metric"}
@@ -1185,30 +1185,30 @@
     (fn stream [event]
       (when (:time event)
         (let [[_ _ event-to-send] (swap! last-sent
-                                       (fn [[last-time-sent counter _]]
-                                         (cond
-                                           ;; window is closed
-                                           ;; we send the event and
-                                           ;; reset the counter
-                                           (or (nil? last-time-sent)
-                                               (>= (:time event)
-                                                   (+ last-time-sent (:duration config))))
-                                           [(:time event)
-                                            1
-                                            event]
+                                         (fn [[last-time-sent counter _]]
+                                           (cond
+                                             ;; window is closed
+                                             ;; we send the event and
+                                             ;; reset the counter
+                                             (or (nil? last-time-sent)
+                                                 (>= (:time event)
+                                                     (+ last-time-sent (:duration config))))
+                                             [(:time event)
+                                              1
+                                              event]
 
-                                           ;; we reached the threshold
-                                           ;; we stop sending
-                                           (= counter (:count config))
-                                           [last-time-sent
-                                            counter
-                                            nil]
+                                             ;; we reached the threshold
+                                             ;; we stop sending
+                                             (= counter (:count config))
+                                             [last-time-sent
+                                              counter
+                                              nil]
 
-                                           ;; counter is smaller, we let the event
-                                           ;; pass
-                                           :else [last-time-sent
-                                                  (inc counter)
-                                                  event])))]
+                                             ;; counter is smaller, we let the event
+                                             ;; pass
+                                             :else [last-time-sent
+                                                    (inc counter)
+                                                    event])))]
           (when event-to-send
             (call-rescue event-to-send children)))))))
 
@@ -2462,23 +2462,23 @@
             (call-rescue w
                          children)))))))
 
-(s/def ::aggr-sum (s/cat :config (s/keys :req-un [::duration]
-                                         :opt-un [::delay])))
+(s/def ::sum (s/cat :config (s/keys :req-un [::duration]
+                                    :opt-un [::delay])))
 
-(s/def ::aggr-max (s/cat :config (s/keys :req-un [::duration]
-                                         :opt-un [::delay])))
+(s/def ::top (s/cat :config (s/keys :req-un [::duration]
+                                    :opt-un [::delay])))
 
-(s/def ::aggr-min (s/cat :config (s/keys :req-un [::duration]
-                                         :opt-un [::delay])))
+(s/def ::bottom (s/cat :config (s/keys :req-un [::duration]
+                                       :opt-un [::delay])))
 
-(s/def ::aggr-mean (s/cat :config (s/keys :req-un [::duration]
-                                          :opt-un [::delay])))
+(s/def ::mean (s/cat :config (s/keys :req-un [::duration]
+                                     :opt-un [::delay])))
 
-(defn aggr-sum
+(defn sum
   "Sum the events field from the last dt seconds.
 
   ```clojure
-  (aggr-sum {:duration 10}
+  (sum {:duration 10}
     (info))
   ```
 
@@ -2487,22 +2487,22 @@
   delay:
 
   ```clojure
-  (aggr-sum {:duration 10 :delay 5}
+  (sum {:duration 10 :delay 5}
     (info))
   ```"
   [config & children]
-  (mspec/valid-action? ::aggr-sum [config])
-  {:action :aggr-sum
+  (mspec/valid-action? ::sum [config])
+  {:action :sum
    :description {:message (format "Sum the events field from the last %s seconds"
                                   (:duration config))}
    :params [(assoc config :aggr-fn :+)]
    :children children})
 
-(defn aggr-max
+(defn top
   "Get the max event from the last dt seconds.
 
   ```clojure
-  (aggr-max {:duration 10}
+  (top {:duration 10}
     (info))
   ```
 
@@ -2511,22 +2511,22 @@
   delay:
 
   ```clojure
-  (aggr-max {:duration 10 :delay 5}
+  (top {:duration 10 :delay 5}
     (info))
   ```"
   [config & children]
-  (mspec/valid-action? ::aggr-max [config])
-  {:action :aggr-max
+  (mspec/valid-action? ::top [config])
+  {:action :top
    :description {:message (format "Get the max event from the last %s seconds"
                                   (:duration config))}
    :params [(assoc config :aggr-fn :max)]
    :children children})
 
-(defn aggr-min
+(defn bottom
   "Get the min event from the last dt seconds.
 
   ```clojure
-  (aggr-min {:duration 10}
+  (bottom {:duration 10}
     (info))
   ```
 
@@ -2535,22 +2535,22 @@
   delay:
 
   ```clojure
-  (aggr-min {:duration 10 :delay 5}
+  (bottom {:duration 10 :delay 5}
     (info))
   ```"
   [config & children]
-  (mspec/valid-action? ::aggr-min [config])
-  {:action :aggr-min
+  (mspec/valid-action? ::bottom [config])
+  {:action :bottom
    :description {:message (format "Get the min event from the last %s seconds"
                                   (:duration config))}
    :params [(assoc config :aggr-fn :min)]
    :children children})
 
-(defn aggr-mean
+(defn mean
   "Get the mean of event metrics from the last dt seconds.
 
   ```clojure
-  (aggr-mean {:duration 10}
+  (mean {:duration 10}
     (info))
   ```
 
@@ -2559,12 +2559,12 @@
   delay:
 
   ```clojure
-  (aggr-mean {:duration 10 :delay 5}
+  (mean {:duration 10 :delay 5}
     (info))
   ```"
   [config & children]
-  (mspec/valid-action? ::aggr-mean [config])
-  {:action :aggr-mean
+  (mspec/valid-action? ::mean [config])
+  {:action :mean
    :description {:message (format "Get the min of events from the last %s seconds"
                                   (:duration config))}
    :params [(assoc config :aggr-fn :mean)]
@@ -2611,7 +2611,7 @@
       (let [result (swap!
                     state
                     (fn [{:keys [cutoff buffer]}]
-                      ; Compute minimum allowed time
+                                        ; Compute minimum allowed time
                       (let [cutoff (max cutoff (- (get event :time 0) duration))
                             send? (or (nil? (:time event))
                                       (< cutoff (:time event)))
@@ -2824,13 +2824,13 @@
    :params [k]
    :children children})
 
-(s/def ::aggr-rate (s/cat :config (s/keys :req-un [::duration]
-                                          :opt-un [::delay])))
+(s/def ::rate (s/cat :config (s/keys :req-un [::duration]
+                                     :opt-un [::delay])))
 
-(defn aggr-rate
+(defn rate
   [config & children]
-  (mspec/valid-action? ::aggr-rate [config])
-  {:action :aggr-rate
+  (mspec/valid-action? ::rate [config])
+  {:action :rate
    :description {:message (format "Computes the rate of received events (by counting them) and emits it every %d seconds" (::duration config))}
    :params [(assoc config :aggr-fn :rate)]
    :children children})
@@ -2909,14 +2909,11 @@
 
 (def action->fn
   {:above-dt cond-dt*
-   :aggr-max aggregation*
-   :aggr-min aggregation*
-   :aggr-mean aggregation*
-   :aggr-sum aggregation*
-   :aggr-rate aggregation*
+   :sum aggregation*
    :async-queue! async-queue!*
    :below-dt cond-dt*
    :between-dt cond-dt*
+   :bottom aggregation*
    :changed changed*
    :coalesce coalesce*
    :coll-bottom coll-bottom*
@@ -2953,6 +2950,7 @@
    :io io*
    :json-fields json-fields*
    :keep-keys keep-keys*
+   :mean aggregation*
    :moving-event-window moving-event-window*
    :moving-time-window moving-time-window*
    :not-expired not-expired*
@@ -2962,6 +2960,7 @@
    :project project*
    :publish! publish!*
    :output! output!*
+   :rate aggregation*
    :reaper reaper*
    :reinject! reinject!*
    :rename-keys rename-keys*
@@ -2981,6 +2980,7 @@
    :test-action test-action*
    :throttle throttle*
    :to-base64 to-base64*
+   :top aggregation*
    :under under*
    :untag untag*
    :warning warning*

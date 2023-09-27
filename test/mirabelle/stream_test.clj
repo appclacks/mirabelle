@@ -705,10 +705,10 @@
                                                    :profile :prod})
                           (a/smax)
                           (a/smin)
-                          (a/aggr-max {:duration 5 :delay 2})
-                          (a/aggr-min {:duration 5})
-                          (a/aggr-sum {:duration 5})
-                          (a/aggr-mean {:duration 5})
+                          (a/top {:duration 5 :delay 2})
+                          (a/bottom {:duration 5})
+                          (a/sum {:duration 5})
+                          (a/mean {:duration 5})
                           (a/stable 5 :state)
                           (a/stable 5 [:foo :bar])
                           (a/project [[:= :host "foo"]
@@ -801,12 +801,12 @@
     (entrypoint {:state "ok" :time 100 :metric 1 :host "foo" :service "b"})
     (entrypoint {:state "ok" :time 200 :metric 1 :host "foo" :service "a"})))
 
-(deftest aggr-sum-test
+(deftest sum-test
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
-                :actions (a/aggr-sum {:duration 10}
-                                     (a/test-action recorder))}
+                :actions (a/sum {:duration 10}
+                                (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:time 0 :metric 10})
     (entrypoint {:time 7 :metric 1})
@@ -823,12 +823,12 @@
             {:time 60 :metric 1}]
            @recorder))))
 
-(deftest aggr-mean-test
+(deftest mean-test
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
-                :actions (a/aggr-mean {:duration 10}
-                                      (a/test-action recorder))}
+                :actions (a/mean {:duration 10}
+                                 (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:time 0 :metric 10})
     (entrypoint {:time 7 :metric 1})
@@ -840,13 +840,13 @@
             {:time 17 :metric (/ 25 3)}]
            @recorder))))
 
-(deftest aggr-max-test
+(deftest top-test
   (testing "no delay"
     (let [recorder (atom [])
           stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/aggr-max {:duration 10}
-                                       (a/test-action recorder))}
+                  :actions (a/top {:duration 10}
+                                  (a/test-action recorder))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
@@ -866,8 +866,8 @@
     (let [recorder (atom [])
           stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/aggr-max {:duration 10 :delay 25}
-                                       (a/test-action recorder))}
+                  :actions (a/top {:duration 10 :delay 25}
+                                  (a/test-action recorder))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
@@ -893,8 +893,8 @@
     (let [recorder (atom [])
           stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/aggr-max {:duration 10 :delay 25}
-                                       (a/test-action recorder))}
+                  :actions (a/top {:duration 10 :delay 25}
+                                  (a/test-action recorder))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
@@ -917,13 +917,13 @@
               {:time 35 :metric 10}]
              @recorder)))))
 
-(deftest aggr-min-test
+(deftest bottom-test
   (testing "no delay"
     (let [recorder (atom [])
           stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/aggr-min {:duration 10}
-                                       (a/test-action recorder))}
+                  :actions (a/bottom {:duration 10}
+                                     (a/test-action recorder))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
@@ -943,8 +943,8 @@
     (let [recorder (atom [])
           stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/aggr-min {:duration 10 :delay 25}
-                                       (a/test-action recorder))}
+                  :actions (a/bottom {:duration 10 :delay 25}
+                                     (a/test-action recorder))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
@@ -1026,13 +1026,13 @@
            @recorder))))
 
 
-(deftest aggr-rate-test
+(deftest rate-test
   (testing "no delay"
     (let [recorder (atom [])
           stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/aggr-rate {:duration 10}
-                                        (a/test-action recorder))}
+                  :actions (a/rate {:duration 10}
+                                   (a/test-action recorder))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
@@ -1052,8 +1052,8 @@
     (let [recorder (atom [])
           stream {:name "my-stream"
                   :description "foo"
-                  :actions (a/aggr-rate {:duration 10 :delay 25}
-                                        (a/test-action recorder))}
+                  :actions (a/rate {:duration 10 :delay 25}
+                                   (a/test-action recorder))}
           {:keys [entrypoint]} (stream/compile-stream! {} stream)]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
