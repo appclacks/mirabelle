@@ -1,6 +1,6 @@
 # Mirabelle
 
-Mirabelle is a stream processing engine which can be used to aggregate events, metrics and logs.
+Mirabelle is a stream processing engine which can be used to aggregate events, metrics, logs and traces.
 
 Its powerful and extensible DSL allows you to define computations on a stream of data. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabeling, etc.) which can be easily combined according to your needs.
 

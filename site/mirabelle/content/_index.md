@@ -1,6 +1,6 @@
 # Mirabelle, a powerful stream processing engine
 
-Mirabelle is a stream processing engine which can be used to aggregate events, metrics and logs.
+Mirabelle is a stream processing engine which can be used to aggregate events, metrics, logs and traces.
 
 Its powerful and extensible DSL allows you to define computations on a stream of data. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabeling, etc.) which can be easily combined according to your needs.
 
@@ -20,9 +20,11 @@ Mirabelle is heavily inspired by [Riemann](https://riemann.io/). Actually, parts
 
 I would like to thank all Riemann maintainers and contributors for this amazing tool.
 
-Mirabelle uses the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also contains a lot of new features).
+Mirabelle supports the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also contains a lot of new features).
 
-Mirabelle also provides an HTTP API and natively supports receiving metrics in [Prometheus remote write](https://prometheus.io/docs/operating/integrations/) format. See the [API documentation](/api/#prometheus-remote-write) for more information.
+Mirabelle also provides an HTTP API and natively supports receiving metrics in [Prometheus remote write](https://prometheus.io/docs/operating/integrations/) format. See the [API documentation](/api/#prometheus-remote-write) for more information about Prometheus integration.
+
+It also supports Opentelemetry traces as input.
 
 ## Streams clocks, real time, continuous queries
 

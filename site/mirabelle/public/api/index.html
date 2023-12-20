@@ -12,20 +12,20 @@
     <title>HTTP API :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1703105575" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1703105575" rel="stylesheet">
-    <link href="/css/hybrid.css?1703105575" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1703105575" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1703105575" rel="stylesheet">
-    <link href="/css/auto-complete.css?1703105575" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1703105575" rel="stylesheet">
-    <link href="/css/theme.css?1703105575" rel="stylesheet">
-    <link href="/css/tabs.css?1703105575" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1703105575" rel="stylesheet">
+    <link href="/css/nucleus.css?1703106062" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1703106062" rel="stylesheet">
+    <link href="/css/hybrid.css?1703106062" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1703106062" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1703106062" rel="stylesheet">
+    <link href="/css/auto-complete.css?1703106062" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1703106062" rel="stylesheet">
+    <link href="/css/theme.css?1703106062" rel="stylesheet">
+    <link href="/css/tabs.css?1703106062" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1703106062" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1703105575"></script>
+    <script src="/js/jquery-3.3.1.min.js?1703106062"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1703105575"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1703105575"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1703106062"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1703106062"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1703105575"></script>
+<script type="text/javascript" src="/js/search.js?1703106062"></script>
 
     
   </div>
@@ -552,6 +552,7 @@
         <li><a href="#remove-a-stream">Remove a stream</a></li>
         <li><a href="#push-an-event">Push an event</a></li>
         <li><a href="#prometheus-remote-write">Prometheus remote write</a></li>
+        <li><a href="#opentelemetry-traces-input">Opentelemetry traces input</a></li>
         <li><a href="#query-the-index">Query the index</a></li>
         <li><a href="#get-an-index-current-time">Get an index current time</a></li>
       </ul>
@@ -652,6 +653,11 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">remote_write</span>:
 </span></span><span style="display:flex;"><span>  - <span style="color:#f92672">url</span>: <span style="color:#e6db74">&#39;http://localhost:5558/api/v1/prometheus/remote-write/default&#39;</span>
 </span></span></code></pre></div><p>The metric name will be bind in Mirabelle to the event <code>:service</code> key, anc each label will be a key as well. The event <code>:metric</code> will contain the Prometheus meric value.</p>
+<h3 id="opentelemetry-traces-input">Opentelemetry traces input</h3>
+<ul>
+<li><strong>POST</strong> <code>/api/v1/opentelemetry/v1/traces/&lt;stream-name&gt;</code></li>
+</ul>
+<p>This endpoint can be used to send Opentelemetry traces to Mirabelle. The HTTP transport (containing Protobuf body) should be used on Opentelemetry clients when pushing traces to Mirabelle.</p>
 <h3 id="query-the-index">Query the index</h3>
 <ul>
 <li><strong>GET</strong> <code>/api/v1/index/&lt;steam-name&gt;/search</code></li>
@@ -975,19 +981,19 @@ In that case, Mirabelle will write the stream configuration into the <strong>fir
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1703105575"></script>
-    <script src="/js/perfect-scrollbar.min.js?1703105575"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1703105575"></script>
-    <script src="/js/jquery.sticky.js?1703105575"></script>
-    <script src="/js/featherlight.min.js?1703105575"></script>
-    <script src="/js/highlight.pack.js?1703105575"></script>
+    <script src="/js/clipboard.min.js?1703106062"></script>
+    <script src="/js/perfect-scrollbar.min.js?1703106062"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1703106062"></script>
+    <script src="/js/jquery.sticky.js?1703106062"></script>
+    <script src="/js/featherlight.min.js?1703106062"></script>
+    <script src="/js/highlight.pack.js?1703106062"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1703105575"></script>
-    <script src="/js/learn.js?1703105575"></script>
-    <script src="/js/hugo-learn.js?1703105575"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1703106062"></script>
+    <script src="/js/learn.js?1703106062"></script>
+    <script src="/js/hugo-learn.js?1703106062"></script>
     
         
-            <script src="/mermaid/mermaid.js?1703105575"></script>
+            <script src="/mermaid/mermaid.js?1703106062"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

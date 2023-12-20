@@ -113,8 +113,7 @@
       (doseq [resource-spans resources-spans]
         (doseq [scope-spans resource-spans]
           (doseq [event scope-spans]
-            (stream/push! stream-handler event stream-name)
-            )))
+            (stream/push! stream-handler event stream-name))))
       {:status 200}))
   (current-time [_ {:keys [all-params]}]
     {:status 200

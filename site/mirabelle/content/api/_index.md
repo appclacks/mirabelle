@@ -115,6 +115,12 @@ remote_write:
 
 The metric name will be bind in Mirabelle to the event `:service` key, anc each label will be a key as well. The event `:metric` will contain the Prometheus meric value.
 
+### Opentelemetry traces input
+
+- **POST** `/api/v1/opentelemetry/v1/traces/<stream-name>`
+
+This endpoint can be used to send Opentelemetry traces to Mirabelle. The HTTP transport (containing Protobuf body) should be used on Opentelemetry clients when pushing traces to Mirabelle.
+
 ### Query the index
 
 - **GET** `/api/v1/index/<steam-name>/search`
