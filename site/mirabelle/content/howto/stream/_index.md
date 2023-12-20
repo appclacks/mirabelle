@@ -418,6 +418,52 @@ You can also tags to events, for example:
 (tag ["foo" "bar"])
 ```
 
+#### Compute percentiles
+
+The `percentiles` action allows you to compute percentiles (quantiles) on events:
+
+```clojure
+(percentiles {:percentiles [0.5 0.75 0.99]
+              :duration 10
+              :nb-significant-digits 3}
+```
+
+This example will compute the 0.5, 0.75 and 0.99 quantiles every 10 seconds. It also supports the `:delay` parameter (to tolerate events arriving late), `:highest-trackable-value` and `:lowest-discernible-value` to bound results.
+
+The implementation uses the [HdrHistogram](https://github.com/HdrHistogram/HdrHistogram) library.
+
+#### Compute the rate of events
+
+You can compute rate of events (by counting them) using the `rate` action:
+
+```clojure
+(rate {:duration 20})
+```
+
+This action will send the rate of events downstream every 20 seconds. You can also add a `:delay` parameter to tolerate late events.
+
+
+#### Sum events for a time period
+
+The `:sum` stream can be used to sum events `:metrics` field for a period of time:
+
+```clojure
+(sum {:duration 20})
+```
+
+It also supports a `:delay` parameter to tolerate late events.
+
+### Compute the mean of events for a time period
+
+Use `mean` to compute the mean of events metrics over time:
+
+```clojure
+(mean {:duration 10}
+    (info))
+```
+
+It also supports a `:delay` parameter to tolerate late events.
+
 #### Detect state transitions
 
 The `changed` action can be used to detect state transitions.
@@ -632,7 +678,7 @@ The result is the rate of requests during this time period.
 
 We already saw in the [Action on lists of events: max, min, count, percentiles, rate...](/howto/stream/#actions-on-list-of-events) section the `coll-max` and `coll-min` streams. You have two other ways to compute maximum and minimum values without having to build list of events.
 
-`aggr-max` and `aggr-min` can be used to get the maximum or minimum events from the last seconds. For example, `(aggr-max {:duration 10})` will compute the maximum event for windows of 10 seconds. You can also configure these streams with a `:delay` value to tolerate late events (`(aggr-max {:duration 10 :delay 10})` for example).
+`top` and `bottom` can be used to get the maximum or minimum events from the last seconds. For example, `(top {:duration 10})` will compute the maximum event for windows of 10 seconds. You can also configure these streams with a `:delay` value to tolerate late events (`(top {:duration 10 :delay 10})` for example).
 
 `smax` and `smin` will send downstream *for each event they receive* the maximum or minimum event. The value is never resetted. 
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.103.0" />
+    <meta name="generator" content="Hugo 0.119.0">
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Writing streams :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1664834030" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1664834030" rel="stylesheet">
-    <link href="/css/hybrid.css?1664834030" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1664834030" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1664834030" rel="stylesheet">
-    <link href="/css/auto-complete.css?1664834030" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1664834030" rel="stylesheet">
-    <link href="/css/theme.css?1664834030" rel="stylesheet">
-    <link href="/css/tabs.css?1664834030" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1664834030" rel="stylesheet">
+    <link href="/css/nucleus.css?1703105575" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1703105575" rel="stylesheet">
+    <link href="/css/hybrid.css?1703105575" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1703105575" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1703105575" rel="stylesheet">
+    <link href="/css/auto-complete.css?1703105575" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1703105575" rel="stylesheet">
+    <link href="/css/theme.css?1703105575" rel="stylesheet">
+    <link href="/css/tabs.css?1703105575" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1703105575" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1664834030"></script>
+    <script src="/js/jquery-3.3.1.min.js?1703105575"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1664834030"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1664834030"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1703105575"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1703105575"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1664834030"></script>
+<script type="text/javascript" src="/js/search.js?1703105575"></script>
 
     
   </div>
@@ -557,6 +557,7 @@
         <li><a href="#outputs-and-async-queues">outputs and async queues</a></li>
         <li><a href="#events-time">Events time</a></li>
         <li><a href="#more-examples">More examples</a></li>
+        <li><a href="#compute-the-mean-of-events-for-a-time-period">Compute the mean of events for a time period</a></li>
       </ul>
     </li>
   </ul>
@@ -834,7 +835,27 @@ For example, the <code>above-dt</code> stream will only let events pass if all e
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">;; add the &#34;foo&#34; and &#34;bar&#34; tags to events</span>
 </span></span><span style="display:flex;"><span>(<span style="color:#a6e22e">tag</span> [<span style="color:#e6db74">&#34;foo&#34;</span> <span style="color:#e6db74">&#34;bar&#34;</span>])
-</span></span></code></pre></div><h4 id="detect-state-transitions">Detect state transitions</h4>
+</span></span></code></pre></div><h4 id="compute-percentiles">Compute percentiles</h4>
+<p>The <code>percentiles</code> action allows you to compute percentiles (quantiles) on events:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">percentiles</span> {<span style="color:#e6db74">:percentiles</span> [<span style="color:#ae81ff">0.5</span> <span style="color:#ae81ff">0.75</span> <span style="color:#ae81ff">0.99</span>]
+</span></span><span style="display:flex;"><span>              <span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#e6db74">:nb-significant-digits</span> <span style="color:#ae81ff">3</span>}
+</span></span></code></pre></div><p>This example will compute the 0.5, 0.75 and 0.99 quantiles every 10 seconds. It also supports the <code>:delay</code> parameter (to tolerate events arriving late), <code>:highest-trackable-value</code> and <code>:lowest-discernible-value</code> to bound results.</p>
+<p>The implementation uses the <a href="https://github.com/HdrHistogram/HdrHistogram">HdrHistogram</a> library.</p>
+<h4 id="compute-the-rate-of-events">Compute the rate of events</h4>
+<p>You can compute rate of events (by counting them) using the <code>rate</code> action:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">rate</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">20</span>})
+</span></span></code></pre></div><p>This action will send the rate of events downstream every 20 seconds. You can also add a <code>:delay</code> parameter to tolerate late events.</p>
+<h4 id="sum-events-for-a-time-period">Sum events for a time period</h4>
+<p>The <code>:sum</code> stream can be used to sum events <code>:metrics</code> field for a period of time:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">sum</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">20</span>})
+</span></span></code></pre></div><p>It also supports a <code>:delay</code> parameter to tolerate late events.</p>
+<h3 id="compute-the-mean-of-events-for-a-time-period">Compute the mean of events for a time period</h3>
+<p>Use <code>mean</code> to compute the mean of events metrics over time:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">mean</span> {<span style="color:#e6db74">:duration</span> <span style="color:#ae81ff">10</span>}
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">info</span>))
+</span></span></code></pre></div><p>It also supports a <code>:delay</code> parameter to tolerate late events.</p>
+<h4 id="detect-state-transitions">Detect state transitions</h4>
 <p>The <code>changed</code> action can be used to detect state transitions.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">changed</span> {<span style="color:#e6db74">:field</span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">:init</span> <span style="color:#e6db74">&#34;ok&#34;</span>}
 </span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">error</span>))
@@ -957,7 +978,7 @@ receive events since <code>:fork-ttl</code> seconds.</p>
 <p>The result is the rate of requests during this time period.</p>
 <h4 id="compute-maximum-and-minimum-values">Compute maximum and minimum values</h4>
 <p>We already saw in the <a href="/howto/stream/#actions-on-list-of-events">Action on lists of events: max, min, count, percentiles, rate&hellip;</a> section the <code>coll-max</code> and <code>coll-min</code> streams. You have two other ways to compute maximum and minimum values without having to build list of events.</p>
-<p><code>aggr-max</code> and <code>aggr-min</code> can be used to get the maximum or minimum events from the last seconds. For example, <code>(aggr-max {:duration 10})</code> will compute the maximum event for windows of 10 seconds. You can also configure these streams with a <code>:delay</code> value to tolerate late events (<code>(aggr-max {:duration 10 :delay 10})</code> for example).</p>
+<p><code>top</code> and <code>bottom</code> can be used to get the maximum or minimum events from the last seconds. For example, <code>(top {:duration 10})</code> will compute the maximum event for windows of 10 seconds. You can also configure these streams with a <code>:delay</code> value to tolerate late events (<code>(top {:duration 10 :delay 10})</code> for example).</p>
 <p><code>smax</code> and <code>smin</code> will send downstream <em>for each event they receive</em> the maximum or minimum event. The value is never resetted.</p>
 <h4 id="handle-exceptions-errors">Handle exceptions (errors)</h4>
 <p>Sometimes, streams can generate errors. For example, a downstream service can be down, or you could try to do an invalid action on an event. Let&rsquo;s take an example:</p>
@@ -1304,19 +1325,19 @@ receive events since <code>:fork-ttl</code> seconds.</p>
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1664834030"></script>
-    <script src="/js/perfect-scrollbar.min.js?1664834030"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1664834030"></script>
-    <script src="/js/jquery.sticky.js?1664834030"></script>
-    <script src="/js/featherlight.min.js?1664834030"></script>
-    <script src="/js/highlight.pack.js?1664834030"></script>
+    <script src="/js/clipboard.min.js?1703105575"></script>
+    <script src="/js/perfect-scrollbar.min.js?1703105575"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1703105575"></script>
+    <script src="/js/jquery.sticky.js?1703105575"></script>
+    <script src="/js/featherlight.min.js?1703105575"></script>
+    <script src="/js/highlight.pack.js?1703105575"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1664834030"></script>
-    <script src="/js/learn.js?1664834030"></script>
-    <script src="/js/hugo-learn.js?1664834030"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1703105575"></script>
+    <script src="/js/learn.js?1703105575"></script>
+    <script src="/js/hugo-learn.js?1703105575"></script>
     
         
-            <script src="/mermaid/mermaid.js?1664834030"></script>
+            <script src="/mermaid/mermaid.js?1703105575"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });
