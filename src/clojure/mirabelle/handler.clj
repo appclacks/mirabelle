@@ -25,6 +25,7 @@
   (push-event [this params] "Push an event to a stream")
   (current-time [this params] "Get the current time of a given stream's index.")
   (prom-remote-write [this params] "Prometheus remote write endpoint")
+  (fluentbit [this params] "fluentbit http log endpoint")
   (otel-traces [this params] "Opentelemetry traces v1 endpoint")
   (not-found [this params] "Not found handler")
   (metrics [this params] "Return the metrics"))
@@ -96,6 +97,13 @@
         (doseq [event serie]
           (stream/push! stream-handler event stream-name)))
       {:status 200}))
+  (fluentbit [_ {:keys [body path-params] :as request}]
+    (let [stream-name (:name path-params)]
+      (doseq [log (:body request)]
+        (stream/push! stream-handler
+                      (-> log (assoc :time (:date log)) (dissoc :date))
+                      (keyword stream-name))))
+    {:status 200})
   (otel-traces [_ {:keys [all-params] :as request}]
     (let [stream-name (:name all-params)
           ^java.io.InputStream body (:body request)
@@ -139,6 +147,8 @@
                                   :spec :mirabelle.http.stream/get}
                             :delete {:handler remove-stream
                                      :spec :mirabelle.http.stream/remove}}]
+   ["/api/v1/fluentbit/:name" {:post {:handler fluentbit
+                                      :spec any?}}]
    ["/api/v1/prometheus/remote-write/:name" {:post {:handler prom-remote-write
                                                     :spec :mirabelle.http.prometheus/remote-write}}]
    ["/api/v1/opentelemetry/v1/traces/:name" {:post {:handler otel-traces

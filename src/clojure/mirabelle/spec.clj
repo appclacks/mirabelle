@@ -39,6 +39,6 @@
 (s/def :mirabelle.http.stream/get (s/keys :req-un [:mirabelle.stream/name]))
 (s/def :mirabelle.http.stream/event (s/keys :req-un [:mirabelle.stream/name
                                                      :mirabelle.stream/event]))
-(s/def :mirabelle.http.prometheus/remote-write (s/keys :req-un [:mirabelle.stream/name]))
+(s/def :mirabelle.http.fluentbit/post (s/keys :req-un [:mirabelle.stream/name]))
 (s/def :mirabelle.http.prometheus/remote-write (s/keys :req-un [:mirabelle.stream/name]))
 (s/def :mirabelle.http.stream/remove (s/keys :req-un [:mirabelle.stream/name]))

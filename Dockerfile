@@ -1,4 +1,4 @@
-FROM clojure:temurin-17-lein-focal as build-env
+FROM clojure:temurin-21-lein-bullseye as build-env
 
 ADD . /app
 WORKDIR /app
@@ -7,15 +7,15 @@ RUN lein uberjar
 
 # -----------------------------------------------------------------------------
 
-from eclipse-temurin:17-focal
+from eclipse-temurin:21-jammy
 
-RUN groupadd -r mirabelle && useradd -r -s /bin/false -g mirabelle mirabelle
+RUN groupadd -g 10000 -r mirabelle && useradd -u 10000 -r -s /bin/false -g mirabelle mirabelle
 RUN mkdir /app
 COPY --from=build-env /app/target/uberjar/mirabelle-*-standalone.jar /app/mirabelle.jar
 
-RUN chown -R mirabelle:mirabelle /app
+RUN chown -R 10000:10000 /app
 
-user mirabelle
+user 10000
 
 ENTRYPOINT ["java"]
 
