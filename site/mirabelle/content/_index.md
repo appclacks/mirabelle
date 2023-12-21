@@ -14,7 +14,7 @@ It also implements a publish-subscribe system, which allows you to see in real t
 
 Mirabelle is currently in alpha, but I'm eager to receive feedback.
 
-## Mirabelle supports multiple inputs protocols (including the Riemann one)
+## Mirabelle supports multiple inputs protocols
 
 Mirabelle is heavily inspired by [Riemann](https://riemann.io/). Actually, parts of the Mirabelle codebase (like the TCP server implementation for example) were taken from Riemann (these parts are mentioned in the codebase).
 
@@ -24,7 +24,7 @@ Mirabelle supports the same protocol than Riemann. It means all Riemann tooling 
 
 Mirabelle also provides an HTTP API and natively supports receiving metrics in [Prometheus remote write](https://prometheus.io/docs/operating/integrations/) format. See the [API documentation](/api/#prometheus-remote-write) for more information about Prometheus integration.
 
-It also supports Opentelemetry traces as input.
+It also supports [Opentelemetry traces](/api/#opentelemetry-traces-input) as input.
 
 ## Streams clocks, real time, continuous queries
 
