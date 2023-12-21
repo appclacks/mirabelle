@@ -21,8 +21,6 @@ The resulting jar will be in `target/uberjar/mirabelle-<version>-standalone.jar`
 
 Mirabelle needs a [configuration file](/howto/configuration/). The path to this configuration file should be referenced by the `MIRABELLE_CONFIGURATION` environment variable.
 
-Releases are available on [Github](https://github.com/mcorbin/mirabelle/releases).
-
 You can then run Mirabelle by launching `java -jar mirabelle.jar`.
 
 ## Using Docker
@@ -48,7 +46,7 @@ docker run -p 5555:5555 -p 5558:5558 \
 -v /etc/mirabelle/streams:/streams \
 -v /etc/mirabelle/config.edn:/config/config.edn \
 -e MIRABELLE_CONFIGURATION=/config/config.edn \
-mcorbin/mirabelle:v0.11.0
+appclacks/mirabelle:v0.12.1
 ```
 
 ## Using Leiningen
