@@ -155,6 +155,8 @@
   [dirs-path]
   (->> (map (fn [path] (.listFiles (io/file path))) dirs-path)
        (map (fn [files]
+              (filter #(.isFile %) files)))
+       (map (fn [files]
               (for [f files]
                 (.getPath ^File f))))
        (reduce #(concat %2 %1) [])
