@@ -2021,7 +2021,12 @@
 
 (defn sformat*
   [_ template target-field fields & children]
-  (let [value-fn (fn [event] (reduce #(conj %1 (get event %2)) [] fields))]
+  (let [value-fn (fn [event] (reduce #(conj %1
+                                            (if (sequential? %2)
+                                                (get-in event %2)
+                                                (get event %2)))
+                                     []
+                                     fields))]
     (fn stream [event]
       (call-rescue
        (assoc event
