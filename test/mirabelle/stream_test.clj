@@ -221,7 +221,7 @@
                   :description "foo"
                   :actions (a/output! :file-example-output)}
           file "/tmp/mirabelle-test-io"
-          output-component (output-file/map->File {:path file})
+          output-component (output-file/file-output {:path file})
           {:keys [entrypoint]} (stream/compile-stream!
                                 {:outputs {:file-example-output {:component output-component}}}
                                 stream)]

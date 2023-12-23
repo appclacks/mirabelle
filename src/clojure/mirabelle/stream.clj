@@ -89,7 +89,7 @@
       (= :file t)
       (assoc output-config
              :component
-             (io-file/map->File (:config output-config)))
+             (io-file/file-output (:config output-config)))
 
       (= :pagerduty t)
       (assoc output-config
