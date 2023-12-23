@@ -20,8 +20,7 @@
         date-suffix-fn (fn [p event]
                          (let [time (.atZone (Instant/ofEpochMilli (* 1000 (:time event (time/now))))
                                              ZoneOffset/UTC)]
-                           (format "%s-%s" p (.format formatter time))))
-        ]
+                           (format "%s-%s" p (.format formatter time))))]
     (fn [event]
       (let [path (if fields-suffix
                    (fields-suffix-fn path event)
