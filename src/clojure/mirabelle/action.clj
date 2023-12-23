@@ -1833,7 +1833,7 @@
   "
   [fields & children]
   (mspec/valid-action? ::json-fields [fields])
-  {:action :tap
+  {:action :json-fields
    :description {:message "Parse the provided fields from json to edn"
                  :params (pr-str fields)}
    :params [(if (keyword? fields) [fields] fields)]
