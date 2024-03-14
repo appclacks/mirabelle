@@ -262,7 +262,7 @@ You can now use this output named `:pagerduty-client` in a stream by using the `
 ```clojure
 (streams
   (stream {:name :pagerduty-example}
-    (output! :pagerduty)))
+    (output! :pagerduty-client)))
 ```
 
 If this event is set to Mirabelle:
