@@ -14,7 +14,7 @@ It means streams configurations can be easily parsed by other systems, passed be
 
 ## No global side effects/schedulers
 
-In Mirabelle, **all** actions use the events time as wall clock. It means streams times advance depending of the event they receives.
+In Mirabelle, **all** actions use the events' time as wall clock. It means streams times advance depending on the event they receive.
 
 Because of that, it's easy to reason about (and test) streams: the same inputs always produce the same outputs. It's also possible to have multiple streams with different times running in parallel.
 
@@ -22,7 +22,7 @@ Because of that, it's easy to reason about (and test) streams: the same inputs a
 
 You can in Mirabelle create streams which will not receive the events passed to the Mirabelle TCP server by default.
 
-It means you can have some streams for "real time" computation, and some streams for some use cases. Each stream will run independently, will have its own time...
+It means you can have some streams for "real time" computation, and some streams for other use cases. Each stream will run independently, will have its own time...
 
 When you send an event to Mirabelle, you can specify the `stream` attribute in order to send the event to a specific stream.
 
@@ -32,7 +32,7 @@ Riemann mostly works on the `:host` and `:service` fields. it's common to encode
 
 For example, you could have in Riemann a service named `http_requests_duration_prod_p99`. In Mirabelle, you would model this event like this: `{:service "http_requests_duration" :environment "prod" :quantile "0.99"}`
 
-A lot of Riemann streams/actions (`index`, `coalesce`...) were rewritten. You can now provide for each action on which keys it should work instead to have to manipulate complex `:service` names.
+A lot of Riemann streams/actions (`index`, `coalesce`...) were rewritten. You can now provide for each action on which keys it should work instead of having to manipulate complex `:service` names.
 
 ## New actions
 
@@ -40,7 +40,7 @@ New actions which I think could be interesting were added to Mirabelle. Also, no
 
 ## HTTP API
 
-Mirabelle provides an [HTTP API](/api) which allow you to manage streams dynamically (create, list, get, remove), and to gather information about your system:
+Mirabelle provides an [HTTP API](/api) which allows you to manage streams dynamically (create, list, get, remove), and to gather information about your system:
 
 - Querying the [Index](/howto/stream-index/) and the current index time
 - Pushing events
@@ -56,7 +56,7 @@ Streams and I/O are configured separately, and streams references I/O. These com
 
 ## Hot reload
 
-In Riemann, all streams states (time windows for example) all lost during reloads. it's not the case in Mirabelle. Only streams which were modified in the configuration are recreated.
+In Riemann, all streams' states (time windows for example) all lost during reloads. it's not the case in Mirabelle. Only streams which were modified in the configuration are recreated and thus lose state.
 
 ## Index
 
