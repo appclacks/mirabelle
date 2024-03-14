@@ -299,7 +299,7 @@ This will create a new async queue named `:thread-pool`. When you use an async q
   (some-blocking-action))
 ```
 
-You can use async queues to avoid blocking the main Mirabelle threads and achieve better performances. Of course
+You can use async queues to avoid blocking the main Mirabelle threads and achieve better performance.
 
 ### Events time
 
