@@ -1315,7 +1315,7 @@
   [n & children]
   (mspec/valid-action? ::over [n])
   {:action :over
-   :description {:message (format "Keep events with metrics greater than %d" n)}
+   :description {:message (format "Keep events with metrics greater than %s" n)}
    :params [n]
    :children children})
 
@@ -1341,7 +1341,7 @@
   [n & children]
   (mspec/valid-action? ::under [n])
   {:action :under
-   :description {:message (format "Keep events with metrics under than %d" n)}
+   :description {:message (format "Keep events with metrics under %s" n)}
    :params [n]
    :children children})
 
