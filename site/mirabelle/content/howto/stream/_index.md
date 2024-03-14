@@ -182,7 +182,7 @@ More examples are available at the bottom on this page, and availables actions a
 
 Streams can also be created dynamically using [the API](/howto/dynamic-streams/).
 
-Mirabelle supports hot reload on a SIGKILL. On a reload, only streams which had their configurations modified will be reloaded. Streams created using the API will be unchanged.
+Mirabelle supports hot reload on a SIGHUP. On a reload, only streams which had their configurations modified will be reloaded. Streams created using the API will be unchanged.
 
 ### Include streams snippets in the main configuration, profiles and variables
 
