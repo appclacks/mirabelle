@@ -5,7 +5,7 @@ disableToc: false
 ---
 
 In this section, you will learn about how streams work, how to define them and how to use them.
-Not all availables actions and I/O are listed here. You can see the full list in [this section of the documentation](/howto/action-io-ref/).
+Not all available actions and I/O are listed here. You can see the full list in [this section of the documentation](/howto/action-io-ref/).
 
 **Concepts**
 
@@ -178,7 +178,7 @@ You will see in the Mirabelle logs:
 
 The event is logged twice: one time by our `info` action, and the second time by `error` (you can see the `level` key in the log). In the second log, the `:state` was set to "critical". Our threshold works !
 
-More examples are available at the bottom on this page, and availables actions are listed in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
+More examples are available at the bottom on this page, and available actions are listed in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
 
 Streams can also be created dynamically using [the API](/howto/dynamic-streams/).
 
@@ -242,7 +242,7 @@ The `include` action allows you to create parameterizable configuration snippets
 
 In the previous example, we are only logging events, which is not very useful. What if we want to interact with other systems, like sending alerts to a service like Pagerduty, or forward all events a timeserie database like InfluxDB ?
 
-Outputs should be defined in the `:outputs` section fo the [configuration file](/howto/configuration/). All outputs availables natively are described in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
+Outputs should be defined in the `:outputs` section fo the [configuration file](/howto/configuration/). All natively available outputs are described in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
 
 For example, Mirabelle supports sending alerts to Pagerduty. Let's configure a Pagerduty client and use it in a stream.
 
@@ -494,7 +494,7 @@ In this example, events wll be forwarded to the child action (`info`) only if th
 
 #### Events Windows
 
-You have three windows types availables in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
+You have three available window types in Mirabelle. Like some actions in Mirabelle, time windows will send downstream a list of events instead of an individual event.
 It means you should be careful about which action you will use downstream. It should be actions working on list of events.
 
 The first one, `fixed-time-window`, will buffer all events during a defined duration and then flush them downstream. For example, `(fixed-time-window {:duration 60})` will create windows of 60 seconds. You can pass a `:delay` option to `fixed-time-window` to tolerate late events and avoid losing them (for example: `(fixed-time-window {:duration 60 :delay 30})`).
