@@ -178,7 +178,7 @@ You will see in the Mirabelle logs:
 
 The event is logged twice: one time by our `info` action, and the second time by `error` (you can see the `level` key in the log). In the second log, the `:state` was set to "critical". Our threshold works !
 
-More examples are available at the bottom on this page, and available actions are listed in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
+More examples are available at the bottom on this page, and available actions are listed in the [Actions and I/O reference](/howto/action-io-ref/) section of the documentation.
 
 Streams can also be created dynamically using [the API](/howto/dynamic-streams/).
 
@@ -242,7 +242,7 @@ The `include` action allows you to create parameterizable configuration snippets
 
 In the previous example, we are only logging events, which is not very useful. What if we want to interact with other systems, like sending alerts to a service like Pagerduty, or forward all events a timeserie database like InfluxDB ?
 
-Outputs should be defined in the `:outputs` section fo the [configuration file](/howto/configuration/). All natively available outputs are described in the [Actions and I/O reference](/action-io-ref/) section of the documentation.
+Outputs should be defined in the `:outputs` section fo the [configuration file](/howto/configuration/). All natively available outputs are described in the [Actions and I/O reference](/howto/action-io-ref/) section of the documentation.
 
 For example, Mirabelle supports sending alerts to Pagerduty. Let's configure a Pagerduty client and use it in a stream.
 
@@ -273,7 +273,7 @@ riemann-client send --metric-d 100 --service "http_requests_duration_seconds" --
 
 You should see in Pagerduty a new triggered alert named `myhost - http_requests_duration_seconds - critical` containing all the informations about your event.
 
-You can check the [I/O documentation](/action-io-ref/) to have details about how the Pagerduty output can be used (to resolve alert automatically for example).
+You can check the [I/O documentation](/howto/action-io-ref/) to have details about how the Pagerduty output can be used (to resolve alert automatically for example).
 
 A special output is `async-queue`. You could define an async queue in the `:outputs` configuration key:
 
@@ -316,7 +316,7 @@ Some use cases are explained in [this section](/production/#use-cases) of the do
 
 ### More examples
 
-This section shows more advanced use cases for streams. Not all actions are described here, the list of all actions is available [here](/action-io-ref/).
+This section shows more advanced use cases for streams. Not all actions are described here, the list of all actions is available [here](/howto/action-io-ref/).
 
 #### Filtering events
 
