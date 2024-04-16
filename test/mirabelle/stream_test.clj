@@ -213,7 +213,25 @@
                                  (a/test-action recorder))}
         {:keys [entrypoint]} (stream/compile-stream! {} stream)]
     (entrypoint {:metric 1 :time 1})
-    (is (= [{:metric 2 :time 1}] @recorder))))
+    (is (= [{:metric 2 :time 1}] @recorder)))
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/with [:nested :metric] 2
+                                 (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:time 1})
+    (is (= [{:nested {:metric 2} :time 1}] @recorder)))
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/with {[:nested :metric] 2
+                                  :foo 3
+                                  }
+                                 (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:time 1})
+    (is (= [{:nested {:metric 2} :time 1 :foo 3}] @recorder))))
 
 (deftest output-file-test
   (testing "non-test mode"

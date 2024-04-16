@@ -876,7 +876,14 @@
 (defn with*
   [_ fields & children]
   (fn stream [event]
-    (call-rescue (merge event fields) children)))
+    (call-rescue
+     (reduce (fn [event [k v]]
+               (if (sequential? k)
+                 (assoc-in event k v)
+                 (assoc event k v)))
+             event
+             fields)
+     children)))
 
 (defn with
   "Set an event field to the given value.
@@ -896,7 +903,19 @@
   ```
 
   This example set the the field `:service` to \"foo\" and the field `:state`
-  to \"critical\" for events."
+  to \"critical\" for events.
+
+  This action also supports updated nested keys:
+
+  ```clojure
+  (with [:nested :key] \"critical\"
+    (debug))
+  ```
+
+  ```clojure
+  (with {[:nested :key] \"critical\"}
+    (debug))
+  ```"
   [& args]
   (cond
     (map? (first args))

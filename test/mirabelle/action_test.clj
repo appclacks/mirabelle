@@ -337,7 +337,13 @@
                    {:state "ok" :metric 3}
                    {:state "ok" :metric 4}
                    {:state "ok" :metric 5}
-                   {:state "ok" :metric 6}])))
+                   {:state "ok" :metric 6}])
+    (test-actions (a/with* nil {[:nested :state] "ok"} rec)
+                  state
+                  [{:metric 1}
+                   {:nested {:state "critical"} :metric 2}]
+                  [{:nested {:state "ok"} :metric 1}
+                   {:nested {:state "ok"} :metric 2}])))
 
 (deftest coll-max*-test
   (let [[rec state] (recorder)]
