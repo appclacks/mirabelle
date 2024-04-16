@@ -255,7 +255,21 @@
                    {:state "critical" :metric 3}
                    {:state "ok" :metric 4}
                    {:state "ok" :metric 5}
-                   {:state "critical" :metric 6}])))
+                   {:state "critical" :metric 6}])
+    (test-actions (a/default* nil [:labels :state] "ok" rec)
+                  state
+                  [{:metric 1}
+                   {:labels {:state "critical"} :metric 2}
+                   {:labels {:state "critical"} :metric 3}
+                   {:labels {:state "ok"} :metric 4}
+                   {:labels {} :metric 5}
+                   {:labels {:state "critical"} :metric 6}]
+                  [{:labels {:state "ok"} :metric 1}
+                   {:labels {:state "critical"} :metric 2}
+                   {:labels {:state "critical"} :metric 3}
+                   {:labels {:state "ok"} :metric 4}
+                   {:labels {:state "ok"} :metric 5}
+                   {:labels {:state "critical"} :metric 6}])))
 
 (deftest coalesce*-test
   (let [state (atom [])

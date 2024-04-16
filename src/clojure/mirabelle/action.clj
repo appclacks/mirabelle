@@ -700,12 +700,20 @@
 
 (defn default*
   [_ field value & children]
-  (fn stream [event]
-    (if-not (get event field)
-      (call-rescue (assoc event field value) children)
-      (call-rescue event children))))
+  (let [get-fn (if (sequential? field)
+                 get-in
+                 get)
+        assoc-fn (if (sequential? field)
+                   assoc-in
+                   assoc)]
+    (fn stream [event]
+      (if-not (get-fn event field)
+        (call-rescue (assoc-fn event field value) children)
+        (call-rescue event children)))))
 
-(s/def ::default (s/cat :field mspec/not-null :value any?))
+(s/def ::default (s/cat :field (s/or :any mspec/not-null
+                                     :seq (s/coll-of mspec/not-null))
+                        :value any?))
 
 (defn default
   "Set a default value for an event
@@ -716,7 +724,14 @@
   ```
 
   In this example, all events where `:state` is not set will be updated with
-  `:state` to \"ok\"."
+  `:state` to \"ok\".
+
+  It also supports nested keys:
+
+  ```clojure
+  (default [:nested :key] \"ok\"
+    (info))
+  ```"
   [field value & children]
   (mspec/valid-action? ::default [field value])
   {:action :default
@@ -1271,7 +1286,7 @@
         c-existing (- 1 r)
         c-new r]
     (fn stream [event]
-                                        ; Compute new ewma
+      ;; Compute new ewma
       (let [m (when-let [metric-new (:metric event)]
                 (swap! m (comp (partial + (* c-new metric-new))
                                (partial * c-existing))))]
