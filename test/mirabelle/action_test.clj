@@ -996,24 +996,40 @@
 (deftest to-base64*-test
   (let [[rec state] (recorder)]
     (test-actions (a/to-base64* nil
-                                [:host :service]
+                                :host
                                 rec)
                   state
                   [{:host "aa" :service "bb"}
                    {:host "bb" :service "aa" :state "critical"}]
-                  [{:host "YWE=" :service "YmI="}
-                   {:host "YmI=" :service "YWE=" :state "critical"}])))
+                  [{:host "YWE=" :service "bb"}
+                   {:host "YmI=" :service "aa" :state "critical"}])
+    (test-actions (a/to-base64* nil
+                                [:foo :bar]
+                                rec)
+                  state
+                  [{:foo {:bar "aa"} :service "bb"}
+                   {:foo {:bar "bb"} :service "aa" :state "critical"}]
+                  [{:foo {:bar "YWE="} :service "bb"}
+                   {:foo {:bar "YmI="} :service "aa" :state "critical"}])))
 
 (deftest from-base64*-test
   (let [[rec state] (recorder)]
     (test-actions (a/from-base64* nil
-                                  [:host :service]
+                                  :host
                                   rec)
                   state
                   [{:host "YWE=" :service "YmI="}
                    {:host "YmI=" :service "YWE=" :state "critical"}]
-                  [{:host "aa" :service "bb"}
-                   {:host "bb" :service "aa" :state "critical"}])))
+                  [{:host "aa" :service "YmI="}
+                   {:host "bb" :service "YWE=" :state "critical"}])
+    (test-actions (a/from-base64* nil
+                                  [:host :bar]
+                                  rec)
+                  state
+                  [{:host {:bar "YWE="} :service "YmI="}
+                   {:host {:bar "YmI="} :service "YWE=" :state "critical"}]
+                  [{:host {:bar "aa"} :service "YmI="}
+                   {:host {:bar "bb"} :service "YWE=" :state "critical"}])))
 
 (deftest sformat*-test
   (let [[rec state] (recorder)]

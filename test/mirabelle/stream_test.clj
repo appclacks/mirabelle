@@ -715,8 +715,8 @@
                                       [:= :service "bar"]])
                           (a/to-base64 :host
                                        (a/from-base64 :host))
-                          (a/to-base64 [:host :service]
-                                       (a/from-base64 [:host :service]))
+                          (a/to-base64 [:host]
+                                       (a/from-base64 [:host]))
                           (a/sdissoc :foo)
                           (a/sdissoc [:foo [:a :b :c]])
                           (a/sformat "%s" :host [:service])

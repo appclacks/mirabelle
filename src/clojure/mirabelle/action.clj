@@ -1978,25 +1978,28 @@
     :params [interval destination-stream]
     :children []}))
 
-(s/def ::to-base64 (s/cat :fields (s/coll-of keyword?)))
+(s/def ::to-base64 (s/cat :fields (s/or :keyword keyword?
+                                        :seq (s/coll-of keyword?))))
 
 (defn to-base64*
   [_ fields & children]
-  (fn stream [event]
-    (call-rescue (reduce #(update %1 %2 b64/to-base64) event fields) children)))
+  (let [update-fn (if (sequential? fields)
+                    update-in
+                    update)]
+    (fn stream [event]
+      (call-rescue (update-fn event fields b64/to-base64) children))))
 
 (defn to-base64
-  "Convert a field or multiple fields to base64.
-  Fields values should be string.
+  "Convert a field to base64.
+  Field value should be string.
 
   ```clojure
   (sdo
     ;; you can pass one field
     (to-base64 :host)
-    ;; or a list of fields
+    ;; or a list to update a nested keys
     (to-base64 [:host :service]))
-  ```
-  "
+  ```"
   [field & children]
   (let [fields (if (keyword? field) [field] field)]
     (mspec/valid-action? ::to-base64 [fields])
@@ -2008,23 +2011,25 @@
 
 (defn from-base64*
   [_ fields & children]
-  (fn stream [event]
-    (call-rescue (reduce #(update %1 %2 b64/from-base64) event fields) children)))
+  (let [update-fn (if (sequential? fields)
+                    update-in
+                    update)]
+    (fn stream [event]
+      (call-rescue (update-fn event fields b64/from-base64) children))))
 
-(s/def ::from-base64 (s/cat :fields (s/coll-of keyword?)))
+(s/def ::from-base64 (s/cat :fields (s/or :keyword keyword?
+                                          :seq (s/coll-of keyword?))))
 
 (defn from-base64
-  "Convert a field or multiple fields from base64 to string.
-  Fields values should be string.
+  "Decode a base64 field.
 
   ```clojure
   (sdo
     ;; you can pass one field
     (from-base64 :host)
-    ;; or a list of fields
+    ;; or a list to update a nested keys
     (from-base64 [:host :service]))
-  ```
-  "
+  ```"
   [field & children]
   (let [fields (if (keyword? field) [field] field)]
     (mspec/valid-action? ::from-base64 [fields])
@@ -2840,7 +2845,15 @@
     (info))
   ```
 
-  If `extract` receives in this example `{:time 1 :base-event {:time 1 :service \"foo\" :host \"bar\"}`, `info` will receive the content of `:base-time`."
+  If `extract` receives in this example `{:time 1 :base-event {:time 1 :service \"foo\" :host \"bar\"}`, `info` will receive the content of `:base-time`.
+
+  It also supports nested keys:
+
+
+  ```clojure
+  (extract [:foo :bar]
+    (info))
+  ```"
   [k & children]
   (mspec/valid-action? ::extract [k])
   {:action :extract
