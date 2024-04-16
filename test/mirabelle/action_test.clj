@@ -1296,6 +1296,10 @@
                   state
                   [[{:metric -1} {:metric 30} {:metric 0}]]
                   [[{:metric 30}]])
+    (test-actions (a/coll-where* nil [:pos? [:nested :metric]] rec)
+                  state
+                  [[{:nested {:metric -1}} {:nested {:metric 30}} {:nested {:metric 0}}]]
+                  [[{:nested {:metric 30}}]])
     (test-actions (a/coll-where* nil [:> :metric 20] rec)
                   state
                   [[{:metric -1} {:metric 30} {:metric 0}]]
