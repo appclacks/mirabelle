@@ -1428,6 +1428,14 @@
                    {:foo nil}
                    {}]
                   [{:time 1}
+                   {:time 2}])
+    (test-actions (a/extract* nil [:foo :bar] rec)
+                  state
+                  [{:foo {:bar {:time 1}}}
+                   {:foo {:bar {:time 2}} :bar "a"}
+                   {:foo {:bar nil}}
+                   {}]
+                  [{:time 1}
                    {:time 2}])))
 
 (deftest aggr-rate*-test

@@ -1073,3 +1073,13 @@
               {:time 35 :metric 1/10}]
              @recorder)))))
 
+(deftest extract-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/extract :foo (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:foo {:time 0 :metric 10}})
+    (entrypoint {:time 7 :metric 1})
+    (is (= [{:time 0 :metric 10}]
+           @recorder))))

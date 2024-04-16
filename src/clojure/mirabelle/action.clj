@@ -2822,11 +2822,15 @@
 
 (defn extract*
   [_ k & children]
-  (fn [event]
-    (when-let [result (get event k)]
-      (call-rescue result children))))
+  (let [get-fn (if (sequential? k)
+                 get-in
+                 get)]
+    (fn [event]
+      (when-let [result (get-fn event k)]
+        (call-rescue result children)))))
 
-(s/def ::extract (s/cat :k keyword?))
+(s/def ::extract (s/cat :k (s/or :keyword keyword?
+                                 :seq (s/coll-of keyword?))))
 
 (defn extract
   "Takes a key as parameter and send downstream the content of this key.
@@ -2839,7 +2843,7 @@
   If `extract` receives in this example `{:time 1 :base-event {:time 1 :service \"foo\" :host \"bar\"}`, `info` will receive the content of `:base-time`."
   [k & children]
   (mspec/valid-action? ::extract [k])
-  {:action :smin
+  {:action :extract
    :description {:message (format "Extract the key %s from the event and send its value downstream" k)}
    :params [k]
    :children children})
