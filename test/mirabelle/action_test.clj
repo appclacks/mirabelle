@@ -1067,7 +1067,16 @@
                               rec)
                   state
                   [{:host {:h "aa"} :service "bb" :foo "bar"}]
-                  [{:host {:h "aa"} :service "aa-cc-bar" :foo "bar"}])))
+                  [{:host {:h "aa"} :service "aa-cc-bar" :foo "bar"}]))
+  (let [[rec state] (recorder)]
+    (test-actions (a/sformat* nil
+                              "%s-cc-%s"
+                              [:a :service]
+                              [[:host :h] :foo]
+                              rec)
+                  state
+                  [{:host {:h "aa"} :service "bb" :foo "bar"}]
+                  [{:host {:h "aa"} :service "bb" :a {:service "aa-cc-bar"} :foo "bar"}])))
 
 (deftest coll-top-test
   (let [[rec state] (recorder)]

@@ -2064,17 +2064,22 @@
                                                 (get-in event %2)
                                                 (get event %2)))
                                      []
-                                     fields))]
+                                     fields))
+        assoc-fn (if (sequential? target-field)
+                   assoc-in
+                   assoc)]
     (fn stream [event]
       (call-rescue
-       (assoc event
-              target-field
-              (apply format template (value-fn event)))
+       (assoc-fn event
+                 target-field
+                 (apply format template (value-fn event)))
        children))))
 
 (s/def ::sformat (s/cat :template string?
-                        :target-field keyword?
-                        :fields (s/coll-of keyword?)))
+                        :target-field (s/or :keyword keyword?
+                                            :seq (s/coll-of keyword?))
+                        :fields (s/coll-of (s/or :keyword keyword?
+                                                 :seq (s/coll-of keyword?)))))
 
 (defn sformat
   "Takes the content of multiple event keys, and use them to build a string value
@@ -2087,6 +2092,12 @@
   If the event `{:host \"machine\" :service \"bar\"}` is passed to this action
   the event will become
   `{:host \"machine\" :service \"bar\" :format-test \"machine-foo-bar\"}`.
+
+  It also supports nested keys both for the destination or the fields to extract:
+
+  ```clojure
+  (sformat \"%s-foo-%s\" [:nested :key] [[:host :name] :service])
+  ```
 
   More information about availables formatters in the Clojure documentation:
   https://clojuredocs.org/clojure.core/format"

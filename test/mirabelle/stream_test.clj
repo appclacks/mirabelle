@@ -738,6 +738,8 @@
                           (a/sdissoc :foo)
                           (a/sdissoc [:foo [:a :b :c]])
                           (a/sformat "%s" :host [:service])
+                          (a/sformat "%s" [:host] [:service])
+                          (a/sformat "%s" [:host] [[:service]])
                           (a/exception-stream
                            (a/by {:fields [:host]})
                            (a/decrement))
