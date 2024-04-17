@@ -1836,41 +1836,40 @@
    :description {:message (format "Save events into the tap %s" tap-name)}
    :params [tap-name]})
 
-(defn json-fields*
-  [_ fields & children]
-  (fn stream [event]
-    (call-rescue
-     (reduce (fn [event field]
-               (if (get event field)
-                 (update event field json/parse-string true)
-                 event))
-             event
-             fields)
-     children)))
+(defn from-json*
+  [_ k & children]
+  (let [update-fn (if (sequential? k)
+                    update-in
+                    update)]
+    (fn stream [event]
+      (call-rescue
+       (update-fn event k json/parse-string true)
+       children))))
 
-(s/def ::json-fields (s/cat :fields
-                            (s/or :single keyword?
-                                  :multiple (s/coll-of keyword?))))
+(s/def ::from-json (s/cat :k
+                          (s/or :single keyword?
+                                :multiple (s/coll-of keyword?))))
 
-(defn json-fields
+(defn from-json
   "Takes a field or a list of fields, and converts the values associated to these
-  fields from json to edn.
+  fields from a json string to edn.
 
   ```clojure
   (with :my-field \"{\"foo\": \"bar\"}
-    (json-fields [:my-field]))
+    (from-json :my-field))
   ```
 
   In this example, we associate to `:my-field` a json string and then we call
-  `json-fields` on it. `:my-field` will now contain an edn map built from the json
+  `from-json` on it. `:my-field` will now contain an edn map built from the json
   data, with keywords as keys.
-  "
-  [fields & children]
-  (mspec/valid-action? ::json-fields [fields])
-  {:action :json-fields
-   :description {:message "Parse the provided fields from json to edn"
-                 :params (pr-str fields)}
-   :params [(if (keyword? fields) [fields] fields)]
+
+  This action also supports nested keys by passing an array of keys (for example `(from-json [:nested :key])`)"
+  [k & children]
+  (mspec/valid-action? ::from-json [k])
+  {:action :from-json
+   :description {:message "Parse the provided key from a json string to edn"
+                 :params (pr-str k)}
+   :params [k]
    :children children})
 
 (defn exception->event
@@ -3004,7 +3003,7 @@
    :increment increment*
    :index index*
    :io io*
-   :json-fields json-fields*
+   :from-json from-json*
    :keep-keys keep-keys*
    :mean aggregation*
    :moving-event-window moving-event-window*

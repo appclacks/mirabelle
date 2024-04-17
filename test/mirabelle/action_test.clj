@@ -904,30 +904,28 @@
                    {:metric 3 :tags ["foo" "bar"]}]
                   [{:metric 3 :tags ["foo" "bar"]}])))
 
-(deftest json-fields*-test
+(deftest from-json*-test
   (let [[rec state] (recorder)]
-    (test-actions (a/json-fields* nil
-                                  [:foo]
-                                  rec)
+    (test-actions (a/from-json* nil
+                                [:foo]
+                                rec)
                   state
                   [{:foo "{\"bar\": \"baz\"}"}]
                   [{:foo {:bar "baz"}}])
-    (test-actions (a/json-fields* nil
-                                  [:foo :bar]
-                                  rec)
+    (test-actions (a/from-json* nil
+                                [:foo :bar]
+                                rec)
                   state
-                  [{:foo "{\"bar\": \"baz\"}"
-                    :host "h"
-                    :bar "{\"a\": \"b\"}"}]
-                  [{:foo {:bar "baz"}
-                    :host "h"
-                    :bar {:a "b"}}])
-    (test-actions (a/json-fields* nil
-                                  [:foo]
-                                  rec)
+                  [{:foo {:bar "{\"bar\": \"baz2\"}"}
+                    :host "h"}]
+                  [{:foo {:bar {:bar "baz2"}}
+                    :host "h"}])
+    (test-actions (a/from-json* nil
+                                [:foo]
+                                rec)
                   state
                   [{:host "aa"}]
-                  [{:host "aa"}])))
+                  [{:host "aa" :foo nil}])))
 
 (deftest exception-stream*-test
   (let [[rec state] (recorder)
