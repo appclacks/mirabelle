@@ -12,15 +12,15 @@
             [exoscale.interceptor :as itc]
             [mirabelle.handler :as mh]
             [mirabelle.transport.websocket :as ws]
-            [ring.adapter.jetty9 :as jetty]))
+            [ring.adapter.jetty9 :as jetty]
+            [ring.websocket :as ringws]))
 
 (defn ws-interceptor
   [pubsub nb-conn]
   {:name :websocket
    :enter (fn [ctx]
             (if (jetty/ws-upgrade-request? (:request ctx))
-              (itc/halt (jetty/ws-upgrade-response
-                         (ws/websocket-handler pubsub nb-conn)))
+              (itc/halt (ws/websocket-handler (:request ctx) pubsub nb-conn))
               ctx))})
 
 (defn interceptor-chain

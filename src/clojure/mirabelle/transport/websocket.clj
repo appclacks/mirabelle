@@ -12,8 +12,21 @@
             [mirabelle.pubsub :as pubsub]
             [mirabelle.b64 :as b64]
             [reitit.core :as r]
-            [ring.adapter.jetty9.websocket :as websocket])
-  (:import org.eclipse.jetty.websocket.api.WebSocketAdapter))
+            [ring.adapter.jetty9 :as jetty]
+            [ring.adapter.jetty9.common :as common]
+            [ring.websocket :as ringws])
+  (:import java.net.URI
+           java.nio.ByteBuffer
+           org.eclipse.jetty.websocket.api.Callback
+           org.eclipse.jetty.websocket.common.WebSocketSession))
+
+(defn- write-callback
+  [action]
+  (reify Callback
+    (succeed [_]
+      (log/debug {} (format "websocket %s succeed" action)))
+    (fail [_ throwable]
+      (log/error {} (format "fail to send websocket %s: %s" action throwable)))))
 
 (defn http-query-map
   "Converts a URL query string into a map."
@@ -54,7 +67,7 @@
   [ps actions ws pred channel]
   (let [handler (fn emit [event]
                   (when (pred event)
-                    (websocket/send! ws (.getBytes (json/generate-string event)))))
+                    (ringws/send ws (ByteBuffer/wrap (.getBytes (json/generate-string event))))))
         sub-id (pubsub/add ps channel handler)]
     (log/info {} (format "New websocket subscription %s %s" channel sub-id))
 
@@ -64,48 +77,50 @@
                                   channel sub-id))
              (pubsub/rm ps channel sub-id)))))
 
-(defn websocket-handler [pubsub nb-conn]
-  (fn [upgrade-request]
-    (let [provided-subprotocols (:websocket-subprotocols upgrade-request)
-          provided-extensions (:websocket-extensions upgrade-request)
-          actions (atom [])]
-      {:on-connect (fn on-connect [ws]
-                     (let [request (websocket/req-of ws)
-                           uri (:uri request)
-                           route-match (r/match-by-path router uri)
-                           handler (or (-> route-match :data :name)
-                                       :ws/not-found)
-                           query-params (-> (:query-string request)
-                                            http-query-map)
-                           pred (request->pred query-params)]
-                       (if (= :ws/not-found handler)
-                         (do
-                           (log/info {} "Unknown URI " (:uri request) ", closing websocket connection")
-                           (websocket/close! ws))
-                         (do
-                           (swap! nb-conn inc)
-                           (condp = handler
-                             :ws/index (ws-handler pubsub
-                                                   actions
-                                                   ws
-                                                   pred
-                                                   (index/channel (get query-params
-                                                                       "stream"
-                                                                       :default)))
-                             :ws/channel (ws-handler pubsub
-                                                     actions
-                                                     ws
-                                                     pred
-                                                     (-> route-match :path-params :channel keyword)))))))
-       :on-close (fn on-close [_ status-code reason]
-                   (log/info {} (format "Closing Websocket connection status=%d reason=%s" status-code reason))
-                   (swap! nb-conn dec)
-                   (doseq [action @actions]
-                     (action)))
-       :on-error (fn on-error [ws e]
-                   (log/error {} e "Error in the websocket handler")
-                   (websocket/close! ws))
-       :on-ping (fn on-ping [^WebSocketAdapter ws payload]
-                  (-> ws .getRemote (.sendPong payload)))
-       :subprotocol (first provided-subprotocols)
-       :extentions provided-extensions})))
+(defn websocket-handler [upgrade-request pubsub nb-conn]
+  (let [provided-subprotocols (:websocket-subprotocols upgrade-request)
+        provided-extensions (:websocket-extensions upgrade-request)
+        actions (atom [])]
+    {:ring.websocket/protocol (first provided-subprotocols)
+     :ring.websocket/listener
+     {:on-open (fn on-open [^WebSocketSession ws]
+                 (let [request (.getUpgradeRequest ws)
+                       ^URI uri (.getRequestURI request)
+                       path (.getPath uri)
+                       route-match (r/match-by-path router path)
+                       handler (or (-> route-match :data :name)
+                                   :ws/not-found)
+                       query-params (-> (.getQueryString request)
+                                        http-query-map)
+                       pred (request->pred query-params)]
+                   (if (= :ws/not-found handler)
+                     (do
+                       (log/info {} "Unknown path " path ", closing websocket connection")
+                       (.close ws))
+                     (do
+                       (swap! nb-conn inc)
+                       (condp = handler
+                         :ws/index (ws-handler pubsub
+                                               actions
+                                               ws
+                                               pred
+                                               (index/channel (get query-params
+                                                                   "stream"
+                                                                   :default)))
+                         :ws/channel (ws-handler pubsub
+                                                 actions
+                                                 ws
+                                                 pred
+                                                 (-> route-match :path-params :channel keyword)))))))
+      :on-close (fn on-close [_ status-code reason]
+                  (log/info {} (format "Closing Websocket connection status=%d reason=%s" status-code reason))
+                  (swap! nb-conn dec)
+                  (doseq [action @actions]
+                    (action)))
+      :on-error (fn on-error [^WebSocketSession ws e]
+                  (log/error {} e "Error in the websocket handler")
+                  (.close ws))
+      :on-pong (fn on-pong [^WebSocketSession ws payload]
+                 (.sendPong ws payload (write-callback "pong")))
+      :on-ping (fn on-ping [^WebSocketSession ws payload]
+                 (.sendPing ws payload (write-callback "ping")))}}))

@@ -19,3 +19,4 @@ java.iml
 venv
 .clj-kondo
 .lsp
+.venv
