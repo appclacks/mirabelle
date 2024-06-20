@@ -34,9 +34,9 @@ lein new app mymodule
 
 Now, open the `project.clj` file in the `my-module` directory.
 
-First, remove the `:main ^:skip-aot my-module-name.core` line. Then, adds to the `:dependencies` list the Mirabelle project by adding `[fr.mcorbin/mirabelle "<replace-with-your-mirabelle-version>"]`. Be sure to use the same version than your Mirabelle version (it may in theory work with different versions but we never know).
+First, remove the `:main ^:skip-aot my-module-name.core` line. Then extend the `:dependencies` list of the Mirabelle project file by adding `[fr.mcorbin/mirabelle "<replace-with-your-mirabelle-version>"]`. Be sure to use the same version as the Mirabelle you're using (it may in theory work with different versions but we never know).
 
-Be sure to also remove the `org.clojure/clojure` dependency from the `;dependencies` list, Clojure being already provided by Mirabelle itself.
+Be sure to also remove the `org.clojure/clojure` dependency from the `:dependencies` list, Clojure being already provided by Mirabelle itself.
 
 You can now open the file in `src/mymodule/core.clj`
 
@@ -69,11 +69,11 @@ Then, we create a Clojure function named `keep-if-greater-than*`. This function 
 
 Then, we check if the event `:metric` field is greater than the threshold. If yes, we call `(a/call-rescue event children)`.
 
-`call-rescue` is a function taking an event (or a list of events), the list of children, and will forward the event to each children. In our case, we only firward them of the `:metric` field is greater than the threshold.
+`call-rescue` is a function taking an event (or a list of events), the list of children, and will forward the event to each child stream. In our case, we only forward them if the `:metric` field is greater than the threshold.
 
 ## Write a custom output
 
-Outputs are stateful components which can be then referenced in Mirabelle to interact with external systems (timeserie databases, cloud services...).
+Outputs are stateful components which can be then referenced in Mirabelle to interact with external systems (timeseries databases, cloud services...).
 
 Let's define a simple I/O which will write events into a path (you can add the code at the end of the `core.clj` file):
 
@@ -85,15 +85,15 @@ Let's define a simple I/O which will write events into a path (you can add the c
       (spit path (str (pr-str event) "\n") :append true))))
 ```
 
-We create here a clojure `record` which implements one `protocol`: `IO`.
+Here we create a clojure `record` which implements one `protocol`: `IO`.
 
-This protocol has only one function, which receives a list of events. This event is then written the file on the `path` location.
+This protocol has only one function, which receives a list of events. These events are then written to the file with the `path` location.
 
 `registry` and `path` are fields passed to the record. `registry` is automatically injected by Mirabelle and is a [https://micrometer.io/](micrometer) registry, and can be used to add metrics on your I/O component.
 
 The `path` parameter will be set by the user (it's explained a bit later in the documentation).
 
-The I/O records can also implement the `Lifecycle` protocol from the [https://github.com/stuartsierra/component](component library). it's very useful in order to initialize some states for your component, and properly shut it down if needed.
+The I/O records can also implement the `Lifecycle` protocol from the [https://github.com/stuartsierra/component](component library). It's very useful in order to initialize some states for your component, and properly shut it down if needed.
 
 ## Use the custom action and the custom output in Mirabelle
 
@@ -120,7 +120,7 @@ The first thing to do to use your module is to reference your new action and I/O
 
 You can see that the `:keep-if-greater-than*` key references the function you wrote in your module, and that the `:custom-file` Output references `my-module-name.core/map->CustomFileOutput` in `:builder` (the `map->CustomFileOutput` function is automatically available, it's how Clojure records work).
 
-You can also write a stream which use both your new action and the new output you declared:
+You can also write a stream which uses both your new action and the new output you declared:
 
 ```clojure
 (streams
@@ -137,5 +137,5 @@ You should now launch Mirabelle and include your module jar in the command:
 java -cp "mirabelle.jar:your-module.jar" mirabelle.core
 ```
 
-Mirabele lshould be running, and if you push an event with a metric greater than 5 it should be written into the `/tmp/custom` path.
+Mirabelle should be running, and if you push an event with a metric greater than 5 it should be written into the `/tmp/custom` path.
 
