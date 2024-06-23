@@ -76,10 +76,11 @@
       ;; it's a custom output
       ;; need to resolve the fn from the config
       (= :custom t)
-      (assoc output-config
-             :component
-             ((requiring-resolve (:builder output-config)) (assoc (:config output-config)
-                                                                  :registry registry)))
+      (let [output ((requiring-resolve (:builder output-config)) (assoc (:config output-config)
+                                                                        :registry registry))]
+        (assoc output-config
+               :component
+               (component/start output)))
 
       (= :async-queue t)
       (assoc output-config :component (pool/dynamic-thread-pool-executor registry
