@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.119.0">
+    <meta name="generator" content="Hugo 0.121.2">
     <meta name="description" content="">
 
 
@@ -12,20 +12,20 @@
     <title>Differences with Riemann :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1703106062" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1703106062" rel="stylesheet">
-    <link href="/css/hybrid.css?1703106062" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1703106062" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1703106062" rel="stylesheet">
-    <link href="/css/auto-complete.css?1703106062" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1703106062" rel="stylesheet">
-    <link href="/css/theme.css?1703106062" rel="stylesheet">
-    <link href="/css/tabs.css?1703106062" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1703106062" rel="stylesheet">
+    <link href="/css/nucleus.css?1719177977" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1719177977" rel="stylesheet">
+    <link href="/css/hybrid.css?1719177977" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1719177977" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1719177977" rel="stylesheet">
+    <link href="/css/auto-complete.css?1719177977" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1719177977" rel="stylesheet">
+    <link href="/css/theme.css?1719177977" rel="stylesheet">
+    <link href="/css/tabs.css?1719177977" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1719177977" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1703106062"></script>
+    <script src="/js/jquery-3.3.1.min.js?1719177977"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1703106062"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1703106062"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1719177977"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1719177977"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1703106062"></script>
+<script type="text/javascript" src="/js/search.js?1719177977"></script>
 
     
   </div>
@@ -583,20 +583,20 @@
 <p>In Riemann, streams are function. In Mirabelle, they <a href="/howto/stream/#edn-representation-and-compilation">compile</a> as EDN.</p>
 <p>It means streams configurations can be easily parsed by other systems, passed between systems, verified&hellip;</p>
 <h2 id="no-global-side-effectsschedulers">No global side effects/schedulers</h2>
-<p>In Mirabelle, <strong>all</strong> actions use the events time as wall clock. It means streams times advance depending of the event they receives.</p>
+<p>In Mirabelle, <strong>all</strong> actions use the events&rsquo; time as wall clock. It means streams times advance depending on the event they receive.</p>
 <p>Because of that, it&rsquo;s easy to reason about (and test) streams: the same inputs always produce the same outputs. It&rsquo;s also possible to have multiple streams with different times running in parallel.</p>
 <h2 id="various-streams-can-coexist-dynamic-streams">Various streams can coexist, dynamic streams</h2>
 <p>You can in Mirabelle create streams which will not receive the events passed to the Mirabelle TCP server by default.</p>
-<p>It means you can have some streams for &ldquo;real time&rdquo; computation, and some streams for some use cases. Each stream will run independently, will have its own time&hellip;</p>
+<p>It means you can have some streams for &ldquo;real time&rdquo; computation, and some streams for other use cases. Each stream will run independently, will have its own time&hellip;</p>
 <p>When you send an event to Mirabelle, you can specify the <code>stream</code> attribute in order to send the event to a specific stream.</p>
 <h2 id="multiple-dimensions">Multiple dimensions</h2>
 <p>Riemann mostly works on the <code>:host</code> and <code>:service</code> fields. it&rsquo;s common to encode &ldquo;dimensions&rdquo; in <code>:service</code>.</p>
 <p>For example, you could have in Riemann a service named <code>http_requests_duration_prod_p99</code>. In Mirabelle, you would model this event like this: <code>{:service &quot;http_requests_duration&quot; :environment &quot;prod&quot; :quantile &quot;0.99&quot;}</code></p>
-<p>A lot of Riemann streams/actions (<code>index</code>, <code>coalesce</code>&hellip;) were rewritten. You can now provide for each action on which keys it should work instead to have to manipulate complex <code>:service</code> names.</p>
+<p>A lot of Riemann streams/actions (<code>index</code>, <code>coalesce</code>&hellip;) were rewritten. You can now provide for each action on which keys it should work instead of having to manipulate complex <code>:service</code> names.</p>
 <h2 id="new-actions">New actions</h2>
 <p>New actions which I think could be interesting were added to Mirabelle. Also, not all Riemann actions were backported, only the main ones (I could probably backport the other ones later if needed).</p>
 <h2 id="http-api">HTTP API</h2>
-<p>Mirabelle provides an <a href="/api">HTTP API</a> which allow you to manage streams dynamically (create, list, get, remove), and to gather information about your system:</p>
+<p>Mirabelle provides an <a href="/api">HTTP API</a> which allows you to manage streams dynamically (create, list, get, remove), and to gather information about your system:</p>
 <ul>
 <li>Querying the <a href="/howto/stream-index/">Index</a> and the current index time</li>
 <li>Pushing events</li>
@@ -607,7 +607,7 @@
 <h2 id="clear-distinctions-streams-and-io">Clear distinctions streams and I/O</h2>
 <p>Streams and I/O are configured separately, and streams references I/O. These components do not have the same lifecycle, and handling I/O is less error prone in Mirabelle, especially during reloads.</p>
 <h2 id="hot-reload">Hot reload</h2>
-<p>In Riemann, all streams states (time windows for example) all lost during reloads. it&rsquo;s not the case in Mirabelle. Only streams which were modified in the configuration are recreated.</p>
+<p>In Riemann, all streams&rsquo; states (time windows for example) all lost during reloads. it&rsquo;s not the case in Mirabelle. Only streams which were modified in the configuration are recreated and thus lose state.</p>
 <h2 id="index">Index</h2>
 <p>In Mirabelle, each stream has its own dedicated index.</p>
 <h2 id="new-features">New features</h2>
@@ -918,19 +918,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1703106062"></script>
-    <script src="/js/perfect-scrollbar.min.js?1703106062"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1703106062"></script>
-    <script src="/js/jquery.sticky.js?1703106062"></script>
-    <script src="/js/featherlight.min.js?1703106062"></script>
-    <script src="/js/highlight.pack.js?1703106062"></script>
+    <script src="/js/clipboard.min.js?1719177977"></script>
+    <script src="/js/perfect-scrollbar.min.js?1719177977"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1719177977"></script>
+    <script src="/js/jquery.sticky.js?1719177977"></script>
+    <script src="/js/featherlight.min.js?1719177977"></script>
+    <script src="/js/highlight.pack.js?1719177977"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1703106062"></script>
-    <script src="/js/learn.js?1703106062"></script>
-    <script src="/js/hugo-learn.js?1703106062"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1719177977"></script>
+    <script src="/js/learn.js?1719177977"></script>
+    <script src="/js/hugo-learn.js?1719177977"></script>
     
         
-            <script src="/mermaid/mermaid.js?1703106062"></script>
+            <script src="/mermaid/mermaid.js?1719177977"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

@@ -28,6 +28,7 @@ Not all available actions and I/O are listed here. You can see the full list in 
 - [The throttle action](/howto/stream/#throttle)
 - [Convert a counter to a rate](/howto/stream/#convert-a-counter-to-a-rate)
 - [Compute maximum and minimum values](/howto/stream/#compute-maximum-and-minimum-values)
+- [Format a string based on values](/howto/stream/#format-a-string-based-on-values)
 - [Handle errors in streams](/howto/stream/#handle-exceptions-errors)
 - [Discarded events](/howto/stream/#discarded-events)
 - [Move events between streams](/howto/stream/#move-events-between-streams)
@@ -378,6 +379,8 @@ A lot of actions allow you to modify events. The first one, `with`, allows you t
 ```clojure
 (with :state "critical"
   (info))
+(with [:nested :key] "critical"
+  (info))
 (with {:state "critical" :ttl 60}
   (info))
 ```
@@ -386,6 +389,9 @@ The `default` action is similar to `with` but it only accepts one value, and wil
 
 ```clojure
 (default :ttl 60
+  (info))
+;; nested keys
+(default [:nested :key] 60
   (info))
 ```
 
@@ -680,7 +686,19 @@ We already saw in the [Action on lists of events: max, min, count, percentiles, 
 
 `top` and `bottom` can be used to get the maximum or minimum events from the last seconds. For example, `(top {:duration 10})` will compute the maximum event for windows of 10 seconds. You can also configure these streams with a `:delay` value to tolerate late events (`(top {:duration 10 :delay 10})` for example).
 
-`smax` and `smin` will send *for each event they receive* the maximum or minimum event. The value is never resetted. 
+`smax` and `smin` will send *for each event they receive* the maximum or minimum event. The value is never resetted.
+
+#### Format a string based on values
+
+If you need to create a value from others keys values, use `sformat`:
+
+```clojure
+(sformat \"%s-foo-%s\" :format-test [:host :service])
+;; nested keys
+(sformat \"%s-foo-%s\" [:nested :key] [[:host :name] :service])
+```
+
+It's using Clojure [https://clojuredocs.org/clojure.core/format](format) function under the hood to associate to a key (that can be nested) the result of the string formatting using the values extracted from the list of keys passed as last parameter.
 
 #### Handle exceptions (errors)
 

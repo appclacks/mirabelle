@@ -5,6 +5,7 @@
     <link>https://www.mirabelle.mcorbin.fr/</link>
     <description>Recent content on Mirabelle</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="https://www.mirabelle.mcorbin.fr/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <atom:link href="https://www.mirabelle.mcorbin.fr/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

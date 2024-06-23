@@ -5,6 +5,7 @@
     <link>https://www.mirabelle.mcorbin.fr/howto/action-io-ref/</link>
     <description>Recent content in I/O and actions reference on Mirabelle</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="https://www.mirabelle.mcorbin.fr/howto/action-io-ref/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <atom:link href="https://www.mirabelle.mcorbin.fr/howto/action-io-ref/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

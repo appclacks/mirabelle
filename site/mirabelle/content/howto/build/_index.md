@@ -46,7 +46,7 @@ docker run -p 5555:5555 -p 5558:5558 \
 -v /etc/mirabelle/streams:/streams \
 -v /etc/mirabelle/config.edn:/config/config.edn \
 -e MIRABELLE_CONFIGURATION=/config/config.edn \
-appclacks/mirabelle:v0.12.1
+appclacks/mirabelle:v0.13.0
 ```
 
 ## Using Leiningen
