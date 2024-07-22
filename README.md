@@ -6,7 +6,7 @@ Its powerful and extensible DSL allows you to define computations on a stream of
 
 It can be used for a lot of use cases like monitoring, fraud detection, alerting, to route events and metrics between different systems…
 
-Check the documentation (https://www.mirabelle.mcorbin.fr/) for more information !
+Check the documentation (https://www.mirabelle.appclacks.com/) for more information !
 
 ![Mirabelle schema](site/mirabelle/static/img/mirabelle_presentation.png)
 
