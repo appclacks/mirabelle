@@ -13,7 +13,6 @@
             [mirabelle.index :as index]
             [mirabelle.output.elasticsearch :as elasticsearch]
             [mirabelle.output.file :as io-file]
-            [mirabelle.output.influxdb :as influxdb]
             [mirabelle.output.pagerduty :as pagerduty]
             [mirabelle.pool :as pool])
   (:import [io.micrometer.core.instrument Timer]
@@ -103,11 +102,6 @@
              (component/start (elasticsearch/map->Elasticsearch
                                {:config (:config output-config)})))
 
-      (= :influxdb t)
-      (assoc output-config
-             :component
-             (component/start (influxdb/map->Influx
-                               {:config (:config output-config)})))
       :else
       (throw (ex/ex-incorrect
               (format "Invalid Output: %s" t)

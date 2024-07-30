@@ -757,11 +757,11 @@
   "Push events to an external system.
 
   Outputs are configured into the main Mirabelle configuration file.
-  If you create a new output named `:influxdb`
+  If you create a new output named `:elasticsearch`
   for example, you can use output! to push all events into this I/O:
 
   ```clojure
-  (output! :influxdb)
+  (output! :elasticsearch)
   ```
 
   Outputs are automatically discarded in test mode."
