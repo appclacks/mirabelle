@@ -23,6 +23,13 @@
               (itc/halt (ws/websocket-handler (:request ctx) pubsub nb-conn))
               ctx))})
 
+(defn debug-interceptor
+  [string]
+  {:name :websocket
+   :enter (fn [ctx]
+            (println (System/nanoTime) " " string)
+            ctx)})
+
 (defn interceptor-chain
   [{:keys [api-handler registry config pubsub]}]
   (let [nb-conn (atom 0)]
@@ -30,20 +37,19 @@
                    :websocket.connections.count
                    {}
                    (fn [] @nb-conn))
-    [(ws-interceptor pubsub nb-conn) ;; enter
-     itc-response/response ;;leave
-     (itc-error/last-error registry) ;;error
+    [(ws-interceptor pubsub nb-conn)        ;; enter
+     itc-response/response                  ;;leave
+     (itc-error/last-error registry)        ;;error
      (itc-metric/response-metrics registry) ;; leave
-     itc-json/json ;; leave
-     itc-error/error ;; error
+     itc-json/json                          ;; leave
+     itc-error/error                        ;; error
      (when-let [basic-auth (:basic-auth config)]
        (itc-auth/basic-auth basic-auth))
      (itc-route/route {:router mh/router
                        :registry registry
                        :handler-component api-handler}) ;; enter
-     itc-id/request-id ;;enter
-     itc-ring/cookies ;; enter + leave
-     itc-ring/params ;; enter
+     itc-id/request-id                                  ;;enter
+     itc-ring/params         ;; enter
      itc-ring/keyword-params ;; enter
      itc-json/request-params ;; enter
      (itc-handler/main-handler {:registry registry
