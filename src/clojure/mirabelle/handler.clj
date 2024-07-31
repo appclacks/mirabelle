@@ -10,7 +10,7 @@
             [mirabelle.prometheus :as prometheus]
             [mirabelle.stream :as stream])
   (:import io.micrometer.core.instrument.Counter
-           io.micrometer.prometheus.PrometheusMeterRegistry
+           io.micrometer.prometheusmetrics.PrometheusMeterRegistry
            io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest
            org.xerial.snappy.Snappy
            prometheus.Remote$WriteRequest))

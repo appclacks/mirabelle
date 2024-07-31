@@ -15,7 +15,8 @@
             [mirabelle.output.file :as io-file]
             [mirabelle.output.pagerduty :as pagerduty]
             [mirabelle.pool :as pool])
-  (:import [io.micrometer.core.instrument Timer]
+  (:import [io.micrometer.core.instrument Timer Timer$Sample]
+           [io.micrometer.prometheusmetrics PrometheusMeterRegistry]
            [java.io File]
            [java.util.concurrent TimeUnit Executor]))
 
@@ -150,7 +151,7 @@
   [dirs-path]
   (->> (map (fn [path] (.listFiles (io/file path))) dirs-path)
        (map (fn [files]
-              (filter #(.isFile %) files)))
+              (filter #(.isFile ^File %) files)))
        (map (fn [files]
               (for [f files]
                 (.getPath ^File f))))
@@ -164,8 +165,8 @@
   (str (name stream-name) "-api.edn"))
 
 ;; I should simplify this crappy code
-(deftype StreamHandler [streams-directories ;; config
-                        outputs-configurations;; config
+(deftype StreamHandler [streams-directories    ;; config
+                        outputs-configurations ;; config
                         lock
                         ;; streams from the config file
                         ^:volatile-mutable streams-configurations
@@ -173,9 +174,8 @@
                         custom-outputs
                         ^:volatile-mutable compiled-streams
                         ^:volatile-mutable compiled-outputs
-                        ^:volatile-mutable ^Timer stream-timer
                         queue
-                        registry
+                        ^PrometheusMeterRegistry registry
                         tap
                         test-mode?
                         index
@@ -187,17 +187,13 @@
                                     (map (fn [[k v]] [k (compile-output! registry
                                                                          k
                                                                          v)]))
-                                    (into {}))
-          timer (metric/get-timer! registry
-                                   :stream-duration
-                                   {})]
+                                    (into {}))]
       (when-let [output (seq (map first outputs-configurations))]
         (log/infof {}
                    "Adding outputs %s"
                    (string/join #", " output)))
       (set! compiled-outputs new-compiled-outputs)
       (set! compiled-streams {})
-      (set! stream-timer timer)
       (reload this))
     this)
   (stop [_]
@@ -234,6 +230,7 @@
                                               [k (compile-stream!
                                                   (assoc (context this k)
                                                          :index (component/start (index/map->Index {}))
+                                                         :timer (metric/get-timer! registry "stream-duration" {:name k})
                                                          :default (boolean (:default v)))
                                                   (update v :default boolean))]))
                                       (into {})
@@ -253,15 +250,17 @@
          :streams-configurations new-streams-configurations})))
   (push! [_ event stream]
     (if (= :default stream)
-      (doseq [[_ s] compiled-streams]
+      (doseq [[n s] compiled-streams]
         (when (:default s)
-          (let [t1 (System/nanoTime)]
-            (stream! s event)
-            (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS))))
+          (let [t1 (System/nanoTime)
+                ^Timer timer (-> s :context :timer)]
+                (stream! s event)
+                (.record timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS))))
       (if-let [s (get compiled-streams stream)]
-        (let [t1 (System/nanoTime)]
+        (let [t1 (System/nanoTime)
+              ^Timer timer (-> s :context :timer)]
           (stream! s event)
-          (.record stream-timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS))
+          (.record timer (- (System/nanoTime) t1) TimeUnit/NANOSECONDS))
         (throw (ex/ex-info
                 (format "Stream %s not found" stream)
                 [::not-found [:corbi/user ::ex/not-found]])))))
@@ -280,7 +279,9 @@
         (let [compiled-stream (compile-stream!
                                (assoc (context this stream-name)
                                       :index
-                                      (component/start (index/map->Index {})))
+                                      (component/start (index/map->Index {}))
+                                      :timer
+                                      (metric/get-timer! registry "stream-duration" {:name stream-name}))
                                (update stream-configuration :default boolean))
               new-compiled-streams (assoc compiled-streams
                                           stream-name
@@ -317,7 +318,6 @@
            custom-outputs
            compiled-streams
            compiled-outputs
-           stream-timer
            queue
            registry
            test-mode?
@@ -338,7 +338,6 @@
                    custom-outputs
                    compiled-streams
                    compiled-outputs
-                   stream-timer
                    queue
                    registry
                    (atom {})
