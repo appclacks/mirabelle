@@ -2894,6 +2894,7 @@
                                      :opt-un [::delay])))
 
 (defn rate
+  "Computes the rate of received events (by counting them) and emits the result at a periodic interval"
   [config & children]
   (mspec/valid-action? ::rate [config])
   {:action :rate
