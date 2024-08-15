@@ -4,6 +4,7 @@
   :license {:name "EPL-1.0"
             :url "https://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[clj-http "3.12.3"]
+                 [commons-codec/commons-codec "1.16.1"]
                  [com.boundary/high-scale-lib "1.0.6"]
                  [com.google.protobuf/protobuf-java "3.22.0"]
                  [com.google.protobuf/protobuf-java-util "3.22.0"]

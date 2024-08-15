@@ -11,6 +11,7 @@
            io.opentelemetry.proto.common.v1.InstrumentationScope
            io.opentelemetry.proto.trace.v1.Span$Event
            io.opentelemetry.proto.trace.v1.Span$Link
+           io.opentelemetry.proto.trace.v1.Span$Builder
            io.opentelemetry.proto.trace.v1.Status$StatusCode
            io.opentelemetry.proto.trace.v1.Span$SpanKind
            org.apache.commons.codec.binary.Hex))
@@ -19,7 +20,11 @@
 
 (defn byte-string->string
   [^ByteString byte-string]
-  (Hex/encodeHexString (.toByteArray  byte-string)))
+  (Hex/encodeHexString (.toByteArray byte-string)))
+
+(defn string->byte-string
+  [^String s]
+  (ByteString/copyFrom (Hex/encode ^"[B" (.getBytes s))))
 
 (defn any-value->value
   [^AnyValue any-value]
@@ -32,7 +37,7 @@
                                           (.getValuesList
                                            (.getArrayValue any-value)))
       AnyValue$ValueCase/KVLIST_VALUE (key-value-list->map
-                                        (.getValuesList (.getKvlistValue any-value)))
+                                       (.getValuesList (.getKvlistValue any-value)))
       AnyValue$ValueCase/BYTES_VALUE (.toByteArray (.getBytesValue any-value))
       nil)))
 
@@ -101,6 +106,7 @@
      :kind kind
      :time (double (/ end-time 1000000000))
      :start-time start-time
+     :end-time end-time
      :metric duration
      :attributes (key-value-list->map (.getAttributesList span))
      :dropped-attributes-count (.getDroppedAttributesCount span)
@@ -131,3 +137,33 @@
   [^ExportTraceServiceRequest service-request]
   (let [^ResourceSpans span-list (.getResourceSpansList service-request)]
     (map resource-span->events span-list)))
+
+
+(defn event->span
+  [{:keys [trace-id
+           span-id
+           status
+           trace-state
+           parent-span-id
+           name
+           kind
+           start-time
+           end-time
+           attributes
+           events
+           links
+           status] :as event}]
+  (let [builder (Span/newBuilder)]
+    (when trace-id
+      
+      )
+    (when start-time
+      (.setStartTimeUnixNano builder start-time))
+    (when end-time
+      (.setEndTimeUnixNano builder end-time))
+    
+    )
+
+  )
+
+
