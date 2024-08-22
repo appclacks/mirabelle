@@ -31,10 +31,12 @@
 (defn http-query-map
   "Converts a URL query string into a map."
   [string]
-  (apply hash-map
-         (map clj-http/url-decode
-              (mapcat (fn [kv] (string/split kv #"=" 2))
-                      (string/split string #"&")))))
+  (if string
+    (apply hash-map
+           (map clj-http/url-decode
+                (mapcat (fn [kv] (string/split kv #"=" 2))
+                        (string/split string #"&"))))
+    {}))
 
 (defn query-true?
   "Helper to support the Riemann default `true` query."
@@ -46,7 +48,7 @@
 (defn request->pred
   "Returns the predicate for the channel events based on the request query params"
   [query-params]
-  (let [query (get query-params "query")]
+  (let [query (get query-params "query" "true")]
     (try
       (-> query
           query-true?

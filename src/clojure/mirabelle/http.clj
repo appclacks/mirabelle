@@ -37,14 +37,14 @@
                    :websocket.connections.count
                    {}
                    (fn [] @nb-conn))
-    [(ws-interceptor pubsub nb-conn)        ;; enter
-     itc-response/response                  ;;leave
+    [itc-response/response                  ;;leave
      (itc-error/last-error registry)        ;;error
      (itc-metric/response-metrics registry) ;; leave
      itc-json/json                          ;; leave
      itc-error/error                        ;; error
      (when-let [basic-auth (:basic-auth config)]
        (itc-auth/basic-auth basic-auth))
+     (ws-interceptor pubsub nb-conn)        ;; enter
      (itc-route/route {:router mh/router
                        :registry registry
                        :handler-component api-handler}) ;; enter
