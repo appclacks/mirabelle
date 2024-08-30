@@ -65,7 +65,7 @@
   [^Span$Link link]
   {:trace-id (byte-string->string (.getTraceId link))
    :span-id (byte-string->string (.getSpanId link))
-   :trace-state (.getTraceState link)
+   :state (.getTraceState link)
    :attributes (key-value-list->map (.getAttributesList link))
    :dropped-attributes-count (.getDroppedAttributesCount link)})
 
@@ -75,13 +75,13 @@
         end-time (.getEndTimeUnixNano span)
         duration (- end-time start-time)
         kind (condp = (.getKind span)
-               Span$SpanKind/SPAN_KIND_UNSPECIFIED :unspecified
-               Span$SpanKind/SPAN_KIND_INTERNAL :internal
-               Span$SpanKind/SPAN_KIND_SERVER :server
-               Span$SpanKind/SPAN_KIND_CLIENT :client
-               Span$SpanKind/SPAN_KIND_PRODUCER :producer
-               Span$SpanKind/SPAN_KIND_CONSUMER :consumer
-               :unrecognized)
+               Span$SpanKind/SPAN_KIND_UNSPECIFIED "unspecified"
+               Span$SpanKind/SPAN_KIND_INTERNAL "internal"
+               Span$SpanKind/SPAN_KIND_SERVER "server"
+               Span$SpanKind/SPAN_KIND_CLIENT "client"
+               Span$SpanKind/SPAN_KIND_PRODUCER "producer"
+               Span$SpanKind/SPAN_KIND_CONSUMER "consumer"
+               "unrecognized")
         status (.getStatus span)
         service (get-in resource [:attributes :service.name])
         status-code (condp = (.getCode status)
@@ -95,21 +95,23 @@
      :trace-id (byte-string->string (.getTraceId span))
      :span-id (byte-string->string (.getSpanId span))
      :state status-code
-     :trace-state (.getTraceState span)
+     :status (.getCode status)
+     :description (.getMessage status)
+     ;:trace-state (.getTraceState span)
      :parent-span-id (byte-string->string (.getParentSpanId span))
      :name (.getName span)
      :kind kind
+     :span-kind (.getNumber (.getKind span))
      :time (double (/ end-time 1000000000))
      :start-time start-time
+     :end-time end-time
      :metric duration
      :attributes (key-value-list->map (.getAttributesList span))
      :dropped-attributes-count (.getDroppedAttributesCount span)
      :events (map event->map (.getEventsList span))
      :dropped-events-count (.getDroppedEventsCount span)
      :links (map link->map (.getLinksList span))
-     :dropped-links-count (.getDroppedLinksCount span)
-     :status {:message (.getMessage status)
-              :status status-code}}))
+     :dropped-links-count (.getDroppedLinksCount span)}))
 
 (defn scope-span->events
   [^ScopeSpans scope-spans resource]
