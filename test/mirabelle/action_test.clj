@@ -110,6 +110,11 @@
                    {:metric -1 :service "foo" :env "prod"}]
                   [{:metric 10 :service "foo" :env "prod"}
                    {:metric -1 :service "foo" :env "prod"}])
+    (test-actions (a/where* nil [:= [:attributes :host] "foo"] rec)
+                  state
+                  [{:attributes {}}
+                   {:attributes {:host "foo"}}]
+                  [{:attributes {:host "foo"}}])
     (test-actions (a/where* nil [:and
                                  [:and
                                   [:= :host "bar"]
