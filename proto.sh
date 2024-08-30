@@ -1,6 +1,9 @@
 prom_src="src/java/proto/prometheus"
 otel_src="src/java/proto"
+riemann_src="src/java/proto"
 dest="src/java"
+
+protoc -I="${riemann_src}" --java_out "${dest}" "${riemann_src}/riemann/proto.proto"
 
 protoc -I="${prom_src}" --java_out "${dest}" "${prom_src}/types.proto"
 protoc -I="${prom_src}" --java_out "${dest}" "${prom_src}/remote.proto"

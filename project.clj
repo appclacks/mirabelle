@@ -23,8 +23,7 @@
                  [org.clojure/clojure "1.11.3"]
                  [org.clojure/spec.alpha "0.5.238"]
                  [org.elasticsearch.client/elasticsearch-rest-client "8.14.3"]
-                 [org.xerial.snappy/snappy-java "1.1.10.5"]
-                 [riemann-clojure-client "0.5.4"]]
+                 [org.xerial.snappy/snappy-java "1.1.10.5"]]
   :main ^:skip-aot mirabelle.core
   :global-vars {*warn-on-reflection* true}
   :target-path "target/%s"

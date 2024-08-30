@@ -3,7 +3,7 @@
 (ns mirabelle.transport
   (:require [clojure.tools.logging :as log]
             [mirabelle.time :as time]
-            [riemann.codec  :as codec])
+            [mirabelle.transport.codec :as codec])
   (:import
     (java.util List)
     (java.util.concurrent TimeUnit)
@@ -40,7 +40,6 @@
   [msg]
   (let [msg (codec/decode-pb-msg msg)]
     (-> msg
-      (assoc :states (map post-load-event (:states msg)))
       (assoc :events (map post-load-event (:events msg))))))
 
 (defn ^DefaultChannelGroup channel-group
