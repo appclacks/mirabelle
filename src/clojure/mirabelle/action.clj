@@ -1602,7 +1602,7 @@
 
   (sdissoc [:environment :host] (info))
 
-  (sdissoc [:environment [:nested :key] (info))
+  (sdissoc [:environment [:nested :key]] (info))
   ```"
   [fields & children]
   (mspec/valid-action? ::sdissoc [fields])
@@ -2272,9 +2272,29 @@
 (defn rename-keys*
   [_ replacement & children]
   (fn stream [event]
-    (call-rescue (set/rename-keys event replacement) children)))
+    (call-rescue
+     (reduce
+      (fn [event [old new]]
+        (let [seq-old (sequential? old)
+              val (if seq-old
+                    (get-in event old)
+                    (get event old))]
+          (if val
+            (let [event (if seq-old
+                          (dissoc-in event old)
+                          (dissoc event old))]
+              (if (sequential? new)
+                (assoc-in event new val)
+                (assoc event new val)))
+            event)))
+      event
+      replacement)
+     children)))
 
-(s/def ::rename-keys (s/cat :replacement (s/map-of keyword? keyword?)))
+(s/def ::rename-keys (s/cat :replacement (s/map-of (s/or :keyword keyword?
+                                                         :seq (s/coll-of keyword?))
+                                                   (s/or :keyword keyword?
+                                                         :seq (s/coll-of keyword?)))))
 
 (defn rename-keys
   "Rename events keys.

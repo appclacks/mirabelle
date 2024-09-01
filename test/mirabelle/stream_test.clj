@@ -806,6 +806,8 @@
                           (a/scale 100)
                           (a/with :foo 1)
                           (a/rename-keys {:host :service})
+                          (a/rename-keys {:host [:baz :bar]})
+                          (a/rename-keys {[:attribute :foo] [:baz :bar]})
                           (a/with {:foo 1})
                           (a/where [:> :metric 10])
                           (a/where [:always-true]

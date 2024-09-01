@@ -1175,7 +1175,33 @@
                   [{:service "foo" :env "prod"}
                    {:service "foo"}
                    {:service "bar"}
-                   {}])))
+                   {}])
+    (test-actions (a/rename-keys* nil
+                                  {[:attributes :foo] :service
+                                   [:attributes :bar] [:attributes :baz]}
+                                  rec)
+                  state
+                  [{:host "foo" :service "bar" :environment "prod" :attributes {}}
+                   {:attributes {:foo "1"
+                                 :bar "2"}}]
+                  [{:host "foo" :service "bar" :environment "prod" :attributes {}}
+                   {:service "1"
+                    :attributes {:baz "2"}}])
+
+    (test-actions (a/rename-keys* nil
+                                  {:host [:attributes :host]
+                                   [:attributes :foo] :service
+                                   [:attributes :bar] [:attributes :baz]}
+                                  rec)
+                  state
+                  [{:host "foo" :service "bar" :environment "prod" :attributes {}}
+                   {:attributes {:foo "1"
+                                 :bar "2"}}]
+                  [{:service "bar"
+                    :environment "prod"
+                    :attributes {:host "foo"}}
+                   {:service "1"
+                    :attributes {:baz "2"}}])))
 
 (deftest keep-keys*-test
   (let [[rec state] (recorder)]
