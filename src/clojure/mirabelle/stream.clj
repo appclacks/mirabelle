@@ -197,10 +197,14 @@
       (reload this))
     this)
   (stop [_]
+    ;; TODO: find a better way to "wait" for streams completion
+    (Thread/sleep 3000)
     ;; stop executors first to let them finish ongoing tasks
     (doseq [[_ queue] (filter #(= :async-queue (:type %)) compiled-outputs)]
       (let [^Executor executor (:component queue)]
         (pool/shutdown executor)))
+    ;; TODO: find a better way to "wait" for streams completion
+    (Thread/sleep 2000)
     (doseq [[_ io] (remove #(= :async-queue (:type %)) compiled-outputs)]
       (component/stop io)))
   IStreamHandler
