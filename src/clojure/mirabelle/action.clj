@@ -155,7 +155,7 @@
 (defn increment
   "Increment the event :metric field.
 
-  ```
+  ```clojure
   (increment
     (index [:host]))
   ```
@@ -174,7 +174,7 @@
 (defn decrement
   "Decrement the event :metric field.
 
-  ```
+  ```clojure
   (decrement
     (index [:host]))
   ```
@@ -2306,7 +2306,17 @@
 
   In this example, the `:host` key will be renamed `:service` and the
   `:environment` key is renamed `:env`.
-  Existing values will be overrided."
+
+  You can also pass a list of keys as source or destination to rename nested attributes:
+
+  ```clojure
+  (rename-keys {[:attribute source] [:attribute: destination]
+                :state [:attribute :state]
+                [:attribute :host] :host})
+  ```
+
+  Existing values will be overrided.
+"
   [replacement & children]
   (mspec/valid-action? ::rename-keys [replacement])
   {:action :rename-keys
@@ -2987,6 +2997,21 @@
 
 
 (defn percentiles
+  "Computes quantiles based on a stream of events. Results are flushed periodically downstreal based on the action configuration
+
+   ```clojure
+   (a/percentiles {:percentiles [0.5 0.75 0.99]
+                   :duration 10
+                   :nb-significant-digits 3})
+   ```
+
+  `:percentiles` contains a list of quantiles to compute, `:duration` is the duration before sending the result downstream, `:nb-significant-digits` is the precision for the computation.
+
+  After the end of the period, the action will generate one event for each percentile that is computed, with the key `:quantile` set to the percentile value. In this example, it would generate 3 events with `:quantile` equal to `0.5`, `0.75` or `0.99`.
+
+  The action also supports optinal options: a `:delay` option to tolerate late events (in that case the current window will be flushed `:delay` seconds after its end), and `:highest-trackabe-value` and `:lowest-discernible-value` to configure the histogram computation.
+
+  See hdrhistogram documentation (http://hdrhistogram.org/) for more information about these settings."
   [config & children]
   (mspec/valid-action? ::percentiles [config])
   {:action :percentiles
@@ -3012,14 +3037,14 @@
 
 (defn to-string
   "Converts values associated to keys to string. nil values are converted to an empty string.
-  The parameter is a list of keys. It supports updating nested keys by passing a vector of keywords.
+  The parameter is a list of keys. It supports updating nested keys by passing a list of keywords.
 
-  ```
+  ```clojure
   (to-string [:service :state]
     (info))
   ```
 
-  ```
+  ```clojure
   (to-string [[:attributes :name] :quantile]
     (info))
   ```"
