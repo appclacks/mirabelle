@@ -9,7 +9,7 @@
 
 (defn shutdown
   "Graceful shutdown of an executor"
-  [^Executor executor]
+  [^ThreadPoolExecutor executor]
   (when executor
     (.shutdown executor)
     (.awaitTermination executor
