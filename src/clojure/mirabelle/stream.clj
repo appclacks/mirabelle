@@ -197,6 +197,7 @@
       (reload this))
     this)
   (stop [_]
+    (log/info {} "starting streams shutdown sequence")
     ;; TODO: find a better way to "wait" for streams completion
     (Thread/sleep 3000)
     ;; stop executors first to let them finish ongoing tasks
