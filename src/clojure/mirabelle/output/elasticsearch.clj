@@ -59,7 +59,6 @@
                                         ::service-token
                                         ::api-key]))
 
-
 (defn config->http-hosts
   [config]
   (->> config

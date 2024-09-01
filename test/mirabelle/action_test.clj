@@ -1526,7 +1526,7 @@
                      {:time 19 :metric 3/10}
                      {:time 24 :metric 1/2}]))))
 
-(deftest percentiles
+(deftest percentiles-test
   (let [[rec state] (recorder)]
     (test-actions (a/percentiles* nil
                                   {:percentiles [0 0.5 0.99 1]
@@ -1546,3 +1546,22 @@
                    {:time 12, :metric 200, :quantile 0.5}
                    {:time 12, :metric 800, :quantile 0.99}
                    {:time 12, :metric 800, :quantile 1}])))
+
+(deftest to-string-test
+  (let [[rec state] (recorder)]
+    (test-actions (a/to-string* nil
+                                [:foo :bar]
+                                rec)
+                  state
+                  [{}
+                   {:foo 1 :bar {:a {:b true}} :baz 3}]
+                  [{:foo "" :bar ""}
+                   {:foo "1" :bar "{:a {:b true}}" :baz 3}])
+    (test-actions (a/to-string* nil
+                                [:foo [:bar :a :b]]
+                                rec)
+                  state
+                  [{}
+                   {:foo 1 :bar {:a {:b true}} :baz 3}]
+                  [{:foo "" :bar {:a {:b ""}}}
+                   {:foo "1" :bar {:a {:b "true"}} :baz 3}])))

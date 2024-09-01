@@ -808,6 +808,8 @@
                           (a/rename-keys {:host :service})
                           (a/rename-keys {:host [:baz :bar]})
                           (a/rename-keys {[:attribute :foo] [:baz :bar]})
+                          (a/to-string [:a :b])
+                          (a/to-string [[:a :b] [:b :c]])
                           (a/with {:foo 1})
                           (a/where [:> :metric 10])
                           (a/where [:always-true]

@@ -2994,6 +2994,42 @@
    :params [config]
    :children children})
 
+(s/def ::to-string (s/coll-of (s/or :keyword keyword?
+                                    :coll (s/coll-of keyword?))))
+
+(defn to-string*
+  [_ keys & children]
+  (fn stream [event]
+    (call-rescue
+     (reduce
+      (fn [event k]
+        (if (keyword? k)
+          (update event k str)
+          (update-in event k str)))
+      event
+      keys)
+     children)))
+
+(defn to-string
+  "Converts values associated to keys to string. nil values are converted to an empty string.
+  The parameter is a list of keys. It supports updating nested keys by passing a vector of keywords.
+
+  ```
+  (to-string [:service :state]
+    (info))
+  ```
+
+  ```
+  (to-string [[:attributes :name] :quantile]
+    (info))
+  ```"
+  [keys & children]
+  (mspec/valid-action? ::to-string keys)
+  {:action :to-string
+   :description {:message (format "Convert to string the values associated to keys %s" keys)}
+   :params [keys]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :sum aggregation*
@@ -3067,6 +3103,7 @@
    :test-action test-action*
    :throttle throttle*
    :to-base64 to-base64*
+   :to-string to-string*
    :top aggregation*
    :under under*
    :untag untag*
