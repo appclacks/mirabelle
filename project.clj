@@ -7,6 +7,7 @@
                  [com.boundary/high-scale-lib "1.0.6"]
                  [com.google.protobuf/protobuf-java "3.22.0"]
                  [com.google.protobuf/protobuf-java-util "3.22.0"]
+                 [com.taoensso/nippy "v3.4.2"]
                  [org.hdrhistogram/HdrHistogram "2.2.2"]
                  [com.taoensso/nippy "3.4.2"]
                  [io.netty/netty-all "4.1.89.Final"]
@@ -20,6 +21,7 @@
                  [org.apache.kafka/kafka-clients "3.4.0"]
                  [org.clj-commons/byte-streams "0.3.2"]
                  [ch.qos.logback/logback-classic "1.2.11"]
+                 [net.openhft/chronicle-queue "5.26ea6"]
                  [org.clojure/clojure "1.11.3"]
                  [org.clojure/spec.alpha "0.5.238"]
                  [org.elasticsearch.client/elasticsearch-rest-client "8.14.3"]
@@ -35,12 +37,21 @@
           :metadata   {:doc/format :markdown}}
   :profiles {:dev {:dependencies [[pjstadig/humane-test-output "0.11.0"]
                                   [org.clojure/tools.namespace "1.4.1"]
-                                  [org.clojure/data.fressian "1.0.0"]
                                   [com.clojure-goes-fast/clj-memory-meter "0.2.2"]]
                    :plugins [[lein-ancient "0.6.15"]
                              [lein-environ "1.1.0"]]
                    :resource-paths ["resources" "test/resources" "gen-resources"]
-                   :jvm-opts ["-Djdk.attach.allowAttachSelf"]
+                   :jvm-opts ["-Djdk.attach.allowAttachSelf"
+                              "--add-exports=java.base/jdk.internal.util=ALL-UNNAMED"
+                              "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
+                              "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
+                              "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED"
+                              "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED"
+                              "--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED"
+                              "--add-opens=java.base/java.lang=ALL-UNNAMED"
+                              "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
+                              "--add-opens=java.base/java.io=ALL-UNNAMED"
+                              "--add-opens=java.base/java.util=ALL-UNNAMED"]
                    :repl-options {:init-ns user}
                    :env {:mirabelle-configuration "dev/resources/config.edn"}
                    :injections [(require 'pjstadig.humane-test-output)
