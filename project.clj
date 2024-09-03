@@ -17,6 +17,7 @@
                  [io.netty/netty-transport "4.1.89.Final"]
                  [io.netty/netty-resolver "4.1.89.Final"]
                  [fr.mcorbin/corbihttp "0.35.0"]
+                 [org.rocksdb/rocksdbjni "6.6.4"]
                  [org.apache.kafka/kafka-clients "3.4.0"]
                  [org.clj-commons/byte-streams "0.3.2"]
                  [ch.qos.logback/logback-classic "1.2.11"]
