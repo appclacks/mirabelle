@@ -8,6 +8,7 @@
             [less.awful.ssl :as less-ssl]
             [mirabelle.b64 :as b64]
             [mirabelle.config :as config]
+            [mirabelle.event :as e]
             [mirabelle.io :as io]
             [mirabelle.spec :as mspec]
             [mirabelle.time :as time])
@@ -159,7 +160,7 @@
                                        (log/error
                                         {}
                                         e
-                                        "Elasticsearch error"))))
+                                        "Elasticsearch client error"))))
           (assoc-in [:config :default-index-formatter]
                     (DateTimeFormatter/ofPattern (:default-index-pattern config))))))
   (stop [this]
@@ -168,8 +169,9 @@
     (assoc this :client nil :response-listener nil))
   io/Output
   (inject! [_ events]
-    (let [^Request request (Request. "POST" "/_bulk")]
-      (.setEntity request
-                  (NStringEntity. ^String (format-events config events)
-                                  ^ContentType ContentType/APPLICATION_JSON))
-      (.performRequestAsync client request response-listener))))
+    (let [events (e/sequential-events events)]
+      (let [^Request request (Request. "POST" "/_bulk")]
+        (.setEntity request
+                    (NStringEntity. ^String (format-events config events)
+                                    ^ContentType ContentType/APPLICATION_JSON))
+        (.performRequestAsync client request response-listener)))))

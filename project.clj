@@ -17,6 +17,7 @@
                  [io.netty/netty-transport "4.1.89.Final"]
                  [io.netty/netty-resolver "4.1.89.Final"]
                  [fr.mcorbin/corbihttp "0.35.0"]
+                 [org.apache.httpcomponents.client5/httpclient5 "5.3.1"]
                  [org.apache.kafka/kafka-clients "3.4.0"]
                  [org.clj-commons/byte-streams "0.3.2"]
                  [ch.qos.logback/logback-classic "1.2.11"]
@@ -45,4 +46,6 @@
                    :env {:mirabelle-configuration "dev/resources/config.edn"}
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]}
+             :test-env {:env {:mirabelle-configuration "dev/resources/config-test.edn"}}
+             :test [:dev :test-env]
              :uberjar {:aot :all}})

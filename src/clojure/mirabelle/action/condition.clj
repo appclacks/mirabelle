@@ -11,6 +11,7 @@
    :< <
    :<= <=
    := =
+   :true (constantly true)
    :always-true (constantly true)
    :contains (fn [field value]
                (some #(= value %) field))
@@ -36,6 +37,9 @@
      (every? identity (map #(valid-condition? %) (rest condition)))
 
      (= :always-true (first condition))
+     true
+
+     (= :true (first condition))
      true
 
      :else
