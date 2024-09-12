@@ -10,6 +10,8 @@
           :actions {:custom mirabelle.action/where*}}
  :outputs {:write-file {:config {:path "/tmp/file"}
                         :type :file}
+           :prometheus {:config {:url "http://localhost:9090/api/v1/write"}
+                        :type :prometheus}
            :foo-custom {:builder mirabelle.output.file/map->File
                         :type :custom
                         :config {:path "/tmp/file2"}}}

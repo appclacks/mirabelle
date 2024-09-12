@@ -2,6 +2,7 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
             [clojure.test :refer :all]
+            [cheshire.core :as json]
             [com.stuartsierra.component :as component]
             [corbihttp.metric :as metric]
             [mirabelle.action :as a]
@@ -247,9 +248,9 @@
       (entrypoint [{:state "critical" :time 1 :tags ["ok"]}])
       (entrypoint {:state "critical" :time 2})
       (let [result (slurp file)]
-        (is (= ["{:state \"critical\", :time 1}"
-                "{:state \"critical\", :time 1, :tags [\"ok\"]}"
-                "{:state \"critical\", :time 2}"]
+        (is (= [(json/generate-string {:state "critical", :time 1})
+                (json/generate-string {:state "critical", :time 1, :tags ["ok"]})
+                (json/generate-string {:state "critical", :time 2})]
                (string/split result #"\n"))))
       (io/delete-file file)))
   (testing "test mode"
