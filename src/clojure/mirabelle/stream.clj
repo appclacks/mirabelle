@@ -14,6 +14,7 @@
             [mirabelle.output.elasticsearch :as elasticsearch]
             [mirabelle.output.file :as io-file]
             [mirabelle.output.pagerduty :as pagerduty]
+            [mirabelle.output.prometheus :as prometheus]
             [mirabelle.pool :as pool])
   (:import [io.micrometer.core.instrument Timer Timer$Sample]
            [io.micrometer.prometheusmetrics PrometheusMeterRegistry]
@@ -102,6 +103,12 @@
              :component
              (component/start (elasticsearch/map->Elasticsearch
                                {:config (:config output-config)})))
+
+      (= :prometheus t)
+      (assoc output-config
+             :component
+             (component/start (prometheus/map->Prometheus
+                               (:config output-config))))
 
       :else
       (throw (ex/ex-incorrect

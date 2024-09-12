@@ -17,14 +17,6 @@
     (action event))
   (is (= expected @state)))
 
-(deftest keep-non-discarded-events-test
-  (is (nil? (a/keep-non-discarded-events {:tags ["mirabelle/discard"]})))
-  (is (= {:tags ["foo"]} (a/keep-non-discarded-events {:tags ["foo"]})))
-  (is (= [{:tags ["foo"]}] (a/keep-non-discarded-events [{:tags ["foo"]}])))
-  (is (nil? (a/keep-non-discarded-events [{:tags ["mirabelle/discard"]}])))
-  (is (= [{:tags ["ok"]}]
-         (a/keep-non-discarded-events [{:tags ["mirabelle/discard"]} {:tags ["ok"]}]))))
-
 (deftest where*-test
   (let [[rec state] (recorder)]
     (test-actions (a/where* nil [:pos? :metric] rec)
@@ -852,6 +844,13 @@
                    {:host "bar"
                     :metric 2}])
     (test-actions (a/sdissoc* nil
+                              [[:attributes :x-client]]
+                              rec)
+                  state
+                  [{:attributes {:x-client 1}
+                    :metric 1}]
+                  [{:metric 1}])
+    (test-actions (a/sdissoc* nil
                               [:foo :host]
                               rec)
                   state
@@ -1222,8 +1221,8 @@
                                 rec)
                   state
                   [{:a 1 :host "foo" :foo {:bar {:baz "1"
-                                            :toto "2"}
-                                      :invalid true}}]
+                                                 :toto "2"}
+                                           :invalid true}}]
                   [{:a 1 :foo {:bar {:baz "1"}}}])))
 
 (deftest include-test
@@ -1565,3 +1564,75 @@
                    {:foo 1 :bar {:a {:b true}} :baz 3}]
                   [{:foo "" :bar {:a {:b ""}}}
                    {:foo "1" :bar {:a {:b "true"}} :baz 3}])))
+
+(deftest ratio-test
+  (let [[rec state] (recorder)]
+    (test-actions (a/aggregation* nil
+                                  {:duration 10 :aggr-fn :ratio :delay 0
+                                   :conditions [[:= :state "error"] [:true]]}
+                                  rec)
+                  state
+                  [{:state "ok" :time 1}
+                   {:state "ok" :time 2}
+                   {:state "ok" :time 2}
+                   {:state "error" :time 3}
+                   {:state "ok" :time 4}
+                   {:state "ok" :time 12}
+                   {:state "error" :time 13}
+                   {:state "ok" :time 19}
+                   {:state "ok" :time 20}
+                   {:state "ok" :time 21}
+                   {:state "ok" :time 22}
+                   {:state "error" :time 23}
+                   {:state "error" :time 140}
+                   {:state "ok" :time 141}
+                   {:state "ok", :time 141}
+                   {:state "error", :time 142}
+                   {:state "ok" :time 1151}]
+                  [{:state "ok", :time 4, :metric (/ 1 5)}
+                   {:state "ok", :time 20, :metric (/ 1 4)}
+                   {:state "error", :time 23, :metric (/ 1 3)}
+                   {:state "error", :time 140, :metric 1}
+                   {:state "error", :time 142, :metric 1/3}]))
+  (let [[rec state] (recorder)]
+    (test-actions (a/aggregation* nil
+                                  {:duration 10 :aggr-fn :ratio :delay 0 :metric true
+                                   :conditions [[:= :state "error"] [:true]]}
+                                  rec)
+                  state
+                  [{:state "ok" :time 1 :metric 1}
+                   {:state "ok" :time 2 :metric 1}
+                   {:state "ok" :time 2 :metric 2}
+                   {:state "error" :time 3 :metric 10}
+                   {:state "ok" :time 4 :metric 3}
+                   {:state "error" :time 12 :metric 2}
+                   {:state "error" :time 13 :metric 1}
+                   {:state "ok" :time 19 :metric 10}
+                   {:state "ok" :time 20 :metric 3}
+                   {:state "ok" :time 21 :metric 2}
+                   {:state "ok" :time 22 :metric 10}
+                   {:state "error" :time 2 :metric 13}
+                   ]
+                  [{:state "ok", :time 4, :metric 10/17}
+                   {:state "ok", :time 20, :metric 3/16}]))
+    (let [[rec state] (recorder)]
+    (test-actions (a/aggregation* nil
+                                  {:duration 10 :aggr-fn :ratio :delay 0
+                                   :conditions [[:= :state "error"] [:= :state "warn"]]}
+                                  rec)
+                  state
+                  [{:state "error" :time 1 :metric 1}
+                   {:state "error" :time 2 :metric 1}
+                   {:state "ok" :time 2 :metric 2}
+                   {:state "error" :time 3 :metric 10}
+                   {:state "ok" :time 4 :metric 3}
+                   {:state "error" :time 12 :metric 2}
+                   {:state "error" :time 13 :metric 1}
+                   {:state "error" :time 19 :metric 10}
+                   {:state "ok" :time 20 :metric 3}
+                   {:state "ok" :time 21 :metric 2}
+                   {:state "ok" :time 22 :metric 10}
+                   {:state "error" :time 2 :metric 13}
+                   ]
+                  [{:state "ok", :time 4, :metric 0}
+                   {:state "ok", :time 20, :metric 0}])))

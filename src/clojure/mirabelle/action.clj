@@ -69,23 +69,6 @@
   (doseq [child children]
     (child event)))
 
-(defn discard-fn
-  [e]
-  (some #(= "mirabelle/discard" %) (:tags e)))
-
-(defn keep-non-discarded-events
-  "Takes an event or a list of events. Returns an event (or a list of events
-  depending of the input) with all events tagged \"mirabelle/discard\" filtered.
-  Returns nil if all events are filtered."
-  [events]
-  (if (sequential? events)
-    (let [result (remove discard-fn
-                         events)]
-      (when-not (empty? result)
-        result))
-    (when-not (discard-fn events)
-      events)))
-
 (defn where*
   [_ conditions & children]
   (let [condition-fn (cd/compile-conditions conditions)]
@@ -189,11 +172,10 @@
   [source-stream level]
   (let [meta {:stream (name source-stream)}]
     (fn stream [event]
-      (when-let [event (keep-non-discarded-events event)]
-        (condp = level
-          :debug (log/debug meta (json/generate-string event))
-          :info (log/info meta (json/generate-string event))
-          :error (log/error meta (json/generate-string event)))))))
+      (condp = level
+        :debug (log/debug meta (json/generate-string event))
+        :info (log/info meta (json/generate-string event))
+        :error (log/error meta (json/generate-string event))))))
 
 (defn debug*
   [ctx]
@@ -746,8 +728,7 @@
     (fn stream [_] nil)
     (if-let [output-component (get-in context [:outputs output-name :component])]
       (fn stream [event]
-        (when-let [events (keep-non-discarded-events event)]
-          (io/inject! output-component (e/sequential-events events))))
+        (io/inject! output-component event))
       (throw (ex/ex-incorrect (format "Output %s not found"
                                       output-name))))))
 
@@ -2116,8 +2097,7 @@
   (let [pubsub (:pubsub context)]
     (fn stream [event]
       (when-not (:test-mode? context)
-        (when-let [event (keep-non-discarded-events event)]
-          (pubsub/publish! pubsub channel event))))))
+        (pubsub/publish! pubsub channel event)))))
 
 (s/def ::publish! (s/cat :channel keyword?))
 
@@ -2408,47 +2388,76 @@
                profile (assoc :profile profile)
                (:variables config) (assoc :variables (:variables config))))))))
 
+(defn ratio-state-update
+  [state event state-fn cond1 cond2]
+  (cond-> state
+    (cond1 event) (state-fn event :first-cond)
+    (cond2 event) (state-fn event :last-cond)))
+
 (def keyword->aggr-fn
-  {:max (fn [state event]
-          (if state
-            (if (> (:metric state) (:metric event))
-              state
-              event)
-            event))
-   :ssort (fn [state event]
+  {:max (fn [config]
+          (fn [state event]
             (if state
-              (conj state event)
-              [event]))
-   :rate (fn [state event]
-           (if state
-             (-> (update state :count inc)
-                 (assoc :event (e/most-recent-event event (:event state))))
-             {:count 1
-              :event event}))
-   :min (fn [state event]
+              (if (> (:metric state) (:metric event))
+                state
+                event)
+              event)))
+   :ssort (fn [config]
+            (fn [state event]
+              (if state
+                (conj state event)
+                [event])))
+   :rate (fn [config]
+           (fn [state event]
+             (if state
+               (-> (update state :count inc)
+                   (assoc :event (e/most-recent-event event (:event state))))
+               {:count 1
+                :event event})))
+   :min (fn [config]
+          (fn [state event]
+            (if state
+              (if (< (:metric state) (:metric event))
+                state
+                event)
+              event)))
+   :mean (fn [config]
+           (fn [state event]
+             (if state
+               (-> (update state :sum + (:metric event 0))
+                   (update :count inc)
+                   (assoc :event (e/most-recent-event event (:event state))))
+               {:sum (:metric event 0)
+                :count 1
+                :event event})))
+   :fixed-time-window (fn [config]
+                        (fn [state event]
+                          (if state
+                            (conj state event)
+                            [event])))
+   :ratio (fn [{:keys [conditions metric]}]
+            (let [[cond1 cond2] (map cd/compile-conditions conditions)
+                  state-fn (if metric
+                             (fn [state event k]
+                               (update state k + (:metric event 0)))
+                             (fn [state event k]
+                               (update state k inc)))]
+              (fn [state event]
+                (if state
+                  (-> (ratio-state-update state event state-fn cond1 cond2)
+                      (assoc :event (e/most-recent-event event (:event state))))
+                  (ratio-state-update {:first-cond 0 :last-cond 0 :event event}
+                                      event
+                                      state-fn
+                                      cond1
+                                      cond2)))))
+   :+ (fn [config]
+        (fn [state event]
           (if state
-            (if (< (:metric state) (:metric event))
-              state
-              event)
-            event))
-   :mean (fn [state event]
-           (if state
-             (-> (update state :sum + (:metric event 0))
-                 (update :count inc)
-                 (assoc :event (e/most-recent-event event (:event state))))
-             {:sum (:metric event 0)
-              :count 1
-              :event event}))
-   :fixed-time-window (fn [state event]
-                        (if state
-                          (conj state event)
-                          [event]))
-   :+ (fn [state event]
-        (if state
-          (if (> (:time event) (:time state))
-            (update event :metric + (:metric state))
-            (update state :metric + (:metric event)))
-          event))})
+            (if (> (:time event) (:time state))
+              (update event :metric + (:metric state))
+              (update state :metric + (:metric event)))
+            event)))})
 
 (def keyword->aggr-finalizer-fn
   {:ssort (fn [config windows]
@@ -2457,6 +2466,13 @@
                (fn [event] (get-in event (:field config)))
                (:field config))
              (flatten windows)))
+   :ratio (fn [config windows]
+            (map (fn [window]
+                   (assoc (:event window)
+                          :metric
+                          (if (zero? (:last-cond window))
+                            0
+                            (/ (:first-cond window) (:last-cond window))))) windows))
    :rate (fn [config windows]
            (map (fn [window]
                   (assoc (:event window) :metric (/ (:count window) (:duration config))))
@@ -2483,7 +2499,7 @@
         finalizer-fn (get keyword->aggr-finalizer-fn
                           (:aggr-fn config)
                           default-aggr-finalizer)
-        aggr-fn (get keyword->aggr-fn (:aggr-fn config))
+        aggr-fn ((get keyword->aggr-fn (:aggr-fn config)) config)
         state (atom {:start-time nil
                      :current-window nil
                      :current-time nil
@@ -3055,6 +3071,50 @@
    :params [keys]
    :children children})
 
+(s/def :ratio/metric boolean?)
+(s/def :ratio/conditions (s/tuple ::condition ::condition))
+
+(s/def ::ratio (s/cat :config (s/keys :req-un [::duration
+                                               :ratio/conditions]
+                                      :opt-un [::delay
+                                               :ratio/metric])))
+
+(defn ratio
+  "Computes the ratio for 2 conditions:
+
+  ```clojure
+  (ratio {:duration 30
+          :conditions [[:= :state \"error\"] [:true]]}
+    (info))
+  ```
+
+  In this example, the action will count the number of events matching each conditions (:state = \"error, and :true matching all events).
+
+  Every 30 seconds, an event will be send downstream with the :metric field set to the ratio between the count of events for the second condition and the count for the first one.
+  For example, if the action received 30 events in total during the interval, and with 5 with :state = \"error\", :metric will be equal to 5/30.
+
+  The latest event is used as a base to build the event that is sent downstream.
+
+  It also supports a :metric option. If set to true, the action will sum the :metric value of events matching conditions instead of counting them.
+
+  ```clojure
+  (ratio {:duration 30
+          :conditions [[:= :state \"error\"] [:true]]
+          :metric true}
+    (info))
+  ```
+
+  You can pass a `:delay` key to the configuration in order to tolerate late
+  events. In that case, events from previous windows will be flushed after this
+  delay."
+  [config & children]
+  (mspec/valid-action? ::ratio [config])
+  {:action :ratio
+   :description {:message (format "TODO %s"
+                                  (:duration config))}
+   :params [(assoc config :aggr-fn :ratio)]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :sum aggregation*
@@ -3109,6 +3169,7 @@
    :publish! publish!*
    :output! output!*
    :rate aggregation*
+   :ratio aggregation*
    :reaper reaper*
    :reinject! reinject!*
    :rename-keys rename-keys*

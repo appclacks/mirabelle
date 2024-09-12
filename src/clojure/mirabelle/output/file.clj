@@ -1,5 +1,7 @@
 (ns mirabelle.output.file
-  (:require [mirabelle.io :as io]
+  (:require [cheshire.core :as json]
+            [mirabelle.event :as e]
+            [mirabelle.io :as io]
             [mirabelle.time :as time])
   (:import java.time.format.DateTimeFormatter
            java.time.Instant
@@ -29,12 +31,20 @@
           (date-suffix-fn path event)
           path)))))
 
-(defrecord File [format-path-fn]
+(def json-fn #(str (json/generate-string %) "\n"))
+
+(defn gen-format-fn
+  [format]
+  (condp = format
+    :json json-fn
+    json-fn))
+
+(defrecord File [format-path-fn format-fn]
   io/Output
   (inject! [_ events]
-    (doseq [event events]
-      (spit (format-path-fn event) (str (pr-str event) "\n") :append true))))
+    (doseq [event (e/sequential-events events)]
+      (spit (format-path-fn event) (format-fn event) :append true))))
 
 (defn file-output
-  [{:keys [path fields-suffix date-suffix]}]
-  (File. (format-path path fields-suffix date-suffix)))
+  [{:keys [path fields-suffix date-suffix format]}]
+  (File. (format-path path fields-suffix date-suffix) (gen-format-fn format)))

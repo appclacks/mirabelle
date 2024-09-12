@@ -20,4 +20,4 @@ jobs:
         with:
           lein: latest
       - name: Run lein tests
-        run: lein test
+        run: lein with-profile test test

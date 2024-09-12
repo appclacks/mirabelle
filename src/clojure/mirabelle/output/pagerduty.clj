@@ -9,6 +9,7 @@
             [corbihttp.spec :as spec]
             [exoscale.cloak :as cloak]
             [exoscale.ex :as ex]
+            [mirabelle.event :as e]
             [mirabelle.io :as io]
             [mirabelle.spec :as mspec]
             [mirabelle.time :as time]))
@@ -100,7 +101,7 @@
   (stop [this] this)
   io/Output
   (inject! [this events]
-    (doseq [event events]
+    (doseq [event (e/sequential-events events)]
       (send-event this
                   (or (:pagerduty/action event)
                       (condp = (:state event)

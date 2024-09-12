@@ -244,10 +244,7 @@
                                 {:outputs {:file-example-output {:component output-component}}}
                                 stream)]
       (entrypoint {:state "critical" :time 1})
-      (entrypoint {:state "critical" :time 1 :tags ["mirabelle/discard"]})
-      (entrypoint [{:state "critical" :time 1 :tags ["mirabelle/discard"]}
-                   {:state "critical" :time 1 :tags ["mirabelle/discard"]}
-                   {:state "critical" :time 1 :tags ["ok"]}])
+      (entrypoint [{:state "critical" :time 1 :tags ["ok"]}])
       (entrypoint {:state "critical" :time 2})
       (let [result (slurp file)]
         (is (= ["{:state \"critical\", :time 1}"
@@ -723,6 +720,7 @@
                                                    :profile :prod})
                           (a/smax)
                           (a/smin)
+                          (a/ratio {:duration 30 :conditions [[:true] [:= :service "bar"]]})
                           (a/top {:duration 5 :delay 2})
                           (a/bottom {:duration 5})
                           (a/sum {:duration 5})
