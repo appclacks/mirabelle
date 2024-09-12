@@ -95,14 +95,14 @@
      :trace-id (byte-string->string (.getTraceId span))
      :span-id (byte-string->string (.getSpanId span))
      :state status-code
-     :status (.getCode status)
+     :status (.getCodeValue status)
      :description (.getMessage status)
      ;:trace-state (.getTraceState span)
      :parent-span-id (byte-string->string (.getParentSpanId span))
      :name (.getName span)
      :kind kind
      :span-kind (.getNumber (.getKind span))
-     :time (double (/ end-time 1000000000))
+     :time end-time
      :start-time start-time
      :end-time end-time
      :metric duration
