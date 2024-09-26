@@ -14,7 +14,8 @@
             [mirabelle.io :as io]
             [mirabelle.math :as math]
             [mirabelle.pubsub :as pubsub]
-            [mirabelle.spec :as mspec])
+            [mirabelle.spec :as mspec]
+            [mirabelle.time :as time])
   (:import java.util.concurrent.Executor
            org.HdrHistogram.Histogram
            org.HdrHistogram.Recorder))
@@ -31,6 +32,13 @@
 (s/def ::fields (s/coll-of (s/or :keyword keyword?
                                  :seq (s/coll-of keyword?))))
 (s/def ::count pos-int?)
+
+(defn duration->ns
+  "converts the :duration key to nanoseconds if it exists"
+  [config]
+  (cond-> config
+    (:duration config) (update :duration time/s->ns)
+    (:delay config) (update :delay time/s->ns)))
 
 (defn select-keys-nested
   [event keyseq]
@@ -523,7 +531,7 @@
                  (format "Keep events if :metric is greater than %d during %d seconds"
                          (:threshold config)
                          (:duration config))}
-   :params [[:> :metric (:threshold config)] (:duration config)]
+   :params [[:> :metric (:threshold config)] (time/s->ns (:duration config))]
    :children children})
 
 (s/def ::below-dt (s/cat :config (s/keys :req-un [::threshold ::duration])))
@@ -549,7 +557,7 @@
                  (format "Keep events if :metric is lower than %d during %d seconds"
                          (:threshold config)
                          (:duration config))}
-   :params [[:< :metric (:threshold config)] (:duration config)]
+   :params [[:< :metric (:threshold config)] (time/s->ns (:duration config))]
    :children children})
 
 (s/def ::between-dt (s/cat :config (s/keys :req-un [::high ::low ::duration])))
@@ -579,7 +587,7 @@
    :params [[:and
              [:> :metric (:low config)]
              [:< :metric (:high config)]]
-            (:duration config)]
+            (time/s->ns (:duration config))]
    :children children})
 
 (s/def ::outside-dt (s/cat :config (s/keys :req-un [::low ::high ::duration])))
@@ -610,7 +618,7 @@
    :params [[:or
              [:< :metric (:low config)]
              [:> :metric (:high config)]]
-            (:duration config)]
+            (time/s->ns (:duration config))]
    :children children})
 
 (s/def ::critical-dt (s/cat :config (s/keys :req-un [::duration])))
@@ -635,7 +643,7 @@
                  (format "Keep events if the state is critical for more than %d seconds"
                          (:duration config))}
    :params [[:= :state "critical"]
-            (:duration config)]
+            (time/s->ns (:duration config))]
    :children children})
 
 (defn critical*
@@ -852,7 +860,7 @@
                          (:duration config)
                          (pr-str (:fields config)))}
    :children children
-   :params [config]})
+   :params [(duration->ns config)]})
 
 (defn with*
   [_ fields & children]
@@ -1247,7 +1255,7 @@
    :description {:message (format "Let %d events pass at most every %d seconds"
                                   (:count config)
                                   (:duration config))}
-   :params [config]
+   :params [(duration->ns config)]
    :children children})
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
@@ -2475,7 +2483,10 @@
                             (/ (:first-cond window) (:last-cond window))))) windows))
    :rate (fn [config windows]
            (map (fn [window]
-                  (assoc (:event window) :metric (/ (:count window) (:duration config))))
+                  (assoc (:event window)
+                         :metric
+                         (/ (:count window)
+                            (time/ns->s (:duration config)))))
                 windows))
    :mean (fn [_ windows]
            (map (fn [window]
@@ -2490,8 +2501,8 @@
   [event start-time duration]
   (let [window (/ (- (:time event) start-time) duration)]
     (if (>= window 0)
-      (int window)
-      (dec (int window)))))
+      (long window)
+      (dec (long window)))))
 
 (defn aggregation*
   [_ {:keys [duration] :as config} & children]
@@ -2595,7 +2606,7 @@
   {:action :sum
    :description {:message (format "Sum the events field from the last %s seconds"
                                   (:duration config))}
-   :params [(assoc config :aggr-fn :+)]
+   :params [(duration->ns (assoc config :aggr-fn :+))]
    :children children})
 
 (defn top
@@ -2619,7 +2630,7 @@
   {:action :top
    :description {:message (format "Get the max event from the last %s seconds"
                                   (:duration config))}
-   :params [(assoc config :aggr-fn :max)]
+   :params [(duration->ns (assoc config :aggr-fn :max))]
    :children children})
 
 (defn bottom
@@ -2643,7 +2654,7 @@
   {:action :bottom
    :description {:message (format "Get the min event from the last %s seconds"
                                   (:duration config))}
-   :params [(assoc config :aggr-fn :min)]
+   :params [(duration->ns (assoc config :aggr-fn :min))]
    :children children})
 
 (defn mean
@@ -2667,7 +2678,7 @@
   {:action :mean
    :description {:message (format "Get the min of events from the last %s seconds"
                                   (:duration config))}
-   :params [(assoc config :aggr-fn :mean)]
+   :params [(duration->ns (assoc config :aggr-fn :mean))]
    :children children})
 
 (s/def ::fixed-time-window (s/cat :config
@@ -2699,7 +2710,7 @@
   {:action :fixed-time-window
    :description {:message (format "Build %d seconds fixed time windows"
                                   (:duration config))}
-   :params [(assoc config :aggr-fn :fixed-time-window)]
+   :params [(duration->ns (assoc config :aggr-fn :fixed-time-window))]
    :children children})
 
 (defn moving-time-window*
@@ -2744,7 +2755,7 @@
   {:action :moving-time-window
    :description {:message (format "Build sliding windows of %d seconds"
                                   (:duration config))}
-   :params [config]
+   :params [(duration->ns config)]
    :children children})
 
 (s/def ::ssort (s/cat :config (s/keys :req-un [::duration ::field]
@@ -2793,7 +2804,10 @@
    :description {:message (format "Sort events during %d seconds based on the field %s"
                                   (:duration config)
                                   (:field config))}
-   :params [(assoc config :aggr-fn :ssort :nested? (sequential? (:field config)))]
+   :params [(duration->ns
+             (assoc config
+                    :aggr-fn :ssort
+                    :nested? (sequential? (:field config))))]
    :children children})
 
 (defn coll-increase*
@@ -2945,7 +2959,7 @@
   (mspec/valid-action? ::rate [config])
   {:action :rate
    :description {:message (format "Computes the rate of received events (by counting them) and emits it every %d seconds" (::duration config))}
-   :params [(assoc config :aggr-fn :rate)]
+   :params [(duration->ns (assoc config :aggr-fn :rate))]
    :children children})
 
 (defn percentiles*
@@ -3032,7 +3046,7 @@
   (mspec/valid-action? ::percentiles [config])
   {:action :percentiles
    :description {:message (format "Computes the quantiles %s" (:percentiles config))}
-   :params [config]
+   :params [(duration->ns config)]
    :children children})
 
 (s/def ::to-string (s/coll-of (s/or :keyword keyword?
@@ -3112,7 +3126,7 @@
   {:action :ratio
    :description {:message (format "TODO %s"
                                   (:duration config))}
-   :params [(assoc config :aggr-fn :ratio)]
+   :params [(duration->ns (assoc config :aggr-fn :ratio))]
    :children children})
 
 (def action->fn

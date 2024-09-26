@@ -11,7 +11,22 @@
             [mirabelle.io :refer [Output]]
             [mirabelle.pool :as pool]
             [mirabelle.pubsub :as pubsub]
-            [mirabelle.stream :as stream]))
+            [mirabelle.stream :as stream]
+            [mirabelle.time :as time]))
+
+(defn entrypoint-ns
+  "Update a test entrypoint to convert all events times to ns"
+  [config]
+  (assoc config :entrypoint
+         (fn [event]
+           (if-let [t (:time event)]
+             ((:entrypoint config) (assoc event :time (time/s->ns t)))
+             ((:entrypoint config) event)))))
+
+(defn times-ns
+  "update events :time to nanoseconds"
+  [events]
+  (map #(update % :time time/s->ns) events))
 
 (deftest custom-action-test
   (testing "can compile with a custom action"
@@ -73,19 +88,19 @@
                 :description "foo"
                 :actions (a/above-dt {:threshold 5 :duration 10}
                                      (a/test-action recorder))}
-        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+        {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
     (entrypoint {:metric 12 :time 1})
     (is (= [] @recorder))
     (entrypoint {:metric 12 :time 2})
     (entrypoint {:metric 12 :time 10})
     (entrypoint {:metric 12 :time 12})
-    (is (= [{:metric 12 :time 12}] @recorder))
+    (is (= (times-ns [{:metric 12 :time 12}]) @recorder))
     (entrypoint {:metric 13 :time 14})
     (entrypoint {:metric 1 :time 15})
     (entrypoint {:metric 14 :time 20})
-    (is (= [{:metric 12 :time 12} {:metric 13 :time 14}] @recorder))
+    (is (= (times-ns [{:metric 12 :time 12} {:metric 13 :time 14}]) @recorder))
     (entrypoint {:metric 15 :time 31})
-    (is (= [{:metric 12 :time 12} {:metric 13 :time 14} {:metric 15 :time 31}]
+    (is (= (times-ns [{:metric 12 :time 12} {:metric 13 :time 14} {:metric 15 :time 31}])
            @recorder))))
 
 (deftest between-dt-test
@@ -94,19 +109,19 @@
                 :description "foo"
                 :actions (a/between-dt {:low 20 :high 30 :duration 10}
                                        (a/test-action recorder))}
-        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+        {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
     (entrypoint {:metric 21 :time 1})
     (is (= [] @recorder))
     (entrypoint {:metric 22 :time 2})
     (entrypoint {:metric 23 :time 10})
     (entrypoint {:metric 24 :time 12})
-    (is (= [{:metric 24 :time 12}] @recorder))
+    (is (= (times-ns [{:metric 24 :time 12}]) @recorder))
     (entrypoint {:metric 25 :time 14})
     (entrypoint {:metric 1 :time 15})
     (entrypoint {:metric 29 :time 20})
-    (is (= [{:metric 24 :time 12} {:metric 25 :time 14}] @recorder))
+    (is (= (times-ns [{:metric 24 :time 12} {:metric 25 :time 14}]) @recorder))
     (entrypoint {:metric 28 :time 31})
-    (is (= [{:metric 24 :time 12} {:metric 25 :time 14} {:metric 28 :time 31}]
+    (is (= (times-ns [{:metric 24 :time 12} {:metric 25 :time 14} {:metric 28 :time 31}])
            @recorder))))
 
 (deftest outside-dt-test
@@ -115,19 +130,19 @@
                 :description "foo"
                 :actions (a/outside-dt {:low 20 :high 30 :duration 10}
                                        (a/test-action recorder))}
-        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+        {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
     (entrypoint {:metric 1 :time 1})
     (is (= [] @recorder))
     (entrypoint {:metric 2 :time 2})
     (entrypoint {:metric 3 :time 10})
     (entrypoint {:metric 4 :time 12})
-    (is (= [{:metric 4 :time 12}] @recorder))
+    (is (= (times-ns [{:metric 4 :time 12}]) @recorder))
     (entrypoint {:metric 5 :time 14})
     (entrypoint {:metric 25 :time 15})
     (entrypoint {:metric 10 :time 20})
-    (is (= [{:metric 4 :time 12} {:metric 5 :time 14}] @recorder))
+    (is (= (times-ns [{:metric 4 :time 12} {:metric 5 :time 14}]) @recorder))
     (entrypoint {:metric 40 :time 31})
-    (is (= [{:metric 4 :time 12} {:metric 5 :time 14} {:metric 40 :time 31}]
+    (is (= (times-ns [{:metric 4 :time 12} {:metric 5 :time 14} {:metric 40 :time 31}])
            @recorder))))
 
 (deftest critical-dt-test
@@ -136,21 +151,21 @@
                 :description "foo"
                 :actions (a/critical-dt {:duration 10}
                                         (a/test-action recorder))}
-        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+        {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
     (entrypoint {:state "critical" :time 1})
     (is (= [] @recorder))
     (entrypoint {:state "critical" :time 2})
     (entrypoint {:state "critical" :time 10})
     (entrypoint {:state "critical" :time 12})
-    (is (= [{:state "critical" :time 12}] @recorder))
+    (is (= (times-ns [{:state "critical" :time 12}]) @recorder))
     (entrypoint {:state "critical" :time 14})
     (entrypoint {:state "ok" :time 15})
     (entrypoint {:state "critical" :time 20})
-    (is (= [{:state "critical" :time 12} {:state "critical" :time 14}] @recorder))
+    (is (= (times-ns [{:state "critical" :time 12} {:state "critical" :time 14}]) @recorder))
     (entrypoint {:state "critical" :time 31})
-    (is (= [{:state "critical" :time 12}
-            {:state "critical" :time 14}
-            {:state "critical" :time 31}]
+    (is (= (times-ns [{:state "critical" :time 12}
+                      {:state "critical" :time 14}
+                      {:state "critical" :time 31}])
            @recorder))))
 
 (deftest ddt-test
@@ -830,7 +845,7 @@
                 :description "foo"
                 :actions (a/sum {:duration 10}
                                 (a/test-action recorder))}
-        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+        {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
     (entrypoint {:time 0 :metric 10})
     (entrypoint {:time 7 :metric 1})
     (entrypoint {:time 11 :metric 3})
@@ -840,10 +855,10 @@
     (entrypoint {:time 23 :metric 4})
     (entrypoint {:time 60 :metric 1})
     (entrypoint {:time 71 :metric 1})
-    (is (= [{:time 7 :metric 11}
-            {:time 19 :metric 12}
-            {:time 23 :metric 6}
-            {:time 60 :metric 1}]
+    (is (= (times-ns [{:time 7 :metric 11}
+                      {:time 19 :metric 12}
+                      {:time 23 :metric 6}
+                      {:time 60 :metric 1}])
            @recorder))))
 
 (deftest mean-test
@@ -852,15 +867,15 @@
                 :description "foo"
                 :actions (a/mean {:duration 10}
                                  (a/test-action recorder))}
-        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+        {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
     (entrypoint {:time 0 :metric 10})
     (entrypoint {:time 7 :metric 1})
     (entrypoint {:time 11 :metric 4})
     (entrypoint {:time 14 :metric 19})
     (entrypoint {:time 17 :metric 2})
     (entrypoint {:time 22 :metric 3})
-    (is (= [{:time 7 :metric (/ 11 2)}
-            {:time 17 :metric (/ 25 3)}]
+    (is (= (times-ns [{:time 7 :metric (/ 11 2)}
+                      {:time 17 :metric (/ 25 3)}])
            @recorder))))
 
 (deftest top-test
@@ -870,7 +885,7 @@
                   :description "foo"
                   :actions (a/top {:duration 10}
                                   (a/test-action recorder))}
-          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+          {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
       (entrypoint {:time 11 :metric 3})
@@ -880,10 +895,10 @@
       (entrypoint {:time 23 :metric 4})
       (entrypoint {:time 60 :metric 1})
       (entrypoint {:time 71 :metric 1})
-      (is (= [{:time 0 :metric 10}
-              {:time 14 :metric 8}
-              {:time 23 :metric 4}
-              {:time 60 :metric 1}]
+      (is (= (times-ns [{:time 0 :metric 10}
+                        {:time 14 :metric 8}
+                        {:time 23 :metric 4}
+                        {:time 60 :metric 1}])
              @recorder))))
   (testing "with delay"
     (let [recorder (atom [])
@@ -891,7 +906,7 @@
                   :description "foo"
                   :actions (a/top {:duration 10 :delay 25}
                                   (a/test-action recorder))}
-          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+          {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
       (entrypoint {:time -10 :metric 1})
@@ -906,11 +921,11 @@
       (entrypoint {:time 12 :metric 20})
       (entrypoint {:time 60 :metric 1})
       (entrypoint {:time 71 :metric 1})
-      (is (= [{:time -11 :metric 4}
-              {:time 1 :metric 100}
-              {:time 12 :metric 20}
-              {:time 23 :metric 4}
-              {:time 35 :metric 10}]
+      (is (= (times-ns[{:time -11 :metric 4}
+                       {:time 1 :metric 100}
+                       {:time 12 :metric 20}
+                       {:time 23 :metric 4}
+                       {:time 35 :metric 10}])
              @recorder))))
   (testing "with delay 2"
     (let [recorder (atom [])
@@ -918,7 +933,7 @@
                   :description "foo"
                   :actions (a/top {:duration 10 :delay 25}
                                   (a/test-action recorder))}
-          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+          {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
       (entrypoint {:time -10 :metric 1})
@@ -933,11 +948,11 @@
       (entrypoint {:time 12 :metric 20})
       (entrypoint {:time 60 :metric 1})
       (entrypoint {:time 71 :metric 1})
-      (is (= [{:time -11 :metric 4}
-              {:time 0 :metric 10}
-              {:time 12 :metric 20}
-              {:time 23 :metric 4}
-              {:time 35 :metric 10}]
+      (is (= (times-ns [{:time -11 :metric 4}
+                        {:time 0 :metric 10}
+                        {:time 12 :metric 20}
+                        {:time 23 :metric 4}
+                        {:time 35 :metric 10}])
              @recorder)))))
 
 (deftest bottom-test
@@ -947,7 +962,7 @@
                   :description "foo"
                   :actions (a/bottom {:duration 10}
                                      (a/test-action recorder))}
-          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+          {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
       (entrypoint {:time 11 :metric 3})
@@ -957,10 +972,10 @@
       (entrypoint {:time 23 :metric 4})
       (entrypoint {:time 60 :metric 1})
       (entrypoint {:time 71 :metric 1})
-      (is (= [{:time 7 :metric 1}
-              {:time 14 :metric -10}
-              {:time 20 :metric 2}
-              {:time 60 :metric 1}]
+      (is (= (times-ns [{:time 7 :metric 1}
+                        {:time 14 :metric -10}
+                        {:time 20 :metric 2}
+                        {:time 60 :metric 1}])
              @recorder))))
   (testing "with delay"
     (let [recorder (atom [])
@@ -968,7 +983,7 @@
                   :description "foo"
                   :actions (a/bottom {:duration 10 :delay 25}
                                      (a/test-action recorder))}
-          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+          {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
       (entrypoint {:time -10 :metric 1})
@@ -983,11 +998,11 @@
       (entrypoint {:time 12 :metric 20})
       (entrypoint {:time 60 :metric 1})
       (entrypoint {:time 71 :metric 1})
-      (is (= [{:time -11 :metric -100}
-              {:time 1 :metric -200}
-              {:time 19 :metric 1}
-              {:time 25 :metric 2}
-              {:time 35 :metric 10}]
+      (is (= (times-ns [{:time -11 :metric -100}
+                        {:time 1 :metric -200}
+                        {:time 19 :metric 1}
+                        {:time 25 :metric 2}
+                        {:time 35 :metric 10}])
              @recorder)))))
 
 (deftest fixed-time-window-test
@@ -997,7 +1012,7 @@
                   :description "foo"
                   :actions (a/fixed-time-window {:duration 10 :delay 5}
                                                 (a/test-action recorder))}
-          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+          {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
       (entrypoint {:time 19 :metric 1})
@@ -1006,10 +1021,10 @@
       (entrypoint {:time 23 :metric 4})
       (entrypoint {:time 60 :metric 1})
       (entrypoint {:time 76 :metric 1})
-      (is (= [[{:time 0 :metric 10} {:time 7 :metric 1} ]
-              [{:time 19 :metric 1} {:time 14 :metric -10}]
-              [{:time 20 :metric 2} {:time 23 :metric 4}]
-              [{:time 60 :metric 1}]]
+      (is (= [(times-ns [{:time 0 :metric 10} {:time 7 :metric 1} ])
+              (times-ns [{:time 19 :metric 1} {:time 14 :metric -10}])
+              (times-ns [{:time 20 :metric 2} {:time 23 :metric 4}])
+              (times-ns [{:time 60 :metric 1}])]
              @recorder)))))
 
 (deftest smax-test
@@ -1048,7 +1063,6 @@
             {:time 12 :metric -1}]
            @recorder))))
 
-
 (deftest rate-test
   (testing "no delay"
     (let [recorder (atom [])
@@ -1056,7 +1070,7 @@
                   :description "foo"
                   :actions (a/rate {:duration 10}
                                    (a/test-action recorder))}
-          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+          {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
       (entrypoint {:time 11 :metric 3})
@@ -1066,10 +1080,10 @@
       (entrypoint {:time 23 :metric 4})
       (entrypoint {:time 60 :metric 1})
       (entrypoint {:time 71 :metric 1})
-      (is (= [{:time 7 :metric 2/10}
-              {:time 19 :metric 3/10}
-              {:time 23 :metric 2/10}
-              {:time 60 :metric 1/10}]
+      (is (= (times-ns [{:time 7 :metric (/ 2 10)}
+                        {:time 19 :metric (/ 3 10)}
+                        {:time 23 :metric (/ 2 10)}
+                        {:time 60 :metric (/ 1 10)}])
              @recorder))))
   (testing "with delay"
     (let [recorder (atom [])
@@ -1077,7 +1091,7 @@
                   :description "foo"
                   :actions (a/rate {:duration 10 :delay 25}
                                    (a/test-action recorder))}
-          {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+          {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
       (entrypoint {:time 0 :metric 10})
       (entrypoint {:time 7 :metric 1})
       (entrypoint {:time 11 :metric 3})
@@ -1090,10 +1104,10 @@
       (entrypoint {:time 12 :metric 20})
       (entrypoint {:time 60 :metric 1})
       (entrypoint {:time 71 :metric 1})
-      (is (= [{:time 7 :metric 3/10}
-              {:time 19 :metric 4/10}
-              {:time 25 :metric 2/10}
-              {:time 35 :metric 1/10}]
+      (is (= (times-ns [{:time 7 :metric (/ 3 10)}
+                        {:time 19 :metric (/ 4 10)}
+                        {:time 25 :metric (/ 2 10)}
+                        {:time 35 :metric (/ 1 10)}])
              @recorder)))))
 
 (deftest extract-test
