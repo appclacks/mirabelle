@@ -58,15 +58,14 @@
                                 :index (component/start (index/map->Index {}))}))
               ;; the context source stream is not important here
               ;; because we only want the tap
-              tap (:tap (stream/context stream-handler :test))]
-          (if-let [target (:target test-config)]
-            (do (stream/add-stream stream-handler
-                                   target
-                                   (get streams target))
-                (doseq [event (:input test-config)]
-                  (stream/push! stream-handler event target)))
-            (doseq [event (:input test-config)]
-              (stream/push! stream-handler event :default)))
+              tap (:tap (stream/context stream-handler :test))
+              target (:target test-config)]
+          (when target
+            (stream/add-stream stream-handler
+                               target
+                               (get streams target)))
+          (doseq [event (:input test-config)]
+            (stream/push! stream-handler event (or target :default)))
           (doseq [[tap-name expected] (:tap-results test-config)]
             (when-not (= expected (get @tap tap-name))
               (swap! result
