@@ -621,28 +621,29 @@
             (time/s->ns (:duration config))]
    :children children})
 
-(s/def ::critical-dt (s/cat :config (s/keys :req-un [::duration])))
+(s/def ::cond-dt (s/cat :config
+                            (s/keys :req-un [::duration
+                                             ::condition])))
 
-(defn critical-dt
+(defn cond-dt
   "Takes a time period in seconds `duration`.
-  If all events received during at least the period `duration` have `:state` critical,
-  new critical events received after the `duration` period will be passed on until
-  an invalid event arrives.
+  If all events received during at least the period `duration` matches the condition, events will be passed on until
 
   ```clojure
-  (critical-dt {:duration 10}
+  (cond-dt {:duration 10 :condition [:= :state \"error\"]}
     (debug))
   ```
 
-  In this example, if the events `:state` are \"critical\" for more than 10 seconds, events are passed downstream.
+  In this example, if the events `:state` are \"error\" for more than 10 seconds, events are passed downstream.
   "
   [config & children]
-  (mspec/valid-action? ::critical-dt [config])
-  {:action :critical-dt
+  (mspec/valid-action? ::cond-dt [config])
+  {:action :cond-dt
    :description {:message
-                 (format "Keep events if the state is critical for more than %d seconds"
+                 (format "Keep events if they are matching the provided condition %s for %d seconds"
+                         (str (:condition config))
                          (:duration config))}
-   :params [[:= :state "critical"]
+   :params [(:condition config)
             (time/s->ns (:duration config))]
    :children children})
 
@@ -3152,7 +3153,7 @@
    :coll-top coll-top*
    :coll-where coll-where*
    :critical critical*
-   :critical-dt cond-dt*
+   :cond-dt cond-dt*
    :debug debug*
    :default default*
    :decrement decrement*

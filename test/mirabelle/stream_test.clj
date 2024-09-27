@@ -145,12 +145,12 @@
     (is (= (times-ns [{:metric 4 :time 12} {:metric 5 :time 14} {:metric 40 :time 31}])
            @recorder))))
 
-(deftest critical-dt-test
+(deftest cond-dt-test
   (let [recorder (atom [])
         stream {:name "my-stream"
                 :description "foo"
-                :actions (a/critical-dt {:duration 10}
-                                        (a/test-action recorder))}
+                :actions (a/cond-dt {:duration 10 :condition [:= :state "critical"]}
+                                    (a/test-action recorder))}
         {:keys [entrypoint]} (entrypoint-ns (stream/compile-stream! {} stream))]
     (entrypoint {:state "critical" :time 1})
     (is (= [] @recorder))
@@ -773,7 +773,7 @@
                           (a/split
                            [:> :metric 10] (a/critical))
                           (a/critical)
-                          (a/critical-dt {:duration 10})
+                          (a/cond-dt {:duration 10 :condition [:= :state "critical"]})
                           (a/debug)
                           (a/info)
                           (a/error)
