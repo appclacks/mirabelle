@@ -7,8 +7,8 @@
                  {:kind "client"
                   :time 13e9}]
          :target :test
-         :tap-results {:result [{:metric 3/10
-                                 :time 4e9
-                                 :kind "client"
-                                 :name "RATE"
-                                 }]}}}
+         :taps {:result [{:metric 3/10
+                         :time 4e9
+                         :kind "client"
+                         :name "RATE"
+                         }]}}}

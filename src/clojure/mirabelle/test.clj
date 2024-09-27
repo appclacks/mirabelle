@@ -63,7 +63,7 @@
                                (get streams target)))
           (doseq [event (:input test-config)]
             (stream/push! stream-handler event (or target :default)))
-          (doseq [[tap-name expected] (:tap-results test-config)]
+          (doseq [[tap-name expected] (:taps test-config)]
             (when-not (= expected (get @tap tap-name))
               (swap! result
                      conj
