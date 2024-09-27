@@ -647,48 +647,6 @@
             (time/s->ns (:duration config))]
    :children children})
 
-(defn critical*
-  [_ & children]
-  (fn stream [event]
-    (when (e/critical? event)
-      (call-rescue event children))))
-
-(defn critical
-  "Keep all events in state critical.
-
-  ```clojure
-  (critical
-    (error))
-  ```
-
-  In this example, all events with `:state` \"critical\" will be logged.
-  "
-  [& children]
-  {:action :critical
-   :description {:message "Keep critical events"}
-   :children children})
-
-(defn warning*
-  [_ & children]
-  (fn stream [event]
-    (when (e/warning? event)
-      (call-rescue event children))))
-
-(defn warning
-  "Keep all events in state warning.
-
-  ```clojure
-  (warning
-    (warning))
-  ```
-
-  In this example, all events with `:state` \"warning\" will be logged.
-  "
-  [& children]
-  {:action :warning
-   :description {:message "Keep warning events"}
-   :children children})
-
 (defn default*
   [_ field value & children]
   (let [get-fn (if (sequential? field)
@@ -3152,7 +3110,6 @@
    :coll-sum coll-sum*
    :coll-top coll-top*
    :coll-where coll-where*
-   :critical critical*
    :cond-dt cond-dt*
    :debug debug*
    :default default*
@@ -3208,7 +3165,6 @@
    :top aggregation*
    :under under*
    :untag untag*
-   :warning warning*
    :where where*
    :with with*})
 

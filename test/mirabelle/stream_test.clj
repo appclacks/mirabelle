@@ -761,7 +761,6 @@
                           (a/by {:fields [:host :service]})
                           (a/sdissoc [:host :service])
                           (a/throttle {:count 1 :duration 10})
-                          (a/warning)
                           (a/ewma-timeless 1)
                           (a/over 1)
                           (a/under 1)
@@ -771,8 +770,7 @@
                            (a/by {:fields [:host]}))
                           (a/fixed-time-window {:duration 5})
                           (a/split
-                           [:> :metric 10] (a/critical))
-                          (a/critical)
+                           [:> :metric 10] (a/debug))
                           (a/cond-dt {:duration 10 :condition [:= :state "critical"]})
                           (a/debug)
                           (a/info)
@@ -827,7 +825,7 @@
                           (a/with {:foo 1})
                           (a/where [:> :metric 10])
                           (a/where [:always-true]
-                                   (a/critical))
+                                   (a/debug))
                           (a/where [:and
                                     [:< :metric 10]
                                     [:> :metric 1]]))}
