@@ -10,7 +10,6 @@
             [exoscale.ex :as ex]
             [mirabelle.action :as action]
             mirabelle.config
-            [mirabelle.index :as index]
             [mirabelle.output.elasticsearch :as elasticsearch]
             [mirabelle.output.file :as io-file]
             [mirabelle.output.pagerduty :as pagerduty]
@@ -185,7 +184,6 @@
                         ^PrometheusMeterRegistry registry
                         tap
                         test-mode?
-                        index
                         pubsub
                         ]
   component/Lifecycle
@@ -241,7 +239,6 @@
                                       (mapv (fn [[k v]]
                                               [k (compile-stream!
                                                   (assoc (context this k)
-                                                         :index (component/start (index/map->Index {}))
                                                          :timer (metric/get-timer! registry "stream-duration" {:name k})
                                                          :default (boolean (:default v)))
                                                   (update v :default boolean))]))
@@ -290,8 +287,6 @@
       (locking lock
         (let [compiled-stream (compile-stream!
                                (assoc (context this stream-name)
-                                      :index
-                                      (component/start (index/map->Index {}))
                                       :timer
                                       (metric/get-timer! registry "stream-duration" {:name stream-name}))
                                (update stream-configuration :default boolean))
@@ -333,7 +328,6 @@
            queue
            registry
            test-mode?
-           index
            pubsub]
     :or {streams-configurations {}
          outputs-configurations {}
@@ -354,5 +348,4 @@
                    registry
                    (atom {})
                    test-mode?
-                   index
                    pubsub))

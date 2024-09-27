@@ -10,7 +10,6 @@
             [mirabelle.action.condition :as cd]
             [mirabelle.b64 :as b64]
             [mirabelle.event :as e]
-            [mirabelle.index :as index]
             [mirabelle.io :as io]
             [mirabelle.math :as math]
             [mirabelle.pubsub :as pubsub]
@@ -148,7 +147,7 @@
 
   ```clojure
   (increment
-    (index [:host]))
+    (debug))
   ```
   "
   [& children]
@@ -167,7 +166,7 @@
 
   ```clojure
   (decrement
-    (index [:host]))
+    (debug))
   ```
   "
   [& children]
@@ -986,13 +985,13 @@
   "Removes a tag, or set of tags, from events which flow through.
 
   ```clojure
-  (untag \"foo\" index)
+  (untag \"foo\" (debug))
   ```
 
   This example removes the tag \"foo\" from events.
 
   ```clojure
-  (untag [\"foo\" \"bar\"] index)
+  (untag [\"foo\" \"bar\"] (debug))
   ```
 
   This example removes the tags \"foo\" and \"bar\" from events"
@@ -1463,39 +1462,6 @@
    :params [conditions]
    :children children})
 
-(defn index*
-  [context labels]
-  (let [i (:index context)
-        channel (index/channel (:source-stream context))
-        default-channel (index/channel :default)
-        pubsub (:pubsub context)]
-    (fn stream [event]
-      (when-let [t (:time event)]
-        (index/new-time? i t))
-      (when-not (:test-mode? context)
-        (pubsub/publish! pubsub channel event)
-        (when (:default context)
-          (pubsub/publish! pubsub default-channel event)))
-      (index/insert i event labels))))
-
-(s/def ::index (s/cat :labels (s/coll-of keyword?)))
-
-(defn index
-  "Insert events into the index.
-  Events are indexed using the keys passed as parameter.
-
-  ```clojure
-  (index [:host :service])
-  ```
-
-  This example will index events by host and services."
-  [labels]
-  (mspec/valid-action? ::index [labels])
-  {:action :index
-   :description {:message "Insert events into the index using the provided fields as keys"
-                 :params (pr-str labels)}
-   :params [labels]})
-
 (defn coll-count*
   [_ & children]
   (fn stream [events]
@@ -1898,51 +1864,6 @@
                  :params (str params)}
    :params (or params [])
    :children children})
-
-(defn reaper*
-  [context interval destination-stream]
-  (let [index (:index context)
-        clock (atom [0 false])
-        reinject-fn (:reinject context)
-        destination-stream (or destination-stream (:source-stream context))]
-    (fn stream [event]
-      (when (:time event)
-        (let [[_ expire?] (swap! clock (fn [[previous-tick _ :as s]]
-                                         (if (>= (:time event)
-                                                 (+ interval previous-tick))
-                                           [(:time event) true]
-                                           s)))]
-          (when expire?
-            (doseq [event (index/expire index)]
-              (reinject-fn event destination-stream))))))))
-
-(s/def ::reaper (s/cat :interval pos-int?
-                       :destination-stream (s/or :keyword keyword?
-                                                 :nil nil?)))
-
-(defn reaper
-  "Everytime this action receives an event, it will expires events from the
-  index (every dt seconds) and reinject them into a stream
-  (default to the current stream if not specified).
-
-  ```clojure
-  (reaper 5)
-  ```
-
-  ```clojure
-  (reaper 5 :custom-stream)
-  ```"
-  ([interval] (reaper interval nil))
-  ([interval destination-stream]
-   (mspec/valid-action? ::reaper [interval destination-stream])
-   {:action :reaper
-    :description {:message (format "Expires events every %d second and reinject them into %s"
-                                   interval
-                                   (if destination-stream
-                                     (str "the stream " destination-stream)
-                                     (str "the current stream")))}
-    :params [interval destination-stream]
-    :children []}))
 
 (s/def ::to-base64 (s/cat :fields (s/or :keyword keyword?
                                         :seq (s/coll-of keyword?))))
@@ -3126,7 +3047,6 @@
    :fixed-time-window aggregation*
    :from-base64 from-base64*
    :increment increment*
-   :index index*
    :io io*
    :from-json from-json*
    :keep-keys keep-keys*
@@ -3142,7 +3062,6 @@
    :output! output!*
    :rate aggregation*
    :ratio aggregation*
-   :reaper reaper*
    :reinject! reinject!*
    :rename-keys rename-keys*
    :scale scale*

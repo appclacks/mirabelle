@@ -9,7 +9,6 @@
             [mirabelle.graphviz :as graphviz]
             [mirabelle.handler :as handler]
             [mirabelle.http :as http]
-            [mirabelle.index :as index]
             [mirabelle.test :as test]
             [mirabelle.transport :as transport]
             [mirabelle.pubsub :as pubsub]
@@ -25,11 +24,9 @@
 (defn build-system
   [{:keys [tcp stream http outputs custom-outputs]}]
   (let [registry (metric/registry-component {})
-        index (component/start (index/map->Index {}))
         pubsub (component/start (pubsub/map->PubSub {}))]
     (component/system-map
      :registry registry
-     :index index
      :pubsub pubsub
      :http (-> (corbihttp/map->Server {:config http
                                        :registry registry
@@ -40,10 +37,8 @@
                        :outputs-configurations (dissoc outputs :custom)
                        :custom-outputs (:custom outputs {})
                        :custom-actions (:actions stream)
-                       :index index
                        :registry registry
                        :pubsub pubsub})
-     :index index
      :api-handler (-> (handler/map->Handler {})
                       (component/using [:stream-handler :registry]))
      :shared-event-executor (transport/event-executor

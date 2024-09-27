@@ -23,13 +23,9 @@
                             (pr-str value)))
       (throw e))))
 
-(s/def :mirabelle.index/query ::spec/ne-string)
 (s/def :mirabelle.stream/name keyword?)
 (s/def :mirabelle.stream/config ::spec/ne-string)
 (s/def :mirabelle.stream/event map?)
-
-(s/def :mirabelle.http.index/search (s/keys :req-un [:mirabelle.index/query
-                                                     :mirabelle.stream/name]))
 
 (s/def :mirabelle.http.index/current-time (s/keys :req-un [:mirabelle.stream/name]))
 

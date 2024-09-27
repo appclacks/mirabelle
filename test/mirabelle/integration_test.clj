@@ -25,7 +25,7 @@
       (is (= {:message "ok"}
              (:body resp)))))
   (testing "add-stream"
-    (let [body (-> {:config (-> {:actions {:action :index :params [[:host]]}}
+    (let [body (-> {:config (-> {:actions {:action :debug}}
                                 pr-str
                                 b64/to-base64)}
                    json/generate-string)
@@ -59,42 +59,14 @@
       (is (= 404 (:status resp)))
       (is (= {:error "Stream :test-bar not found"}
              (json/parse-string (:body resp) true)))))
-  (testing "search-index"
-    (let [body (-> {:query (-> [:always-true]
-                                pr-str
-                                b64/to-base64)}
-                   json/generate-string)
-          resp (http/post "http://localhost:5558/api/v1/index/test-foo/search"
-                          {:content-type :json
-                           :headers basic
-                           :throw-exceptions false
-                           :as :json
-                           :body body})]
-      (is (= 200 (:status resp)))
-      (is (= {:events [{:host "test-foo" :time 3}]}
-             (:body resp))))
-    (let [body (-> {:query (-> [:always-true]
-                                pr-str
-                                b64/to-base64)}
-                   json/generate-string)
-          resp (http/post "http://localhost:5558/api/v1/index/test-bar/search"
-                          {:content-type :json
-                           :headers basic
-                           :throw-exceptions false
-                           :as :json
-                           :body body})]
-      (is (= 404 (:status resp)))
-      (is (= {:error "stream :test-bar not found"}
-             (json/parse-string (:body resp) true)))))
   (testing "get-stream"
     (let [resp (http/get "http://localhost:5558/api/v1/stream/test-foo"
                          {:as :json
                           :headers basic})]
       (is (= 200 (:status resp)))
-      (is (= {:config (-> {:actions {:action :index :params [[:host]]} :default false}
+      (is (= {:config (-> {:actions {:action :debug} :default false}
                           pr-str
-                          b64/to-base64)
-              :current-time 3}
+                          b64/to-base64)}
              (:body resp)))))
   (testing "list-streams"
     (let [resp (http/get "http://localhost:5558/api/v1/stream"
@@ -103,13 +75,6 @@
           streams (-> resp :body :streams set)]
       (is (= 200 (:status resp)))
       (is (streams "test-foo"))))
-  (testing "current-time"
-    (let [resp (http/get "http://localhost:5558/api/v1/index/test-foo/current-time"
-                         {:as :json
-                          :headers basic})]
-      (is (= 200 (:status resp)))
-      (is (= {:current-time 3}
-             (:body resp)))))
   (testing "remove-stream"
     (let [resp (http/delete "http://localhost:5558/api/v1/stream/test-foo"
                             {:as :json
@@ -130,18 +95,6 @@
                              :throw-exceptions false})]
       (is (= 404 (:status resp)))
       (is (= {:error "uri /api/v1/notfound not found for method delete"}
-             (json/parse-string (:body resp) true)))))
-  (testing "search-index: wring parameter"
-    (let [body (-> {:query nil}
-                   json/generate-string)
-          resp (http/post "http://localhost:5558/api/v1/index/test-foo/search"
-                          {:content-type :json
-                           :headers basic
-                           :throw-exceptions false
-                           :as :json
-                           :body body})]
-      (is (= 400 (:status resp)))
-      (is (= {:error "field query is incorrect"}
              (json/parse-string (:body resp) true)))))
   (testing "bad auth"
     (let [resp (http/get "http://localhost:5558/healthz"

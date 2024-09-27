@@ -6,7 +6,6 @@
             [com.stuartsierra.component :as component]
             [corbihttp.metric :as metric]
             [mirabelle.action :as a]
-            [mirabelle.index :as index]
             [mirabelle.output.file :as output-file]
             [mirabelle.io :refer [Output]]
             [mirabelle.pool :as pool]
@@ -659,68 +658,6 @@
                                 stream)]
       (is (fn? entrypoint))
       (entrypoint {:metric 12}))))
-
-(deftest index-test
-  (let [index (component/start (index/map->Index {}))
-        pubsub (component/start (pubsub/map->PubSub {}))
-        stream {:name "my-stream"
-                :description "foo"
-                :actions (a/index [:host])}
-        pubsub-result (atom [])
-        {:keys [entrypoint]} (stream/compile-stream! {:index index
-                                                      :pubsub pubsub
-                                                      :source-stream "my-stream"}
-                                                     stream)]
-    (pubsub/add pubsub (index/channel "my-stream") (fn [event]
-                                                     (swap! pubsub-result conj event)))
-    (entrypoint {:host "f" :metric 12 :time 1})
-    (is (= [{:host "f" :metric 12 :time 1}]
-           @pubsub-result))
-    (entrypoint {:host "a" :metric 13 :time 1})
-    (is (= [{:host "f" :metric 12 :time 1}
-            {:host "a" :metric 13 :time 1}]
-           @pubsub-result))
-    (is (= 1 (index/current-time index)))
-    (is (= 2 (index/size-index index)))
-    (is (= (set [{:host "f" :metric 12 :time 1}
-                 {:host "a" :metric 13 :time 1}])
-           (set (index/search index [:always-true]))))
-    (entrypoint {:host "a" :metric 13 :time 10})
-    (entrypoint {:host "a" :metric 13 :time 9})
-    (is (= 10 (index/current-time index)))
-    (entrypoint {:host "a" :metric 13 :time 12})
-    (is (= 12 (index/current-time index)))))
-
-(deftest reaper-test
-  (let [index (component/start (index/map->Index {}))
-        recorder (atom [])
-        dest (atom [])
-        pubsub (component/start (pubsub/map->PubSub {}))
-        stream {:name "my-stream"
-                :description "foo"
-                :actions (a/sdo (a/index [:host])
-                                (a/reaper 20))}
-        {:keys [entrypoint]} (stream/compile-stream!
-                              {:index index
-                               :pubsub pubsub
-                               :source-stream "my-stream"
-                               :reinject (fn [event destination-stream]
-                                           (swap! dest conj destination-stream)
-                                           (swap! recorder conj event))}
-                              stream)]
-    (entrypoint {:host "f" :metric 12 :time 1 :ttl 15})
-    (is (= 1 (index/current-time index)))
-    (is (= 1 (index/size-index index)))
-    (entrypoint {:host "b" :metric 12 :time 17})
-    (is (= 17 (index/current-time index)))
-    ;; not expired yet because of the reaper interval
-    (is (= 2 (index/size-index index)))
-    (entrypoint {:host "b" :metric 12 :time 20})
-    (is (= ["my-stream"] @dest))
-    (is (= [{:host "b" :metric 12 :time 20}]
-           (index/search index [:always-true])))
-    (is (= [{:host "f" :metric 12 :time 1 :ttl 15 :state "expired"}]
-           @recorder))))
 
 (deftest full-test
   (let [include-path (.getPath (io/resource "include/action"))

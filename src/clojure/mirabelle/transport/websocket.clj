@@ -8,7 +8,6 @@
             [clojure.string :as string]
             [exoscale.ex :as ex]
             [mirabelle.action.condition :as condition]
-            [mirabelle.index :as index]
             [mirabelle.pubsub :as pubsub]
             [mirabelle.b64 :as b64]
             [reitit.core :as r]
@@ -62,8 +61,7 @@
 
 (def router
   (r/router
-   [["/index" :ws/index]
-    ["/channel/:channel" :ws/channel]]))
+   [["/channel/:channel" :ws/channel]]))
 
 (defn ws-handler
   [ps actions ws pred channel]
@@ -102,13 +100,6 @@
                      (do
                        (swap! nb-conn inc)
                        (condp = handler
-                         :ws/index (ws-handler pubsub
-                                               actions
-                                               ws
-                                               pred
-                                               (index/channel (get query-params
-                                                                   "stream"
-                                                                   :default)))
                          :ws/channel (ws-handler pubsub
                                                  actions
                                                  ws

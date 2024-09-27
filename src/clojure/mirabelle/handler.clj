@@ -5,7 +5,6 @@
             [corbihttp.metric :as metric]
             [exoscale.ex :as ex]
             [mirabelle.b64 :as b64]
-            [mirabelle.index :as index]
             [mirabelle.otel.traces :as traces]
             [mirabelle.prometheus :as prometheus]
             [mirabelle.stream :as stream])
@@ -20,10 +19,8 @@
   (add-stream [this params] "Add a new stream")
   (get-stream [this params] "Get a stream")
   (remove-stream [this params] "Remove a stream")
-  (search-index [this params] "Query the index")
   (list-streams [this params] "List streams")
   (push-event [this params] "Push an event to a stream")
-  (current-time [this params] "Get the current time of a given stream's index.")
   (prom-remote-write [this params] "Prometheus remote write endpoint")
   (fluentbit [this params] "fluentbit http log endpoint")
   (otel-traces [this params] "Opentelemetry traces v1 endpoint")
@@ -44,16 +41,6 @@
   (healthz [_ _]
     {:status 200
      :body {:message "ok"}})
-  (search-index [_ {:keys [all-params]}]
-    (let [query (-> all-params :query b64/from-base64 edn/read-string)
-          stream-name (:name all-params)
-          index (if (= :default stream-name)
-                  (:index (stream/context stream-handler :default))
-                  (-> (stream/get-stream stream-handler stream-name)
-                      :context
-                      :index))]
-      {:status 200
-       :body {:events (index/search index query)}}))
   (add-stream [_ {:keys [all-params]}]
     (let [stream-name (:name all-params)
           config (-> all-params :config b64/from-base64 edn/read-string)]
@@ -76,11 +63,9 @@
           config (-> stream
                      (dissoc :context :entrypoint)
                      pr-str
-                     b64/to-base64)
-          index (get-in stream [:context :index])]
+                     b64/to-base64)]
       {:status 200
-       :body {:config config
-              :current-time (index/current-time index)}}))
+       :body {:config config}}))
   (list-streams [_ _]
     {:status 200
      :body {:streams (stream/list-streams stream-handler)}})
@@ -115,13 +100,6 @@
           (doseq [event scope-spans]
             (stream/push! stream-handler event stream-name))))
       {:status 200}))
-  (current-time [_ {:keys [all-params]}]
-    {:status 200
-     :body {:current-time (-> (stream/get-stream stream-handler
-                                                 (:name all-params))
-                              :context
-                              :index
-                              index/current-time)}})
   (not-found [_ _]
     {:status 404
      :body {:error "not found"}})
@@ -133,11 +111,7 @@
 (def path-vars-regex #"[a-zA-Z0-9~._+~-]+")
 
 (def router
-  [["/api/v1/index/:name/search" {:post {:spec :mirabelle.http.index/search
-                                         :handler search-index}}]
-   ["/api/v1/index/:name/current-time" {:get {:spec :mirabelle.http.index/current-time
-                                              :handler current-time}}]
-   ["/api/v1/stream" {:get {:handler list-streams}}]
+  [["/api/v1/stream" {:get {:handler list-streams}}]
    ["/api/v1/stream/:name" {:put {:handler push-event
                                   :spec :mirabelle.http.stream/event}
                             :post {:handler add-stream

@@ -4,7 +4,6 @@
             [com.stuartsierra.component :as component]
             [corbihttp.log :as log]
             [corbihttp.metric :as metric]
-            [mirabelle.index :as index]
             [mirabelle.stream :as stream]))
 
 (defn tap-error-message
@@ -53,9 +52,7 @@
                                {:streams-directories (:directories stream)
                                 :custom-actions (:actions stream)
                                 :registry registry
-                                :test-mode? true
-                                ;; dedicated index in test mode
-                                :index (component/start (index/map->Index {}))}))
+                                :test-mode? true}))
               ;; the context source stream is not important here
               ;; because we only want the tap
               tap (:tap (stream/context stream-handler :test))
