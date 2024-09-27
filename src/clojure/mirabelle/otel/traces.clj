@@ -56,7 +56,7 @@
 
 (defn event->map
   [^Span$Event event]
-  {:time (float (/ (.getTimeUnixNano event) 1000000000))
+  {:time (.getTimeUnixNano event)
    :name (.getName event)
    :attributes (key-value-list->map (.getAttributesList event))
    :dropped-attributes-count (.getDroppedAttributesCount event)})
