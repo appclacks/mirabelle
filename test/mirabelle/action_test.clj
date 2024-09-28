@@ -861,9 +861,9 @@
                                        rec)
                   state
                   [[{:metric 3} {:metric 1} {:metric 2}]]
-                  [{:metric 1 :quantile "0"}
-                   {:metric 2 :quantile "0.5"}
-                   {:metric 3 :quantile "1"}])))
+                  [{:metric 1 :attributes {:quantile "0"}}
+                   {:metric 2 :attributes {:quantile "0.5"}}
+                   {:metric 3 :attributes {:quantile "1"}}])))
 
 (deftest tagged-all*-test
   (let [[rec state] (recorder)]
@@ -915,7 +915,7 @@
     (stream {:foo 1})
     (is (= 1 (count @state)))
     (is (= "error" (:state (first @state))))
-    (is (= "mirabelle-exception" (:service (first @state))))
+    (is (= "mirabelle-exception" (:name (first @state))))
     (is (instance? Exception (:exception (first @state))))))
 
 (deftest streams-test
@@ -1518,10 +1518,10 @@
                    {:time 2 :metric 200}
                    {:time 4 :metric 800}
                    {:time 12 :metric 800}]
-                  [{:time 12, :metric 100, :quantile "0"}
-                   {:time 12, :metric 200, :quantile "0.5"}
-                   {:time 12, :metric 800, :quantile "0.99"}
-                   {:time 12, :metric 800, :quantile "1"}])))
+                  [{:time 12, :metric 100, :attributes {:quantile "0"}}
+                   {:time 12, :metric 200, :attributes {:quantile "0.5"}}
+                   {:time 12, :metric 800, :attributes {:quantile "0.99"}}
+                   {:time 12, :metric 800, :attributes {:quantile "1"}}])))
 
 (deftest to-string-test
   (let [[rec state] (recorder)]

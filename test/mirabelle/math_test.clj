@@ -59,16 +59,24 @@
     []
 
     [{:metric 1 :service "foo"}]
-    [{:metric 1 :service "foo" :quantile "0"} {:metric 1 :service "foo" :quantile "0.5"} {:metric 1 :service "foo" :quantile "1"}]
+    [{:metric 1 :service "foo" :attributes {:quantile "0"}}
+     {:metric 1 :service "foo" :attributes {:quantile "0.5"}}
+     {:metric 1 :service "foo" :attributes {:quantile "1"}}]
 
     [{:metric 2} {:metric 1}]
-    [{:metric 1 :quantile "0"} {:metric 2 :quantile "0.5"} {:metric 2 :quantile "1"}]
+    [{:metric 1 :attributes {:quantile "0"}}
+     {:metric 2 :attributes {:quantile "0.5"}}
+     {:metric 2 :attributes {:quantile "1"}}]
 
     [{:metric 3} {:metric 1} {:metric 2}]
-    [{:metric 1 :quantile "0"} {:metric 2 :quantile "0.5"} {:metric 3 :quantile "1"}]
+    [{:metric 1 :attributes {:quantile "0"}}
+     {:metric 2 :attributes {:quantile "0.5"}}
+     {:metric 3 :attributes {:quantile "1"}}]
 
     [{:metric 6} {:metric 1} {:metric 2} {:metric 1} {:metric 1}]
-    [{:metric 1 :quantile "0"} {:metric 1 :quantile "0.5"} {:metric 6 :quantile "1"}]))
+    [{:metric 1 :attributes {:quantile "0"}}
+     {:metric 1 :attributes {:quantile "0.5"}}
+     {:metric 6 :attributes {:quantile "1"}}]))
 
 (deftest extremum-n-test
   (are [events expected] (= (math/extremum-n 3 > events) expected)

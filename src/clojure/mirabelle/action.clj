@@ -1790,7 +1790,7 @@
   "Build a new event from an Exception and from the event which caused it."
   [^Exception e base-event]
   {:time (:time base-event)
-   :service "mirabelle-exception"
+   :name "mirabelle-exception"
    :state "error"
    :metric 1
    :tags ["exception" (.getName (class e))]
@@ -2884,13 +2884,12 @@
             (let [^Histogram histogram (.getIntervalHistogram recorder)]
               (.recordValue recorder (:metric event))
               (doseq [percentile percentiles]
-                (call-rescue (assoc event
-                                    :metric (.getValueAtPercentile histogram
-                                                                   (double (* 100 percentile)))
-                                    :quantile (str percentile))
+                (call-rescue (-> (assoc event
+                                        :metric (.getValueAtPercentile histogram
+                                                                      (double (* 100 percentile))))
+                                 (assoc-in [:attributes :quantile] (str percentile)))
                              children)))
             (.recordValue recorder (:metric event))))))))
-
 
 (s/def ::highest-trackable-value pos-int?)
 (s/def ::nb-significant-digits pos-int?)
@@ -3019,7 +3018,6 @@
            (-> (assoc event destination b)
                (dissoc source))
            children))))))
-
 
 (defn iterate-on
   [config & children]
