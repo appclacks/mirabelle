@@ -699,6 +699,8 @@
                           (a/sdissoc [:host :service])
                           (a/throttle {:count 1 :duration 10})
                           (a/ewma-timeless 1)
+                          (a/iterate-on {:source [:events]
+                                         :destination :event})
                           (a/over 1)
                           (a/under 1)
                           (a/tap :foo)

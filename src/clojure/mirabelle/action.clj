@@ -3019,11 +3019,18 @@
                (dissoc source))
            children))))))
 
+
+(s/def :iterate-on/source (s/or :keyword keyword? :vec (s/coll-of keyword?)))
+(s/def :iterate-on/destination (s/or :keyword keyword? :vec (s/coll-of keyword?)))
+
+(s/def ::iterate-on (s/cat :config (s/keys :req-un [:iterate-on/source
+                                                    :iterate-on/destination])))
+
 (defn iterate-on
   [config & children]
-  ;(mspec/valid-action? ::extract [k])
+  (mspec/valid-action? ::iterate-on [config])
   {:action :iterate-on
-   :description {:message "TODO"}
+   :description {:message (format"Extract the list from source %s and create new events for each element, with the element mapped to the destination %s" (:source config) (:destination config))}
    :params [config]
    :children children})
 
