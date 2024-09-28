@@ -376,30 +376,30 @@
   (let [[rec state] (recorder)]
     (test-actions (a/coll-rate* nil rec)
                   state
-                  [[{:metric 1 :time 1}]]
-                  [{:metric 1 :time 1}])
+                  [[{:metric 1 :time 1e9}]]
+                  [{:metric 1 :time 1e9}])
     (test-actions (a/coll-rate* nil rec)
                   state
-                  [[{:metric 1 :time 1}
-                    {:metric 10 :time 2}
-                    {:metric 4 :time 3}
-                    {:metric 10 :time 1}
-                    {:metric 5 :time 4}]]
-                  [{:time 4 :metric (/ 30 3)}])
+                  [[{:metric 1 :time 1e9}
+                    {:metric 10 :time 2e9}
+                    {:metric 4 :time 3e9}
+                    {:metric 10 :time 1e9}
+                    {:metric 5 :time 4e9}]]
+                  [{:time 4e9 :metric (/ 30 3)}])
     (test-actions (a/coll-rate* nil rec)
                   state
                   [[{:metric 1 :time 0}
-                    {:metric 1 :time 2}
-                    {:metric 1 :time 3}
-                    {:metric 1 :time 1}
-                    {:metric 1 :time 10}]]
-                  [{:time 10 :metric (/ 5 10)}])
+                    {:metric 1 :time 2e9}
+                    {:metric 1 :time 3e9}
+                    {:metric 1 :time 1e9}
+                    {:metric 1 :time 10e9}]]
+                  [{:time 10e9 :metric (/ 5 10)}])
     (test-actions (a/coll-rate* nil rec)
                   state
-                  [[{:metric 1 :time 1}
-                    {:metric 2 :time 2}
-                    {:metric 1 :time 3}]]
-                  [{:time 3 :metric 2}])))
+                  [[{:metric 1 :time 1e9}
+                    {:metric 2 :time 2e9}
+                    {:metric 1 :time 3e9}]]
+                  [{:time 3e9 :metric 2}])))
 
 (deftest sflatten*-test
   (let [[rec state] (recorder)]
@@ -1518,10 +1518,10 @@
                    {:time 2 :metric 200}
                    {:time 4 :metric 800}
                    {:time 12 :metric 800}]
-                  [{:time 12, :metric 100, :quantile 0}
-                   {:time 12, :metric 200, :quantile 0.5}
-                   {:time 12, :metric 800, :quantile 0.99}
-                   {:time 12, :metric 800, :quantile 1}])))
+                  [{:time 12, :metric 100, :quantile "0"}
+                   {:time 12, :metric 200, :quantile "0.5"}
+                   {:time 12, :metric 800, :quantile "0.99"}
+                   {:time 12, :metric 800, :quantile "1"}])))
 
 (deftest to-string-test
   (let [[rec state] (recorder)]
@@ -1613,3 +1613,22 @@
                    ]
                   [{:state "ok", :time 4, :metric 0}
                    {:state "ok", :time 20, :metric 0}])))
+
+(deftest iterate-on-test
+  (let [[rec state] (recorder)]
+    (test-actions (a/iterate-on* nil
+                                   {:source :events
+                                    :destination :event
+                                    }
+                                   rec)
+                  state
+                  [{:trace-id "123"
+                    :span-id "234"
+                    :events [{:time 3 :name "hello" :attributes {:id "foo"}}
+                             {:time 4 :name "bye" :attributes {:id "bar"}}]}]
+                  [{:trace-id "123"
+                    :span-id "234"
+                    :event {:time 3 :name "hello" :attributes {:id "foo"}}}
+                   {:trace-id "123"
+                    :span-id "234"
+                    :event {:time 4 :name "bye" :attributes {:id "bar"}}}])))

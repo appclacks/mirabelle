@@ -2887,7 +2887,7 @@
                 (call-rescue (assoc event
                                     :metric (.getValueAtPercentile histogram
                                                                    (double (* 100 percentile)))
-                                    :quantile percentile)
+                                    :quantile (str percentile))
                              children)))
             (.recordValue recorder (:metric event))))))))
 
@@ -3009,6 +3009,26 @@
    :params [(duration->ns (assoc config :aggr-fn :ratio))]
    :children children})
 
+(defn iterate-on*
+  [_ {:keys [source destination]} & children]
+  (fn stream [event]
+    (let [base (get event source)]
+      (when (sequential? base)
+        (doseq [b base]
+          (call-rescue
+           (-> (assoc event destination b)
+               (dissoc source))
+           children))))))
+
+
+(defn iterate-on
+  [config & children]
+  ;(mspec/valid-action? ::extract [k])
+  {:action :iterate-on
+   :description {:message "TODO"}
+   :params [config]
+   :children children})
+
 (def action->fn
   {:above-dt cond-dt*
    :sum aggregation*
@@ -3038,6 +3058,7 @@
    :ddt ddt*
    :ddt-pos ddt*
    :info info*
+   :iterate-on iterate-on*
    :error error*
    :extract extract*
    :ewma-timeless ewma-timeless*

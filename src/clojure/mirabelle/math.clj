@@ -1,5 +1,6 @@
 (ns mirabelle.math
-  (:require [mirabelle.event :as event]))
+  (:require [mirabelle.event :as event]
+            [mirabelle.time :as time]))
 
 (defn mean
   "Takes a list of events and returns the metrics mean.
@@ -77,7 +78,7 @@
   (extremum <= events))
 
 (defn rate
-  "Takes a list of events and compute the rate for them.
+  "Takes a list of events and compute the rate (in events/seconds) for them.
   Use the most recent event as a base for the new event."
   [events]
   (when-not (zero? (count events))
@@ -102,7 +103,7 @@
           interval (- (:time base) min-time)]
       (if (zero? interval)
         (assoc base :metric sum)
-        (assoc base :metric (/ sum interval))))))
+        (assoc base :metric (/ sum (time/ns->s interval)))))))
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (defn sorted-sample-extract

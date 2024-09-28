@@ -1,14 +1,32 @@
-{:test1 {:input [{:kind "client"
-                  :time 1e9}
-                 {:kind "client"
-                  :time 3e9}
-                 {:kind "client"
-                  :time 4e9}
-                 {:kind "client"
-                  :time 13e9}]
-         :target :test
-         :taps {:result [{:metric 3/10
-                         :time 4e9
-                         :kind "client"
-                         :name "RATE"
-                         }]}}}
+{:percentiles {:input [{:name "http_request_duration_seconds"
+                        :metric 1.1
+                        :time 1e9
+                        :attributes {:application "app1"
+                                     :environment "production"}}
+                       {:name "http_request_duration_seconds"
+                        :metric 4.2
+                        :time 10e9
+                        :attributes {:application "app1"
+                                     :environment "production"}}
+                       {:name "http_request_duration_seconds"
+                        :metric 2
+                        :time 14e9
+                        :attributes {:application "app1"
+                                     :environment "production"}}
+                       {:name "http_request_duration_seconds"
+                        :metric 5
+                        :time 18e9
+                        :attributes {:application "app1"
+                                     :environment "production"}}
+                       {:name "http_request_duration_seconds"
+                        :metric 0.2
+                        :time 22e9
+                        :attributes {:application "app1"
+                                     :environment "production"}}]
+               :taps {:alert [{:name "http_request_duration_seconds"
+                               :metric 5
+                               :time 22e9
+                               :quantile "0.99"
+                               :attributes {:application "app1"
+                                            :environment "production"}
+                               :state "error"}]}}}

@@ -7,7 +7,8 @@
             [mirabelle.b64 :as b64]
             [mirabelle.otel.traces :as traces]
             [mirabelle.prometheus :as prometheus]
-            [mirabelle.stream :as stream])
+            [mirabelle.stream :as stream]
+            [mirabelle.time :as time])
   (:import io.micrometer.core.instrument.Counter
            io.micrometer.prometheusmetrics.PrometheusMeterRegistry
            io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest
@@ -49,7 +50,9 @@
        :body {:message "stream added"}}))
   (push-event [_ {:keys [all-params]}]
     (let [stream-name (:name all-params)]
-      (stream/push! stream-handler (:event all-params) stream-name)
+      (stream/push! stream-handler
+                    (time/default-time (:event all-params))
+                    stream-name)
       {:status 200
        :body {:message "ok"}}))
   (remove-stream [_ {:keys [all-params]}]

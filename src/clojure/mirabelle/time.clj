@@ -7,6 +7,12 @@
 
 (def default-ttl 120)
 
+(defn default-time
+  [event]
+  (if (:time event)
+    event
+    (assoc event :time (now))))
+
 (defn s->ns
   [seconds]
   (* seconds 1000000000))

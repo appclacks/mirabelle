@@ -769,10 +769,10 @@
         {:keys [entrypoint]} (stream/compile-stream! {:source-stream "my-stream"}
                                                      stream)]
     (is (fn? entrypoint))
-    (entrypoint {:state "ok" :time 2 :metric 1 :host "foo" :service "a"})
-    (entrypoint {:state "ok" :time 4 :metric 1 :host "foo" :service "a"})
-    (entrypoint {:state "ok" :time 100 :metric 1 :host "foo" :service "b"})
-    (entrypoint {:state "ok" :time 200 :metric 1 :host "foo" :service "a"})))
+    (entrypoint {:state "ok" :time 2e9 :metric 1 :host "foo" :service "a"})
+    (entrypoint {:state "ok" :time 4e9 :metric 1 :host "foo" :service "a"})
+    (entrypoint {:state "ok" :time 100e9 :metric 1 :host "foo" :service "b"})
+    (entrypoint {:state "ok" :time 200e9 :metric 1 :host "foo" :service "a"})))
 
 (deftest sum-test
   (let [recorder (atom [])
@@ -1054,4 +1054,16 @@
     (entrypoint {:foo {:time 0 :metric 10}})
     (entrypoint {:time 7 :metric 1})
     (is (= [{:time 0 :metric 10}]
+           @recorder))))
+
+(deftest iterate-on-rename-span-events-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/iterate-on {:source :events :destination :event}
+                                       (a/rename-keys {[:event :time] :time}
+                                                      (a/test-action recorder)))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:time 1 :trace-id "123" :events [{:time 3 :name "ev1" :attributes {:a1 "v1" :a2 "v2"}}]})
+    (is (= [{:time 3 :trace-id "123" :event {:name "ev1" :attributes {:a1 "v1" :a2 "v2"}}}]
            @recorder))))

@@ -18,15 +18,15 @@
 
 (deftest rate-test
   (is (nil? (math/rate [])))
-  (is (= {:metric 1 :time 1} (math/rate [{:metric 1 :time 1}])))
-  (is (= {:metric 2 :time 1} (math/rate [{:metric 1 :time 1}
-                                         {:metric 1 :time 1}])))
-  (is (= {:metric 11 :time 1} (math/rate [{:metric 1 :time 1}
-                                         {:metric 10 :time 1}])))
-  (is (= {:metric (/ 3 9) :time 10}
-         (math/rate [{:metric 1 :time 2}
-                     {:metric 1 :time 1}
-                     {:metric 1 :time 10}]))))
+  (is (= {:metric 1 :time 1e9} (math/rate [{:metric 1 :time 1e9}])))
+  (is (= {:metric 2 :time 1e9} (math/rate [{:metric 1 :time 1e9}
+                                         {:metric 1 :time 1e9}])))
+  (is (= {:metric 11 :time 1e9} (math/rate [{:metric 1 :time 1e9}
+                                          {:metric 10 :time 1e9}])))
+  (is (= {:metric (/ 3 9) :time 10e9}
+         (math/rate [{:metric 1 :time 2e9}
+                     {:metric 1 :time 1e9}
+                     {:metric 1 :time 10e9}]))))
 
 ;; Copyright Riemann authors (riemann.io), thanks to them!
 (deftest sorted-sample-extract-test

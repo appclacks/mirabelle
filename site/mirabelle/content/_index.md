@@ -1,10 +1,8 @@
-# Mirabelle, a powerful stream processing engine
+# Mirabelle, a powerful event stream processing engine
 
-Mirabelle is a stream processing engine which can be used to aggregate events, metrics, logs and traces.
+Mirabelle is a stream processing engine which can be used to aggregate events of any kinds (logs, metrics, traces...).
 
-Its powerful and extensible DSL allows you to define computations on a stream of data. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabeling, etc.) which can be easily combined according to your needs.
-
-It can be used for a lot of use cases like monitoring, fraud detection, alerting, to route events and metrics between different systems...
+Its powerful and extensible DSL allows you to define computations on events streams. Mirabelle offers natively a lot of functions (time windows, mathematical operations, transforming data, relabeling, etc.) which can be easily combined according to your needs. +
 
 ![Mirabelle](img/mirabelle_presentation.png)
 
@@ -12,13 +10,9 @@ Mirabelle can also route events to external systems (timeseries databases, loggi
 
 It also implements a publish-subscribe system, which allows you to see in real time (through Websockets) events flowing into streams.
 
-Mirabelle is currently in alpha, but I'm eager to receive feedback.
-
 ## Mirabelle supports multiple inputs protocols
 
-Mirabelle is heavily inspired by [Riemann](https://riemann.io/). Actually, parts of the Mirabelle codebase (like the TCP server implementation for example) were taken from Riemann (these parts are mentioned in the codebase).
-
-I would like to thank all Riemann maintainers and contributors for this amazing tool.
+Mirabelle isinspired by [Riemann](https://riemann.io/). I would like to thank all Riemann maintainers and contributors.
 
 Mirabelle supports the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also contains a lot of new features).
 
@@ -28,7 +22,7 @@ It also supports [Opentelemetry traces](/api/#opentelemetry-traces-input) as inp
 
 ## Streams clocks, real time, continuous queries
 
-In Mirabelle (and unlike Riemann), **all** streams advance based on the time of the events they receive. Because of that, it's super easy to reason about your streams, and to unit test them (the same inputs always produce the same outputs).
+In Mirabelle, **all** streams advance based on the time of the events they receive. Because of that, it's easy to reason about your streams, and to unit test them (the same inputs always produce the same outputs).
 
 In Mirabelle, events arrive by default in streams defined in the Mirabelle configuration file. As said previously, the Mirabelle clock for a stream will only advance if you send new events.
 
@@ -36,21 +30,21 @@ You can also in Mirabelle instantiate steams on the fly (using the Mirabelle HTT
 
 ![Mirabelle](img/mirabelle_streams.png)
 
-You can have real time streams receiving events directly from your servers and applications, and some streams working on old (and maybe ordered) data coming from various databases. Like that, you can have the best of both words: real time analytics, and run analytics on old data using continuous queries for example.
+You can have real time streams receiving events directly from your servers and applications, and some streams working on old (and probabled time ordered) data coming from external sutems. Like that, you can have the best of both words: real time analytics, and run analytics on old data using continuous queries for example.
 
 Being able to use the same tool for stream processing and to work on historical data is interesting. You could for example have a Mirabelle instance used for real time stream processing, and another one (or even the same one on dedicated streams) working on old data... It's up to you to decide !
 
 ## Stream example, with unit tests
 
-Let's say a web application is pushing the duration (in seconds) of the HTTP requests it receives. This metric could be modeled using this Mirabelle event
+Let's say a web application is pushing the duration (in seconds) of the HTTP requests it receives. This metric could be modeled using this Mirabelle event (time is a nanosecond timestamp):
 
 ```clojure
-{:host "my-server"
- :service "http_request_duration_seconds"
- :application "my-web-app"
+{:name "http_request_duration_seconds"
  :time 1619731016,145
  :tags ["web"]
- :metric 0.5}
+ :metric 0.5
+ :attributes {:application "my-api"
+              :environment "production"}}
 ```
 
 You could write a Mirabelle stream which will compute on the fly the quantiles for this metric. In this example, Mirabelle will split the received events into 60 seconds windows, then compute the percentiles, set the event `:state` to "critical" and send an alert to Pagerduty if the `0.99` quantiles is greater than 1 second.
