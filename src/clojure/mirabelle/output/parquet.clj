@@ -2,9 +2,10 @@
   (:require [com.stuartsierra.component :as component]
             [mirabelle.io :as io])
   (:import io.opentelemetry.proto.trace.v1.Span$SpanKind
-           org.apache.hadoop.fs.Path
-           org.apache.hadoop.conf.Configuration
+           ;org.apache.hadoop.fs.Path
+           ;org.apache.hadoop.conf.Configuration
            org.apache.parquet.io.api.Binary
+           org.apache.parquet.io.LocalOutputFile
            org.apache.parquet.example.data.Group
            org.apache.parquet.example.data.simple.SimpleGroup
            org.apache.parquet.hadoop.ParquetWriter
@@ -76,8 +77,11 @@
 (defn riemann-writer
   [path]
   (let [schema (MessageTypeParser/parseMessageType schema)
-        path (Path. ^String path)
-        builder (ExampleParquetWriter/builder path)
+        outputFile (LocalOutputFile. (java.nio.file.Paths/get
+                                      ^String path
+                                      ^"[Ljava.lang.String;" (into-array String [])))
+        ;path (Path. ^String path)
+        builder (ExampleParquetWriter/builder outputFile)
         writer (.build (.withType builder schema))]
     {:writer writer
      :schema schema}))
@@ -245,46 +249,46 @@
                          (.getString tag-group "tag" 0))))))
       event)))
 
-(defn read-parquet
-  [^String path]
-  (let [path (Path. path)
-        file (HadoopInputFile/fromPath path (Configuration.))
-        read-support (GroupReadSupport.)
-        reader (.build (ParquetReader/builder read-support path))]
-    (loop [^SimpleGroup main-group (.read reader)
-           result []]
-      (if main-group
-        (recur (.read reader)
-               (conj result
-                     (cond-> (-> {:time (.getLong main-group "time" 0)}
-                                 (set-attributes main-group)
-                                 (set-resources main-group)
-                                 (set-events main-group)
-                                 (set-tags main-group))
-                       (= 1 (.getFieldRepetitionCount main-group "traceID"))
-                       (assoc :trace-id (.getString main-group "traceID" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "spanID"))
-                       (assoc :span-id (.getString main-group "spanID" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "parentSpanID"))
-                       (assoc :parent-span-id (.getString main-group "parentSpanID" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "name"))
-                       (assoc :name (.getString main-group "name" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "startTime"))
-                       (assoc :start-time (.getLong main-group "startTime" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "statusCode"))
-                       (assoc :status-code (.getLong main-group "statusCode" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "kind"))
-                       (span-kind (.getLong main-group "kind" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "serviceName"))
-                       (assoc :service (.getString main-group "serviceName" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "description"))
-                       (assoc :description (.getString main-group "description" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "state"))
-                       (assoc :state (.getString main-group "state" 0))
-                       (= 1 (.getFieldRepetitionCount main-group "metric"))
-                       (assoc :metric (.getDouble main-group "metric" 0)))))
-        (do (.close reader)
-            result)))))
+;; (defn read-parquet
+;;   [^String path]
+;;   (let [path (Path. path)
+;;         file (HadoopInputFile/fromPath path (Configuration.))
+;;         read-support (GroupReadSupport.)
+;;         reader (.build (ParquetReader/builder read-support path))]
+;;     (loop [^SimpleGroup main-group (.read reader)
+;;            result []]
+;;       (if main-group
+;;         (recur (.read reader)
+;;                (conj result
+;;                      (cond-> (-> {:time (.getLong main-group "time" 0)}
+;;                                  (set-attributes main-group)
+;;                                  (set-resources main-group)
+;;                                  (set-events main-group)
+;;                                  (set-tags main-group))
+;;                        (= 1 (.getFieldRepetitionCount main-group "traceID"))
+;;                        (assoc :trace-id (.getString main-group "traceID" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "spanID"))
+;;                        (assoc :span-id (.getString main-group "spanID" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "parentSpanID"))
+;;                        (assoc :parent-span-id (.getString main-group "parentSpanID" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "name"))
+;;                        (assoc :name (.getString main-group "name" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "startTime"))
+;;                        (assoc :start-time (.getLong main-group "startTime" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "statusCode"))
+;;                        (assoc :status-code (.getLong main-group "statusCode" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "kind"))
+;;                        (span-kind (.getLong main-group "kind" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "serviceName"))
+;;                        (assoc :service (.getString main-group "serviceName" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "description"))
+;;                        (assoc :description (.getString main-group "description" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "state"))
+;;                        (assoc :state (.getString main-group "state" 0))
+;;                        (= 1 (.getFieldRepetitionCount main-group "metric"))
+;;                        (assoc :metric (.getDouble main-group "metric" 0)))))
+;;         (do (.close reader)
+;;             result)))))
 
 (defrecord ParquetOutput [path schema format group-fn ^ParquetWriter writer]
   component/Lifecycle
