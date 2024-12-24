@@ -40,10 +40,10 @@ Let's write a test file for these streams. The tests file should be referenced i
                  {:metric 101
                   :service "bar"}]
 
-         :tap-results {:foo [{:metric 10
-                              :service "foo"}]
+         :taps {:foo [{:metric 10
+                       :service "foo"}]
                        :bar [{:metric 101
-                              :service "bar"}]}}}
+                       :service "bar"}]}}}
 ```
 
 We defined here a test named `:test1`. You could have add more tests to the map (or in another files), all tests are run in isolation.
@@ -51,7 +51,7 @@ We defined here a test named `:test1`. You could have add more tests to the map 
 This `:test1` key contains a map with two keys:
 
 - `:input`: the events which will be injected into the streams
-- `:tap-results`: the expected contents of the tap.
+- `:taps`: the expected contents of the tap.
 
 Here, we see that the tap `:foo` should contain the first event (with `:service` "foo"), and the tap `:bar` the second (with `:metric` greater than 100).
 
@@ -82,13 +82,11 @@ Tests can also take a `:target` configuration, for example:
                  {:metric 101
                   :service "bar"}]
          :target :foo
-         :tap-results {:foo [{:metric 10
-                              :service "foo"}]}}}
+         :taps {:foo [{:metric 10
+                       :service "foo"}]}}}
 ```
 
 In this example, events in `:input` will only be injected into the `:foo` stream.
-
-One dedicated [index](/howto/stream-index/) is created for each test.
 
 ## Things excluded from tests
 

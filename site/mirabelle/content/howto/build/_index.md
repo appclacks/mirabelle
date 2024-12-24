@@ -11,7 +11,7 @@ In order to build Mirabelle, you need to install:
 - [Leiningen](https://leiningen.org/), the Clojure build tool.
 - Java. Mirabelle is tested under Java 17 (LTS).
 
-Then, clone the Mirabelle [Git repository](https://github.com/mcorbin/mirabelle). You can now build the project with `lein uberjar`.
+Then, clone the Mirabelle [Git repository](https://github.com/appclacks/mirabelle). You can now build the project with `lein uberjar`.
 
 The resulting jar will be in `target/uberjar/mirabelle-<version>-standalone.jar`
 

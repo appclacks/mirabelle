@@ -39,17 +39,19 @@ Mirabelle ships with a complete, extensible DSL to define streams. The DSL is he
 
 ### Events
 
-Events are represented as an immutable map. An event has standard fields. All fields are optional.
+Events are represented as an immutable map. An event has standard fields. All fields are optional and you can also add arbitrary ones, the schema is fully free.
 
 - `:host`: the event source. It can be an hostname for example.
-- `:service`: What is measured. `http_requests_duration_seconds` for example.
+- `:service`: the name of the service emitting the event.
+- `:name`: What is measured. `http_requests_duration_seconds` for example.
 - `:state`: A string representing the event state. By convention, `ok`, `warning`, `critical` or `expired` are often used.
 - `:metric`: A number associated to the event (the value of what is measured).
-- `:time`: The event time in second, as a timestamp (`1619988803` for example). It could also be a float (`1619988803,173413` for example), the Mirabelle/Riemann protocol supports microsecond resolution.
+- `:time`: The event time in nanoseconds, as a timestamp (`1735047872000000000` for example).
 - `:description`: The event description.
-- `:ttl`: The duration that the event is considered valid. See the [Index](/index) documentation for more information about the index and events expiration.
 - `:tags`: A list of tags associated to the event (like `["foo" "bar"]` for example).
-- Extra fields can also be added if you want to. One important extra field is `:stream`. It can be used to specify on which stream the event should be send. By default, events are sent to all streags with `:default` in their configurations.
+- `:attributes`: a list of arbitrary ke-value attributes.
+
+Extra fields can also be added if you want to. One important extra field is `:stream`. It can be used to specify on which stream the event should be send. By default, events are sent to all streams with `:default` set to `true` in their configurations.
 
 ### Streams
 
@@ -73,7 +75,7 @@ Let's now define another stream:
   (stream {:name :log :default true}
     (info))
   (stream {:name :http_requests_duration}
-    (where [:= :service "http_requests_duration_seconds"]
+    (where [:= :name "http_requests_duration_seconds"]
       (info)
       (over 1.5
         (with :state "critical"
@@ -82,7 +84,7 @@ Let's now define another stream:
 
 In this second example, we still have our first stream named `:log`. We also have another stream, a bit more complex, named `:http_requests_duration`.
 
-This second stream will first keep only events with services equal to "http_requests_duration_seconds" using the `where` action.
+This second stream will first keep only events with `:name` equal to "http_requests_duration_seconds" using the `where` action.
 
 Then, it will log (using `info`) the events. In another branch, `over` is used
 tp keep only events with `:metric` greater than `1.5` (we can imagine that
@@ -102,7 +104,7 @@ The Mirabelle DSL should first be compiled to an EDN datastructure before being 
 ```clojure
 (streams
   (stream {:name :http_requests_duration}
-    (where [:= :service "http_requests_duration_seconds"]
+    (where [:= :name "http_requests_duration_seconds"]
       (info)
       (over 1.5
         (with :state "critical"
@@ -115,7 +117,7 @@ You then need to compile this file using this command:
 java -jar mirabelle.jar compile <source-directory-containing-your-stream> <destination-directory>
 ```
 
-For example, let's say you have put the previous stream in a file named `stream.clj` in the `/tmp/streams` directory.  
+For example, let's say you have put the previous stream in a file named `stream.clj` in the `/tmp/streams` directory.
 If ou launch `java -jar mirabelle.jar compile /tmp/streams /tmp/compiled`, your file will be compiled and a new `stream.clj` file will be created in the destination directory (which is `/tmp/compiled` here).
 
 Let's do that.
@@ -132,7 +134,7 @@ The resulting file in `/tmp/compiled/stream.clj` should be:
   {:action :sdo,
    :children
    ({:action :where,
-     :params [[:= :service "http_requests_duration_seconds"]],
+     :params [[:= :name "http_requests_duration_seconds"]],
      :children
      ({:action :info}
       {:action :over,
@@ -153,14 +155,16 @@ How to launch Mirabelle is explained in [this section](/howto/build/).
 
 Once Mirabelle started, you can send events to it. For that, you can check the [integration](/integration/) documentation section for the available clients (Riemann clients are fully compatible with Mirabelle). In this example, I will use the [Riemann C client](https://github.com/algernon/riemann-c-client) which provides a CLI and is available in many Linux package managers.
 
+TODO: replace with Appclacks CLI in the whole example
+
 ```
-riemann-client send --metric-f 1 --service "http_requests_duration_seconds" --host=my-host
+riemann-client send --metric-f 1 --name "http_requests_duration_seconds" --host=my-host
 ```
 
 If I send the previous event, I should see in Mirabelle logs:
 
 ```json
-{"@timestamp":"2021-05-01T22:48:58.786+02:00","@version":"1","message":"#riemann.codec.Event{:host \"my-host\", :service \"http_requests_duration_seconds\", :state nil, :description nil, :metric 1.0, :tags nil, :time 1.619902138786E9, :ttl nil, :x-client \"riemann-c-client\"}","logger_name":"mirabelle.action","thread_name":"defaultEventExecutorGroup-2-8","level":"INFO","level_value":20000}
+{"@timestamp":"2021-05-01T22:48:58.786+02:00","@version":"1","message":"#riemann.codec.Event{:host \"my-host\", :name \"http_requests_duration_seconds\", :state nil, :description nil, :metric 1.0, :tags nil, :time 1.619902138786E9, :ttl nil, :x-client \"riemann-c-client\"}","logger_name":"mirabelle.action","thread_name":"defaultEventExecutorGroup-2-8","level":"INFO","level_value":20000}
 ```
 
 My event was indeed logging by the `info` action in my stream. Let's send an event with the metric greater than our threshold:
@@ -197,7 +201,7 @@ You can set the `PROFILE` environment variable in order to use Aero [profiles](h
 (streams
   (stream {:name :foo :default true}
     (where [:and
-             [:= :service "disk-used"]
+             [:= :name "disk-used"]
              [:> :metric #profile {:preprod 70
                                    :prod 60
                                    :default 90}]]
@@ -212,10 +216,10 @@ You can also use other Aero build-in readers described in the Aero [readme](http
 
 **Include**
 
-It's possible to include a configuration file in another one. Let's take this file named for example `log-service.clj`:
+It's possible to include a configuration file in another one. Let's take this file named for example `log-name.clj`:
 
 ```clojure
-(where [:= :service #mirabelle/var :my-service]
+(where [:= :name #mirabelle/var :my-name]
   (info))
 ```
 
@@ -224,16 +228,16 @@ You can then use this file using `include` in a Mirabelle stream:
 ```clojure
 (streams
   (stream {:name :foo :default true}
-    (include "log-service.clj" {:variables {:my-service "disk-used"}})
-    (include "log-service.clj" {:variables {:my-service "ram-used"}})))
+    (include "log-name.clj" {:variables {:my-name "disk-used"}})
+    (include "log-name.clj" {:variables {:my-name "ram-used"}})))
 ```
 
-The `#mirabelle/var` reader allows you to read a variable passed to the `include` action (here, the variable is named `:my-service`).
+The `#mirabelle/var` reader allows you to read a variable passed to the `include` action (here, the variable is named `:my-name`).
 
 You can also override the default Mirabelle profile (passed as an environment variable) by passing the `;profile` key to the `include` options:
 
 ```clojure
-(include "log-service.clj" {:variables {:my-service "disk-used"}
+(include "log-name.clj" {:variables {:my-name "disk-used"}
                             :profile :dev})
 ```
 
@@ -265,6 +269,8 @@ You can now use this output named `:pagerduty-client` in a stream by using the `
   (stream {:name :pagerduty-example}
     (output! :pagerduty-client)))
 ```
+
+TODO review example
 
 If this event is set to Mirabelle:
 
@@ -368,7 +374,7 @@ For example, the `above-dt` stream will only let events pass if all events recei
 
 In this example, `above-dt` will let events pass (to log them as error) only if it receives events with `:metric` greater than 1 during more than 6O seconds.
 
-The streams `below-dt`, `between-dt`, `outside-dt`, `critical-dt` also work that way. They are useful to avoid alerting on spikes for examples.
+The streams `below-dt`, `between-dt`, `outside-dt`, `cond-dt` also work that way. They are useful to avoid alerting on spikes for examples.
 
 The `tagged-all` stream is also available to keep only events containing one tag or a set of tags: `(tagged-all "foo")` or `(tagged-all ["foo" "bar"])`.
 
@@ -404,12 +410,12 @@ You can use `rename-keys` to rename some events keys:
               :environment :env})
 ```
 
-In this example, the `:host` key will be renamed `:service` and the `:environment` key is renamed `:env`. Existing values will be overrided.
+In this example, the `:host` key will be renamed `:service` and the `:environment` key is renamed `:env`. Existing values will be overrided. Nested keys are also supported, by passing a list of fields as keys or attributes (for example `[:attributes :foo]`.
 
 If you want to keep only some keys from an event (and so remove all the others), you can use `keep-keys`:
 
 ```clojure
-(keep-keys [:host :service :time :metric :description :environment])
+(keep-keys [:host :service :time :metric :description [:nested :field]])
 ```
 
 Some actions can modify the `:metric` field. `increment` and `decrement` will add +1 or -1 to it, and you can use `scale` to multiply it with a value: `(scale 1000)` for example.
@@ -430,11 +436,10 @@ The `percentiles` action allows you to compute percentiles (quantiles) on events
 
 ```clojure
 (percentiles {:percentiles [0.5 0.75 0.99]
-              :duration 10
-              :nb-significant-digits 3}
+              :duration 10}
 ```
 
-This example will compute the 0.5, 0.75 and 0.99 quantiles every 10 seconds. It also supports the `:delay` parameter (to tolerate events arriving late), `:highest-trackable-value` and `:lowest-discernible-value` to bound results.
+This example will compute the 0.5, 0.75 and 0.99 quantiles every 10 seconds. It also supports the `:delay` parameter (to tolerate events arriving late), `:highest-trackable-value` and `:lowest-discernible-value` to bound results, and `:nb-significant-digits` for precision (default to 3).
 
 The implementation uses the [HdrHistogram](https://github.com/HdrHistogram/HdrHistogram) library.
 
@@ -447,7 +452,6 @@ You can compute the rate of incoming events (by counting them) using the `rate` 
 ```
 
 This action will send the rate of events downstream every 20 seconds. You can also add a `:delay` parameter to tolerate late events.
-
 
 #### Sum events for a time period
 
@@ -687,6 +691,15 @@ We already saw in the [Action on lists of events: max, min, count, percentiles, 
 `top` and `bottom` can be used to get the maximum or minimum events from the last seconds. For example, `(top {:duration 10})` will compute the maximum event for windows of 10 seconds. You can also configure these streams with a `:delay` value to tolerate late events (`(top {:duration 10 :delay 10})` for example).
 
 `smax` and `smin` will send *for each event they receive* the maximum or minimum event. The value is never resetted.
+
+#### Convert a value to string
+
+The `to-string` stream can be used to convert values associated to some keys to string:
+
+```clojure
+(to-string [:service :state [:nested :attributes]
+  (info))
+```
 
 #### Format a string based on values
 

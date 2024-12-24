@@ -12,20 +12,20 @@
     <title>Publish Subscribe :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1719177977" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1719177977" rel="stylesheet">
-    <link href="/css/hybrid.css?1719177977" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1719177977" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1719177977" rel="stylesheet">
-    <link href="/css/auto-complete.css?1719177977" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1719177977" rel="stylesheet">
-    <link href="/css/theme.css?1719177977" rel="stylesheet">
-    <link href="/css/tabs.css?1719177977" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1719177977" rel="stylesheet">
+    <link href="/css/nucleus.css?1735048470" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1735048470" rel="stylesheet">
+    <link href="/css/hybrid.css?1735048470" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1735048470" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1735048470" rel="stylesheet">
+    <link href="/css/auto-complete.css?1735048470" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1735048470" rel="stylesheet">
+    <link href="/css/theme.css?1735048470" rel="stylesheet">
+    <link href="/css/tabs.css?1735048470" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1735048470" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1719177977"></script>
+    <script src="/js/jquery-3.3.1.min.js?1735048470"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1719177977"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1719177977"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1735048470"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1735048470"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1719177977"></script>
+<script type="text/javascript" src="/js/search.js?1735048470"></script>
 
     
   </div>
@@ -232,32 +232,6 @@
         ">
       <a href="/howto/action-io-ref/">
           I/O and actions reference
-          
-      </a>
-      
-      
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
-
-
- 
-  
-    
-    <li data-nav-id="/howto/stream-index/" title="The index" class="dd-item
-        
-        
-        
-        ">
-      <a href="/howto/stream-index/">
-          The index
           
       </a>
       
@@ -548,11 +522,7 @@
     <div class="wrapper">
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#an-example">An example</a>
-      <ul>
-        <li><a href="#riemann-compatibility">Riemann compatibility</a></li>
-      </ul>
-    </li>
+    <li><a href="#an-example">An example</a></li>
   </ul>
 </nav>
     </div>
@@ -578,24 +548,18 @@
 
 
 
-	<p>The Mirabelle Websocket server allows user to subscribe to the streams <a href="/howto/stream-index/">index</a> or to channels.</p>
+	<p>The Mirabelle Websocket server allows user to subscribe to channels.</p>
 <h2 id="an-example">An example</h2>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>(<span style="color:#a6e22e">streams</span>
-</span></span><span style="display:flex;"><span> (<span style="color:#a6e22e">stream</span>
-</span></span><span style="display:flex;"><span>  {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:bar</span> <span style="color:#e6db74">:default</span> true}
+</span></span><span style="display:flex;"><span> (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:bar</span> <span style="color:#e6db74">:default</span> true}
 </span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;bar&#34;</span>]
-</span></span><span style="display:flex;"><span>    (index [<span style="color:#e6db74">:host</span>])
 </span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">publish!</span> <span style="color:#e6db74">:my-channel</span>))))
-</span></span></code></pre></div><p>In this stream, we filter all events with <code>:service</code> &ldquo;bar&rdquo;. Then, we index them, and we also call <code>publish!</code> to publish the event to a channel named <code>:my-channel</code>.</p>
-<p>A channel is created by default for each index (the channel name being <code>&lt;stream-name&gt;-index</code>).
-You can also subscribe for events indexed into indexes belonging to streams tagged <code>:default</code> by subscribing to the <code>default-index</code> channel.</p>
-<p>Users can also subscribe to other channels, not related to indexes. It&rsquo;s what <code>publish!</code> does. In this example, all users subscribing to the <code>:my-channel</code> channel will receive the events.</p>
+</span></span></code></pre></div><p>In this stream, we filter all events with <code>:service</code> &ldquo;bar&rdquo;, then we publish them to a channel named <code>:my-channel</code>.</p>
+<p>Users then subscripe to those channels. In this example, all users subscribing to the <code>:my-channel</code> channel will receive the events.</p>
 <p>You can test that yourself by running the <code>websocket.py</code> script available <a href="https://github.com/mcorbin/mirabelle/tree/master/pubsub">here</a>. You will need Python 3, and to install the dependencies listed in <code>requirements.txt</code> using <code>pip install -r requirements.txt</code>.</p>
 <p>When you subscribe to a channel, you should provide a valid <a href="/howto/stream/#filtering-events">where clause</a> in base64. For example, the query <code>[:always-true]</code> which matches everything would be <code>WzphbHdheXMtdHJ1ZV0=</code>.</p>
-<p>You can now run the script with <code>./websocket.py</code>. By default, it subscribes to the default index. You can specify a channel with <code>--channel</code> (like <code>--channel my-channel</code> here), or a query with <code>--query</code> (the query will be automatically converted to base64 by the script).</p>
+<p>You can now run the script with <code>./websocket.py</code>. You can specify a channel with <code>--channel</code> (like <code>--channel my-channel</code> here), or a query with <code>--query</code> (the query will be automatically converted to base64 by the script).</p>
 <p>You can also write your own scripts in various languages. You need to subscribe to <code>ws://&lt;host&gt;:&lt;port&gt;/channel/&lt;channel-name&gt;?query=&lt;query&gt;</code>.</p>
-<h3 id="riemann-compatibility">Riemann compatibility</h3>
-<p>In order to be compatible with Riemann clients, you can also subscribe on <code>/index</code> (to subscribe to the default index), or <code>/index?stream=&lt;stream-name&gt;</code> to subscribe to an index for a dynamic stream.</p>
 
 
 
@@ -735,22 +699,6 @@ You can also subscribe for events indexed into indexes belonging to streams tagg
             
                 
                     
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
                     
                 
                 
@@ -890,7 +838,7 @@ You can also subscribe for events indexed into indexes belonging to streams tagg
 	 
 	 
 		
-			<a class="nav nav-prev" href="/howto/stream-index/" title="The index"> <i class="fa fa-chevron-left"></i></a>
+			<a class="nav nav-prev" href="/howto/action-io-ref/" title="I/O and actions reference"> <i class="fa fa-chevron-left"></i></a>
 		
 		
 			<a class="nav nav-next" href="/production/" title="Mirabelle in production" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
@@ -903,19 +851,19 @@ You can also subscribe for events indexed into indexes belonging to streams tagg
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1719177977"></script>
-    <script src="/js/perfect-scrollbar.min.js?1719177977"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1719177977"></script>
-    <script src="/js/jquery.sticky.js?1719177977"></script>
-    <script src="/js/featherlight.min.js?1719177977"></script>
-    <script src="/js/highlight.pack.js?1719177977"></script>
+    <script src="/js/clipboard.min.js?1735048470"></script>
+    <script src="/js/perfect-scrollbar.min.js?1735048470"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1735048470"></script>
+    <script src="/js/jquery.sticky.js?1735048470"></script>
+    <script src="/js/featherlight.min.js?1735048470"></script>
+    <script src="/js/highlight.pack.js?1735048470"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1719177977"></script>
-    <script src="/js/learn.js?1719177977"></script>
-    <script src="/js/hugo-learn.js?1719177977"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1735048470"></script>
+    <script src="/js/learn.js?1735048470"></script>
+    <script src="/js/hugo-learn.js?1735048470"></script>
     
         
-            <script src="/mermaid/mermaid.js?1719177977"></script>
+            <script src="/mermaid/mermaid.js?1735048470"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

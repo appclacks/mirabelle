@@ -1,32 +1,20 @@
 {:percentiles {:input [{:name "http_request_duration_seconds"
-                        :metric 1.1
-                        :time 1e9
-                        :attributes {:application "app1"
-                                     :environment "production"}}
+                        :metric 0.1
+                        :time 1e9}
                        {:name "http_request_duration_seconds"
-                        :metric 4.2
-                        :time 10e9
-                        :attributes {:application "app1"
-                                     :environment "production"}}
+                        :metric 1.2
+                        :time 30e9}
                        {:name "http_request_duration_seconds"
-                        :metric 2
-                        :time 14e9
-                        :attributes {:application "app1"
-                                     :environment "production"}}
+                        :metric 10
+                        :time 40e9}
                        {:name "http_request_duration_seconds"
-                        :metric 5
-                        :time 18e9
-                        :attributes {:application "app1"
-                                     :environment "production"}}
+                        :metric 8
+                        :time 50e9}
                        {:name "http_request_duration_seconds"
-                        :metric 0.2
-                        :time 22e9
-                        :attributes {:application "app1"
-                                     :environment "production"}}]
+                        :metric 3
+                        :time 70e9}]
                :taps {:alert [{:name "http_request_duration_seconds"
-                               :metric 5
-                               :time 22e9
-                               :quantile "0.99"
-                               :attributes {:application "app1"
-                                            :environment "production"}
-                               :state "error"}]}}}
+                               :metric 10
+                               :time 70e9
+                               :state "critical"
+                               :attributes {:quantile "0.99"}}]}}}
