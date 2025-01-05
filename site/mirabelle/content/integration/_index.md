@@ -6,25 +6,20 @@ chapter: false
 
 All [Riemann tooling](http://riemann.io/clients.html) should in theory work with Mirabelle.
 
-I will test with Mirabelle the Riemann integrations one by one and update this page later.
+## Prometheus
 
-## Emacs
-
-You can put that in your emacs configuration in order to have a good indentation for Mirabelle actions (as you can see, only a few actions are list, I will put the other ones later):
+Mirabelle supports receiving events from [https://prometheus.io/](Prometheus). You can configure Prometheus to point to the Mirabelle HTTP API:
 
 ```
-(put-clojure-indent 'above-dt 2)
-(put-clojure-indent 'by 1)
-(put-clojure-indent 'coalesce 2)
-(put-clojure-indent 'coll-percentiles 1)
-(put-clojure-indent 'changed 2)
-(put-clojure-indent 'fixed-time-window 1)
-(put-clojure-indent 'not-expired 0)
-(put-clojure-indent 'over 1)
-(put-clojure-indent 'rate 0)
-(put-clojure-indent 'sflatten 0)
-(put-clojure-indent 'sformat 3)
-(put-clojure-indent 'stream 1)
-(put-clojure-indent 'with 1)
-(put-clojure-indent 'where 1)
+remote_write:
+  - url: 'http://localhost:5558/api/v1/prometheus/remote-write/default'
 ```
+
+This configuration will send Prometheus metrics too the default streams. You can send metrics to a specific stream by replacying `default` with a stream name.
+
+The metric name will be set to the event `:name` key, the metric value to `:metric`, the timestamp to `:time`, all all labels will be set in the `:attributes` map.
+
+## Opentelemetry traces
+
+Mirabelle supports receiving traces through HTTP, in the [https://opentelemetry.io/docs/concepts/signals/traces/](Opentelemetry) format on the endpoint `/api/v1/opentelemetry/v1/traces/<stream-name>`.
+For example, you could set `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:5558/api/v1/opentelemetry/v1/traces/default` to send traces to default streams in an Opentelemetry client.

@@ -12,20 +12,20 @@
     <title> :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1735048470" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1735048470" rel="stylesheet">
-    <link href="/css/hybrid.css?1735048470" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1735048470" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1735048470" rel="stylesheet">
-    <link href="/css/auto-complete.css?1735048470" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1735048470" rel="stylesheet">
-    <link href="/css/theme.css?1735048470" rel="stylesheet">
-    <link href="/css/tabs.css?1735048470" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1735048470" rel="stylesheet">
+    <link href="/css/nucleus.css?1736110965" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1736110965" rel="stylesheet">
+    <link href="/css/hybrid.css?1736110965" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1736110965" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1736110965" rel="stylesheet">
+    <link href="/css/auto-complete.css?1736110965" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1736110965" rel="stylesheet">
+    <link href="/css/theme.css?1736110965" rel="stylesheet">
+    <link href="/css/tabs.css?1736110965" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1736110965" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1735048470"></script>
+    <script src="/js/jquery-3.3.1.min.js?1736110965"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1735048470"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1735048470"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1736110965"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1736110965"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1735048470"></script>
+<script type="text/javascript" src="/js/search.js?1736110965"></script>
 
     
   </div>
@@ -503,8 +503,7 @@
 <h2 id="mirabelle-supports-multiple-inputs-protocols">Mirabelle supports multiple inputs protocols</h2>
 <p>Mirabelle isinspired by <a href="https://riemann.io/">Riemann</a>. I would like to thank all Riemann maintainers and contributors.</p>
 <p>Mirabelle supports the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also contains a lot of new features).</p>
-<p>Mirabelle also provides an HTTP API and natively supports receiving metrics in <a href="https://prometheus.io/docs/operating/integrations/">Prometheus remote write</a> format. See the <a href="/api/#prometheus-remote-write">API documentation</a> for more information about Prometheus integration.</p>
-<p>It also supports <a href="/api/#opentelemetry-traces-input">Opentelemetry traces</a> as input.</p>
+<p>Mirabelle also provides an HTTP API and natively supports receiving metrics in <a href="https://prometheus.io/docs/operating/integrations/">Prometheus remote write</a>. It also supports <a href="/api/#opentelemetry-traces-input">Opentelemetry traces</a> as input.</p>
 <h2 id="streams-clocks-real-time-continuous-queries">Streams clocks, real time, continuous queries</h2>
 <p>In Mirabelle, <strong>all</strong> streams advance based on the time of the events they receive. Because of that, it&rsquo;s easy to reason about your streams, and to unit test them (the same inputs always produce the same outputs).</p>
 <p>In Mirabelle, events arrive by default in streams defined in the Mirabelle configuration file. As said previously, the Mirabelle clock for a stream will only advance if you send new events.</p>
@@ -560,8 +559,8 @@
 </span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">stream</span> {<span style="color:#e6db74">:name</span> <span style="color:#e6db74">:multiple-branches</span>}
 </span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">where</span> [<span style="color:#e6db74">:=</span> <span style="color:#e6db74">:name</span> <span style="color:#e6db74">&#34;http_request_duration_seconds&#34;</span>]
 </span></span><span style="display:flex;"><span>      (<span style="color:#a6e22e">with</span> <span style="color:#e6db74">:ttl</span> <span style="color:#ae81ff">60</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">;; push everything into influxdb</span>
-</span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">output!</span> <span style="color:#e6db74">:influxdb</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">;; push everything into Prometheus</span>
+</span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">output!</span> <span style="color:#e6db74">:prometheus</span>)
 </span></span><span style="display:flex;"><span>        <span style="color:#75715e">;; by will generate a branch for each :host value. Like that, downstream</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#75715e">;; computations will be per host and will not conflict between each other</span>
 </span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">by</span> {<span style="color:#e6db74">:fields</span> [<span style="color:#e6db74">:host</span>]}
@@ -851,19 +850,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1735048470"></script>
-    <script src="/js/perfect-scrollbar.min.js?1735048470"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1735048470"></script>
-    <script src="/js/jquery.sticky.js?1735048470"></script>
-    <script src="/js/featherlight.min.js?1735048470"></script>
-    <script src="/js/highlight.pack.js?1735048470"></script>
+    <script src="/js/clipboard.min.js?1736110965"></script>
+    <script src="/js/perfect-scrollbar.min.js?1736110965"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1736110965"></script>
+    <script src="/js/jquery.sticky.js?1736110965"></script>
+    <script src="/js/featherlight.min.js?1736110965"></script>
+    <script src="/js/highlight.pack.js?1736110965"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1735048470"></script>
-    <script src="/js/learn.js?1735048470"></script>
-    <script src="/js/hugo-learn.js?1735048470"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1736110965"></script>
+    <script src="/js/learn.js?1736110965"></script>
+    <script src="/js/hugo-learn.js?1736110965"></script>
     
         
-            <script src="/mermaid/mermaid.js?1735048470"></script>
+            <script src="/mermaid/mermaid.js?1736110965"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

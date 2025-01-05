@@ -12,67 +12,35 @@ Outputs can be [referenced in streams](/howto/stream/#outputs-and-async-queues) 
 
 ### File
 
-This I/O write all events into a file, as edn.
+This I/O writes all events into a file, as edn.
 
 ```clojure
 {:my-io-file {:config {:path "/tmp/events?edn"}
               :type :file}}
 ```
 
-### Pagerduty
+### Prometheus
 
-This I/O forwards events to [Pagerduty](https://pagerduty.com).
+This I/O forwards events to [Prometheus](https://prometheus.io/).
 
-```clojure
-{:pagerduty-client {:config {:service-key #secret "pagerduty-service-key"
-                             :source-key :service
-                             :summary-keys [:host :service :state]
-                             :dedup-keys [:host :service]
-                             :http-options {:socket-timeout 5000
-                                            :connection-timeout 5000}}
-                    :type :pagerduty}}
-```
-
-- The `:service-key` parameter is your Pagerduty service (integration) key.
-- `:source-key` is the event key which will be used for the alert source in the Pagerduty payload.
-- `:summary-keys` is a list of keys which will be used to build the event summary. In this example, the summary would be `<event-host>-<event-service>-<event-state>`.
-- `:dedup-keys` is a list of keys used to build the Pagerduty dedup key in the alert payload.
- `:http-options` is an optional map for extra HTTP options (see [clj-http](https://github.com/dakrone/clj-http) for more information).
-
-The raw event will also be sent to Pagerduty in the `custom_details` field. The alert timestamp will be the event time, or the current time if the event has no time.
-
-By default, the event `:state` is used to deduce the right Pagerduty action:
-
-- "critical": trigger
-- "ok": resolve
-
-You can also set a `:pagerduty/action` key to your event in order to set the action (with the `with` action for example: `(with :pagerduty/action :trigger ...)`
-
-### InfluxDB
-
-Forward events to the [InfluxDB](https://www.influxdata.com/) timserie database. This I/O forwards events to InfluxDB asynchronously.
+The `:name` value is used for the metric name. The `:state` and `service` keys will be used as labels, as well as all keys stored in the `:attributes` map.
 
 ```clojure
-{:influxdb {:config {:connection-string "http://127.0.0.1:8086"
-                     :bucket "mirabelle"
-                     :org "mirabelle"
-                     :measurement :service
-                     ;; either use username/password
-                     :username "mirabelle"
-                     :password #secret "mirabelle"
-                     ;; or token authenticate
-                     :token #secret "my-token"
-                     :default-tags {"project" "mirabelle"}
-                     :tags [:service]
-                     :fields [:environment]}
-            :type :influxdb}}
+{:name "http_requests_total"
+ :service "my-app"
+ :state "critical"
+ :metric 10
+ :timestamp 1735047872000000000
+ :attributes {:environment "production"}}
 ```
 
-The `:measurement`, `:username`, `:password`, `:token`, `:default-tags`, `:tags` and `fields` parameters are optional. The `:measurement` parameter is the event key which will be used for the influxdb measurement
+This event will produce the metric `http_requests_total{"service": "my-app", "state": "critical", "environment": "production"} 10` for the given timestamp.
 
-Default tags will be added to all events. The `:tags` option contains the list of keys to convert to influxdb tags, and the `:fields` option for fields.
 
-You can also add the `:influxdb/measurement`, `:influxdb/fields` and `:influxdb/tags` to your events (using the `with` action for example) in order to override per event the default configuration for these options.
+```clojure
+{:prometheus {:type :prometheus
+              :config {:url "http://localhost:9090/api/v1/write"}}}
+```
 
 ### Elasticsearch
 
@@ -111,6 +79,35 @@ Forward events to [ElasticSearch](https://www.elastic.co/fr/). This I/O forwards
 
 You can set `:elasticsearch/index` to your event in order to forward an event to a specific index.
 
+### Pagerduty
+
+This I/O forwards events to [Pagerduty](https://pagerduty.com).
+
+```clojure
+{:pagerduty-client {:config {:service-key #secret "pagerduty-service-key"
+                             :source-key :service
+                             :summary-keys [:host :service :state]
+                             :dedup-keys [:host :service]
+                             :http-options {:socket-timeout 5000
+                                            :connection-timeout 5000}}
+                    :type :pagerduty}}
+```
+
+- The `:service-key` parameter is your Pagerduty service (integration) key.
+- `:source-key` is the event key which will be used for the alert source in the Pagerduty payload.
+- `:summary-keys` is a list of keys which will be used to build the event summary. In this example, the summary would be `<event-host>-<event-service>-<event-state>`.
+- `:dedup-keys` is a list of keys used to build the Pagerduty dedup key in the alert payload.
+ `:http-options` is an optional map for extra HTTP options (see [clj-http](https://github.com/dakrone/clj-http) for more information).
+
+The raw event will also be sent to Pagerduty in the `custom_details` field. The alert timestamp will be the event time, or the current time if the event has no time.
+
+By default, the event `:state` is used to deduce the right Pagerduty action:
+
+- "critical": trigger
+- "ok": resolve
+
+You can also set a `:pagerduty/action` key to your event in order to set the action (with the `with` action for example: `(with :pagerduty/action :trigger ...)`
+
 ## Actions
 
 The [generated documentation](/generated-doc/mirabelle.action.html) from the code contains explanations and examples about the available actions. Here is the list:
@@ -136,8 +133,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - [coll-sum](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-sum)
 - [coll-top](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-top)
 - [coll-where](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-where)
-- [critical](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-critical)
-- [critical-dt](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-critical-dt)
+- [cond-dt](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-cond-dt)
 - [ddt](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ddt)
 - [ddt-pos](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ddt-pos)
 - [debug](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-debug)
@@ -151,12 +147,12 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - [fixed-event-window](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-event-window)
 - [fixed-time-window](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-time-window)
 - [from-base64](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-from-base64)
+- [from-json](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-from-json)
 - [include](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-include)
 - [increment](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-increment)
-- [index](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-index)
 - [info](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-info)
 - [io](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-io)
-- [json-fields](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-json-fields)
+- [iterate-on](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-iterate-on)
 - [keep-keys](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-keep-keys)
 - [mean](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-mean)
 - [moving-event-window](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-moving-event-window)
@@ -169,7 +165,7 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - [project](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-project)
 - [publish!](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-publish!)
 - [rate](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-rate)
-- [reaper](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-reaper)
+- [ratio](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ratio)
 - [reinject!](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-reinject!)
 - [rename-keys](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-rename-keys)
 - [scale](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-scale)
@@ -189,9 +185,9 @@ The [generated documentation](/generated-doc/mirabelle.action.html) from the cod
 - [test-action](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-test-action)
 - [throttle](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-throttle)
 - [to-base64](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-to-base64)
+- [to-string](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-to-string)
 - [top](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-top)
 - [under](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-under)
 - [untag](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-untag)
-- [warning](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-warning)
 - [where](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-where)
 - [with](https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-with)

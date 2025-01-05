@@ -6,6 +6,8 @@ disableToc: false
 
 The Mirabelle Websocket server allows user to subscribe to channels.
 
+This guide uses the [https://github.com/appclacks/cl](Appclacks CLI) to interact with Mirabelle.
+
 ## An example
 
 ```clojure
@@ -19,10 +21,8 @@ In this stream, we filter all events with `:service` "bar", then we publish them
 
 Users then subscripe to those channels. In this example, all users subscribing to the `:my-channel` channel will receive the events.
 
-You can test that yourself by running the `websocket.py` script available [here](https://github.com/mcorbin/mirabelle/tree/master/pubsub). You will need Python 3, and to install the dependencies listed in `requirements.txt` using `pip install -r requirements.txt`.
+You can test that yourself by running the `appclacks mirabelle subscribe --channel my-channel` command. You can then send an event to Mirabelle (`mirabelle event send --name http_requests_duration_seconds --metric 1 --service bar`) and it should be displayed by the `subscribe` command.
 
-When you subscribe to a channel, you should provide a valid [where clause](/howto/stream/#filtering-events) in base64. For example, the query `[:always-true]` which matches everything would be `WzphbHdheXMtdHJ1ZV0=`.
-
-You can now run the script with `./websocket.py`. You can specify a channel with `--channel` (like `--channel my-channel` here), or a query with `--query` (the query will be automatically converted to base64 by the script).
+When you subscribe to a channel, you should provide a valid [where clause](/howto/stream/#filtering-events) in base64. For example, the query `[:> :metric 10]` which matches everything would be `Wzo+IDptZXRyaWMgMTBd`. The CLI will do the conversion for you: `appclacks mirabelle subscribe --channel my-channel --query '[:> :metric 10]'` will keep only events with the `metric` field greater than 10.
 
 You can also write your own scripts in various languages. You need to subscribe to `ws://<host>:<port>/channel/<channel-name>?query=<query>`.

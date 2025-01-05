@@ -7,6 +7,8 @@ disableToc: false
 In this section, you will learn about how streams work, how to define them and how to use them.
 Not all available actions and I/O are listed here. You can see the full list in [this section of the documentation](/howto/action-io-ref/).
 
+This guide uses the [https://github.com/appclacks/cl](Appclacks CLI) to interact with Mirabelle.
+
 **Concepts**
 
 - [What is a Mirabelle event](/howto/stream/#events)
@@ -49,7 +51,7 @@ Events are represented as an immutable map. An event has standard fields. All fi
 - `:time`: The event time in nanoseconds, as a timestamp (`1735047872000000000` for example).
 - `:description`: The event description.
 - `:tags`: A list of tags associated to the event (like `["foo" "bar"]` for example).
-- `:attributes`: a list of arbitrary ke-value attributes.
+- `:attributes`: a list of arbitrary key-value attributes.
 
 Extra fields can also be added if you want to. One important extra field is `:stream`. It can be used to specify on which stream the event should be send. By default, events are sent to all streams with `:default` set to `true` in their configurations.
 
@@ -153,32 +155,29 @@ Let's launch Mirabelle, with the `/tmp/compiled` directory referenced into the c
 
 How to launch Mirabelle is explained in [this section](/howto/build/).
 
-Once Mirabelle started, you can send events to it. For that, you can check the [integration](/integration/) documentation section for the available clients (Riemann clients are fully compatible with Mirabelle). In this example, I will use the [Riemann C client](https://github.com/algernon/riemann-c-client) which provides a CLI and is available in many Linux package managers.
-
-TODO: replace with Appclacks CLI in the whole example
+Once Mirabelle started, you can send events to it. For that, you can check the [integration](/integration/) documentation section for the available clients (Riemann clients are fully compatible with Mirabelle). In this example, I will use the [Appclacks CLI](https://github.com/appclacks/cli). You can use the `MIRABELLE_API_ENDPOINT` variable to target a specific host (default to `localhost:5558`):
 
 ```
-riemann-client send --metric-f 1 --name "http_requests_duration_seconds" --host=my-host
+appclacks mirabelle event send --name http_requests_duration_seconds
 ```
 
-If I send the previous event, I should see in Mirabelle logs:
+You should see in Mirabelle logs:
 
 ```json
-{"@timestamp":"2021-05-01T22:48:58.786+02:00","@version":"1","message":"#riemann.codec.Event{:host \"my-host\", :name \"http_requests_duration_seconds\", :state nil, :description nil, :metric 1.0, :tags nil, :time 1.619902138786E9, :ttl nil, :x-client \"riemann-c-client\"}","logger_name":"mirabelle.action","thread_name":"defaultEventExecutorGroup-2-8","level":"INFO","level_value":20000}
+{"@timestamp":"2024-12-27T09:11:44.512+01:00","@version":"1","message":"{\"host\":\"fedora\",\"time\":1735287104509143999,\"name\":\"http_requests_duration_seconds\"}","logger_name":"mirabelle.action","thread_name":"qtp2108856868-49","level":"INFO","level_value":20000,"stream":"http_requests_duration"}
 ```
 
-My event was indeed logging by the `info` action in my stream. Let's send an event with the metric greater than our threshold:
+The event was indeed logging by the `info` action in my stream. Let's send an event with the metric greater than our threshold:
 
 ```
-riemann-client send --metric-f 2 --service "http_requests_duration_seconds" --host=my-host
+appclacks mirabelle event send --name http_requests_duration_seconds --metric 3
 ```
 
 You will see in the Mirabelle logs:
 
 ```json
-{"@timestamp":"2021-05-01T22:50:57.960+02:00","@version":"1","message":"#riemann.codec.Event{:host \"my-host\", :service \"http_requests_duration_seconds\", :state nil, :description nil, :metric 2.0, :tags nil, :time 1.61990225796E9, :ttl nil, :x-client \"riemann-c-client\"}","logger_name":"mirabelle.action","thread_name":"defaultEventExecutorGroup-2-2","level":"INFO","level_value":20000}
-
-{"@timestamp":"2021-05-01T22:50:57.961+02:00","@version":"1","message":"#riemann.codec.Event{:host \"my-host\", :service \"http_requests_duration_seconds\", :state \"critical\", :description nil, :metric 2.0, :tags nil, :time 1.61990225796E9, :ttl nil, :x-client \"riemann-c-client\"}","logger_name":"mirabelle.action","thread_name":"defaultEventExecutorGroup-2-2","level":"ERROR","level_value":40000}
+{"@timestamp":"2024-12-27T09:12:28.635+01:00","@version":"1","message":"{\"host\":\"fedora\",\"metric\":3,\"time\":1735287148631350038,\"name\":\"http_requests_duration_seconds\"}","logger_name":"mirabelle.action","thread_name":"qtp2108856868-54","level":"INFO","level_value":20000,"stream":"http_requests_duration"}
+{"@timestamp":"2024-12-27T09:12:28.635+01:00","@version":"1","message":"{\"host\":\"fedora\",\"metric\":3,\"time\":1735287148631350038,\"name\":\"http_requests_duration_seconds\",\"state\":\"critical\"}","logger_name":"mirabelle.action","thread_name":"qtp2108856868-54","level":"ERROR","level_value":40000,"stream":"http_requests_duration"}
 ```
 
 The event is logged twice: one time by our `info` action, and the second time by `error` (you can see the `level` key in the log). In the second log, the `:state` was set to "critical". Our threshold works !
@@ -270,15 +269,13 @@ You can now use this output named `:pagerduty-client` in a stream by using the `
     (output! :pagerduty-client)))
 ```
 
-TODO review example
-
 If this event is set to Mirabelle:
 
 ```shell
-riemann-client send --metric-d 100 --service "http_requests_duration_seconds" --state "critical" --host=myhost --attribute=environment=prod
+mirabelle event send --name http_requests_duration_seconds --metric 100 --attributes=environment=prod --state critical
 ```
 
-You should see in Pagerduty a new triggered alert named `myhost - http_requests_duration_seconds - critical` containing all the informations about your event.
+You should see in Pagerduty a new triggered alert named `hostname - http_requests_duration_seconds - critical` containing all the informations about your event.
 
 You can check the [I/O documentation](/howto/action-io-ref/) to have details about how the Pagerduty output can be used (to resolve alert automatically for example).
 

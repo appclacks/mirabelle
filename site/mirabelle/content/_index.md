@@ -16,9 +16,7 @@ Mirabelle isinspired by [Riemann](https://riemann.io/). I would like to thank al
 
 Mirabelle supports the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also contains a lot of new features).
 
-Mirabelle also provides an HTTP API and natively supports receiving metrics in [Prometheus remote write](https://prometheus.io/docs/operating/integrations/) format. See the [API documentation](/api/#prometheus-remote-write) for more information about Prometheus integration.
-
-It also supports [Opentelemetry traces](/api/#opentelemetry-traces-input) as input.
+Mirabelle also provides an HTTP API and natively supports receiving metrics in [Prometheus remote write](https://prometheus.io/docs/operating/integrations/). It also supports [Opentelemetry traces](/api/#opentelemetry-traces-input) as input.
 
 ## Streams clocks, real time, continuous queries
 
@@ -101,8 +99,8 @@ Here is a more complete and commented example, with multiple actions performed i
   (stream {:name :multiple-branches}
     (where [:= :name "http_request_duration_seconds"]
       (with :ttl 60
-        ;; push everything into influxdb
-        (output! :influxdb)
+        ;; push everything into Prometheus
+        (output! :prometheus)
         ;; by will generate a branch for each :host value. Like that, downstream
         ;; computations will be per host and will not conflict between each other
         (by {:fields [:host]}
