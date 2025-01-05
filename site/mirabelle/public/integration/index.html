@@ -12,20 +12,20 @@
     <title>Clients and integrations :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1719177977" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1719177977" rel="stylesheet">
-    <link href="/css/hybrid.css?1719177977" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1719177977" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1719177977" rel="stylesheet">
-    <link href="/css/auto-complete.css?1719177977" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1719177977" rel="stylesheet">
-    <link href="/css/theme.css?1719177977" rel="stylesheet">
-    <link href="/css/tabs.css?1719177977" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1719177977" rel="stylesheet">
+    <link href="/css/nucleus.css?1736111360" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1736111360" rel="stylesheet">
+    <link href="/css/hybrid.css?1736111360" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1736111360" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1736111360" rel="stylesheet">
+    <link href="/css/auto-complete.css?1736111360" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1736111360" rel="stylesheet">
+    <link href="/css/theme.css?1736111360" rel="stylesheet">
+    <link href="/css/tabs.css?1736111360" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1736111360" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1719177977"></script>
+    <script src="/js/jquery-3.3.1.min.js?1736111360"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1719177977"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1719177977"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1736111360"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1736111360"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1719177977"></script>
+<script type="text/javascript" src="/js/search.js?1736111360"></script>
 
     
   </div>
@@ -232,32 +232,6 @@
         ">
       <a href="/howto/action-io-ref/">
           I/O and actions reference
-          
-      </a>
-      
-      
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
-
-
- 
-  
-    
-    <li data-nav-id="/howto/stream-index/" title="The index" class="dd-item
-        
-        
-        
-        ">
-      <a href="/howto/stream-index/">
-          The index
           
       </a>
       
@@ -542,7 +516,8 @@
     <div class="wrapper">
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#emacs">Emacs</a></li>
+    <li><a href="#prometheus">Prometheus</a></li>
+    <li><a href="#opentelemetry-traces">Opentelemetry traces</a></li>
   </ul>
 </nav>
     </div>
@@ -569,24 +544,16 @@
 
 
 	<p>All <a href="http://riemann.io/clients.html">Riemann tooling</a> should in theory work with Mirabelle.</p>
-<p>I will test with Mirabelle the Riemann integrations one by one and update this page later.</p>
-<h2 id="emacs">Emacs</h2>
-<p>You can put that in your emacs configuration in order to have a good indentation for Mirabelle actions (as you can see, only a few actions are list, I will put the other ones later):</p>
-<pre tabindex="0"><code>(put-clojure-indent &#39;above-dt 2)
-(put-clojure-indent &#39;by 1)
-(put-clojure-indent &#39;coalesce 2)
-(put-clojure-indent &#39;coll-percentiles 1)
-(put-clojure-indent &#39;changed 2)
-(put-clojure-indent &#39;fixed-time-window 1)
-(put-clojure-indent &#39;not-expired 0)
-(put-clojure-indent &#39;over 1)
-(put-clojure-indent &#39;rate 0)
-(put-clojure-indent &#39;sflatten 0)
-(put-clojure-indent &#39;sformat 3)
-(put-clojure-indent &#39;stream 1)
-(put-clojure-indent &#39;with 1)
-(put-clojure-indent &#39;where 1)
-</code></pre>
+<h2 id="prometheus">Prometheus</h2>
+<p>Mirabelle supports receiving events from <a href="Prometheus">https://prometheus.io/</a>. You can configure Prometheus to point to the Mirabelle HTTP API:</p>
+<pre tabindex="0"><code>remote_write:
+  - url: &#39;http://localhost:5558/api/v1/prometheus/remote-write/default&#39;
+</code></pre><p>This configuration will send Prometheus metrics too the default streams. You can send metrics to a specific stream by replacying <code>default</code> with a stream name.</p>
+<p>The metric name will be set to the event <code>:name</code> key, the metric value to <code>:metric</code>, the timestamp to <code>:time</code>, all all labels will be set in the <code>:attributes</code> map.</p>
+<h2 id="opentelemetry-traces">Opentelemetry traces</h2>
+<p>Mirabelle supports receiving traces through HTTP, in the <a href="Opentelemetry">https://opentelemetry.io/docs/concepts/signals/traces/</a> format on the endpoint <code>/api/v1/opentelemetry/v1/traces/&lt;stream-name&gt;</code>.
+For example, you could set <code>OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:5558/api/v1/opentelemetry/v1/traces/default</code> to send traces to default streams in an Opentelemetry client.</p>
+
 
 
 
@@ -638,22 +605,6 @@
                     
                     
 
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
                     
                         
             
@@ -892,19 +843,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1719177977"></script>
-    <script src="/js/perfect-scrollbar.min.js?1719177977"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1719177977"></script>
-    <script src="/js/jquery.sticky.js?1719177977"></script>
-    <script src="/js/featherlight.min.js?1719177977"></script>
-    <script src="/js/highlight.pack.js?1719177977"></script>
+    <script src="/js/clipboard.min.js?1736111360"></script>
+    <script src="/js/perfect-scrollbar.min.js?1736111360"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1736111360"></script>
+    <script src="/js/jquery.sticky.js?1736111360"></script>
+    <script src="/js/featherlight.min.js?1736111360"></script>
+    <script src="/js/highlight.pack.js?1736111360"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1719177977"></script>
-    <script src="/js/learn.js?1719177977"></script>
-    <script src="/js/hugo-learn.js?1719177977"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1736111360"></script>
+    <script src="/js/learn.js?1736111360"></script>
+    <script src="/js/hugo-learn.js?1736111360"></script>
     
         
-            <script src="/mermaid/mermaid.js?1719177977"></script>
+            <script src="/mermaid/mermaid.js?1736111360"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

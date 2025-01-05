@@ -11,7 +11,7 @@ In order to build Mirabelle, you need to install:
 - [Leiningen](https://leiningen.org/), the Clojure build tool.
 - Java. Mirabelle is tested under Java 17 (LTS).
 
-Then, clone the Mirabelle [Git repository](https://github.com/mcorbin/mirabelle). You can now build the project with `lein uberjar`.
+Then, clone the Mirabelle [Git repository](https://github.com/appclacks/mirabelle). You can now build the project with `lein uberjar`.
 
 The resulting jar will be in `target/uberjar/mirabelle-<version>-standalone.jar`
 
@@ -39,14 +39,14 @@ Let's say your EDN (compiled) streams are in `/etc/mirabelle/streams`, your conf
            :console {:encoder :json}}}
 ```
 
-You should now be able to launch Mirabelle using Docker (you can check the [Docker hub](https://hub.docker.com/r/mcorbin/mirabelle/tags) to get the latest release):
+You should now be able to launch Mirabelle using Docker (you can check the [Docker hub](https://hub.docker.com/r/appclacks/mirabelle/tags) to get the latest release):
 
 ```
 docker run -p 5555:5555 -p 5558:5558 \
 -v /etc/mirabelle/streams:/streams \
 -v /etc/mirabelle/config.edn:/config/config.edn \
 -e MIRABELLE_CONFIGURATION=/config/config.edn \
-appclacks/mirabelle:v0.13.0
+appclacks/mirabelle:v0.14.0
 ```
 
 ## Using Leiningen

@@ -1506,8 +1506,7 @@
   (let [[rec state] (recorder)]
     (test-actions (a/percentiles* nil
                                   {:percentiles [0 0.5 0.99 1]
-                                   :duration 10
-                                   :nb-significant-digits 3}
+                                   :duration 10}
                                   rec)
                   state
                   [{:time 1 :metric 100}

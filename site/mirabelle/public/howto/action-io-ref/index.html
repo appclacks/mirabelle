@@ -12,20 +12,20 @@
     <title>I/O and actions reference :: Mirabelle</title>
 
     
-    <link href="/css/nucleus.css?1719177977" rel="stylesheet">
-    <link href="/css/fontawesome-all.min.css?1719177977" rel="stylesheet">
-    <link href="/css/hybrid.css?1719177977" rel="stylesheet">
-    <link href="/css/featherlight.min.css?1719177977" rel="stylesheet">
-    <link href="/css/perfect-scrollbar.min.css?1719177977" rel="stylesheet">
-    <link href="/css/auto-complete.css?1719177977" rel="stylesheet">
-    <link href="/css/atom-one-dark-reasonable.css?1719177977" rel="stylesheet">
-    <link href="/css/theme.css?1719177977" rel="stylesheet">
-    <link href="/css/tabs.css?1719177977" rel="stylesheet">
-    <link href="/css/hugo-theme.css?1719177977" rel="stylesheet">
+    <link href="/css/nucleus.css?1736111360" rel="stylesheet">
+    <link href="/css/fontawesome-all.min.css?1736111360" rel="stylesheet">
+    <link href="/css/hybrid.css?1736111360" rel="stylesheet">
+    <link href="/css/featherlight.min.css?1736111360" rel="stylesheet">
+    <link href="/css/perfect-scrollbar.min.css?1736111360" rel="stylesheet">
+    <link href="/css/auto-complete.css?1736111360" rel="stylesheet">
+    <link href="/css/atom-one-dark-reasonable.css?1736111360" rel="stylesheet">
+    <link href="/css/theme.css?1736111360" rel="stylesheet">
+    <link href="/css/tabs.css?1736111360" rel="stylesheet">
+    <link href="/css/hugo-theme.css?1736111360" rel="stylesheet">
     
     
 
-    <script src="/js/jquery-3.3.1.min.js?1719177977"></script>
+    <script src="/js/jquery-3.3.1.min.js?1736111360"></script>
 
     <style>
       :root #header + #content > #left > #rlblock_left{
@@ -58,14 +58,14 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/js/lunr.min.js?1719177977"></script>
-<script type="text/javascript" src="/js/auto-complete.js?1719177977"></script>
+<script type="text/javascript" src="/js/lunr.min.js?1736111360"></script>
+<script type="text/javascript" src="/js/auto-complete.js?1736111360"></script>
 <script type="text/javascript">
     
         var baseurl = "https:\/\/www.mirabelle.mcorbin.fr";
     
 </script>
-<script type="text/javascript" src="/js/search.js?1719177977"></script>
+<script type="text/javascript" src="/js/search.js?1736111360"></script>
 
     
   </div>
@@ -232,32 +232,6 @@
         ">
       <a href="/howto/action-io-ref/">
           I/O and actions reference
-          
-      </a>
-      
-      
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
-
-
- 
-  
-    
-    <li data-nav-id="/howto/stream-index/" title="The index" class="dd-item
-        
-        
-        
-        ">
-      <a href="/howto/stream-index/">
-          The index
           
       </a>
       
@@ -551,9 +525,9 @@
     <li><a href="#outputs">Outputs</a>
       <ul>
         <li><a href="#file">File</a></li>
-        <li><a href="#pagerduty">Pagerduty</a></li>
-        <li><a href="#influxdb">InfluxDB</a></li>
+        <li><a href="#prometheus">Prometheus</a></li>
         <li><a href="#elasticsearch">Elasticsearch</a></li>
+        <li><a href="#pagerduty">Pagerduty</a></li>
       </ul>
     </li>
     <li><a href="#actions">Actions</a></li>
@@ -586,51 +560,22 @@
 <h2 id="outputs">Outputs</h2>
 <p>Outputs can be <a href="/howto/stream/#outputs-and-async-queues">referenced in streams</a> in order to forward events to external systems.</p>
 <h3 id="file">File</h3>
-<p>This I/O write all events into a file, as edn.</p>
+<p>This I/O writes all events into a file, as edn.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:my-io-file</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:path</span> <span style="color:#e6db74">&#34;/tmp/events?edn&#34;</span>}
 </span></span><span style="display:flex;"><span>              <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:file</span>}}
-</span></span></code></pre></div><h3 id="pagerduty">Pagerduty</h3>
-<p>This I/O forwards events to <a href="https://pagerduty.com">Pagerduty</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:pagerduty-client</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:service-key</span> <span style="color:#f92672">#</span>secret <span style="color:#e6db74">&#34;pagerduty-service-key&#34;</span>
-</span></span><span style="display:flex;"><span>                             <span style="color:#e6db74">:source-key</span> <span style="color:#e6db74">:service</span>
-</span></span><span style="display:flex;"><span>                             <span style="color:#e6db74">:summary-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:state</span>]
-</span></span><span style="display:flex;"><span>                             <span style="color:#e6db74">:dedup-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>]
-</span></span><span style="display:flex;"><span>                             <span style="color:#e6db74">:http-options</span> {<span style="color:#e6db74">:socket-timeout</span> <span style="color:#ae81ff">5000</span>
-</span></span><span style="display:flex;"><span>                                            <span style="color:#e6db74">:connection-timeout</span> <span style="color:#ae81ff">5000</span>}}
-</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:pagerduty</span>}}
-</span></span></code></pre></div><ul>
-<li>The <code>:service-key</code> parameter is your Pagerduty service (integration) key.</li>
-<li><code>:source-key</code> is the event key which will be used for the alert source in the Pagerduty payload.</li>
-<li><code>:summary-keys</code> is a list of keys which will be used to build the event summary. In this example, the summary would be <code>&lt;event-host&gt;-&lt;event-service&gt;-&lt;event-state&gt;</code>.</li>
-<li><code>:dedup-keys</code> is a list of keys used to build the Pagerduty dedup key in the alert payload.
-<code>:http-options</code> is an optional map for extra HTTP options (see <a href="https://github.com/dakrone/clj-http">clj-http</a> for more information).</li>
-</ul>
-<p>The raw event will also be sent to Pagerduty in the <code>custom_details</code> field. The alert timestamp will be the event time, or the current time if the event has no time.</p>
-<p>By default, the event <code>:state</code> is used to deduce the right Pagerduty action:</p>
-<ul>
-<li>&ldquo;critical&rdquo;: trigger</li>
-<li>&ldquo;ok&rdquo;: resolve</li>
-</ul>
-<p>You can also set a <code>:pagerduty/action</code> key to your event in order to set the action (with the <code>with</code> action for example: <code>(with :pagerduty/action :trigger ...)</code></p>
-<h3 id="influxdb">InfluxDB</h3>
-<p>Forward events to the <a href="https://www.influxdata.com/">InfluxDB</a> timserie database. This I/O forwards events to InfluxDB asynchronously.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:influxdb</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:connection-string</span> <span style="color:#e6db74">&#34;http://127.0.0.1:8086&#34;</span>
-</span></span><span style="display:flex;"><span>                     <span style="color:#e6db74">:bucket</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>
-</span></span><span style="display:flex;"><span>                     <span style="color:#e6db74">:org</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>
-</span></span><span style="display:flex;"><span>                     <span style="color:#e6db74">:measurement</span> <span style="color:#e6db74">:service</span>
-</span></span><span style="display:flex;"><span>                     <span style="color:#75715e">;; either use username/password</span>
-</span></span><span style="display:flex;"><span>                     <span style="color:#e6db74">:username</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>
-</span></span><span style="display:flex;"><span>                     <span style="color:#e6db74">:password</span> <span style="color:#f92672">#</span>secret <span style="color:#e6db74">&#34;mirabelle&#34;</span>
-</span></span><span style="display:flex;"><span>                     <span style="color:#75715e">;; or token authenticate</span>
-</span></span><span style="display:flex;"><span>                     <span style="color:#e6db74">:token</span> <span style="color:#f92672">#</span>secret <span style="color:#e6db74">&#34;my-token&#34;</span>
-</span></span><span style="display:flex;"><span>                     <span style="color:#e6db74">:default-tags</span> {<span style="color:#e6db74">&#34;project&#34;</span> <span style="color:#e6db74">&#34;mirabelle&#34;</span>}
-</span></span><span style="display:flex;"><span>                     <span style="color:#e6db74">:tags</span> [<span style="color:#e6db74">:service</span>]
-</span></span><span style="display:flex;"><span>                     <span style="color:#e6db74">:fields</span> [<span style="color:#e6db74">:environment</span>]}
-</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:influxdb</span>}}
-</span></span></code></pre></div><p>The <code>:measurement</code>, <code>:username</code>, <code>:password</code>, <code>:token</code>, <code>:default-tags</code>, <code>:tags</code> and <code>fields</code> parameters are optional. The <code>:measurement</code> parameter is the event key which will be used for the influxdb measurement</p>
-<p>Default tags will be added to all events. The <code>:tags</code> option contains the list of keys to convert to influxdb tags, and the <code>:fields</code> option for fields.</p>
-<p>You can also add the <code>:influxdb/measurement</code>, <code>:influxdb/fields</code> and <code>:influxdb/tags</code> to your events (using the <code>with</code> action for example) in order to override per event the default configuration for these options.</p>
-<h3 id="elasticsearch">Elasticsearch</h3>
+</span></span></code></pre></div><h3 id="prometheus">Prometheus</h3>
+<p>This I/O forwards events to <a href="https://prometheus.io/">Prometheus</a>.</p>
+<p>The <code>:name</code> value is used for the metric name. The <code>:state</code> and <code>service</code> keys will be used as labels, as well as all keys stored in the <code>:attributes</code> map.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:name</span> <span style="color:#e6db74">&#34;http_requests_total&#34;</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">&#34;my-app&#34;</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:state</span> <span style="color:#e6db74">&#34;critical&#34;</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:metric</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:timestamp</span> <span style="color:#ae81ff">1735047872000000000</span>
+</span></span><span style="display:flex;"><span> <span style="color:#e6db74">:attributes</span> {<span style="color:#e6db74">:environment</span> <span style="color:#e6db74">&#34;production&#34;</span>}}
+</span></span></code></pre></div><p>This event will produce the metric <code>http_requests_total{&quot;service&quot;: &quot;my-app&quot;, &quot;state&quot;: &quot;critical&quot;, &quot;environment&quot;: &quot;production&quot;} 10</code> for the given timestamp.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:prometheus</span> {<span style="color:#e6db74">:type</span> <span style="color:#e6db74">:prometheus</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:url</span> <span style="color:#e6db74">&#34;http://localhost:9090/api/v1/write&#34;</span>}}}
+</span></span></code></pre></div><h3 id="elasticsearch">Elasticsearch</h3>
 <p>Forward events to <a href="https://www.elastic.co/fr/">ElasticSearch</a>. This I/O forwards events to Elasticsearch asynchronously.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:elastic</span> {<span style="color:#e6db74">:type</span> <span style="color:#e6db74">:elasticsearch</span>
 </span></span><span style="display:flex;"><span>           <span style="color:#e6db74">:config</span> {<span style="color:#75715e">;; the list of elasticsearch osts</span>
@@ -661,6 +606,29 @@
 </span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">:api-key</span> {<span style="color:#e6db74">:id</span> <span style="color:#e6db74">&#34;id&#34;</span>
 </span></span><span style="display:flex;"><span>                              <span style="color:#e6db74">:secret</span> <span style="color:#f92672">#</span>secret <span style="color:#e6db74">&#34;secret&#34;</span>}}}}
 </span></span></code></pre></div><p>You can set <code>:elasticsearch/index</code> to your event in order to forward an event to a specific index.</p>
+<h3 id="pagerduty">Pagerduty</h3>
+<p>This I/O forwards events to <a href="https://pagerduty.com">Pagerduty</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-clojure" data-lang="clojure"><span style="display:flex;"><span>{<span style="color:#e6db74">:pagerduty-client</span> {<span style="color:#e6db74">:config</span> {<span style="color:#e6db74">:service-key</span> <span style="color:#f92672">#</span>secret <span style="color:#e6db74">&#34;pagerduty-service-key&#34;</span>
+</span></span><span style="display:flex;"><span>                             <span style="color:#e6db74">:source-key</span> <span style="color:#e6db74">:service</span>
+</span></span><span style="display:flex;"><span>                             <span style="color:#e6db74">:summary-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span> <span style="color:#e6db74">:state</span>]
+</span></span><span style="display:flex;"><span>                             <span style="color:#e6db74">:dedup-keys</span> [<span style="color:#e6db74">:host</span> <span style="color:#e6db74">:service</span>]
+</span></span><span style="display:flex;"><span>                             <span style="color:#e6db74">:http-options</span> {<span style="color:#e6db74">:socket-timeout</span> <span style="color:#ae81ff">5000</span>
+</span></span><span style="display:flex;"><span>                                            <span style="color:#e6db74">:connection-timeout</span> <span style="color:#ae81ff">5000</span>}}
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">:type</span> <span style="color:#e6db74">:pagerduty</span>}}
+</span></span></code></pre></div><ul>
+<li>The <code>:service-key</code> parameter is your Pagerduty service (integration) key.</li>
+<li><code>:source-key</code> is the event key which will be used for the alert source in the Pagerduty payload.</li>
+<li><code>:summary-keys</code> is a list of keys which will be used to build the event summary. In this example, the summary would be <code>&lt;event-host&gt;-&lt;event-service&gt;-&lt;event-state&gt;</code>.</li>
+<li><code>:dedup-keys</code> is a list of keys used to build the Pagerduty dedup key in the alert payload.
+<code>:http-options</code> is an optional map for extra HTTP options (see <a href="https://github.com/dakrone/clj-http">clj-http</a> for more information).</li>
+</ul>
+<p>The raw event will also be sent to Pagerduty in the <code>custom_details</code> field. The alert timestamp will be the event time, or the current time if the event has no time.</p>
+<p>By default, the event <code>:state</code> is used to deduce the right Pagerduty action:</p>
+<ul>
+<li>&ldquo;critical&rdquo;: trigger</li>
+<li>&ldquo;ok&rdquo;: resolve</li>
+</ul>
+<p>You can also set a <code>:pagerduty/action</code> key to your event in order to set the action (with the <code>with</code> action for example: <code>(with :pagerduty/action :trigger ...)</code></p>
 <h2 id="actions">Actions</h2>
 <p>The <a href="/generated-doc/mirabelle.action.html">generated documentation</a> from the code contains explanations and examples about the available actions. Here is the list:</p>
 <ul>
@@ -684,8 +652,7 @@
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-sum">coll-sum</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-top">coll-top</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-coll-where">coll-where</a></li>
-<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-critical">critical</a></li>
-<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-critical-dt">critical-dt</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-cond-dt">cond-dt</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ddt">ddt</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ddt-pos">ddt-pos</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-debug">debug</a></li>
@@ -699,12 +666,12 @@
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-event-window">fixed-event-window</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-fixed-time-window">fixed-time-window</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-from-base64">from-base64</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-from-json">from-json</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-include">include</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-increment">increment</a></li>
-<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-index">index</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-info">info</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-io">io</a></li>
-<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-json-fields">json-fields</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-iterate-on">iterate-on</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-keep-keys">keep-keys</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-mean">mean</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-moving-event-window">moving-event-window</a></li>
@@ -717,7 +684,7 @@
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-project">project</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-publish!">publish!</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-rate">rate</a></li>
-<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-reaper">reaper</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-ratio">ratio</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-reinject!">reinject!</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-rename-keys">rename-keys</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-scale">scale</a></li>
@@ -737,10 +704,10 @@
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-test-action">test-action</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-throttle">throttle</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-to-base64">to-base64</a></li>
+<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-to-string">to-string</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-top">top</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-under">under</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-untag">untag</a></li>
-<li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-warning">warning</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-where">where</a></li>
 <li><a href="https://mirabelle.mcorbin.fr/generated-doc/mirabelle.action.html#var-with">with</a></li>
 </ul>
@@ -898,22 +865,6 @@
             
         
                     
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
             
         
                     
@@ -1041,7 +992,7 @@
 			<a class="nav nav-prev" href="/howto/tests/" title="Writing tests"> <i class="fa fa-chevron-left"></i></a>
 		
 		
-			<a class="nav nav-next" href="/howto/stream-index/" title="The index" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+			<a class="nav nav-next" href="/howto/pubsub/" title="Publish Subscribe" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
 		
 	
     </div>
@@ -1051,19 +1002,19 @@
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/js/clipboard.min.js?1719177977"></script>
-    <script src="/js/perfect-scrollbar.min.js?1719177977"></script>
-    <script src="/js/perfect-scrollbar.jquery.min.js?1719177977"></script>
-    <script src="/js/jquery.sticky.js?1719177977"></script>
-    <script src="/js/featherlight.min.js?1719177977"></script>
-    <script src="/js/highlight.pack.js?1719177977"></script>
+    <script src="/js/clipboard.min.js?1736111360"></script>
+    <script src="/js/perfect-scrollbar.min.js?1736111360"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js?1736111360"></script>
+    <script src="/js/jquery.sticky.js?1736111360"></script>
+    <script src="/js/featherlight.min.js?1736111360"></script>
+    <script src="/js/highlight.pack.js?1736111360"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/js/modernizr.custom-3.6.0.js?1719177977"></script>
-    <script src="/js/learn.js?1719177977"></script>
-    <script src="/js/hugo-learn.js?1719177977"></script>
+    <script src="/js/modernizr.custom-3.6.0.js?1736111360"></script>
+    <script src="/js/learn.js?1736111360"></script>
+    <script src="/js/hugo-learn.js?1736111360"></script>
     
         
-            <script src="/mermaid/mermaid.js?1719177977"></script>
+            <script src="/mermaid/mermaid.js?1736111360"></script>
         
         <script>
             mermaid.initialize({ startOnLoad: true });

@@ -38,7 +38,7 @@
       (is (= {:message "stream added"}
              (:body resp)))))
   (testing "push-event"
-    (let [body (-> {:event {:host "test-foo" :time 3}}
+    (let [body (-> {:events [{:host "test-foo" :time 3}]}
                    json/generate-string)
           resp (http/put "http://localhost:5558/api/v1/stream/test-foo"
                          {:content-type :json
@@ -48,7 +48,7 @@
       (is (= 200 (:status resp)))
       (is (= {:message "ok"}
              (:body resp))))
-    (let [body (-> {:event {:host "test-foo"}}
+    (let [body (-> {:events [{:host "test-foo"}]}
                    json/generate-string)
           resp (http/put "http://localhost:5558/api/v1/stream/test-bar"
                          {:content-type :json

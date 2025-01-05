@@ -16,9 +16,7 @@ Mirabelle isinspired by [Riemann](https://riemann.io/). I would like to thank al
 
 Mirabelle supports the same protocol than Riemann. It means all Riemann tooling and integrations should work seamlessly with Mirabelle (which also contains a lot of new features).
 
-Mirabelle also provides an HTTP API and natively supports receiving metrics in [Prometheus remote write](https://prometheus.io/docs/operating/integrations/) format. See the [API documentation](/api/#prometheus-remote-write) for more information about Prometheus integration.
-
-It also supports [Opentelemetry traces](/api/#opentelemetry-traces-input) as input.
+Mirabelle also provides an HTTP API and natively supports receiving metrics in [Prometheus remote write](https://prometheus.io/docs/operating/integrations/). It also supports [Opentelemetry traces](/api/#opentelemetry-traces-input) as input.
 
 ## Streams clocks, real time, continuous queries
 
@@ -40,7 +38,7 @@ Let's say a web application is pushing the duration (in seconds) of the HTTP req
 
 ```clojure
 {:name "http_request_duration_seconds"
- :time 1619731016,145
+ :time 1619731016145000000
  :tags ["web"]
  :metric 0.5
  :attributes {:application "my-api"
@@ -52,38 +50,45 @@ You could write a Mirabelle stream which will compute on the fly the quantiles f
 ```clojure
 (streams
   (stream {:name :percentiles :default true}
-    (where [:= :service "http_request_duration_seconds"]
-      (fixed-time-window {:duration 60}
-        (coll-percentiles [0.5 0.75 0.99]
-          (where [:and [:= :quantile "0.99"]
-                       [:> :metric 1]]
-            (with :state "critical"
-              (tap :alert)
-              (output! :pagerduty))))))))
+    (where [:= :name "http_request_duration_seconds"]
+      (percentiles {:duration 60
+                    :percentiles [0.5 0.75 0.99 1]}
+        (where [:and [:= [:attributes :quantile] "0.99"]
+                     [:> :metric 1]]
+               (with :state "critical"
+                     (tap :alert)
+                     (output! :pagerduty)))))))
 ```
 
 The `tap` action is an action which will be only enabled in test mode, and which will save in a tap named `:alert` events passing by it. Indeed, everything can be unit tested easily in Mirabelle.
 
-A test for this stream would be:
+A test for this stream would be (remember that the time is in nanoseconds):
 
 ```clojure
-{:percentiles {:input [{:service "http_request_duration_seconds"
+{:percentiles {:input [{:name "http_request_duration_seconds"
                         :metric 0.1
-                        :time 1}
-                       {:service "http_request_duration_seconds"
+                        :time 1e9}
+                       {:name "http_request_duration_seconds"
                         :metric 1.2
-                        :time 30}
-                       {:service "http_request_duration_seconds"
-                        :metric 0.2
-                        :time 70}]
-               :tap-results {:alert [{:service "http_request_duration_seconds"
-                                      :metric 1.2
-                                      :time 30
-                                      :quantile "0.99"
-                                      :state "critical"}]}}}
+                        :time 30e9}
+                       {:name "http_request_duration_seconds"
+                        :metric 10
+                        :time 40e9}
+                       {:name "http_request_duration_seconds"
+                        :metric 8
+                        :time 50e9}
+                       {:name "http_request_duration_seconds"
+                        :metric 3
+                        :time 70e9}]
+               :taps {:alert [{:name "http_request_duration_seconds"
+                               :metric 10
+                               :time 70e9
+                               :state "critical"
+                               :attributes {:quantile "0.99"}}]}}}
+
 ```
 
-In this test, we inject into the `:percentiles` stream three events, and we verify that the tap named `:alert` contains the expected alert (the `0.99` quantile is greater than 1) generated for these events.
+In this test, we inject into the `:percentiles` stream some events, and we verify that the tap named `:alert` contains the expected alert (the `0.99` quantile is greater than 1) generated for these events.
 
 Thanks to Clojure datastructures, there is *no side effects between streams and actions*. It's OK to modify events in parallel (in multiple threads) and to have multiple branches per stream. You can even pass events between streams (like described [here](todo)). You are free to organize streams and how they communicate between each other exactly how you want to; the tool and its DSL will not limit you.
 
@@ -92,12 +97,10 @@ Here is a more complete and commented example, with multiple actions performed i
 ```clojure
 (streams
   (stream {:name :multiple-branches}
-    (where [:= :service "http_request_duration_seconds"]
+    (where [:= :name "http_request_duration_seconds"]
       (with :ttl 60
-        ;; push everything into influxdb
-        (output! :influxdb)
-        ;; index events in memory by host and service
-        (index [:host :service])
+        ;; push everything into Prometheus
+        (output! :prometheus)
         ;; by will generate a branch for each :host value. Like that, downstream
         ;; computations will be per host and will not conflict between each other
         (by {:fields [:host]}
@@ -111,3 +114,4 @@ Here is a more complete and commented example, with multiple actions performed i
                 (output! :pagerduty)))))))))
 ```
 
+Raw events or computation results could also be forwarded to external systems (TSDB for example) for long-term storage.

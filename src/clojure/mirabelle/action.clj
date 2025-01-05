@@ -2848,7 +2848,8 @@
              delay
              highest-trackable-value
              nb-significant-digits
-             lowest-discernible-value]}
+             lowest-discernible-value]
+      :or {nb-significant-digits 3}}
    & children]
   (let [^Recorder recorder
         (cond
@@ -2898,9 +2899,9 @@
 (s/def :percentiles/percentiles (s/coll-of number?))
 
 (s/def ::percentiles (s/cat :config (s/keys :req-un [::duration
-                                                     :percentiles/percentiles
-                                                     ::nb-significant-digits]
+                                                     :percentiles/percentiles]
                                             :opt-un [::delay
+                                                     ::nb-significant-digits
                                                      ::highest-trackable-value
                                                      ::lowest-discernible-value])))
 
@@ -2910,11 +2911,10 @@
 
    ```clojure
    (a/percentiles {:percentiles [0.5 0.75 0.99]
-                   :duration 10
-                   :nb-significant-digits 3})
+                   :duration 10})
    ```
 
-  `:percentiles` contains a list of quantiles to compute, `:duration` is the duration before sending the result downstream, `:nb-significant-digits` is the precision for the computation.
+  `:percentiles` contains a list of quantiles to compute, `:duration` is the duration before sending the result downstream, `:nb-significant-digits` is the precision for the computation (default to 3).
 
   After the end of the period, the action will generate one event for each percentile that is computed, with the key `:quantile` set to the percentile value. In this example, it would generate 3 events with `:quantile` equal to `0.5`, `0.75` or `0.99`.
 

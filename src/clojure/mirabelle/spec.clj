@@ -26,6 +26,7 @@
 (s/def :mirabelle.stream/name keyword?)
 (s/def :mirabelle.stream/config ::spec/ne-string)
 (s/def :mirabelle.stream/event map?)
+(s/def :mirabelle.stream/events (s/coll-of :mirabelle.stream/event))
 
 (s/def :mirabelle.http.index/current-time (s/keys :req-un [:mirabelle.stream/name]))
 
@@ -33,8 +34,8 @@
                                                    :mirabelle.stream/config]))
 
 (s/def :mirabelle.http.stream/get (s/keys :req-un [:mirabelle.stream/name]))
-(s/def :mirabelle.http.stream/event (s/keys :req-un [:mirabelle.stream/name
-                                                     :mirabelle.stream/event]))
+(s/def :mirabelle.http.stream/events (s/keys :req-un [:mirabelle.stream/name
+                                                      :mirabelle.stream/events]))
 (s/def :mirabelle.http.fluentbit/post (s/keys :req-un [:mirabelle.stream/name]))
 (s/def :mirabelle.http.prometheus/remote-write (s/keys :req-un [:mirabelle.stream/name]))
 (s/def :mirabelle.http.stream/remove (s/keys :req-un [:mirabelle.stream/name]))

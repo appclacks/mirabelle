@@ -50,9 +50,10 @@
        :body {:message "stream added"}}))
   (push-event [_ {:keys [all-params]}]
     (let [stream-name (:name all-params)]
-      (stream/push! stream-handler
-                    (time/default-time (:event all-params))
-                    stream-name)
+      (doseq [event (:events all-params)]
+        (stream/push! stream-handler
+                      (time/default-time event)
+                      stream-name))
       {:status 200
        :body {:message "ok"}}))
   (remove-stream [_ {:keys [all-params]}]
@@ -116,7 +117,7 @@
 (def router
   [["/api/v1/stream" {:get {:handler list-streams}}]
    ["/api/v1/stream/:name" {:put {:handler push-event
-                                  :spec :mirabelle.http.stream/event}
+                                  :spec :mirabelle.http.stream/events}
                             :post {:handler add-stream
                                    :spec :mirabelle.http.stream/add}
                             :get {:handler get-stream

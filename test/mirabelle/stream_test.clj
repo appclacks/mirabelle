@@ -1069,3 +1069,38 @@
     (entrypoint {:time 1 :trace-id "123" :events [{:time 3 :name "ev1" :attributes {:a1 "v1" :a2 "v2"}}]})
     (is (= [{:time 3 :trace-id "123" :event {:name "ev1" :attributes {:a1 "v1" :a2 "v2"}}}]
            @recorder))))
+
+(deftest percentiles-test
+  (let [recorder (atom [])
+        stream {:name "my-stream"
+                :description "foo"
+                :actions (a/percentiles {:duration 60
+                                         :percentiles [0.5 0.75 0.99 1]}
+                                        (a/test-action recorder))}
+        {:keys [entrypoint]} (stream/compile-stream! {} stream)]
+    (entrypoint {:name "http_request_duration_seconds"
+                 :metric 0.1
+                 :time 1e9})
+    (entrypoint {:name "http_request_duration_seconds"
+                 :metric 1.2
+                 :time 30e9})
+    (entrypoint {:name "http_request_duration_seconds"
+                 :metric 0.2
+                 :time 70e9})
+    (is (= [{:name "http_request_duration_seconds"
+             :metric 0
+             :time 70e9
+             :attributes {:quantile "0.5"}}
+            {:name "http_request_duration_seconds"
+             :metric 1
+             :time 70e9
+             :attributes {:quantile "0.75"}}
+            {:name "http_request_duration_seconds"
+             :metric 1
+             :time 70e9
+             :attributes {:quantile "0.99"}}
+            {:name "http_request_duration_seconds"
+             :metric 1
+             :time 70e9
+             :attributes {:quantile "1"}}]
+           @recorder))))
