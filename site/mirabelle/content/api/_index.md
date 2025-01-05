@@ -92,12 +92,12 @@ curl -X DELETE localhost:5558/api/v1/stream/trololo
 
 - **PUT** `/api/v1/stream/<stream-name>`
 
-Push an event to the specified stream.
+Push an event (or a batch of events) to the specified stream.
 
 ---
 
 ```
-curl -H "Content-Type: application/json" -X PUT --data '{"event": {"service": "foo", "metric": 10}}' 127.0.0.1:5558/api/v1/stream/foo
+curl -H "Content-Type: application/json" -X PUT --data '{"events": [{"service": "foo", "metric": 10}]}' 127.0.0.1:5558/api/v1/stream/foo
 
 {"message":"ok"}
 ```
