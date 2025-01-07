@@ -1,0 +1,68 @@
+
+
+;; this was fun to write
+
+(def riemann
+  {:tags [{:tag :binary}]
+   :host :binary
+   :service :binary
+   :state :binary
+   :metric :double
+   :time :required/double
+   :attributes [{:key :binary
+                 :value :binary}]})
+
+(defn repetition
+  [k]
+  (cond
+    (= "optional" (namespace k)) Type$Repetition/OPTIONAL
+    (= "required" (namespace k)) Type$Repetition/REQUIRED
+    :default Type$Repetition/OPTIONAL))
+
+(defn rm-ns
+  [k]
+  (when (keyword? k)
+      (-> k name keyword)))
+
+(defn definition->schema
+  [def state]
+  (for [[k v] def]
+    (cond
+      (= (rm-ns v) :int64) (let [type (PrimitiveType. (repetition v)
+                                              PrimitiveType$PrimitiveTypeName/INT64
+                                              (name k))]
+                     (swap! state assoc k type)
+                     type)
+
+      (= (rm-ns v) :binary) (let [type (PrimitiveType. (repetition v)
+                                               PrimitiveType$PrimitiveTypeName/BINARY
+                                               (name k))]
+                      (swap! state assoc k type)
+                      type)
+
+      (= (rm-ns v) :float) (let [type (PrimitiveType. (repetition v)
+                                              PrimitiveType$PrimitiveTypeName/FLOAT
+                                              (name k))]
+                     (swap! state assoc k type)
+                     type)
+
+      (= (rm-ns v) :double) (let [type (PrimitiveType. (repetition v)
+                                               PrimitiveType$PrimitiveTypeName/DOUBLE
+                                               (name k))]
+                      (swap! state assoc k type)
+                      type)
+
+      (map? v)
+      (let [type (GroupType. Type$Repetition/OPTIONAL ^String (name k)
+                             ^"[Lorg.apache.parquet.schema.Type;" (into-array Type (definition->schema v) state))]
+        (swap! state assoc (-> k name (str "-map") keyword) type)
+        type)
+
+      (sequential? v)
+      (let [type (GroupType. Type$Repetition/REPEATED
+                             ^String (name k)
+                             ^"[Lorg.apache.parquet.schema.Type;"
+                             (into-array Type
+                                         (definition->schema (first v) state)))]
+        (swap! state assoc (-> k name (str "-list") keyword) type)
+        type))))

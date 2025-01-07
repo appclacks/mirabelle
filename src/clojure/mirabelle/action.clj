@@ -2119,7 +2119,7 @@
     (info))
   ```
 
-  In this example, events will be forwarded of the value of the `:state` key
+  In this example, events will be forwarded if the value of the `:state` key
   is the same for at least 10 seconds.
 
   Support nested fields:
