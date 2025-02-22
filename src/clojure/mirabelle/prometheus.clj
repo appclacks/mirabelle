@@ -41,8 +41,7 @@
                                       (:service event) (assoc :service (:service event))
                                       (get-in event [:attributes :name]) (assoc :__name__ (get-in event [:attributes :name]))
                                       (:name event) (assoc :__name__ (:name event))
-                                      true (dissoc :name)
-                                      )
+                                      true (dissoc :name))
                              ^prometheus.Types$TimeSeries$Builder timeserie
                              (get
                               timeseries
@@ -57,9 +56,7 @@
                                 timeserie))
                              sample (doto (Types$Sample/newBuilder)
                                       (.setValue (:metric event))
-                                      (.setTimestamp (long (/ (:time event) 1000000)))
-                                      )
-                             ]
+                                      (.setTimestamp (long (/ (:time event) 1000000))))]
                          (.addSamples timeserie ^Types$Sample (.build sample))
                          (recur (next events) (assoc timeseries labels timeserie)))
                        timeseries))]
